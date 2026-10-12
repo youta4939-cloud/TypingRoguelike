@@ -497,7 +497,7 @@ namespace TypingRoguelike.Battle
                 return;
             image.type = Image.Type.Simple;
             if (additive != null)
-                image.sharedMaterial = additive;
+                image.material = additive;
         }
 
         static CanvasGroup CreateCutins(RectTransform parent, JackpotPresentationDefinition def, out RectTransform[] bands)
