@@ -1,0 +1,522 @@
+{
+  "version": 1,
+  "events": [
+    {
+      "id": "blood_spring",
+      "title": "血の泉",
+      "layer": 1,
+      "condition": {
+        "type": "none"
+      },
+      "body": "床の割れ目から、温かい血が湧いている。湯気の向こうで、泉の底が一度だけ脈を打った。",
+      "lines": [
+        {
+          "char": "Akane",
+          "text": "浸かるだけだろ。……たぶん"
+        },
+        {
+          "char": "Momo",
+          "text": "あったかそう……じゃないですね、これ"
+        }
+      ],
+      "options": [
+        {
+          "label": "ひたる",
+          "outcomes": [
+            {
+              "chance": 80,
+              "text": "熱が頭の芯まで染みて、ざわめきが少し遠のいた。",
+              "effects": [
+                {
+                  "type": "madness",
+                  "value": -150
+                }
+              ]
+            },
+            {
+              "chance": 20,
+              "text": "底から伸びた腕が、足首をつかんだ。",
+              "effects": [
+                {
+                  "type": "battle"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "さける",
+          "outcomes": []
+        }
+      ]
+    },
+    {
+      "id": "chained_jailer",
+      "title": "鎖の獄卒の死体",
+      "layer": 1,
+      "condition": {
+        "type": "none"
+      },
+      "body": "壁に鎖で縫い止められた獄卒が、古いカードを胸に抱いたまま固まっている。指は、まだ温かい。",
+      "lines": [
+        {
+          "char": "Nagi",
+          "text": "この人の名前……知らない。知らないのが、嫌"
+        },
+        {
+          "char": "Akane",
+          "text": "もらっとけ。もう使わねえよ"
+        }
+      ],
+      "options": [
+        {
+          "label": "はがす",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "指を一本ずつ開くたび、誰かの悲鳴が頭に残った。",
+              "effects": [
+                {
+                  "type": "card_gain",
+                  "value": 1
+                },
+                {
+                  "type": "madness",
+                  "value": 100
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "とむらう",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "鎖を外して横たえると、少しだけ体が軽くなった。",
+              "effects": [
+                {
+                  "type": "hp",
+                  "value": 10
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "whetstone_ghost",
+      "title": "研ぎ師の亡者",
+      "layer": 1,
+      "condition": {
+        "type": "min_cards",
+        "value": 4
+      },
+      "body": "骨だけの研ぎ師が、こちらを見ずに砥石を差し出す。「一つ研ぐなら、一つ削る。それが決まりだ」",
+      "lines": [
+        {
+          "char": "Momo",
+          "text": "百年に一度の好機ですよ、たぶん！"
+        },
+        {
+          "char": "Nagi",
+          "text": "……刃の音、嫌いじゃないです"
+        }
+      ],
+      "options": [
+        {
+          "label": "たのむ",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "削られたカードの粉が、砥石の上で黒く光った。",
+              "effects": [
+                {
+                  "type": "card_upgrade_choose",
+                  "value": 1
+                },
+                {
+                  "type": "card_remove_choose",
+                  "value": 1
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "ことわる",
+          "outcomes": []
+        }
+      ]
+    },
+    {
+      "id": "dead_queue",
+      "title": "亡者の行列",
+      "layer": 1,
+      "condition": {
+        "type": "has_next_row"
+      },
+      "body": "上の段まで、亡者が黙って並んでいる。列の真ん中で、獄卒が指を折って数を数えている。",
+      "lines": [
+        {
+          "char": "Akane",
+          "text": "並ぶの嫌いなんだよ"
+        },
+        {
+          "char": "Nagi",
+          "text": "……誰も、前を見てない"
+        }
+      ],
+      "options": [
+        {
+          "label": "まじる",
+          "outcomes": [
+            {
+              "chance": 70,
+              "text": "誰にも見咎められず、列ごと上の段へ押し流された。",
+              "effects": [
+                {
+                  "type": "skip_row"
+                }
+              ]
+            },
+            {
+              "chance": 30,
+              "text": "獄卒の指が止まり、こちらを向いた。「一人、多いな」",
+              "effects": [
+                {
+                  "type": "battle"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "みおくる",
+          "outcomes": []
+        }
+      ]
+    },
+    {
+      "id": "lost_wallet",
+      "title": "落とし物の財布",
+      "layer": 1,
+      "condition": {
+        "type": "min_coins",
+        "value": 1
+      },
+      "body": "行列の足元に、ふくらんだ財布が落ちている。少し先で、亡者が一人、ポケットを探りながら振り返った。",
+      "lines": [
+        {
+          "char": "Momo",
+          "text": "拾得物は詰所に届けるのが規則です！"
+        },
+        {
+          "char": "Akane",
+          "text": "誰も届けねえよ、地獄だぞ"
+        }
+      ],
+      "options": [
+        {
+          "label": "あさる",
+          "outcomes": [
+            {
+              "chance": 75,
+              "text": "小銭の重みが、手のひらに残った。",
+              "effects": [
+                {
+                  "type": "coins_percent",
+                  "value": 20
+                }
+              ]
+            },
+            {
+              "chance": 25,
+              "text": "「それ、私のです」と、声は真後ろからした。",
+              "effects": [
+                {
+                  "type": "coins_percent",
+                  "value": -50
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "ほうる",
+          "outcomes": []
+        }
+      ]
+    },
+    {
+      "id": "first_aid",
+      "title": "詰所の救急箱",
+      "layer": 1,
+      "condition": {
+        "type": "none"
+      },
+      "body": "割れた棚に、ラベルの剥げた瓶が二本だけ残っている。一本は甘い匂い、一本は鉄の匂いがする。",
+      "lines": [
+        {
+          "char": "Nagi",
+          "text": "ラベルの字、見覚えがあります。……気のせいです"
+        },
+        {
+          "char": "Momo",
+          "text": "先輩たちはこれで百年もったんです"
+        }
+      ],
+      "options": [
+        {
+          "label": "のむ",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "甘さが喉を落ちていき、頭の中が静かになった。",
+              "effects": [
+                {
+                  "type": "madness",
+                  "value": -200
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "まく",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "傷口が泡立ち、ゆっくりとふさがった。",
+              "effects": [
+                {
+                  "type": "hp",
+                  "value": 25
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ringing_bell",
+      "title": "鳴りやまない呼び鈴",
+      "layer": 1,
+      "condition": {
+        "type": "min_relics",
+        "value": 1
+      },
+      "body": "詰所の奥で、黒い呼び鈴が鳴り続けている。受話口の向こうで、この階のすべてを知っている声が、代金の話をしている。",
+      "lines": [
+        {
+          "char": "Akane",
+          "text": "うるせえ。止めていいか"
+        },
+        {
+          "char": "Nagi",
+          "text": "……私の名前を、呼んでる気がします"
+        }
+      ],
+      "options": [
+        {
+          "label": "でる",
+          "outcomes": [
+            {
+              "chance": 70,
+              "text": "声は道をすべて教え、最後に「お代はいただきました」とだけ言った。",
+              "effects": [
+                {
+                  "type": "reveal_floor"
+                },
+                {
+                  "type": "reveal_elevator"
+                },
+                {
+                  "type": "coins_percent",
+                  "value": -30
+                }
+              ]
+            },
+            {
+              "chance": 30,
+              "text": "声は道をすべて教え、最後に「お代はいただきました」とだけ言った。",
+              "effects": [
+                {
+                  "type": "reveal_floor"
+                },
+                {
+                  "type": "reveal_elevator"
+                },
+                {
+                  "type": "relic_lose_random",
+                  "value": 1
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "きる",
+          "outcomes": []
+        }
+      ]
+    },
+    {
+      "id": "caged_imp",
+      "title": "檻の中の小鬼",
+      "layer": 1,
+      "condition": {
+        "type": "none"
+      },
+      "body": "檻の中の小鬼が、鍵穴を指でつついている。「出してくれたら、宝のありかを教えてやるよ。本当だって」",
+      "lines": [
+        {
+          "char": "Momo",
+          "text": "かわいい顔してますね。地獄にしては"
+        },
+        {
+          "char": "Akane",
+          "text": "顔で選ぶな"
+        }
+      ],
+      "options": [
+        {
+          "label": "あける",
+          "outcomes": [
+            {
+              "chance": 60,
+              "text": "小鬼は宝箱の場所を早口で言うと、闇に消えた。",
+              "effects": [
+                {
+                  "type": "reveal_treasure"
+                }
+              ]
+            },
+            {
+              "chance": 40,
+              "text": "小鬼は財布をひったくり、笑いながら闇に消えた。",
+              "effects": [
+                {
+                  "type": "coins_percent",
+                  "value": -20
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "しめる",
+          "outcomes": []
+        }
+      ]
+    },
+    {
+      "id": "broken_stairs",
+      "title": "崩れた階段",
+      "layer": 1,
+      "condition": {
+        "type": "min_hp_percent",
+        "value": 30
+      },
+      "body": "上の階へ続く階段が、半分から先で崩れ落ちている。途切れた踊り場で、何かが鈍く光っている。",
+      "lines": [
+        {
+          "char": "Akane",
+          "text": "行ける。行けるって"
+        },
+        {
+          "char": "Nagi",
+          "text": "下、見ないほうがいいです"
+        }
+      ],
+      "options": [
+        {
+          "label": "のぼる",
+          "outcomes": [
+            {
+              "chance": 20,
+              "text": "指先が光に届き、それはまだ温かかった。",
+              "effects": [
+                {
+                  "type": "relic_gain",
+                  "value": 1
+                }
+              ]
+            },
+            {
+              "chance": 80,
+              "text": "全員、踊り場の残骸ごと床に叩きつけられた。",
+              "effects": [
+                {
+                  "type": "hp",
+                  "value": -20
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "まわる",
+          "outcomes": []
+        }
+      ]
+    },
+    {
+      "id": "duty_board",
+      "title": "獄卒の掲示板",
+      "layer": 1,
+      "condition": {
+        "type": "none"
+      },
+      "body": "色あせた勤務表が、何枚も重ねて貼られている。一番下の一枚だけが、妙に分厚い。",
+      "lines": [
+        {
+          "char": "Momo",
+          "text": "私の名前……載ってないですね。新人なので"
+        },
+        {
+          "char": "Nagi",
+          "text": "……勤務表、まだ更新されてる"
+        }
+      ],
+      "options": [
+        {
+          "label": "やぶる",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "紙の裏から、血で封をしたカードが落ちた。破れた端で指が切れた。",
+              "effects": [
+                {
+                  "type": "card_gain",
+                  "value": 1
+                },
+                {
+                  "type": "hp",
+                  "value": -10
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "よむ",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "知らない名前を一つずつ目でなぞるうち、呼吸が落ち着いた。",
+              "effects": [
+                {
+                  "type": "madness",
+                  "value": -100
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
