@@ -83,14 +83,18 @@ Shader "TypingRoguelike/UIAdditive"
 
             fixed4 frag(v2f i) : SV_Target
             {
-                fixed4 color = tex2D(_MainTex, i.texcoord) * i.color;
+                fixed4 tex = tex2D(_MainTex, i.texcoord);
+                // 黒地 PNG：RGB の明るさとアルファだけを加算の強さに使い、透明／黒は出さない。
+                fixed glow = max(tex.a, max(max(tex.r, tex.g), tex.b));
+                fixed3 rgb = tex.rgb * i.color.rgb;
+                fixed alpha = glow * i.color.a;
                 #ifdef UNITY_UI_CLIP_RECT
-                color.a *= UnityGet2DClipping(i.worldPosition.xy, _ClipRect);
+                alpha *= UnityGet2DClipping(i.worldPosition.xy, _ClipRect);
                 #endif
                 #ifdef UNITY_UI_ALPHACLIP
-                clip(color.a - 0.001);
+                clip(alpha - 0.001);
                 #endif
-                return color;
+                return fixed4(rgb, alpha);
             }
             ENDCG
         }

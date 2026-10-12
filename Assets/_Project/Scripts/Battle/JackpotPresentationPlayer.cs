@@ -322,7 +322,6 @@ namespace TypingRoguelike.Battle
             var travel = Mathf.Min(0.28f, slot * 0.75f);
             var target = EnemyLocalPoint(view.Area, enemy);
             var blades = new Blade[count];
-            var additive = ResolveAdditive(def);
             for (var i = 0; i < count; i++)
             {
                 var hitAt = (i + 1) * slot - slot * 0.15f;
@@ -336,7 +335,7 @@ namespace TypingRoguelike.Battle
                     From = new Vector2(i % 2 == 0 ? -780f : 780f, Mathf.Lerp(-220f, 260f, (i % 5) / 4f)),
                     To = target,
                     Pitch = pitch,
-                    Rect = CreateBlade(view.BladeRoot, labels[i], def, additive)
+                    Rect = CreateBlade(view.BladeRoot, labels[i], def)
                 };
                 blades[i].Rect.gameObject.SetActive(false);
             }
@@ -424,7 +423,7 @@ namespace TypingRoguelike.Battle
             }
         }
 
-        static RectTransform CreateBlade(RectTransform parent, string word, JackpotPresentationDefinition def, Material additive)
+        static RectTransform CreateBlade(RectTransform parent, string word, JackpotPresentationDefinition def)
         {
             var rt = CreateRect(parent, "Blade", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
             rt.pivot = new Vector2(0.5f, 0.5f);
@@ -434,8 +433,6 @@ namespace TypingRoguelike.Battle
             image.color = def.bladeColor;
             image.raycastTarget = false;
             BattleUITheme.EnsureSprite(image);
-            if (additive != null)
-                image.material = additive;
             var text = CreateText(rt, "Word", BattleUITheme.Font, 28, Color.white);
             text.rectTransform.anchorMin = Vector2.zero;
             text.rectTransform.anchorMax = Vector2.one;
@@ -475,8 +472,7 @@ namespace TypingRoguelike.Battle
             image.color = color;
             image.raycastTarget = false;
             BattleUITheme.EnsureSprite(image);
-            if (additive != null)
-                image.material = additive;
+            ApplyJackpotGlowImage(image, additive);
             return rt;
         }
 
@@ -491,9 +487,17 @@ namespace TypingRoguelike.Battle
             image.raycastTarget = false;
             image.preserveAspect = true;
             BattleUITheme.EnsureSprite(image);
-            if (additive != null)
-                image.material = additive;
+            ApplyJackpotGlowImage(image, additive);
             return rt;
+        }
+
+        static void ApplyJackpotGlowImage(Image image, Material additive)
+        {
+            if (image == null)
+                return;
+            image.type = Image.Type.Simple;
+            if (additive != null)
+                image.sharedMaterial = additive;
         }
 
         static CanvasGroup CreateCutins(RectTransform parent, JackpotPresentationDefinition def, out RectTransform[] bands)
@@ -542,14 +546,22 @@ namespace TypingRoguelike.Battle
             return group;
         }
 
+        static Material _cachedAdditiveMaterial;
+
         static Material ResolveAdditive(JackpotPresentationDefinition def)
         {
             if (def != null && def.additiveMaterial != null)
                 return def.additiveMaterial;
+            if (_cachedAdditiveMaterial != null)
+                return _cachedAdditiveMaterial;
+            _cachedAdditiveMaterial = Resources.Load<Material>("Battle/JackpotUiAdditive");
+            if (_cachedAdditiveMaterial != null)
+                return _cachedAdditiveMaterial;
             var shader = Shader.Find("TypingRoguelike/UIAdditive");
             if (shader == null)
                 return null;
-            return new Material(shader) { hideFlags = HideFlags.HideAndDontSave };
+            _cachedAdditiveMaterial = new Material(shader) { hideFlags = HideFlags.HideAndDontSave };
+            return _cachedAdditiveMaterial;
         }
 
         static void PlaySe(AudioSource source, AudioClip clip, float volume, float pitch)
