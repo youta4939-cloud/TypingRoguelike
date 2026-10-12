@@ -13,6 +13,7 @@ namespace TypingRoguelike.Battle
     public sealed class BattleController : MonoBehaviour
     {
         [SerializeField] BattleEncounterDefinition encounter;
+        [SerializeField] JackpotPresentationDefinition jackpotPresentation;
 
         RunPartyState _partyState;
         RunMadnessState _madness;
@@ -58,7 +59,12 @@ namespace TypingRoguelike.Battle
         bool _resultContinued;
         readonly HashSet<int> _cooldownSkillIds = new();
         readonly Queue<BattleSkillData> _cutinQueue = new();
-        readonly Queue<int> _jackpotQueue = new();
+        readonly Queue<PendingJackpot> _jackpotQueue = new();
+        readonly List<string> _wordsSinceJackpot = new();
+        JackpotPresentationDefinition _jackpotLook;
+        AudioSource _jackpotSe;
+        JackpotBgmSlot[] _heldBgm;
+        Coroutine _bgmFade;
         readonly JackpotFreezeSystem _jackpot = new();
         bool _presentationPlaying;
         bool _jackpotPlaying;
@@ -103,6 +109,7 @@ namespace TypingRoguelike.Battle
             _skillsTriggered = 0;
             _cutinQueue.Clear();
             _jackpotQueue.Clear();
+            _wordsSinceJackpot.Clear();
             _presentationPlaying = false;
             _jackpotPlaying = false;
 
@@ -379,6 +386,7 @@ namespace TypingRoguelike.Battle
                         break;
                     }
 
+                    _wordsSinceJackpot.Add(string.IsNullOrEmpty(completed.DisplayText) ? "？" : completed.DisplayText);
                     var bonusJackpot = CurrentJackpotRollBonus();
                     var jackpotWon = _jackpot.RegisterWordAndRoll(bonusJackpot, completed.InputLength);
                     PersistJackpotAccumulation();
@@ -398,7 +406,11 @@ namespace TypingRoguelike.Battle
                         PersistJackpotAccumulation();
                         RefreshMadnessMeter();
                         if (!_isGameOver)
-                            EnqueueJackpot(jackpotDamage);
+                        {
+                            var words = _wordsSinceJackpot.ToArray();
+                            _wordsSinceJackpot.Clear();
+                            EnqueueJackpot(jackpotDamage, words);
+                        }
                     }
                     else
                         ApplyDamageToEnemy(_wordClearDamage, $"単語クリア！ {(int)_wordClearDamage} ダメージ！");
@@ -603,10 +615,10 @@ namespace TypingRoguelike.Battle
             EnsurePresentationQueue();
         }
 
-        void EnqueueJackpot(int damage)
+        void EnqueueJackpot(int damage, string[] words)
         {
             _jackpotPlaying = true;
-            _jackpotQueue.Enqueue(damage);
+            _jackpotQueue.Enqueue(new PendingJackpot(damage, words));
             EnsurePresentationQueue();
         }
 
@@ -710,88 +722,171 @@ namespace TypingRoguelike.Battle
             _ui.CutinOverlay.SetActive(false);
         }
 
-        IEnumerator PlayJackpotSequence(int totalDamage)
+        readonly struct PendingJackpot
         {
-            if (_ui?.JackpotOverlay == null)
+            public readonly int Damage;
+            public readonly string[] Words;
+
+            public PendingJackpot(int damage, string[] words)
             {
-                ApplyDamageToEnemy(totalDamage, $"JACKPOT！ {totalDamage} ダメージ！");
+                Damage = damage;
+                Words = words ?? Array.Empty<string>();
+            }
+        }
+
+        IEnumerator PlayJackpotSequence(PendingJackpot show)
+        {
+            _jackpotPlaying = true;
+            if (_ui?.JackpotOverlay != null)
+                _ui.JackpotOverlay.SetActive(false);
+            var look = JackpotLook();
+            var se = EnsureJackpotSe();
+            var landed = false;
+            var routine = JackpotPresentationPlayer.Play(
+                transform,
+                look,
+                show.Damage,
+                show.Words,
+                _ui != null ? _ui.EnemyStage : null,
+                se,
+                SuspendBgm,
+                () =>
+                {
+                    if (_ui?.EnemyStage != null)
+                        StartCoroutine(PunchEnemyStage());
+                },
+                () =>
+                {
+                    if (landed)
+                        return;
+                    landed = true;
+                    ApplyDamageToEnemy(show.Damage, null, showFeedback: false);
+                    if (_ui?.EnemyStage != null)
+                        StartCoroutine(PunchEnemyStage());
+                    if (!_isGameOver)
+                        SetLog($"JACKPOT！ 狂気 × {_jackpotMultiplier:0.##} → {show.Damage} ダメージ！");
+                });
+            try
+            {
+                while (routine.MoveNext())
+                    yield return routine.Current;
+            }
+            finally
+            {
+                if (!landed && isActiveAndEnabled)
+                {
+                    landed = true;
+                    ApplyDamageToEnemy(show.Damage, null, showFeedback: false);
+                }
+
+                var leftover = transform != null ? transform.Find("JackpotPresentation") : null;
+                if (leftover != null)
+                    Destroy(leftover.gameObject);
+                _typing?.ClearTypingProgress();
+                RefreshJackpotMeter();
                 _jackpotPlaying = false;
-                yield break;
+                if (isActiveAndEnabled)
+                    BeginBgmFade(look.bgmFadeSeconds);
+                else
+                    RestoreBgmImmediate();
+            }
+        }
+
+        JackpotPresentationDefinition JackpotLook()
+        {
+            if (jackpotPresentation != null)
+                return jackpotPresentation;
+            if (_jackpotLook == null)
+                _jackpotLook = Resources.Load<JackpotPresentationDefinition>("Battle/JackpotPresentation");
+            if (_jackpotLook == null)
+                _jackpotLook = ScriptableObject.CreateInstance<JackpotPresentationDefinition>();
+            return _jackpotLook;
+        }
+
+        AudioSource EnsureJackpotSe()
+        {
+            if (_jackpotSe != null)
+                return _jackpotSe;
+            var go = new GameObject("JackpotSE");
+            go.transform.SetParent(transform, false);
+            _jackpotSe = go.AddComponent<AudioSource>();
+            _jackpotSe.playOnAwake = false;
+            _jackpotSe.loop = false;
+            _jackpotSe.spatialBlend = 0f;
+            return _jackpotSe;
+        }
+
+        void SuspendBgm()
+        {
+            if (_bgmFade != null)
+            {
+                StopCoroutine(_bgmFade);
+                _bgmFade = null;
             }
 
-            _ui.JackpotOverlay.SetActive(true);
-            _ui.JackpotOverlay.transform.SetAsLastSibling();
-            _ui.JackpotBlackout.color = new Color(0, 0, 0, 0);
-            _ui.JackpotLightStreak.gameObject.SetActive(true);
-            _ui.JackpotLightStreak.anchoredPosition = new Vector2(-1500f, 0);
-            _ui.JackpotCutinGroup.alpha = 0f;
-            _ui.JackpotCutinRoot.localScale = Vector3.one * 0.86f;
-            _ui.JackpotDamageText.text = string.Empty;
-            _ui.JackpotTitle.text = "JACKPOT";
+            if (_heldBgm == null || _heldBgm.Length == 0)
+                _heldBgm = JackpotBgm.Capture(_jackpotSe);
+            else
+                JackpotBgm.RePause(_heldBgm);
+        }
 
+        void BeginBgmFade(float seconds)
+        {
+            if (_heldBgm == null || _heldBgm.Length == 0)
+            {
+                _heldBgm = null;
+                return;
+            }
+            if (_bgmFade != null)
+                StopCoroutine(_bgmFade);
+            _bgmFade = StartCoroutine(FadeBgm(seconds));
+        }
+
+        IEnumerator FadeBgm(float seconds)
+        {
+            var slots = _heldBgm;
+            JackpotBgm.BeginFromMark(slots);
+            var duration = Mathf.Max(0.05f, seconds);
             var elapsed = 0f;
-            const float streakDuration = 0.35f;
-            while (elapsed < streakDuration)
+            while (elapsed < duration)
             {
+                if (_heldBgm != slots)
+                    yield break;
                 elapsed += Time.unscaledDeltaTime;
-                var t = Mathf.Clamp01(elapsed / streakDuration);
-                _ui.JackpotLightStreak.anchoredPosition = new Vector2(Mathf.Lerp(-1500f, 1500f, t), 0);
-                var image = _ui.JackpotLightStreak.GetComponent<Image>();
-                if (image != null)
-                    image.color = new Color(1f, 1f, 1f, Mathf.Sin(t * Mathf.PI));
-                _ui.JackpotBlackout.color = new Color(0, 0, 0, Mathf.Clamp01((t - 0.35f) / 0.65f));
+                var t = Mathf.Clamp01(elapsed / duration);
+                foreach (var slot in slots)
+                {
+                    if (slot.Source != null)
+                        slot.Source.volume = Mathf.Lerp(0f, slot.Volume, t);
+                }
+
                 yield return null;
             }
 
-            _ui.JackpotLightStreak.gameObject.SetActive(false);
-            _ui.JackpotBlackout.color = Color.black;
-            yield return new WaitForSecondsRealtime(2.1f);
-
-            elapsed = 0f;
-            const float cutinDuration = 0.8f;
-            while (elapsed < cutinDuration)
+            if (_heldBgm == slots)
             {
-                elapsed += Time.unscaledDeltaTime;
-                var t = Mathf.Clamp01(elapsed / cutinDuration);
-                var eased = 1f - Mathf.Pow(1f - t, 3f);
-                _ui.JackpotCutinGroup.alpha = eased;
-                _ui.JackpotCutinRoot.localScale = Vector3.one * Mathf.Lerp(0.86f, 1f, eased);
-                yield return null;
+                foreach (var slot in slots)
+                {
+                    if (slot.Source != null)
+                        slot.Source.volume = slot.Volume;
+                }
+
+                _heldBgm = null;
             }
 
-            var hitCount = Mathf.Clamp(Mathf.CeilToInt(totalDamage / 80f), 4, 8);
-            var displayed = 0;
-            for (var i = 0; i < hitCount; i++)
+            _bgmFade = null;
+        }
+
+        void RestoreBgmImmediate()
+        {
+            if (_bgmFade != null)
             {
-                var target = Mathf.RoundToInt(totalDamage * ((i + 1f) / hitCount));
-                var hitDamage = Mathf.Max(1, target - displayed);
-                displayed += hitDamage;
-                _ui.JackpotDamageText.text = $"{displayed}  DAMAGE";
-                ShowEnemyDamageNumber(hitDamage);
-                if (_ui.EnemyStage != null)
-                    StartCoroutine(PunchEnemyStage());
-                yield return new WaitForSecondsRealtime(0.15f);
+                StopCoroutine(_bgmFade);
+                _bgmFade = null;
             }
 
-            ApplyDamageToEnemy(totalDamage, null, showFeedback: false);
-            if (!_isGameOver)
-                SetLog($"JACKPOT！ 狂気 × {_jackpotMultiplier:0.##} → {totalDamage} ダメージ！");
-
-            yield return new WaitForSecondsRealtime(0.45f);
-            elapsed = 0f;
-            const float outroDuration = 0.3f;
-            while (elapsed < outroDuration)
-            {
-                elapsed += Time.unscaledDeltaTime;
-                var t = Mathf.Clamp01(elapsed / outroDuration);
-                _ui.JackpotBlackout.color = new Color(0, 0, 0, 1f - t);
-                _ui.JackpotCutinGroup.alpha = 1f - t;
-                yield return null;
-            }
-
-            _ui.JackpotOverlay.SetActive(false);
-            RefreshJackpotMeter();
-            _jackpotPlaying = false;
+            JackpotBgm.Restore(_heldBgm);
+            _heldBgm = null;
         }
 
         void TriggerInsanityGameOver()
@@ -807,7 +902,11 @@ namespace TypingRoguelike.Battle
         void PersistJackpotAccumulation() =>
             _madness?.SetAccumulatedJackpotChance(_jackpot.BaseAccumulatedChance);
 
-        void OnDestroy() => PersistJackpotAccumulation();
+        void OnDestroy()
+        {
+            PersistJackpotAccumulation();
+            RestoreBgmImmediate();
+        }
 
         void PulseCharCard(string charName)
         {

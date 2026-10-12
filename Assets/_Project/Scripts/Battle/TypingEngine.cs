@@ -9,11 +9,13 @@ namespace TypingRoguelike.Battle
     {
         public ElementColor Color { get; }
         public int InputLength { get; }
+        public string DisplayText { get; }
 
-        public WordCompletion(ElementColor color, int inputLength)
+        public WordCompletion(ElementColor color, int inputLength, string displayText)
         {
             Color = color;
             InputLength = inputLength;
+            DisplayText = displayText ?? string.Empty;
         }
     }
 
@@ -96,6 +98,12 @@ namespace TypingRoguelike.Battle
             RerollCount = Mathf.Min(RerollCount + amount, Mathf.Max(0, maxRerolls));
         }
 
+        public void ClearTypingProgress()
+        {
+            foreach (var slot in _slots)
+                slot.Progress = 0;
+        }
+
         public KeyProcessResult ProcessKey(char key)
         {
             WordCompletion? completed = null;
@@ -121,7 +129,7 @@ namespace TypingRoguelike.Battle
                         slot.Text = matching[0];
                     slot.Progress = nextPrefix.Length;
                     if (matching.Any(input => input.Length == nextPrefix.Length))
-                        completed = new WordCompletion(slot.Color, nextPrefix.Length);
+                        completed = new WordCompletion(slot.Color, nextPrefix.Length, slot.DisplayText);
                 }
                 else
                 {
