@@ -15,8 +15,12 @@ namespace TypingRoguelike.Data
         [Range(1, 99)] public int towerFloors = 15;
         [Tooltip("1階層内のマップの段数（ボス段を除く）")]
         [Range(3, 8)] public int pathLayers = 6;
-        [Tooltip("1階層内の各段のマス数")]
+        [Tooltip("条件を満たせなかったとき、従来の等間隔生成で使う各段のマス数")]
         [Range(2, 5)] public int branchWidth = 3;
+        [Tooltip("1行のマス数の最小。5列のマス目から選ぶ")]
+        [Range(2, 5)] public int rowNodeCountMin = 2;
+        [Tooltip("1行のマス数の最大")]
+        [Range(2, 5)] public int rowNodeCountMax = 5;
         [Tooltip("1 階層マップに置く焚き火の目安（生成後に危険マスから置き換える）")]
         [Range(0, 3)] public int restNodesPerFloorMin = 1;
         [Range(0, 3)] public int restNodesPerFloorMax = 2;

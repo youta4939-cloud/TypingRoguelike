@@ -7,6 +7,11 @@ namespace TypingRoguelike.Run
         public int Id { get; }
         public int Layer { get; }
         public int Column { get; }
+        /// <summary>横位置の分母。5列の土台なら 5。</summary>
+        public int LayoutColumns { get; set; } = 5;
+        /// <summary>格子に見えないよう、表示時だけずらす量（アンカー比率）。</summary>
+        public float DisplayOffsetX { get; set; }
+        public float DisplayOffsetY { get; set; }
         public DungeonNodeType Type { get; set; }
         public List<int> Next { get; } = new();
         public bool Cleared { get; set; }

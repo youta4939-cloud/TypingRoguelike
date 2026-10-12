@@ -5,6 +5,7 @@ using TypingRoguelike.Battle;
 using TypingRoguelike.Data;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace TypingRoguelike.Run
@@ -16,6 +17,7 @@ namespace TypingRoguelike.Run
         const float MapMarginX = 0.14f;
         const float MapMarginBottom = 0.07f;
         const float MapMarginTop = 0.08f;
+        static readonly Color ChoiceOrange = new Color(1f, 0.48f, 0.08f, 1f);
 
         static readonly DungeonNodeType[] LegendOrder =
         {
@@ -47,6 +49,15 @@ namespace TypingRoguelike.Run
         bool _revealAllNodes;
         int _currentLayer;
         int _visibleRows = 1;
+        Transform _host;
+        DungeonRunState _dungeon;
+        RectTransform _minimapRoot;
+        GameObject _minimapPanel;
+        GameObject _overlayPanel;
+        bool _pausedByOverlay;
+        float _savedTimeScale = 1f;
+
+        public static bool IsOverlayOpen { get; private set; }
 
         bool IsNodeKnown(DungeonMapNode node)
         {
@@ -78,9 +89,13 @@ namespace TypingRoguelike.Run
             int visibleRows = 1,
             bool debugRevealMap = false)
         {
+            _host = host;
+            _dungeon = dungeon;
             _revealAllNodes = revealAllNodes || debugRevealMap;
             _visibleRows = Mathf.Max(0, visibleRows);
             _currentLayer = dungeon.Current?.Layer ?? 0;
+            CloseOverlay();
+            HideMinimap();
             EnsureRoot(host);
             HideModal();
             if (_mapPanel != null)
@@ -108,7 +123,31 @@ namespace TypingRoguelike.Run
                 "TOWER OF SIGILS", BattleUITheme.Arcane);
             var mapBody = mapWindow.Find("Body");
             if (mapBody != null)
-                BuildTowerMap(mapBody, dungeon, topLayer, onNodeSelected);
+                BuildTowerMap(mapBody, dungeon, topLayer, onNodeSelected, interactive: true);
+        }
+
+        /// <summary>道選び以外の画面。右上に前後1段だけのミニマップを出す。</summary>
+        public void ShowMinimap(Transform host, DungeonRunState dungeon, int visibleRows, bool revealAllNodes)
+        {
+            if (host == null || dungeon == null)
+                return;
+
+            _host = host;
+            _dungeon = dungeon;
+            _revealAllNodes = revealAllNodes;
+            _visibleRows = Mathf.Max(0, visibleRows);
+            _currentLayer = dungeon.Current?.Layer ?? 0;
+            CloseOverlay();
+            if (_mapPanel != null)
+            {
+                UnityEngine.Object.Destroy(_mapPanel);
+                _mapPanel = null;
+            }
+
+            EnsureMinimapRoot();
+            if (_minimapPanel != null)
+                UnityEngine.Object.Destroy(_minimapPanel);
+            _minimapPanel = BuildMinimapPanel();
         }
 
         public void Refresh(
@@ -199,9 +238,19 @@ namespace TypingRoguelike.Run
         public void Hide()
         {
             HideModal();
+            CloseOverlay();
+            HideMinimap();
             if (_mapPanel != null)
                 UnityEngine.Object.Destroy(_mapPanel);
             _mapPanel = null;
+        }
+
+        void HideMinimap()
+        {
+            if (_minimapRoot != null)
+                UnityEngine.Object.Destroy(_minimapRoot.gameObject);
+            _minimapRoot = null;
+            _minimapPanel = null;
         }
 
         void BuildTitleBar(
@@ -364,11 +413,15 @@ namespace TypingRoguelike.Run
                 var (glyph, name, desc, color) = entries[i];
                 var yMax = 0.97f - i * rowHeight;
                 var row = CreateRect(body, $"Legend_{i}", new Vector2(0.03f, yMax - rowHeight), new Vector2(0.97f, yMax));
+                var legendShape = glyph == "?"
+                    ? MapNodeShapes.Get(MapNodeShape.Circle)
+                    : MapNodeIcons.Resolve(LegendOrder[i - 1], true).Shape;
 
                 var icon = CreateRect(row, "Icon", new Vector2(0, 0.5f), new Vector2(0, 0.5f));
-                icon.sizeDelta = new Vector2(44, 44);
+                icon.sizeDelta = glyph == "椅" ? new Vector2(52, 32) : new Vector2(44, 44);
                 icon.anchoredPosition = new Vector2(28, 0);
-                CreateImage(icon, "Ring", BattleUISprites.Circle, color, Vector2.zero, Vector2.one);
+                var legendImage = CreateImage(icon, "Ring", legendShape, color, Vector2.zero, Vector2.one);
+                legendImage.preserveAspect = true;
                 var inner = CreateImage(icon, "Inner", BattleUISprites.Circle, new Color(0.03f, 0.035f, 0.07f, 1f),
                     Vector2.zero, Vector2.one);
                 inner.rectTransform.offsetMin = new Vector2(4, 4);
@@ -391,12 +444,11 @@ namespace TypingRoguelike.Run
                 hasElevatorRecord ? BattleUITheme.Gold : BattleUITheme.TextMuted);
         }
 
-        void BuildTowerMap(Transform parent, DungeonRunState dungeon, int topLayer, Action<int> onNodeSelected)
+        void BuildTowerMap(Transform parent, DungeonRunState dungeon, int topLayer, Action<int> onNodeSelected, bool interactive)
         {
             var area = CreateRect(parent, "TowerArea", Vector2.zero, Vector2.one);
-            var maxColumn = dungeon.Nodes.Values.Select(node => node.Column).DefaultIfEmpty(0).Max();
             var positions = dungeon.Nodes.Values.ToDictionary(node => node.Id,
-                node => NodePosition(node, maxColumn, Mathf.Max(1, topLayer)));
+                node => NodePosition(node, Mathf.Max(1, topLayer)));
 
             var routesRoot = CreateRect(area, "Routes", Vector2.zero, Vector2.one);
             routesRoot.SetAsFirstSibling();
@@ -421,7 +473,10 @@ namespace TypingRoguelike.Run
                     {
                         CreateRouteSegment(
                             routesRoot, area, positions[from.Id], positions[nextId],
-                            new Color(1f, 0.82f, 0.4f, 0.98f), 5f, fromRadius, toRadius, dashed: false);
+                            new Color(ChoiceOrange.r, ChoiceOrange.g, ChoiceOrange.b, 0.35f), 11f, fromRadius, toRadius, dashed: false);
+                        CreateRouteSegment(
+                            routesRoot, area, positions[from.Id], positions[nextId],
+                            ChoiceOrange, 5f, fromRadius, toRadius, dashed: false);
                     }
                     else if (traveled)
                     {
@@ -444,8 +499,10 @@ namespace TypingRoguelike.Run
             foreach (var node in dungeon.Nodes.Values.OrderBy(node => node.Layer))
             {
                 var isCurrent = node.Id == dungeon.CurrentNodeId;
-                var canClick = reachable.Contains(node.Id);
-                CreateNode(area, node, positions[node.Id], isCurrent, canClick, () => onNodeSelected?.Invoke(node.Id));
+                var choice = reachable.Contains(node.Id);
+                var canClick = interactive && choice;
+                CreateNode(area, node, positions[node.Id], isCurrent, canClick, choice,
+                    () => onNodeSelected?.Invoke(node.Id));
             }
         }
 
@@ -560,37 +617,51 @@ namespace TypingRoguelike.Run
         }
 
         void CreateNode(RectTransform area, DungeonMapNode node, Vector2 position, bool isCurrent, bool canClick,
-            Action onClick)
+            bool choice, Action onClick)
         {
             var revealed = IsNodeKnown(node);
-            var accent = revealed ? NodeAccent(node.Type) : BattleUITheme.TextMuted;
+            var visual = MapNodeIcons.Resolve(node.Type, revealed);
+            var accent = choice ? ChoiceOrange : visual.Color;
             var isBoss = node.Type == DungeonNodeType.Boss && revealed;
-            var size = isBoss ? NodeSize * 1.3f : NodeSize;
-            var dimmed = !isCurrent && !canClick;
+            var size = NodePixelSize(visual.ShapeKind, isBoss);
+            var dimmed = !isCurrent && !choice;
 
             var rootRt = CreateRect(area, $"Node_{node.Id}", position, position);
-            rootRt.sizeDelta = new Vector2(size, size);
+            rootRt.sizeDelta = size;
             var group = rootRt.gameObject.AddComponent<CanvasGroup>();
             group.alpha = dimmed ? (node.Cleared ? 0.75f : 0.55f) : 1f;
 
             var glow = BattleUIChrome.CreateGlow(rootRt, "Glow", new Vector2(-0.55f, -0.55f), new Vector2(1.55f, 1.55f),
-                new Color(accent.r, accent.g, accent.b, canClick || isCurrent ? 0.28f : 0.06f));
+                new Color(accent.r, accent.g, accent.b, choice || isCurrent ? 0.45f : 0.06f));
 
-            var ring = CreateImage(rootRt, "Ring", BattleUISprites.Circle,
-                canClick ? Color.Lerp(accent, Color.white, 0.25f) : accent, Vector2.zero, Vector2.one);
+            var ring = CreateImage(rootRt, "Ring", visual.Shape,
+                choice ? ChoiceOrange : visual.Color, Vector2.zero, Vector2.one);
+            ring.preserveAspect = true;
             ring.raycastTarget = true;
             var innerColor = node.Cleared
                 ? new Color(0.06f, 0.14f, 0.11f, 1f)
                 : new Color(0.025f, 0.03f, 0.065f, 1f);
-            var inner = CreateImage(rootRt, "Inner", BattleUISprites.Circle, innerColor, Vector2.zero, Vector2.one);
-            var ringWidth = isCurrent ? 6f : canClick ? 5f : 3f;
+            var inner = CreateImage(rootRt, "Inner", visual.Shape, innerColor, Vector2.zero, Vector2.one);
+            inner.preserveAspect = true;
+            var ringWidth = isCurrent ? 6f : choice ? 5f : 3f;
             inner.rectTransform.offsetMin = new Vector2(ringWidth, ringWidth);
             inner.rectTransform.offsetMax = new Vector2(-ringWidth, -ringWidth);
 
-            var glyph = CreateLabel(rootRt, "Glyph", revealed ? NodeGlyph(node.Type) : "?", isBoss ? 36 : 28,
-                TextAnchor.MiddleCenter, Vector2.zero, Vector2.one, revealed ? accent : new Color(0.75f, 0.78f, 0.88f));
-            glyph.fontStyle = FontStyle.Bold;
-            BattleUITheme.AddTextShadow(glyph, new Color(0, 0, 0, 0.9f), new Vector2(2, -2));
+            if (revealed && visual.Picture != null)
+            {
+                var picture = CreateImage(rootRt, "Picture", visual.Picture, Color.white, Vector2.zero, Vector2.one);
+                picture.preserveAspect = true;
+                picture.rectTransform.offsetMin = new Vector2(ringWidth + 6f, ringWidth + 6f);
+                picture.rectTransform.offsetMax = new Vector2(-(ringWidth + 6f), -(ringWidth + 6f));
+            }
+            else
+            {
+                var glyph = CreateLabel(rootRt, "Glyph", visual.Glyph, isBoss ? 36 : 28,
+                    TextAnchor.MiddleCenter, Vector2.zero, Vector2.one,
+                    revealed ? visual.Color : new Color(0.75f, 0.78f, 0.88f));
+                glyph.fontStyle = FontStyle.Bold;
+                BattleUITheme.AddTextShadow(glyph, new Color(0, 0, 0, 0.9f), new Vector2(2, -2));
+            }
 
             var caption = CreateLabel(rootRt, "Caption", revealed ? NodeCaption(node) : "未判明", 13,
                 TextAnchor.UpperCenter, new Vector2(-0.6f, -0.42f), new Vector2(1.6f, -0.04f),
@@ -667,34 +738,29 @@ namespace TypingRoguelike.Run
             trigger.triggers.Add(exit);
         }
 
-        static Vector2 NodePosition(DungeonMapNode node, int maxColumn, int topLayer)
+        static Vector2 NodePixelSize(MapNodeShape shape, bool boss)
         {
-            var x = maxColumn <= 0
-                ? 0.5f
-                : Mathf.Lerp(MapMarginX, 1f - MapMarginX, node.Column / (float)maxColumn);
-            return new Vector2(x, LayerY(node.Layer, topLayer));
+            var scale = boss ? 1.3f : 1f;
+            return shape switch
+            {
+                MapNodeShape.Wide => new Vector2(NodeSize * 1.35f * scale, NodeSize * 0.78f * scale),
+                MapNodeShape.Document => new Vector2(NodeSize * 0.78f * scale, NodeSize * 1.12f * scale),
+                _ => new Vector2(NodeSize * scale, NodeSize * scale)
+            };
+        }
+
+        static Vector2 NodePosition(DungeonMapNode node, int topLayer)
+        {
+            var span = Mathf.Max(1, node.LayoutColumns - 1);
+            var x = Mathf.Lerp(MapMarginX, 1f - MapMarginX, node.Column / (float)span) + node.DisplayOffsetX;
+            var y = LayerY(node.Layer, topLayer) + node.DisplayOffsetY;
+            return new Vector2(Mathf.Clamp(x, 0.08f, 0.92f), Mathf.Clamp(y, 0.04f, 0.96f));
         }
 
         static float LayerY(int layer, int topLayer) =>
             Mathf.Lerp(MapMarginBottom, 1f - MapMarginTop, layer / (float)topLayer);
 
-        static string NodeGlyph(DungeonNodeType type) => type switch
-        {
-            DungeonNodeType.Start => "門",
-            DungeonNodeType.Normal => "道",
-            DungeonNodeType.Danger => "危",
-            DungeonNodeType.Rest => "休",
-            DungeonNodeType.Merchant => "商",
-            DungeonNodeType.Treasure => "宝",
-            DungeonNodeType.Elevator => "昇",
-            DungeonNodeType.Boss => "王",
-            DungeonNodeType.Combat => "戦",
-            DungeonNodeType.Elite => "強",
-            DungeonNodeType.Event => "事",
-            DungeonNodeType.EventV2 => "話",
-            DungeonNodeType.Mystery => "謎",
-            _ => "?"
-        };
+        static string NodeGlyph(DungeonNodeType type) => MapNodeIcons.Glyph(type);
 
         static string NodeName(DungeonNodeType type) => type switch
         {
@@ -829,8 +895,180 @@ namespace TypingRoguelike.Run
                 return "塔の主を撃破した！";
 
             return dungeon.GetReachableNext().Any()
-                ? "光っているマスを選んで上の層へ進もう。\nマスにカーソルを合わせると詳細が表示される。"
+                ? "橙のマスを選んで上の段へ進もう。\n先のマスは？で隠れる。"
                 : "進行データが不正です。ランを最初からやり直してください。";
+        }
+
+        void EnsureMinimapRoot()
+        {
+            if (_minimapRoot != null || _host == null)
+                return;
+
+            RunOverlayUI.EnsureGlobalEventSystem();
+            var go = new GameObject("DungeonMinimapCanvas");
+            go.transform.SetParent(_host, false);
+            var canvas = go.AddComponent<Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            canvas.sortingOrder = 320;
+            var scaler = go.AddComponent<CanvasScaler>();
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new Vector2(1920, 1080);
+            scaler.matchWidthOrHeight = 0.5f;
+            go.AddComponent<GraphicRaycaster>();
+            _minimapRoot = go.GetComponent<RectTransform>();
+            var hotkey = go.AddComponent<MapOverlayHotkey>();
+            hotkey.OnToggle = ToggleOverlay;
+        }
+
+        GameObject BuildMinimapPanel()
+        {
+            var panel = CreateRect(_minimapRoot, "Minimap", new Vector2(0.74f, 0.58f), new Vector2(0.985f, 0.90f));
+            var background = panel.gameObject.AddComponent<Image>();
+            background.color = new Color(0.02f, 0.025f, 0.05f, 0.92f);
+            BattleUITheme.EnsureSprite(background);
+            var outline = panel.gameObject.AddComponent<Outline>();
+            outline.effectColor = new Color(ChoiceOrange.r, ChoiceOrange.g, ChoiceOrange.b, 0.85f);
+            outline.effectDistance = new Vector2(1.5f, -1.5f);
+            var button = panel.gameObject.AddComponent<Button>();
+            button.targetGraphic = background;
+            button.navigation = new Navigation { mode = Navigation.Mode.None };
+            button.onClick.AddListener(ToggleOverlay);
+            var label = CreateLabel(panel, "Caption", "地図", 14, TextAnchor.UpperLeft,
+                new Vector2(0.06f, 0.86f), new Vector2(0.7f, 0.98f), BattleUITheme.Gold);
+            label.fontStyle = FontStyle.Bold;
+
+            var area = CreateRect(panel, "Nodes", new Vector2(0.06f, 0.06f), new Vector2(0.94f, 0.84f));
+            Canvas.ForceUpdateCanvases();
+            LayoutRebuilder.ForceRebuildLayoutImmediate(panel);
+            DrawMinimap(area);
+            return panel.gameObject;
+        }
+
+        void DrawMinimap(RectTransform area)
+        {
+            if (_dungeon?.Nodes == null)
+                return;
+
+            var layer = _dungeon.Current?.Layer ?? 0;
+            var nodes = _dungeon.Nodes.Values.Where(node => Mathf.Abs(node.Layer - layer) <= 1).ToList();
+            var minLayer = nodes.Select(node => node.Layer).DefaultIfEmpty(layer).Min();
+            var maxLayer = nodes.Select(node => node.Layer).DefaultIfEmpty(layer).Max();
+            var span = Mathf.Max(1, maxLayer - minLayer);
+            var reachable = new HashSet<int>(_dungeon.GetReachableNext().Select(node => node.Id));
+            var positions = new Dictionary<int, Vector2>();
+            foreach (var node in nodes)
+            {
+                var columns = Mathf.Max(1, node.LayoutColumns - 1);
+                var x = Mathf.Lerp(0.12f, 0.88f, node.Column / (float)columns) + node.DisplayOffsetX;
+                var y = Mathf.Lerp(0.16f, 0.84f, (node.Layer - minLayer) / (float)span) + node.DisplayOffsetY * 2f;
+                positions[node.Id] = new Vector2(Mathf.Clamp(x, 0.08f, 0.92f), Mathf.Clamp(y, 0.1f, 0.9f));
+            }
+
+            foreach (var from in nodes)
+            {
+                foreach (var nextId in from.Next)
+                {
+                    if (!positions.ContainsKey(nextId) || !positions.ContainsKey(from.Id))
+                        continue;
+                    var choice = from.Id == _dungeon.CurrentNodeId && reachable.Contains(nextId);
+                    var color = choice
+                        ? ChoiceOrange
+                        : new Color(0.55f, 0.58f, 0.72f, 0.7f);
+                    CreateRouteSegment(area, area, positions[from.Id], positions[nextId], color, choice ? 4f : 2f,
+                        12f, 12f, dashed: !choice);
+                }
+            }
+
+            foreach (var node in nodes)
+            {
+                var known = IsNodeKnown(node);
+                var visual = MapNodeIcons.Resolve(node.Type, known);
+                var choice = reachable.Contains(node.Id);
+                var size = MiniSize(visual.ShapeKind);
+                var rt = CreateRect(area, $"Mini_{node.Id}", positions[node.Id], positions[node.Id]);
+                rt.sizeDelta = size;
+                var image = CreateImage(rt, "Shape", visual.Shape, choice ? ChoiceOrange : visual.Color,
+                    Vector2.zero, Vector2.one);
+                image.preserveAspect = true;
+                if (node.Id == _dungeon.CurrentNodeId)
+                {
+                    var mark = CreateRect(rt, "Here", new Vector2(0.5f, 1.15f), new Vector2(0.5f, 1.15f));
+                    mark.sizeDelta = new Vector2(10f, 10f);
+                    CreateImage(mark, "Gem", BattleUISprites.Diamond, BattleUITheme.Gold, Vector2.zero, Vector2.one);
+                }
+            }
+        }
+
+        static Vector2 MiniSize(MapNodeShape shape) => shape switch
+        {
+            MapNodeShape.Wide => new Vector2(28f, 14f),
+            MapNodeShape.Document => new Vector2(14f, 20f),
+            _ => new Vector2(18f, 18f)
+        };
+
+        void ToggleOverlay()
+        {
+            if (_minimapRoot == null || _dungeon == null)
+                return;
+            if (_overlayPanel != null)
+                CloseOverlay();
+            else
+                OpenOverlay();
+        }
+
+        void OpenOverlay()
+        {
+            if (_host == null || _dungeon == null || _overlayPanel != null)
+                return;
+
+            _currentLayer = _dungeon.Current?.Layer ?? 0;
+            _pausedByOverlay = true;
+            _savedTimeScale = Time.timeScale;
+            Time.timeScale = 0f;
+            IsOverlayOpen = true;
+
+            RunOverlayUI.EnsureGlobalEventSystem();
+            var go = new GameObject("DungeonMapOverlayCanvas");
+            go.transform.SetParent(_host, false);
+            var canvas = go.AddComponent<Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            canvas.sortingOrder = 300;
+            var scaler = go.AddComponent<CanvasScaler>();
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new Vector2(1920, 1080);
+            scaler.matchWidthOrHeight = 0.5f;
+            go.AddComponent<GraphicRaycaster>();
+            _overlayPanel = go;
+
+            var dim = CreateRect(go.transform, "Dim", Vector2.zero, Vector2.one);
+            var dimImage = dim.gameObject.AddComponent<Image>();
+            dimImage.color = new Color(0.01f, 0.012f, 0.03f, 0.92f);
+            BattleUITheme.EnsureSprite(dimImage);
+            dimImage.raycastTarget = true;
+
+            var window = BattleUIChrome.CreateLuxuryWindow(
+                go.transform, "PeekMap", new Vector2(0.08f, 0.06f), new Vector2(0.92f, 0.94f),
+                "MAP", BattleUITheme.Arcane);
+            var body = window.Find("Body");
+            var topLayer = _dungeon.Nodes.Values.Select(node => node.Layer).DefaultIfEmpty(0).Max();
+            if (body != null)
+                BuildTowerMap(body, _dungeon, topLayer, null, interactive: false);
+            CreateLabel(go.transform, "Hint", "Tab または右上の地図で閉じる", 16, TextAnchor.LowerCenter,
+                new Vector2(0.2f, 0.01f), new Vector2(0.8f, 0.05f), BattleUITheme.TextMuted);
+        }
+
+        void CloseOverlay()
+        {
+            if (_overlayPanel != null)
+                UnityEngine.Object.Destroy(_overlayPanel);
+            _overlayPanel = null;
+            if (_pausedByOverlay)
+            {
+                Time.timeScale = _savedTimeScale > 0f ? _savedTimeScale : 1f;
+                _pausedByOverlay = false;
+            }
+
+            IsOverlayOpen = false;
         }
 
         void EnsureRoot(Transform host)
@@ -935,6 +1173,19 @@ namespace TypingRoguelike.Run
             label.horizontalOverflow = HorizontalWrapMode.Wrap;
             label.verticalOverflow = VerticalWrapMode.Overflow;
             return label;
+        }
+    }
+
+    sealed class MapOverlayHotkey : MonoBehaviour
+    {
+        public Action OnToggle;
+
+        void Update()
+        {
+            var keyboard = Keyboard.current;
+            if (keyboard == null || !keyboard.tabKey.wasPressedThisFrame)
+                return;
+            OnToggle?.Invoke();
         }
     }
 

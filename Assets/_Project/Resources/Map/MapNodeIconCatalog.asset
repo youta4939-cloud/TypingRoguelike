@@ -1,0 +1,75 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c2f6e1a4b8d4f0e7a3c5d91b6e40218, type: 3}
+  m_Name: MapNodeIconCatalog
+  m_EditorClassIdentifier: TypingRoguelike::TypingRoguelike.Run.MapNodeIconCatalog
+  entries:
+  - type: 2
+    shape: 0
+    shapeSprite: {fileID: 0}
+    picture: {fileID: 0}
+    fallbackGlyph: 鎖
+    color: {r: 0.96, g: 0.42, b: 0.32, a: 1}
+  - type: 11
+    shape: 1
+    shapeSprite: {fileID: 0}
+    picture: {fileID: 0}
+    fallbackGlyph: 話
+    color: {r: 0.72, g: 0.48, b: 0.95, a: 1}
+  - type: 10
+    shape: 1
+    shapeSprite: {fileID: 0}
+    picture: {fileID: 0}
+    fallbackGlyph: 話
+    color: {r: 0.72, g: 0.48, b: 0.95, a: 1}
+  - type: 4
+    shape: 1
+    shapeSprite: {fileID: 0}
+    picture: {fileID: 0}
+    fallbackGlyph: 秤
+    color: {r: 0.93, g: 0.78, b: 0.35, a: 1}
+  - type: 5
+    shape: 2
+    shapeSprite: {fileID: 0}
+    picture: {fileID: 0}
+    fallbackGlyph: 庫
+    color: {r: 0.35, g: 0.85, b: 0.92, a: 1}
+  - type: 3
+    shape: 3
+    shapeSprite: {fileID: 0}
+    picture: {fileID: 0}
+    fallbackGlyph: 椅
+    color: {r: 0.35, g: 0.82, b: 0.48, a: 1}
+  - type: 12
+    shape: 4
+    shapeSprite: {fileID: 0}
+    picture: {fileID: 0}
+    fallbackGlyph: 封
+    color: {r: 0.62, g: 0.5, b: 0.78, a: 1}
+  - type: 0
+    shape: 0
+    shapeSprite: {fileID: 0}
+    picture: {fileID: 0}
+    fallbackGlyph: 門
+    color: {r: 0.93, g: 0.78, b: 0.35, a: 1}
+  - type: 6
+    shape: 2
+    shapeSprite: {fileID: 0}
+    picture: {fileID: 0}
+    fallbackGlyph: 昇
+    color: {r: 0.93, g: 0.78, b: 0.35, a: 1}
+  - type: 7
+    shape: 1
+    shapeSprite: {fileID: 0}
+    picture: {fileID: 0}
+    fallbackGlyph: 王
+    color: {r: 0.86, g: 0.28, b: 0.38, a: 1}

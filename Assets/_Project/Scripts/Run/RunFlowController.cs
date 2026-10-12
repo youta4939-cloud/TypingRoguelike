@@ -199,6 +199,12 @@ namespace TypingRoguelike.Run
             EventDebugUI.Ensure(transform, BuildEventDebugHooks());
         }
 
+        void ShowSideMap()
+        {
+            var revealAll = RelicRunModifiers.Compute(_exploration, ResolveRelicCatalog()).RevealsAllNodes || _debugRevealMap;
+            _mapUi.ShowMinimap(transform, _dungeon, _visibleRows, revealAll);
+        }
+
         /// <summary>マップイベント等から狂気度を変更。発狂したら true。</summary>
         public bool ApplyMadnessDeltaFromEvent(int delta)
         {
@@ -262,13 +268,13 @@ namespace TypingRoguelike.Run
 
         void OpenRunLoadout()
         {
-            _mapUi.Hide();
+            ShowSideMap();
             _overlay.ShowLoadout(transform, _party, ShowMap);
         }
 
         void OpenRunPartyStats()
         {
-            _mapUi.Hide();
+            ShowSideMap();
             _overlay.ShowPartyStats(
                 transform,
                 _party,
@@ -293,7 +299,7 @@ namespace TypingRoguelike.Run
 
         void OpenRunRelicManage()
         {
-            _mapUi.Hide();
+            ShowSideMap();
             _overlay.ShowRunRelicManage(transform, _exploration, ResolveRelicCatalog(), () =>
             {
                 SyncMadnessCapFromRelics();
@@ -914,7 +920,7 @@ namespace TypingRoguelike.Run
                     () =>
                     {
                         _merchantRelicSoldNodeId = nodeId;
-                        ShowMap();
+                        ShowSideMap();
                         _mapUi.ShowModal(
                             "取引完了",
                             $"「{offer.displayName}」を装備した。\n{offer.effectText}\n{FormatCoinLine()}",
@@ -928,7 +934,7 @@ namespace TypingRoguelike.Run
             }
 
             actions.Add(("立ち去る", CompleteNodeAndReturnToMap));
-            ShowMap();
+            ShowSideMap();
             _mapUi.ShowModal("行商人", body, actions);
         }
 
@@ -1300,6 +1306,7 @@ namespace TypingRoguelike.Run
                 return;
             }
 
+            _mapUi.Hide();
             SyncMadnessCapFromRelics();
             ApplyRelicBattleModifiers(ref mods);
             ApplyFloorStrengthBand(ref mods);
@@ -1597,6 +1604,7 @@ namespace TypingRoguelike.Run
 
             try
             {
+                ShowSideMap();
                 _overlay.ShowCardReward(
                     transform,
                     _party,
@@ -1820,6 +1828,7 @@ namespace TypingRoguelike.Run
             }
 
             var names = PartyNames();
+            ShowSideMap();
             _events.Show(transform, ev, query, names, OnEventOption, () => FinishEvent(clearNode: false));
         }
 

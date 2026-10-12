@@ -18,6 +18,8 @@ MonoBehaviour:
   towerFloors: 15
   pathLayers: 6
   branchWidth: 3
+  rowNodeCountMin: 2
+  rowNodeCountMax: 5
   restNodesPerFloorMin: 1
   restNodesPerFloorMax: 2
   restHealFraction: 0.15
