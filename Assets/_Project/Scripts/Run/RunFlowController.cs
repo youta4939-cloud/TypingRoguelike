@@ -286,12 +286,11 @@ namespace TypingRoguelike.Run
         {
             _mapUi.Hide();
             DestroyBattleIfAny();
+            // TODO 未決事項6: 「中断した探索へ戻る（N階）」を残すかは未決。残したまま、1階と解放済みエレベーター階も同じ探索の再開にする。
             var resumeLabel = _profile.towerRunActive
                 ? $"中断した探索へ戻る（{_profile.towerRunFloor} 階）"
                 : null;
-            var elevatorFloors = _profile.towerRunActive
-                ? null
-                : _profile.unlockedElevatorFloors;
+            var elevatorFloors = _profile.unlockedElevatorFloors;
             _overlay.ShowHub(
                 transform,
                 _profile,
@@ -311,6 +310,12 @@ namespace TypingRoguelike.Run
             if (_profile?.unlockedElevatorFloors == null || !_profile.unlockedElevatorFloors.Contains(floor))
             {
                 Debug.LogWarning($"未解放のエレベーター階: {floor}");
+                return;
+            }
+
+            if (_profile.towerRunActive)
+            {
+                ContinueActiveRun(floor, fromElevator: true);
                 return;
             }
 
@@ -336,6 +341,7 @@ namespace TypingRoguelike.Run
                         ?? fallbackEncounter?.playerMaxHp
                         ?? 100f;
             _party.InitRunHp(maxHp * 1.2f);
+            _madness.ResetForNewRun();
 
             _runSeed = _profile.towerSeed;
             _elevatorFloor = 1 + PositiveModulo(_runSeed, TotalFloors);
@@ -373,6 +379,25 @@ namespace TypingRoguelike.Run
                 return;
             }
 
+            RestoreActiveRunState();
+            LoadFloorMap(_profile.towerRunFloor, _profile.towerRunNodeId);
+            ShowMap();
+        }
+
+        void StartActiveTowerRunFromFloorOne()
+        {
+            if (_profile == null || !_profile.towerRunActive)
+            {
+                BeginNewRun();
+                return;
+            }
+
+            ContinueActiveRun(1, fromElevator: false);
+        }
+
+        /// <summary>中断中の探索の刻印・レリック・HP・狂気・塔片を戻す。階の配置は呼び出し側。</summary>
+        void RestoreActiveRunState()
+        {
             _overlay.HideAll();
             _mapUi.Hide();
             DestroyBattleIfAny();
@@ -402,43 +427,24 @@ namespace TypingRoguelike.Run
                 _profile.towerRunMaterialStacks);
             if (_exploration.MaterialCount == 0 && _profile.towerRunMaterials > 0)
                 _exploration.RestoreLegacyMaterialCount(_profile.towerRunMaterials);
-            LoadFloorMap(_profile.towerRunFloor, _profile.towerRunNodeId);
-            ShowMap();
         }
 
-        void StartActiveTowerRunFromFloorOne()
+        void ContinueActiveRun(int floor, bool fromElevator)
         {
-            if (_profile == null || !_profile.towerRunActive)
+            RestoreActiveRunState();
+            if (fromElevator)
             {
-                BeginNewRun();
-                return;
+                LoadFloorMap(floor, restoreNodeId: null, forceElevatorOnFloor: true);
+                var elevatorId = FindElevatorNodeIdOnCurrentMap();
+                if (!elevatorId.HasValue || !_dungeon.TryRestoreCurrentNode(elevatorId.Value))
+                {
+                    Debug.LogWarning($"階 {floor} にエレベーターが見つからない。1 階相当で開始します。");
+                    GenerateFirstFloor();
+                }
             }
+            else
+                LoadFloorMap(floor, restoreNodeId: null);
 
-            _overlay.HideAll();
-            _mapUi.Hide();
-            DestroyBattleIfAny();
-            _runResultRecorded = false;
-            _clearedNodesThisRun = _profile.towerRunClearedNodes;
-
-            _runSeed = _profile.towerRunSeed != 0 ? _profile.towerRunSeed : _profile.towerSeed;
-            _elevatorFloor = 1 + PositiveModulo(_runSeed, TotalFloors);
-
-            var partyDef = ResolvePartyDefinition();
-            _party.InitializeForNewDungeonRun(partyDef);
-            _party.ApplyMemberSaves(_profile.towerRunMembers, GetSkillCatalog());
-            _party.AddCoins(_profile.towerRunCoins);
-
-            var maxHp = _profile.towerRunMaxHp > 0f
-                ? _profile.towerRunMaxHp
-                : dungeonRun?.bossEncounter?.playerMaxHp ?? 100f;
-            _party.InitRunHp(maxHp);
-            if (_profile.towerRunCurrentHp > 0f)
-                _party.SetCurrentHp(_profile.towerRunCurrentHp);
-            RestoreMadnessFromProfile();
-
-            _exploration.Clear();
-
-            LoadFloorMap(1, restoreNodeId: null);
             MetaProgression.SaveActiveTowerRun(
                 _profile,
                 _runSeed,
@@ -461,7 +467,7 @@ namespace TypingRoguelike.Run
         {
             _mapUi.ShowModal(
                 "探索を放棄しますか？",
-                "塔外への撤退はこの探索を終了する。拠点へ帰還するならエレベーターを使う。",
+                "放棄すると全滅と同じ扱いになる（刻印・レリック・塔片を失う）。\n拠点へ戻るならエレベーターを使う。",
                 new (string, Action)[]
                 {
                     ("放棄する", ConfirmAbandonRun),
@@ -471,18 +477,9 @@ namespace TypingRoguelike.Run
 
         void ConfirmAbandonRun()
         {
-            _exploration.Clear();
-            _party.ResetAcquiredSkillCards();
-            MetaProgression.ClearActiveTowerRun(_profile);
-            _profile.revealedTowerNodeIds?.Clear();
-            _profile.clearedTowerNodeIds?.Clear();
-            MetaProgression.Save(_profile);
-            var reward = RecordRunResult(false);
-            _mapUi.Show(transform, _dungeon, _party, _exploration, _madness, OnMapNodeSelected, null);
-            _mapUi.ShowModal(
-                "撤退",
-                $"探索を切り上げた。\n◆ 魔石 +{reward}",
-                new (string, Action)[] { ("拠点へ戻る", ShowHub) });
+            ApplyWipe();
+            _mapUi.Hide();
+            ShowHub();
         }
 
         void OnMapNodeSelected(int nodeId)
@@ -1001,8 +998,7 @@ namespace TypingRoguelike.Run
             _mapUi.ShowModal(
                 "帰還エレベーター",
                 $"拠点へ帰還できる。\n現在 {_dungeon.Floor} / {TotalFloors} 階層。\n\n" +
-                "帰還しても探索は中断されるだけで、装備スキル・塔片・踏破情報は維持される。\n" +
-                "レリックと素材を拠点倉庫に預けた。拠点で店・開発・装備ができる。",
+                "帰還すると塔片は拠点に貯金される。刻印・レリック・踏破情報は残る。",
                 new (string, Action)[]
                 {
                     ("さらに塔を進む", null),
@@ -1014,7 +1010,7 @@ namespace TypingRoguelike.Run
         {
             _mapUi.ShowModal(
                 "帰還の確認",
-                "拠点で整備したあと、同じ探索へ戻れる。\nレリックと素材は拠点倉庫へ預けられる。",
+                "拠点で整備したあと、同じ探索へ戻れる。\n塔片は拠点に貯金される。刻印・レリック・踏破情報は残る。",
                 new (string, Action)[]
                 {
                     ("拠点へ帰還する", ReturnToHubFromElevator),
@@ -1026,7 +1022,9 @@ namespace TypingRoguelike.Run
         {
             _overlay.HideAll();
             DestroyBattleIfAny();
-            MetaProgression.CommitRunLootToMeta(_profile, _exploration);
+            // TODO 未決事項5: 素材は倉庫へ移さず、探索の所持のまま保存する。
+            MetaProgression.BankRunCoins(_profile, _party);
+            _party.ClearRunCoins();
             MetaProgression.SaveActiveTowerRun(
                 _profile,
                 _runSeed,
@@ -1322,6 +1320,7 @@ namespace TypingRoguelike.Run
 
         void CompleteTowerRun()
         {
+            // TODO 未決事項2: 最終階踏破の魔石報酬は未決。RecordRunResult(true) の呼び出しは変えない。
             _overlay.HideAll();
             DestroyBattleIfAny();
             MetaProgression.ClearActiveTowerRun(_profile);
@@ -1365,6 +1364,18 @@ namespace TypingRoguelike.Run
             return true;
         }
 
+        /// <summary>全滅。刻印・レリック・塔片を失い、マップを作り直す。魔石は増えない。</summary>
+        void ApplyWipe()
+        {
+            // TODO 未決事項5: 素材も探索インベントリごと消える。全滅で素材を失うかは未決。
+            _exploration.Clear();
+            _party.ResetAcquiredSkillCards();
+            _party.ClearRunCoins();
+            _madness.ResetForNewRun();
+            MetaProgression.ApplyDeathReset(_profile);
+            RecordRunResult(false);
+        }
+
         IEnumerator HandleDefeat(bool fromBattle, bool fromInsanity)
         {
             if (_defeatHandling)
@@ -1376,15 +1387,10 @@ namespace TypingRoguelike.Run
 
             _overlay.HideAll();
             DestroyBattleIfAny();
-            _exploration.Clear();
-            _party.ResetAcquiredSkillCards();
-            _madness.ResetForNewRun();
-            MetaProgression.ApplyDeathReset(_profile);
-            MetaProgression.Save(_profile);
-            var reward = RecordRunResult(false);
+            ApplyWipe();
             _mapUi.Hide();
             ShowHub();
-            _overlay.ShowDeathNotice(transform, reward, fromInsanity ? "狂気が限界に達し、探索は終わった。" : null);
+            _overlay.ShowDeathNotice(transform, 0, fromInsanity ? "狂気が限界に達し、探索は終わった。" : null);
             _defeatHandling = false;
         }
 

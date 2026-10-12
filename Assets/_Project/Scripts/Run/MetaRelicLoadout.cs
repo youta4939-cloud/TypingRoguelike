@@ -63,6 +63,7 @@ namespace TypingRoguelike.Run
             return true;
         }
 
+        // TODO 未決事項3: 探索開始時には呼んでいない。拠点の装備を塔へ持ち込むかは未決なので、呼ばないままにする。
         public static void ApplyHubLoadoutToRun(
             MetaProgressData data,
             RunExplorationInventory loot,

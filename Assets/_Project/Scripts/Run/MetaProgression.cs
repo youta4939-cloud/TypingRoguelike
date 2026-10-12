@@ -10,8 +10,10 @@ namespace TypingRoguelike.Run
     [Serializable]
     public sealed class MetaProgressData
     {
-        public int version = 2;
+        public int version = 3;
         public int arcaneShards;
+        // TODO 未決事項1: 貯金する通貨は塔片のまま。名前と、魔石へ変換して一本にするかは未決。
+        public int bankedCoins;
         public int completedRuns;
         public int extractedRuns;
         public int failedRuns;
@@ -111,11 +113,9 @@ namespace TypingRoguelike.Run
                 return 0;
 
             clearedNodes = Mathf.Max(0, clearedNodes);
-            var reward = cleared
-                ? 120 + clearedNodes * 15
-                : extracted
-                    ? 40 + clearedNodes * 10
-                : 15 + clearedNodes * 8;
+            // 死亡・放棄・撤退では魔石を出さない。extracted を true で呼ぶ箇所は残っていない。
+            // TODO 未決事項2: 踏破時の魔石（120 + 踏破マス×15）を残すかは未決。式は現状維持。
+            var reward = cleared ? 120 + clearedNodes * 15 : 0;
             data.arcaneShards += reward;
             data.totalRuns++;
             if (cleared)
@@ -128,6 +128,17 @@ namespace TypingRoguelike.Run
             data.lastRunReward = reward;
             Save(data);
             return reward;
+        }
+
+        /// <summary>探索中の塔片を拠点の貯金へ移す。パーティ側の所持は呼び出し元で 0 にする。</summary>
+        public static void BankRunCoins(MetaProgressData data, RunPartyState party)
+        {
+            if (data == null || party == null)
+                return;
+
+            // TODO 未決事項1: bankedCoins は塔片の貯金。魔石（arcaneShards）へは移さない。
+            data.bankedCoins = Mathf.Max(0, data.bankedCoins) + Mathf.Max(0, party.RunCoins);
+            Save(data);
         }
 
         [System.Obsolete("v1.2: スキルカードはメタ倉庫に保存しない。")]
@@ -164,6 +175,7 @@ namespace TypingRoguelike.Run
             Save(data);
         }
 
+        [System.Obsolete("帰還ではレリックと素材を倉庫へ移さない。未決事項3・5が決まるまでメソッドは残す。")]
         public static void CommitRunLootToMeta(MetaProgressData data, RunExplorationInventory loot)
         {
             if (data == null)
@@ -305,6 +317,10 @@ namespace TypingRoguelike.Run
             data.towerRunMaterialStacks ??= new List<MaterialStackSave>();
             data.towerRunMaterialStacks.Clear();
             data.towerRunMaterials = 0;
+            data.towerRunEquippedRelicIds ??= new List<int>();
+            data.towerRunEquippedRelicIds.Clear();
+            data.towerRunBackpackRelicIds ??= new List<int>();
+            data.towerRunBackpackRelicIds.Clear();
             Save(data);
         }
 
@@ -343,6 +359,7 @@ namespace TypingRoguelike.Run
         {
             data.version = Mathf.Max(1, data.version);
             data.arcaneShards = Mathf.Max(0, data.arcaneShards);
+            data.bankedCoins = Mathf.Max(0, data.bankedCoins);
             data.extractedRuns = Mathf.Max(0, data.extractedRuns);
             data.unlockedSkillIds ??= new List<int>();
             data.revealedTowerNodeIds ??= new List<int>();
@@ -362,6 +379,13 @@ namespace TypingRoguelike.Run
                 if (data.towerRunMaterials > 0 && data.towerRunMaterialStacks.Count == 0)
                     data.towerRunMaterialStacks.Add(new MaterialStackSave { materialId = 900, count = data.towerRunMaterials });
                 data.version = 2;
+            }
+
+            if (data.version < 3)
+            {
+                // TODO 未決事項4: 旧セーブの魔石と倉庫レリックは変換せず残す。bankedCoins は 0 から始める。
+                // 中断中の towerRunCoins はそのまま（再開時の所持塔片）。
+                data.version = 3;
             }
 
             var wh = new MaterialWarehouse();

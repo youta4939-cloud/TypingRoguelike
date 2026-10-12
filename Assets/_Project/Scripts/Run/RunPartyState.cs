@@ -145,6 +145,8 @@ namespace TypingRoguelike.Run
         int MemberInnateCount => _members.Count(m => m.innateSlot != null);
         public int RunCoins { get; private set; }
 
+        public void ClearRunCoins() => RunCoins = 0;
+
         public void InitializeFrom(PartyLoadoutDefinition party)
         {
             _members.Clear();

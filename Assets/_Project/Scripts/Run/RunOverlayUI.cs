@@ -95,7 +95,7 @@ namespace TypingRoguelike.Run
                 BattleUITheme.TextPrimary);
             title.fontStyle = FontStyle.Bold;
             BattleUITheme.AddTextShadow(title, new Color(0, 0, 0, 0.95f), new Vector2(3, -3));
-            CreateLabel(body, "Currency", $"◆ 魔石  {profile?.arcaneShards ?? 0}", 21, TextAnchor.MiddleCenter,
+            CreateLabel(body, "Currency", $"◆ 魔石  {profile?.arcaneShards ?? 0}　　貯金 {profile?.bankedCoins ?? 0}", 21, TextAnchor.MiddleCenter,
                 new Vector2(0.35f, 0.76f), new Vector2(0.65f, 0.84f), Vector2.zero, Vector2.zero,
                 BattleUITheme.Gold);
             var whMat = MetaProgression.WarehouseMaterialUnits(profile);
@@ -166,7 +166,11 @@ namespace TypingRoguelike.Run
                 null);
             unlockButton.interactable = false;
 
-            CreateLabel(body, "StartRule", "出発時は各キャラの初期スキルのみ。カードは塔内、レリックは拠点で整備", 16,
+            CreateLabel(body, "StartRule",
+                profile != null && profile.towerRunActive
+                    ? "中断中の探索は、刻印・レリックを持ったまま 1 階か解放済みエレベーター階から再開できる"
+                    : "出発時は各キャラの初期スキルのみ。カードは塔内で集める",
+                16,
                 TextAnchor.MiddleCenter, new Vector2(0.35f, 0.47f), new Vector2(0.65f, 0.54f),
                 Vector2.zero, Vector2.zero, BattleUITheme.TextMuted);
 
@@ -209,7 +213,10 @@ namespace TypingRoguelike.Run
                 foreach (var floor in elevatorFloors.OrderBy(f => f))
                 {
                     var f = floor;
-                    CreateButton(body, $"エレベーター（{f} 階）から再入",
+                    var elevatorLabel = profile != null && profile.towerRunActive
+                        ? $"エレベーター（{f} 階）から続ける"
+                        : $"エレベーター（{f} 階）から再入";
+                    CreateButton(body, elevatorLabel,
                         new Vector2(0.5f, anchorY), new Vector2(0.5f, anchorY), Vector2.zero, new Vector2(420, 58),
                         () => onStartFromElevatorFloor(f));
                     anchorY -= 0.075f;
