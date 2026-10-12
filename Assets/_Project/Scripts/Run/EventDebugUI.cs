@@ -15,6 +15,10 @@ namespace TypingRoguelike.Run
         public Action<int> AddMadness;
         public Action<int> AddHp;
         public Action<int> AddCoins;
+        public Func<int> VisibleRows;
+        public Action<int> AddVisibleRows;
+        public Func<bool> ShowWholeMap;
+        public Action ToggleWholeMap;
     }
 
     /// <summary>エディタと開発ビルドだけで、全イベントの開始と数値の増減を出す。</summary>
@@ -63,6 +67,30 @@ namespace TypingRoguelike.Run
             _list = CreatePanel(_root, "EventList", new Vector2(0.62f, 0.08f), new Vector2(0.98f, 0.92f),
                 new Color(0.03f, 0.04f, 0.08f, 0.96f));
             var y = 0.90f;
+            Text rowsLabel = null;
+            rowsLabel = AddLabeledValue(y, VisibleRowsLabel());
+            CreateButton(_list.transform, "-", new Vector2(0.62f, y - 0.04f), new Vector2(0.74f, y), () =>
+            {
+                _hooks.AddVisibleRows?.Invoke(-1);
+                if (rowsLabel != null)
+                    rowsLabel.text = VisibleRowsLabel();
+            }, BattleUITheme.TextPrimary);
+            CreateButton(_list.transform, "+", new Vector2(0.76f, y - 0.04f), new Vector2(0.88f, y), () =>
+            {
+                _hooks.AddVisibleRows?.Invoke(1);
+                if (rowsLabel != null)
+                    rowsLabel.text = VisibleRowsLabel();
+            }, BattleUITheme.TextPrimary);
+            y -= 0.05f;
+            Text wholeLabel = null;
+            var wholeButton = CreateButton(_list.transform, WholeMapLabel(), new Vector2(0.04f, y - 0.045f), new Vector2(0.96f, y), () =>
+            {
+                _hooks.ToggleWholeMap?.Invoke();
+                if (wholeLabel != null)
+                    wholeLabel.text = WholeMapLabel();
+            }, BattleUITheme.TextPrimary);
+            wholeLabel = wholeButton.GetComponentInChildren<Text>();
+            y -= 0.055f;
             y = AddStatRow(y, "狂気", 100, _hooks.AddMadness);
             y = AddStatRow(y, "HP", 30, _hooks.AddHp);
             y = AddStatRow(y, "通貨", 50, _hooks.AddCoins);
@@ -90,6 +118,23 @@ namespace TypingRoguelike.Run
                     met ? BattleUITheme.TextPrimary : new Color(0.45f, 0.45f, 0.48f));
                 y -= 0.05f;
             }
+        }
+
+        static string VisibleRowsLabel() => $"見える段 {_hooks.VisibleRows?.Invoke() ?? 1}";
+
+        static string WholeMapLabel() =>
+            _hooks.ShowWholeMap != null && _hooks.ShowWholeMap() ? "全体表示をやめる" : "マップ全体を表示";
+
+        static Text AddLabeledValue(float y, string text)
+        {
+            var rt = CreateRect(_list.transform, "VisibleRows", new Vector2(0.04f, y - 0.04f), new Vector2(0.60f, y));
+            var label = rt.gameObject.AddComponent<Text>();
+            label.font = BattleUITheme.Font;
+            label.fontSize = 16;
+            label.alignment = TextAnchor.MiddleLeft;
+            label.color = BattleUITheme.TextPrimary;
+            label.text = text;
+            return label;
         }
 
         static float AddStatRow(float y, string label, int step, Action<int> apply)

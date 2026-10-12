@@ -17,9 +17,21 @@ namespace TypingRoguelike.Data
         [Range(3, 8)] public int pathLayers = 6;
         [Tooltip("1階層内の各段のマス数")]
         [Range(2, 5)] public int branchWidth = 3;
-        [Tooltip("1 階層マップに置く焚き火の目安（生成後に調整）")]
+        [Tooltip("1 階層マップに置く焚き火の目安（生成後に危険マスから置き換える）")]
         [Range(0, 3)] public int restNodesPerFloorMin = 1;
         [Range(0, 3)] public int restNodesPerFloorMax = 2;
+
+        [Header("道中マスの割合（%）全段共通")]
+        [Range(0f, 100f)] public float nodeWeightDanger = 40f;
+        [Range(0f, 100f)] public float nodeWeightEvent = 22f;
+        [Range(0f, 100f)] public float nodeWeightMerchant = 14f;
+        [Range(0f, 100f)] public float nodeWeightTreasure = 12f;
+        [Range(0f, 100f)] public float nodeWeightMystery = 12f;
+
+        [Header("謎マスの中身（%）")]
+        [Range(0f, 100f)] public float mysteryWeightDanger = 50f;
+        [Range(0f, 100f)] public float mysteryWeightEvent = 35f;
+        [Range(0f, 100f)] public float mysteryWeightMerchant = 15f;
 
         [Header("Rest / ラン内通貨（塔片）")]
         [Range(0.05f, 0.35f)] public float restHealFraction = 0.15f;

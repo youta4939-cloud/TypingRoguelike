@@ -312,6 +312,15 @@ namespace TypingRoguelike.Run
             }
         }
 
+        public static int ScaleOnes(int value, int floor)
+        {
+            if (value == 0)
+                return 0;
+            var layer = Mathf.Max(1, floor);
+            var scaled = value * (1.0 + 0.5 * (layer - 1));
+            return (int)Math.Round(scaled, MidpointRounding.AwayFromZero);
+        }
+
         public static int ScaleFixed(int value, int floor)
         {
             if (value == 0)

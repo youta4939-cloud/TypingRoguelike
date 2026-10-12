@@ -46,6 +46,9 @@ namespace TypingRoguelike.Run
         readonly HashSet<int> _chosenCardIds = new();
         bool _eventStartsBattle;
         bool _eventFromDebug;
+        /// <summary>今いる段の先に種類を出す段数。強化で増やす。</summary>
+        int _visibleRows = 1;
+        bool _debugRevealMap;
 
         public RunPartyState Party => _party;
         public RunMadnessState Madness => _madness;
@@ -128,7 +131,10 @@ namespace TypingRoguelike.Run
 
             _runSeed = _profile.towerSeed;
             _elevatorFloor = 1 + PositiveModulo(_runSeed, TotalFloors);
+            _visibleRows = 1;
+            _debugRevealMap = false;
             GenerateFirstFloor();
+            ActivateAndSaveRun();
             ShowMap();
         }
 
@@ -141,6 +147,7 @@ namespace TypingRoguelike.Run
                 dungeonRun, floorSeed, NodeIdBaseForFloor(1), _elevatorFloor == 1);
             _dungeon.BeginTower(
                 _mapData, floorSeed, TotalFloors, _profile.revealedTowerNodeIds, _profile.clearedTowerNodeIds);
+            ApplySavedMysteryResolutions();
         }
 
         void LoadFloorMap(int floor, int? restoreNodeId, bool forceElevatorOnFloor = false)
@@ -159,7 +166,24 @@ namespace TypingRoguelike.Run
 
             if (restoreNodeId.HasValue && !_dungeon.TryRestoreCurrentNode(restoreNodeId.Value))
                 Debug.LogWarning($"保存ノード {restoreNodeId} を復元できませんでした。入口に戻します。");
+            ApplySavedMysteryResolutions();
             ReapplyRowSkips();
+        }
+
+        void ApplySavedMysteryResolutions()
+        {
+            if (_profile?.towerRunMysteryNodes == null)
+                return;
+            foreach (var saved in _profile.towerRunMysteryNodes)
+            {
+                if (saved == null || !_dungeon.Nodes.TryGetValue(saved.nodeId, out var node))
+                    continue;
+                if (!Enum.IsDefined(typeof(DungeonNodeType), saved.resolvedType))
+                    continue;
+                node.Type = (DungeonNodeType)saved.resolvedType;
+                if (node.Type == DungeonNodeType.Danger)
+                    node.DangerEncounterPercent = Mathf.Clamp(saved.dangerPercent, 1, 99);
+            }
         }
 
         void ShowMap()
@@ -171,7 +195,7 @@ namespace TypingRoguelike.Run
             SyncMadnessCapFromRelics();
             var revealAll = RelicRunModifiers.Compute(_exploration, ResolveRelicCatalog()).RevealsAllNodes;
             _mapUi.Show(transform, _dungeon, _party, _exploration, _madness, OnMapNodeSelected, AbandonRun,
-                OpenRunLoadout, OpenRunRelicManage, OpenRunPartyStats, revealAll);
+                OpenRunLoadout, OpenRunRelicManage, OpenRunPartyStats, revealAll, _visibleRows, _debugRevealMap);
             EventDebugUI.Ensure(transform, BuildEventDebugHooks());
         }
 
@@ -188,6 +212,14 @@ namespace TypingRoguelike.Run
             }
 
             return insanity;
+        }
+
+        void ActivateAndSaveRun()
+        {
+            if (_profile == null)
+                return;
+            _profile.towerRunActive = true;
+            PersistActiveRun();
         }
 
         void PersistActiveRun()
@@ -358,6 +390,8 @@ namespace TypingRoguelike.Run
 
             _runSeed = _profile.towerSeed;
             _elevatorFloor = 1 + PositiveModulo(_runSeed, TotalFloors);
+            _visibleRows = 1;
+            _debugRevealMap = false;
             LoadFloorMap(floor, restoreNodeId: null, forceElevatorOnFloor: true);
 
             var elevatorId = FindElevatorNodeIdOnCurrentMap();
@@ -367,6 +401,7 @@ namespace TypingRoguelike.Run
                 GenerateFirstFloor();
             }
 
+            ActivateAndSaveRun();
             ShowMap();
         }
 
@@ -543,6 +578,9 @@ namespace TypingRoguelike.Run
                     Debug.Log($"EventV2 に入った。node={node.Id} layer={node.Layer}");
                     BeginEvent(null, fromDebug: false);
                     break;
+                case DungeonNodeType.Mystery:
+                    ResolveMysteryNode(node);
+                    break;
                 case DungeonNodeType.Merchant:
                     ResolveMerchantNode();
                     break;
@@ -639,10 +677,93 @@ namespace TypingRoguelike.Run
                 return;
             }
 
+            ResolveDangerMiss(node);
+        }
+
+        void ResolveMysteryNode(DungeonMapNode node)
+        {
+            var type = DungeonMapGenerator.RollMysteryContents(dungeonRun, new System.Random());
+            node.Type = type;
+            if (type == DungeonNodeType.Danger)
+            {
+                var pathLayers = dungeonRun != null ? dungeonRun.pathLayers : 5;
+                node.DangerEncounterPercent = DungeonMapGenerator.RollDangerEncounterPercent(
+                    new System.Random(unchecked(_runSeed + node.Id * 104729)), node.Layer, pathLayers);
+            }
+
+            _profile.towerRunMysteryNodes ??= new List<MysteryNodeSave>();
+            _profile.towerRunMysteryNodes.RemoveAll(saved => saved != null && saved.nodeId == node.Id);
+            _profile.towerRunMysteryNodes.Add(new MysteryNodeSave
+            {
+                nodeId = node.Id,
+                resolvedType = (int)type,
+                dangerPercent = node.DangerEncounterPercent
+            });
+            PersistActiveRun();
+
+            switch (type)
+            {
+                case DungeonNodeType.Danger:
+                    ResolveDangerNode(node);
+                    break;
+                case DungeonNodeType.EventV2:
+                    BeginEvent(null, fromDebug: false);
+                    break;
+                case DungeonNodeType.Merchant:
+                    ResolveMerchantNode();
+                    break;
+                default:
+                    ResolveDangerNode(node);
+                    break;
+            }
+        }
+
+        void ResolveDangerMiss(DungeonMapNode node)
+        {
+            var roll = UnityEngine.Random.Range(0, 100);
+            var kind = roll < 35 ? "madness" : roll < 70 ? "coins" : "hp";
+            var floor = _dungeon != null ? Mathf.Max(1, _dungeon.Floor) : 1;
+            var text = DangerLineCatalog.Pick(kind, _profile?.towerRunLastDangerLine);
+            if (_profile != null)
+                _profile.towerRunLastDangerLine = text;
+
+            if (kind == "madness")
+            {
+                var delta = EventRules.ScaleFixed(20, floor);
+                if (ApplyMadnessDeltaFromEvent(delta))
+                    return;
+                ShowDangerMiss(text, $"狂気 +{delta}");
+                return;
+            }
+
+            if (kind == "hp")
+            {
+                var delta = EventRules.ScaleOnes(-5, floor);
+                _party.ApplyHpDelta(delta);
+                if (_party.IsRunDead)
+                {
+                    PersistActiveRun();
+                    TryBeginRunDeath(fromBattle: false);
+                    return;
+                }
+
+                ShowDangerMiss(text, $"HP −{Mathf.Abs(delta)}");
+                return;
+            }
+
+            var coins = Mathf.Max(10, Mathf.RoundToInt(_party.RunCoins * 0.05f));
+            _party.AddCoins(coins);
+            ShowDangerMiss(text, $"通貨 +{coins}");
+        }
+
+        void ShowDangerMiss(string text, string effect)
+        {
             MarkCurrentCleared();
+            PersistActiveRun();
+            ShowMap();
             _mapUi.ShowModal(
                 "危険地帯",
-                $"遭遇率 {displayRate}% …\n\n気配をかわし、回避した。",
+                $"{text}\n{effect}",
                 new (string, Action)[] { ("マップに戻る", null) });
             _mapUi.Refresh(_dungeon, _party, _exploration, _madness);
         }
@@ -1652,6 +1773,18 @@ namespace TypingRoguelike.Run
                     _party.TrySpendCoins(Mathf.Min(_party.RunCoins, -delta));
                 PersistActiveRun();
                 _mapUi.Refresh(_dungeon, _party, _exploration, _madness);
+            },
+            VisibleRows = () => _visibleRows,
+            AddVisibleRows = delta =>
+            {
+                _visibleRows = Mathf.Clamp(_visibleRows + delta, 0, 8);
+                ShowMap();
+            },
+            ShowWholeMap = () => _debugRevealMap,
+            ToggleWholeMap = () =>
+            {
+                _debugRevealMap = !_debugRevealMap;
+                ShowMap();
             }
         };
 

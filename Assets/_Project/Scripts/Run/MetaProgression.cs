@@ -8,6 +8,14 @@ using UnityEngine;
 namespace TypingRoguelike.Run
 {
     [Serializable]
+    public sealed class MysteryNodeSave
+    {
+        public int nodeId;
+        public int resolvedType;
+        public int dangerPercent;
+    }
+
+    [Serializable]
     public sealed class MetaProgressData
     {
         public int version = 3;
@@ -56,6 +64,8 @@ namespace TypingRoguelike.Run
         public List<string> previousRunEventIds = new();
         public List<int> towerRunSkipFromNodeIds = new();
         public bool towerRunEventBattlePending;
+        public string towerRunLastDangerLine;
+        public List<MysteryNodeSave> towerRunMysteryNodes = new();
 
         public bool IsUnlocked(int skillId) => unlockedSkillIds.Contains(skillId);
     }
@@ -330,6 +340,9 @@ namespace TypingRoguelike.Run
             data.towerRunSkipFromNodeIds ??= new List<int>();
             data.towerRunSkipFromNodeIds.Clear();
             data.towerRunEventBattlePending = false;
+            data.towerRunLastDangerLine = null;
+            data.towerRunMysteryNodes ??= new List<MysteryNodeSave>();
+            data.towerRunMysteryNodes.Clear();
             Save(data);
         }
 
@@ -383,6 +396,7 @@ namespace TypingRoguelike.Run
             data.towerRunSeenEventIds ??= new List<string>();
             data.previousRunEventIds ??= new List<string>();
             data.towerRunSkipFromNodeIds ??= new List<int>();
+            data.towerRunMysteryNodes ??= new List<MysteryNodeSave>();
 
             if (data.version < 2)
             {

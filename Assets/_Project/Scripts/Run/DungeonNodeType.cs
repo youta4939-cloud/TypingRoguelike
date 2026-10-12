@@ -18,5 +18,7 @@ namespace TypingRoguelike.Run
         Event,
         /// <summary>JSON の出来事。旧 Event の値は変えない。</summary>
         EventV2,
+        /// <summary>踏むまで中身が分からない。末尾追加で既存の値は変えない。</summary>
+        Mystery,
     }
 }

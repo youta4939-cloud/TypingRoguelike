@@ -6,11 +6,9 @@ using UnityEngine;
 
 namespace TypingRoguelike.Run
 {
-    /// <summary>マス種: Normal / Danger / Rest / Merchant / Treasure / Event / EventV2 / Elevator / Boss。</summary>
+    /// <summary>マス種: Danger / EventV2 / Merchant / Treasure / Mystery / Rest / Elevator / Boss。Normal は抽選しない。</summary>
     public static class DungeonMapGenerator
     {
-        /// <summary>道中マスが EventV2 になる割合。調整用。</summary>
-        public const float EventV2Chance = 0.2f;
         public sealed class Result
         {
             public List<DungeonMapNode> Nodes = new();
@@ -47,7 +45,7 @@ namespace TypingRoguelike.Run
                 {
                     var type = placeElevator && layer == elevatorLayer && col == elevatorColumn
                         ? DungeonNodeType.Elevator
-                        : RollNodeType(rng, layer, pathLayers);
+                        : RollNodeType(rng, config);
                     var node = new DungeonMapNode(id++, layer, col, type);
                     if (type == DungeonNodeType.Danger)
                         node.DangerEncounterPercent = RollDangerEncounterPercent(rng, layer, pathLayers);
@@ -64,7 +62,7 @@ namespace TypingRoguelike.Run
             byLayer.Add(new List<DungeonMapNode> { boss });
 
             WireEdges(byLayer, rng, width);
-            BalanceRestNodes(result, config, rng);
+            BalanceRestNodes(result, config, rng, pathLayers);
             LogNodeTypeCounts(result);
             return result;
         }
@@ -92,7 +90,7 @@ namespace TypingRoguelike.Run
             Debug.Log("マップ生成 マス種類: " + string.Join(", ", parts));
         }
 
-        static void BalanceRestNodes(Result result, DungeonRunDefinition config, System.Random rng)
+        static void BalanceRestNodes(Result result, DungeonRunDefinition config, System.Random rng, int pathLayers)
         {
             if (result?.Nodes == null || result.Nodes.Count == 0)
                 return;
@@ -107,7 +105,8 @@ namespace TypingRoguelike.Run
             while (rests.Count > target)
             {
                 var pick = rests[rng.Next(rests.Count)];
-                pick.Type = DungeonNodeType.Normal;
+                pick.Type = DungeonNodeType.Danger;
+                pick.DangerEncounterPercent = RollDangerEncounterPercent(rng, pick.Layer, pathLayers);
                 rests.Remove(pick);
             }
 
@@ -115,7 +114,7 @@ namespace TypingRoguelike.Run
                 return;
 
             var candidates = result.Nodes
-                .Where(n => n.Type == DungeonNodeType.Normal && n.Layer > 0 && n.Id != result.BossNodeId)
+                .Where(n => n.Type == DungeonNodeType.Danger && n.Layer > 0 && n.Id != result.BossNodeId)
                 .ToList();
             while (rests.Count < target && candidates.Count > 0)
             {
@@ -127,31 +126,50 @@ namespace TypingRoguelike.Run
             }
         }
 
-        static DungeonNodeType RollNodeType(System.Random rng, int layer, int pathLayers)
+        public static DungeonNodeType RollMysteryContents(DungeonRunDefinition config, System.Random rng)
         {
-            if (rng.NextDouble() < EventV2Chance)
-                return DungeonNodeType.EventV2;
-
-            if (layer == pathLayers)
+            return PickWeighted(rng, new[]
             {
-                var late = rng.Next(100);
-                if (late < 22) return DungeonNodeType.Normal;
-                if (late < 48) return DungeonNodeType.Danger;
-                if (late < 62) return DungeonNodeType.Merchant;
-                if (late < 70) return DungeonNodeType.Event;
-                return DungeonNodeType.Treasure;
+                (DungeonNodeType.Danger, config != null ? config.mysteryWeightDanger : 50f),
+                (DungeonNodeType.EventV2, config != null ? config.mysteryWeightEvent : 35f),
+                (DungeonNodeType.Merchant, config != null ? config.mysteryWeightMerchant : 15f)
+            });
+        }
+
+        static DungeonNodeType RollNodeType(System.Random rng, DungeonRunDefinition config)
+        {
+            return PickWeighted(rng, new[]
+            {
+                (DungeonNodeType.Danger, config != null ? config.nodeWeightDanger : 40f),
+                (DungeonNodeType.EventV2, config != null ? config.nodeWeightEvent : 22f),
+                (DungeonNodeType.Merchant, config != null ? config.nodeWeightMerchant : 14f),
+                (DungeonNodeType.Treasure, config != null ? config.nodeWeightTreasure : 12f),
+                (DungeonNodeType.Mystery, config != null ? config.nodeWeightMystery : 12f)
+            });
+        }
+
+        static DungeonNodeType PickWeighted(System.Random rng, (DungeonNodeType type, float weight)[] table)
+        {
+            var total = 0f;
+            foreach (var item in table)
+                total += Mathf.Max(0f, item.weight);
+            if (total <= 0f)
+                return DungeonNodeType.Danger;
+
+            var roll = (float)rng.NextDouble() * total;
+            var cursor = 0f;
+            foreach (var item in table)
+            {
+                cursor += Mathf.Max(0f, item.weight);
+                if (roll < cursor)
+                    return item.type;
             }
 
-            var roll = rng.Next(100);
-            if (roll < 26) return DungeonNodeType.Normal;
-            if (roll < 54) return DungeonNodeType.Danger;
-            if (roll < 68) return DungeonNodeType.Merchant;
-            if (roll < 76) return DungeonNodeType.Event;
-            return DungeonNodeType.Treasure;
+            return table[table.Length - 1].type;
         }
 
         /// <summary>10%刻み。深い段ほどやや高めになりやすい。</summary>
-        static int RollDangerEncounterPercent(System.Random rng, int layer, int pathLayers)
+        public static int RollDangerEncounterPercent(System.Random rng, int layer, int pathLayers)
         {
             var tiers = new[] { 10, 20, 30, 40, 50, 60, 70, 80 };
             var depth = pathLayers <= 0 ? 0f : layer / (float)pathLayers;

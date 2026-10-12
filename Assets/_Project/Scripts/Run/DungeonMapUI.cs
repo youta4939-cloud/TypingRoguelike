@@ -26,6 +26,7 @@ namespace TypingRoguelike.Run
             DungeonNodeType.Merchant,
             DungeonNodeType.Event,
             DungeonNodeType.EventV2,
+            DungeonNodeType.Mystery,
             DungeonNodeType.Elevator,
             DungeonNodeType.Boss
         };
@@ -44,9 +45,21 @@ namespace TypingRoguelike.Run
         Text _detailBody;
         string _defaultHint;
         bool _revealAllNodes;
+        int _currentLayer;
+        int _visibleRows = 1;
 
-        bool IsNodeKnown(DungeonMapNode node) =>
-            node != null && (node.Revealed || _revealAllNodes);
+        bool IsNodeKnown(DungeonMapNode node)
+        {
+            if (node == null)
+                return false;
+            if (_revealAllNodes)
+                return true;
+            if (node.Type is DungeonNodeType.Start or DungeonNodeType.Boss)
+                return true;
+            if (node.Revealed)
+                return true;
+            return node.Layer <= _currentLayer + Mathf.Max(0, _visibleRows);
+        }
 
         Font UiFont => _font ??= BattleUITheme.Font;
 
@@ -61,9 +74,13 @@ namespace TypingRoguelike.Run
             Action onOpenLoadout = null,
             Action onOpenRelics = null,
             Action onOpenPartyStats = null,
-            bool revealAllNodes = false)
+            bool revealAllNodes = false,
+            int visibleRows = 1,
+            bool debugRevealMap = false)
         {
-            _revealAllNodes = revealAllNodes;
+            _revealAllNodes = revealAllNodes || debugRevealMap;
+            _visibleRows = Mathf.Max(0, visibleRows);
+            _currentLayer = dungeon.Current?.Layer ?? 0;
             EnsureRoot(host);
             HideModal();
             if (_mapPanel != null)
@@ -336,7 +353,7 @@ namespace TypingRoguelike.Run
 
             var entries = new List<(string glyph, string name, string desc, Color color)>
             {
-                ("?", "未判明", "一度踏むと次回以降も内容が表示される", BattleUITheme.TextMuted)
+                ("?", "未判明", "今いる段の先は、近づくまで隠れる", BattleUITheme.TextMuted)
             };
             entries.AddRange(LegendOrder.Select(type =>
                 (NodeGlyph(type), NodeName(type), NodeDescription(type), NodeAccent(type))));
@@ -631,7 +648,7 @@ namespace TypingRoguelike.Run
                 _detailTitle.text = known ? NodeHoverTitle(node) : "未判明のマス";
                 var body = known
                     ? NodeHoverDescription(node)
-                    : "何が待つかは踏むまで分からない。\n一度踏めば次回以降の探索で表示される。";
+                    : "先の段は、近づくまで種類が分からない。";
                 if (node.Cleared && node.Type != DungeonNodeType.Start)
                     body += "\n\n（今回の探索で通過済み）";
                 else if (canClick)
@@ -675,6 +692,7 @@ namespace TypingRoguelike.Run
             DungeonNodeType.Elite => "強",
             DungeonNodeType.Event => "事",
             DungeonNodeType.EventV2 => "話",
+            DungeonNodeType.Mystery => "謎",
             _ => "?"
         };
 
@@ -692,6 +710,7 @@ namespace TypingRoguelike.Run
             DungeonNodeType.Elite => "強敵",
             DungeonNodeType.Event => "出来事",
             DungeonNodeType.EventV2 => "イベント",
+            DungeonNodeType.Mystery => "謎",
             _ => "未判明"
         };
 
@@ -725,7 +744,7 @@ namespace TypingRoguelike.Run
                         ? "危険察知: 強敵の気配がする。\n"
                         : "危険察知: 通常程度の敵のようだ。\n"
                     : string.Empty) +
-                "戦闘しなければ報酬なし。勝利で塔片。",
+                "戦闘にならなければ、狂気・通貨・HPのどれかが変わる。勝利で塔片。",
             _ => NodeDescription(node.Type)
         };
 
@@ -743,6 +762,7 @@ namespace TypingRoguelike.Run
             DungeonNodeType.Elite => "手強い敵。塔片は多め",
             DungeonNodeType.Event => "まれに現れる。レリックを1つ拾える",
             DungeonNodeType.EventV2 => "その階の出来事が起きる",
+            DungeonNodeType.Mystery => "踏むまで中身が分からない",
             _ => string.Empty
         };
 
@@ -760,6 +780,7 @@ namespace TypingRoguelike.Run
             DungeonNodeType.Elite => new Color(0.96f, 0.28f, 0.36f),
             DungeonNodeType.Event => BattleUITheme.Arcane,
             DungeonNodeType.EventV2 => new Color(0.72f, 0.48f, 0.95f),
+            DungeonNodeType.Mystery => new Color(0.55f, 0.45f, 0.78f),
             _ => BattleUITheme.TextMuted
         };
 
