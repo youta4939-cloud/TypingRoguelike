@@ -313,6 +313,19 @@ namespace TypingRoguelike.Run
             RunHpInitialized = true;
         }
 
+        public void SetMaxHpPreservingCurrent(float newMax)
+        {
+            if (!RunHpInitialized)
+            {
+                InitRunHp(newMax);
+                return;
+            }
+
+            var clamped = Mathf.Max(1f, newMax);
+            CurrentHp = Mathf.Min(CurrentHp, clamped);
+            MaxHp = clamped;
+        }
+
         public void ApplyHpDelta(int delta)
         {
             if (!RunHpInitialized)

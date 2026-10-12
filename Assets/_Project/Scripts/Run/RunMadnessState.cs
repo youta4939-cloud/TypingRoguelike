@@ -11,11 +11,15 @@ namespace TypingRoguelike.Run
 
         [SerializeField] int currentMadness;
         [SerializeField] int maxMadness = DefaultMaxMadness;
+        [SerializeField] int configuredMadnessCap = DefaultMaxMadness;
+        [SerializeField] int deviceCapPenalty;
         [SerializeField] float bonusJackpotChance;
         [SerializeField] float accumulatedJackpotChance;
 
         public int CurrentMadness => currentMadness;
         public int MaxMadness => Mathf.Max(1, maxMadness);
+        public int ConfiguredMadnessCap => Mathf.Max(1, configuredMadnessCap);
+        public int DeviceCapPenalty => Mathf.Max(0, deviceCapPenalty);
         public float BonusJackpotChance => bonusJackpotChance;
         /// <summary>塔探索中の Jackpot 当選率蓄積（戦闘をまたいで持ち越し）。</summary>
         public float AccumulatedJackpotChance => accumulatedJackpotChance;
@@ -43,7 +47,9 @@ namespace TypingRoguelike.Run
         public void ResetForNewRun(int max = DefaultMaxMadness)
         {
             currentMadness = 0;
-            maxMadness = Mathf.Max(1, max);
+            configuredMadnessCap = Mathf.Max(1, max);
+            deviceCapPenalty = 0;
+            maxMadness = configuredMadnessCap;
             bonusJackpotChance = 0f;
             accumulatedJackpotChance = 0f;
         }
@@ -56,6 +62,13 @@ namespace TypingRoguelike.Run
             accumulatedJackpotChance = Mathf.Max(0f, accumulatedJackpot);
         }
 
+        public void RestoreCurrentAndJackpot(int current, float bonusJackpot, float accumulatedJackpot = 0f)
+        {
+            currentMadness = Mathf.Clamp(current, 0, MaxMadness);
+            bonusJackpotChance = Mathf.Max(0f, bonusJackpot);
+            accumulatedJackpotChance = Mathf.Max(0f, accumulatedJackpot);
+        }
+
         public void SetAccumulatedJackpotChance(float value) =>
             accumulatedJackpotChance = Mathf.Max(0f, value);
 
@@ -64,6 +77,28 @@ namespace TypingRoguelike.Run
             maxMadness = Mathf.Max(1, max);
             if (currentMadness > maxMadness)
                 currentMadness = maxMadness;
+        }
+
+        /// <summary>レリック・永続強化による上限（装置の傷みは別）。</summary>
+        public void SetConfiguredMadnessCap(int cap)
+        {
+            configuredMadnessCap = Mathf.Max(1, cap);
+            ApplyEffectiveMadnessCap();
+        }
+
+        /// <summary>ジャックポット等によるラン中の上限低下。帰還・全滅で 0 に戻す。</summary>
+        public void SetDeviceCapPenalty(int penalty)
+        {
+            deviceCapPenalty = Mathf.Max(0, penalty);
+            ApplyEffectiveMadnessCap();
+        }
+
+        public void ClearDeviceCapPenalty() => SetDeviceCapPenalty(0);
+
+        void ApplyEffectiveMadnessCap()
+        {
+            var effective = Mathf.Max(1, configuredMadnessCap - deviceCapPenalty);
+            SetMaxMadness(effective);
         }
 
         public void SetBonusJackpotChance(float value) => bonusJackpotChance = Mathf.Max(0f, value);

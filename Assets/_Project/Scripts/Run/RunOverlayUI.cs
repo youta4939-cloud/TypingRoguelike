@@ -78,6 +78,7 @@ namespace TypingRoguelike.Run
             Action<int> onStartFromElevatorFloor = null,
             Action onOpenRelicHub = null,
             Action onOpenHubShop = null,
+            Action onOpenRepairShop = null,
             Action onOpenPartyStats = null)
         {
             EnsureRoot(host);
@@ -117,6 +118,14 @@ namespace TypingRoguelike.Run
                 CreateButton(body, "店・レリック開発",
                     new Vector2(0.5f, hubBtnY), new Vector2(0.5f, hubBtnY), Vector2.zero, new Vector2(340, 52),
                     onOpenHubShop);
+                hubBtnY -= 0.08f;
+            }
+
+            if (onOpenRepairShop != null)
+            {
+                CreateButton(body, "修復屋（代理脳）",
+                    new Vector2(0.5f, hubBtnY), new Vector2(0.5f, hubBtnY), Vector2.zero, new Vector2(340, 52),
+                    onOpenRepairShop);
                 hubBtnY -= 0.08f;
             }
 
@@ -763,6 +772,35 @@ namespace TypingRoguelike.Run
                 });
         }
 
+        public void ShowHubRepairPanel(
+            Transform host,
+            MetaProgressData profile,
+            ProxyBrainUpgradeCatalog catalog,
+            Action onClosed)
+        {
+            EnsureRoot(host);
+            HideAll();
+            _loadoutPanel = CreateFullScreenPanel("HubRepair", new Color(0.008f, 0.01f, 0.026f, 0.98f));
+            _loadoutPanel.AddComponent<CanvasGroup>();
+            BuildOverlayBackdrop(_loadoutPanel.transform, BattleUITheme.AccentBoss);
+
+            CreateLabel(_loadoutPanel.transform, "Title", "拠点 — 修復屋", 24,
+                TextAnchor.MiddleCenter, new Vector2(0.08f, 0.88f), new Vector2(0.92f, 0.96f),
+                Vector2.zero, Vector2.zero, BattleUITheme.AccentBoss);
+
+            var body = CreateSubPanel(_loadoutPanel.transform, "Body", new Vector2(0.06f, 0.14f), new Vector2(0.94f, 0.86f));
+            BuildHubRepairPanel(body, profile, catalog, _loadoutPanel.transform, onClosed);
+
+            CreateButton(_loadoutPanel.transform, "聖堂に戻る",
+                new Vector2(0.5f, 0.05f), new Vector2(0.5f, 0.05f), Vector2.zero, new Vector2(280, 48),
+                () =>
+                {
+                    MetaProgression.Save(profile);
+                    HideAll();
+                    onClosed?.Invoke();
+                });
+        }
+
         public void ShowHubShopDevelopPanel(
             Transform host,
             MetaProgressData profile,
@@ -939,6 +977,109 @@ namespace TypingRoguelike.Run
                     });
                 y -= 0.07f;
             }
+        }
+
+        void BuildHubRepairPanel(
+            RectTransform body,
+            MetaProgressData profile,
+            ProxyBrainUpgradeCatalog catalog,
+            Transform host,
+            Action onClosed)
+        {
+            ClearChildren(body);
+            var banked = profile?.bankedCoins ?? 0;
+            CreateLabel(body, "Wallet", $"貯金（塔片） {banked}",
+                18, TextAnchor.UpperCenter, new Vector2(0.04f, 0.92f), new Vector2(0.96f, 0.98f),
+                Vector2.zero, Vector2.zero, BattleUITheme.Gold);
+            CreateLabel(body, "Hint", "持ち帰った塔片で代理脳を強化する。全滅しても装置の強化は残る。",
+                14, TextAnchor.UpperCenter, new Vector2(0.04f, 0.86f), new Vector2(0.96f, 0.92f),
+                Vector2.zero, Vector2.zero, BattleUITheme.TextMuted);
+
+            var y = 0.78f;
+            AppendRepairTrackRow(body, host, profile, catalog, onClosed, ProxyBrainUpgradeTrackKind.MadnessMaxBonus, ref y);
+            AppendRepairTrackRow(body, host, profile, catalog, onClosed, ProxyBrainUpgradeTrackKind.PartyMaxHpPercent, ref y);
+            AppendRepairTrackRow(body, host, profile, catalog, onClosed, ProxyBrainUpgradeTrackKind.RestMadnessRecovery, ref y);
+        }
+
+        void AppendRepairTrackRow(
+            RectTransform body,
+            Transform host,
+            MetaProgressData profile,
+            ProxyBrainUpgradeCatalog catalog,
+            Action onClosed,
+            ProxyBrainUpgradeTrackKind kind,
+            ref float y)
+        {
+            var track = catalog?.GetTrack(kind);
+            var title = track != null && !string.IsNullOrEmpty(track.displayName)
+                ? track.displayName
+                : kind.ToString();
+            var progress = ProxyBrainUpgrades.FormatTrackProgress(profile, kind);
+            CreateLabel(body, $"Hdr_{kind}", $"— {title}（{progress}）", 15, TextAnchor.UpperLeft,
+                new Vector2(0.04f, y), new Vector2(0.96f, y + 0.045f), Vector2.zero, Vector2.zero,
+                BattleUITheme.AccentAlly);
+            y -= 0.055f;
+
+            if (ProxyBrainUpgrades.TryGetNextTier(profile, catalog, kind, out var nextTier, out _))
+            {
+                var preview = ProxyBrainUpgrades.FormatEffectPreview(kind, nextTier);
+                var label = $"購入：{preview}（{nextTier.cost} 塔片）";
+                var canBuy = ProxyBrainUpgrades.CanPurchase(profile, catalog, kind, out var block, out _);
+                if (!canBuy && block == ProxyBrainUpgrades.PurchaseBlockReason.InsufficientFunds)
+                    label += " — 貯金が足りない";
+                var btn = CreateButton(body, label,
+                    new Vector2(0.5f, y), new Vector2(0.5f, y), Vector2.zero, new Vector2(560, 44),
+                    () =>
+                    {
+                        if (!ProxyBrainUpgrades.TryPurchase(profile, catalog, kind, out var line, out _))
+                            return;
+                        ShowRepairShopFlavorDialog(host, line, () =>
+                        {
+                            HideAll();
+                            ShowHubRepairPanel(host, profile, catalog, onClosed);
+                        });
+                    });
+                btn.interactable = canBuy;
+                if (!canBuy)
+                {
+                    var colors = btn.colors;
+                    colors.disabledColor = new Color(0.35f, 0.35f, 0.38f, 0.85f);
+                    btn.colors = colors;
+                }
+            }
+            else
+            {
+                CreateLabel(body, $"Max_{kind}", "最大段階まで強化済み — これ以上は買えない",
+                    14, TextAnchor.UpperLeft, new Vector2(0.06f, y - 0.01f), new Vector2(0.94f, y + 0.04f),
+                    Vector2.zero, Vector2.zero, BattleUITheme.TextMuted);
+            }
+
+            y -= 0.075f;
+        }
+
+        void ShowRepairShopFlavorDialog(Transform host, string line, Action onDismiss)
+        {
+            if (string.IsNullOrWhiteSpace(line))
+            {
+                onDismiss?.Invoke();
+                return;
+            }
+
+            var panel = CreateFullScreenPanel("RepairFlavor", new Color(0, 0, 0, 0.65f));
+            panel.transform.SetParent(host, false);
+            var window = BattleUIChrome.CreateLuxuryWindow(panel.transform, "RepairLine",
+                new Vector2(0.22f, 0.34f), new Vector2(0.78f, 0.62f), "修復屋", BattleUITheme.AccentBoss);
+            var winBody = window.Find("Body") ?? window;
+            CreateLabel(winBody, "Line", line, 19, TextAnchor.MiddleCenter,
+                new Vector2(0.08f, 0.35f), new Vector2(0.92f, 0.82f), Vector2.zero, Vector2.zero,
+                BattleUITheme.TextPrimary);
+            CreateButton(winBody, "続ける",
+                new Vector2(0.5f, 0.12f), new Vector2(0.5f, 0.12f), Vector2.zero, new Vector2(240, 46),
+                () =>
+                {
+                    UnityEngine.Object.Destroy(panel);
+                    onDismiss?.Invoke();
+                });
         }
 
         void BuildHubShopDevelopPanel(RectTransform body, MetaProgressData profile, RelicCatalogDefinition catalog)

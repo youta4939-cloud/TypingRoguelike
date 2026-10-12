@@ -122,12 +122,8 @@ namespace TypingRoguelike.Run
             var partyDef = ResolvePartyDefinition();
             _party.InitializeForNewDungeonRun(partyDef);
 
-            var maxHp = dungeonRun?.bossEncounter?.playerMaxHp
-                        ?? dungeonRun?.combatEncounter?.playerMaxHp
-                        ?? fallbackEncounter?.playerMaxHp
-                        ?? 100f;
-            _party.InitRunHp(maxHp * 1.2f);
-            _madness.ResetForNewRun();
+            ApplyProxyBrainRunMaxHp(preserveCurrentHp: false);
+            _madness.ResetForNewRun(ComputeFullMadnessCap());
 
             _runSeed = _profile.towerSeed;
             _elevatorFloor = 1 + PositiveModulo(_runSeed, TotalFloors);
@@ -259,9 +255,14 @@ namespace TypingRoguelike.Run
 
         void RestoreMadnessFromProfile()
         {
-            _madness.Restore(
+            _madness.SetConfiguredMadnessCap(ComputeFullMadnessCap());
+            var savedMax = _profile.towerRunMadnessMax > 0
+                ? _profile.towerRunMadnessMax
+                : _madness.ConfiguredMadnessCap;
+            var penalty = Mathf.Max(0, _madness.ConfiguredMadnessCap - savedMax);
+            _madness.SetDeviceCapPenalty(penalty);
+            _madness.RestoreCurrentAndJackpot(
                 _profile.towerRunMadnessCurrent,
-                _profile.towerRunMadnessMax > 0 ? _profile.towerRunMadnessMax : RunMadnessState.DefaultMaxMadness,
                 _profile.towerRunBonusJackpotChance,
                 _profile.towerRunJackpotAccumulatedChance);
         }
@@ -338,11 +339,50 @@ namespace TypingRoguelike.Run
             });
         }
 
+        void OpenHubRepairPanel()
+        {
+            _overlay.ShowHubRepairPanel(transform, _profile, ResolveProxyBrainCatalog(), () =>
+            {
+                MetaProgression.Save(_profile);
+                ShowHub();
+            });
+        }
+
         RelicCatalogDefinition ResolveRelicCatalog() =>
             Resources.Load<RelicCatalogDefinition>("Battle/PrototypeRelicCatalog");
 
         MaterialCatalogDefinition ResolveMaterialCatalog() =>
             Resources.Load<MaterialCatalogDefinition>("Battle/PrototypeMaterialCatalog");
+
+        ProxyBrainUpgradeCatalog ResolveProxyBrainCatalog() =>
+            Resources.Load<ProxyBrainUpgradeCatalog>("Run/ProxyBrainUpgradeCatalog");
+
+        float ResolveEncounterBaselineMaxHp()
+        {
+            var maxHp = dungeonRun?.bossEncounter?.playerMaxHp
+                        ?? dungeonRun?.combatEncounter?.playerMaxHp
+                        ?? fallbackEncounter?.playerMaxHp
+                        ?? 100f;
+            return maxHp * 1.2f;
+        }
+
+        void ApplyProxyBrainRunMaxHp(bool preserveCurrentHp)
+        {
+            var baseline = ResolveEncounterBaselineMaxHp();
+            var bonus = ProxyBrainUpgrades.ComputePartyMaxHpPercentBonus(_profile, ResolveProxyBrainCatalog());
+            var max = baseline * (1f + bonus / 100f);
+            if (preserveCurrentHp)
+                _party.SetMaxHpPreservingCurrent(max);
+            else
+                _party.InitRunHp(max);
+        }
+
+        int ComputeFullMadnessCap()
+        {
+            var proxyBonus = ProxyBrainUpgrades.ComputeMadnessBaseBonus(_profile, ResolveProxyBrainCatalog());
+            var relicBonus = RelicRunModifiers.Compute(_exploration, ResolveRelicCatalog()).MadnessMaxBonus;
+            return RunMadnessState.DefaultMaxMadness + Mathf.Max(0, proxyBonus) + Mathf.Max(0, relicBonus);
+        }
 
         void ShowHub()
         {
@@ -364,6 +404,7 @@ namespace TypingRoguelike.Run
                 BeginNewRunFromElevatorFloor,
                 OpenHubRelicPanel,
                 OpenHubShopDevelopPanel,
+                OpenHubRepairPanel,
                 OpenHubPartyStats);
         }
 
@@ -399,12 +440,8 @@ namespace TypingRoguelike.Run
             var partyDef = ResolvePartyDefinition();
             _party.InitializeForNewDungeonRun(partyDef);
 
-            var maxHp = dungeonRun?.bossEncounter?.playerMaxHp
-                        ?? dungeonRun?.combatEncounter?.playerMaxHp
-                        ?? fallbackEncounter?.playerMaxHp
-                        ?? 100f;
-            _party.InitRunHp(maxHp * 1.2f);
-            _madness.ResetForNewRun();
+            ApplyProxyBrainRunMaxHp(preserveCurrentHp: false);
+            _madness.ResetForNewRun(ComputeFullMadnessCap());
 
             _runSeed = _profile.towerSeed;
             _elevatorFloor = 1 + PositiveModulo(_runSeed, TotalFloors);
@@ -480,10 +517,7 @@ namespace TypingRoguelike.Run
             _party.ApplyMemberSaves(_profile.towerRunMembers, GetSkillCatalog());
             _party.AddCoins(_profile.towerRunCoins);
 
-            var maxHp = _profile.towerRunMaxHp > 0f
-                ? _profile.towerRunMaxHp
-                : dungeonRun?.bossEncounter?.playerMaxHp ?? 100f;
-            _party.InitRunHp(maxHp);
+            ApplyProxyBrainRunMaxHp(preserveCurrentHp: false);
             if (_profile.towerRunCurrentHp > 0f)
                 _party.SetCurrentHp(_profile.towerRunCurrentHp);
             RestoreMadnessFromProfile();
@@ -813,11 +847,22 @@ namespace TypingRoguelike.Run
         {
             var frac = dungeonRun != null ? dungeonRun.restHealFraction : 0.3f;
             _party.HealFraction(frac);
+            var madnessRecovery = ProxyBrainUpgrades.ComputeRestMadnessRecovery(_profile, ResolveProxyBrainCatalog());
+            var madnessLine = string.Empty;
+            if (madnessRecovery > 0 && _madness.CurrentMadness > 0)
+            {
+                var before = _madness.CurrentMadness;
+                _madness.ApplyDelta(-madnessRecovery);
+                var reduced = before - _madness.CurrentMadness;
+                if (reduced > 0)
+                    madnessLine = $"\n狂気が {reduced} 静まった。（{_madness.CurrentMadness} / {_madness.MaxMadness}）";
+            }
+
             MarkCurrentCleared();
             ShowMapTabHint();
             _mapUi.ShowModal(
                 "休息",
-                $"焚き火で休んだ。HP が最大の {(int)(frac * 100)}% 回復した。\n{FormatHpLine()}",
+                $"焚き火で休んだ。HP が最大の {(int)(frac * 100)}% 回復した。{madnessLine}\n{FormatHpLine()}",
                 new (string, Action)[] { ("マップに戻る", ShowRouteMap) });
             _mapUi.Refresh(_dungeon, _party, _exploration, _madness);
         }
@@ -1125,8 +1170,9 @@ namespace TypingRoguelike.Run
 
         void SyncMadnessCapFromRelics()
         {
-            var bonus = RelicRunModifiers.Compute(_exploration, ResolveRelicCatalog()).MadnessMaxBonus;
-            _madness.SetMaxMadness(RunMadnessState.DefaultMaxMadness + Mathf.Max(0, bonus));
+            var penalty = _madness.DeviceCapPenalty;
+            _madness.SetConfiguredMadnessCap(ComputeFullMadnessCap());
+            _madness.SetDeviceCapPenalty(penalty);
         }
 
         void TryMerchantHeal(int cost)
@@ -1200,6 +1246,8 @@ namespace TypingRoguelike.Run
         {
             _overlay.HideAll();
             DestroyBattleIfAny();
+            _madness.ClearDeviceCapPenalty();
+            SyncMadnessCapFromRelics();
             // TODO 未決事項5: 素材は倉庫へ移さず、探索の所持のまま保存する。
             MetaProgression.BankRunCoins(_profile, _party);
             _party.ClearRunCoins();
@@ -1555,7 +1603,7 @@ namespace TypingRoguelike.Run
             _exploration.Clear();
             _party.ResetAcquiredSkillCards();
             _party.ClearRunCoins();
-            _madness.ResetForNewRun();
+            _madness.ResetForNewRun(ComputeFullMadnessCap());
             MetaProgression.ApplyDeathReset(_profile);
             RecordRunResult(false);
         }

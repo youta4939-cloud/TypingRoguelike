@@ -18,10 +18,16 @@ namespace TypingRoguelike.Run
     [Serializable]
     public sealed class MetaProgressData
     {
-        public int version = 3;
+        public int version = 4;
         public int arcaneShards;
         // TODO 未決事項1: 貯金する通貨は塔片のまま。名前と、魔石へ変換して一本にするかは未決。
         public int bankedCoins;
+        [Tooltip("修復屋 — 狂気基本上限（0〜3段）")]
+        public int proxyBrainMadnessMaxTier;
+        [Tooltip("修復屋 — パーティ最大HP%（0〜3段）")]
+        public int proxyBrainPartyHpTier;
+        [Tooltip("修復屋 — 休憩狂気回復（0〜3段）")]
+        public int proxyBrainRestMadnessTier;
         public int completedRuns;
         public int extractedRuns;
         public int failedRuns;
@@ -413,6 +419,18 @@ namespace TypingRoguelike.Run
                 // 中断中の towerRunCoins はそのまま（再開時の所持塔片）。
                 data.version = 3;
             }
+
+            if (data.version < 4)
+            {
+                data.proxyBrainMadnessMaxTier = 0;
+                data.proxyBrainPartyHpTier = 0;
+                data.proxyBrainRestMadnessTier = 0;
+                data.version = 4;
+            }
+
+            data.proxyBrainMadnessMaxTier = Mathf.Clamp(data.proxyBrainMadnessMaxTier, 0, ProxyBrainUpgrades.MaxTier);
+            data.proxyBrainPartyHpTier = Mathf.Clamp(data.proxyBrainPartyHpTier, 0, ProxyBrainUpgrades.MaxTier);
+            data.proxyBrainRestMadnessTier = Mathf.Clamp(data.proxyBrainRestMadnessTier, 0, ProxyBrainUpgrades.MaxTier);
 
             var wh = new MaterialWarehouse();
             wh.ReadFrom(data.warehouseMaterialStacks);
