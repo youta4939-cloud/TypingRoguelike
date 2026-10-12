@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c73c0ff84501a21449f4921f763fa243, type: 3}
+  m_Name: PrototypeBossEncounter
+  m_EditorClassIdentifier: TypingRoguelike::TypingRoguelike.Data.BattleEncounterDefinition
+  enemy: {fileID: 11400000, guid: 5559f03a9d9d38242b05e6a8f41959b7, type: 2}
+  wordList: {fileID: 11400000, guid: 3e6750f7febce7141baeb38b724a7780, type: 2}
+  party: {fileID: 11400000, guid: 146103864cb0ec44dad0d77f832abdfc, type: 2}
+  playerMaxHp: 100
+  wordClearDamage: 15
+  rerollsPerBattle: 3
+  enemyTickInterval: 0.05
+  typingAudio: {fileID: 11400000, guid: 21a083445df21d140bad276c8203d79d, type: 2}
+  jackpotMultiplier: 2.5
+  baseFreezeChance: 0
+  freezeChancePerCharacter: 0.000025
+  baseJackpotChanceCap: 0.1
+  maxFreezeChance: 0.99
+  startLogMessage: "\U0001F525 \u30DC\u30B9\u6226\u958B\u59CB\uFF01"
+  rewardCardPool: {fileID: 11400000, guid: f4e8c2b19d3a4f5e8b7c6d5e4f3a2b1c, type: 2}
+  rewardChoiceCount: 3

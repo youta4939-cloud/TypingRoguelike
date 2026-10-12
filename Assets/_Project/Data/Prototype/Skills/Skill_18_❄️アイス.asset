@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a75d71813750e046b8834d9207ae380, type: 3}
+  m_Name: "Skill_18_\u2744\uFE0F\u30A2\u30A4\u30B9"
+  m_EditorClassIdentifier: TypingRoguelike::TypingRoguelike.Data.SkillDefinition
+  skillId: 18
+  characterName: "\u30EB\u30CA"
+  displayName: "\u2744\uFE0F\u30A2\u30A4\u30B9"
+  pattern: 0000000000000000
+  damage: 26
+  heal: 0
+  effectText: "26\u30C0\u30E1"
+  effectKind: 0
+  effectValue: 0
+  effectValueInt: 0
+  description: 

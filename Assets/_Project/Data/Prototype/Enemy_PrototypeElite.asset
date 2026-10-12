@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8cfb66f1254e4a44b8ed62a70698ffa2, type: 3}
+  m_Name: Enemy_PrototypeElite
+  m_EditorClassIdentifier: TypingRoguelike::TypingRoguelike.Data.EnemyDefinition
+  displayName: "\u5F37\u6575"
+  battleIllustration: {fileID: 0}
+  emojiNormal: "\U0001F982"
+  emojiEnraged: "\u2620\uFE0F"
+  emojiDefeated: "\U0001F480"
+  maxHp: 380
+  attackDamage: 22
+  attackTimerMax: 100
+  attackSpeed: 0.38
+  enragedAttackSpeed: 0.58
+  enrageHpFraction: 0.5

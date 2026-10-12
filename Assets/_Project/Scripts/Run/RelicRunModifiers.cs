@@ -1,0 +1,99 @@
+using TypingRoguelike.Data;
+
+namespace TypingRoguelike.Run
+{
+    public readonly struct RelicRunModifiers
+    {
+        public int DangerEncounterReductionPercent { get; }
+        public int BackpackSlotBonus { get; }
+        public int PlayerDamageBonusPercent { get; }
+        public int MadnessMaxBonus { get; }
+        public int JackpotMadnessThreshold { get; }
+        public float JackpotChanceBonus { get; }
+        public float JackpotDamageMultiplier { get; }
+        public bool RevealsAllNodes { get; }
+        public bool ExclusiveEquipped { get; }
+        public float OpeningEnemyStopSeconds { get; }
+
+        public RelicRunModifiers(
+            int dangerReduction,
+            int backpackBonus,
+            int damageBonusPercent,
+            int madnessMaxBonus,
+            int jackpotMadnessThreshold,
+            float jackpotChanceBonus,
+            float jackpotDamageMultiplier,
+            bool revealsAllNodes,
+            bool exclusiveEquipped,
+            float openingEnemyStopSeconds)
+        {
+            DangerEncounterReductionPercent = dangerReduction;
+            BackpackSlotBonus = backpackBonus;
+            PlayerDamageBonusPercent = damageBonusPercent;
+            MadnessMaxBonus = madnessMaxBonus;
+            JackpotMadnessThreshold = jackpotMadnessThreshold;
+            JackpotChanceBonus = jackpotChanceBonus;
+            JackpotDamageMultiplier = jackpotDamageMultiplier <= 0f ? 1f : jackpotDamageMultiplier;
+            RevealsAllNodes = revealsAllNodes;
+            ExclusiveEquipped = exclusiveEquipped;
+            OpeningEnemyStopSeconds = openingEnemyStopSeconds;
+        }
+
+        public static RelicRunModifiers Compute(RunExplorationInventory loot, RelicCatalogDefinition catalog)
+        {
+            if (loot == null || catalog == null)
+                return default;
+
+            var equipped = new RelicDefinition[RunExplorationInventory.RelicSlotCount];
+            var exclusive = false;
+            for (var i = 0; i < equipped.Length; i++)
+            {
+                var id = loot.GetEquippedRelicId(i);
+                if (id < 0)
+                    continue;
+                var def = catalog.FindById(id);
+                equipped[i] = def;
+                if (def != null && def.exclusiveEquip)
+                    exclusive = true;
+            }
+
+            var danger = 0;
+            var backpack = 0;
+            var damage = 0;
+            var madness = 0;
+            var threshold = 0;
+            var chance = 0f;
+            var jackpotDamage = 1f;
+            var reveal = false;
+            var stop = 0f;
+            for (var i = 0; i < equipped.Length; i++)
+            {
+                var def = equipped[i];
+                if (def == null)
+                    continue;
+                if (exclusive && !def.exclusiveEquip)
+                    continue;
+
+                danger += def.dangerEncounterReductionPercent;
+                backpack += def.backpackSlotBonus;
+                damage += def.playerDamageBonusPercent;
+                madness += def.madnessMaxBonus;
+                reveal |= def.revealsAllNodes;
+                if (def.battleStartEnemyStopSeconds > 0f)
+                    stop += def.battleStartEnemyStopSeconds;
+                if (def.jackpotMadnessThreshold <= 0)
+                    continue;
+
+                threshold = threshold == 0
+                    ? def.jackpotMadnessThreshold
+                    : System.Math.Min(threshold, def.jackpotMadnessThreshold);
+                chance += def.jackpotChanceBonus;
+                var mul = def.jackpotDamageMultiplier <= 0f ? 1f : def.jackpotDamageMultiplier;
+                jackpotDamage *= mul;
+            }
+
+            return new RelicRunModifiers(
+                danger, backpack, damage, madness, threshold, chance, jackpotDamage, reveal, exclusive, stop);
+        }
+    }
+}

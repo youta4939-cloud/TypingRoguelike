@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12960ca132f40654dbfa239ffd8620f6, type: 3}
+  m_Name: PrototypeMaterialCatalog
+  m_EditorClassIdentifier: TypingRoguelike::TypingRoguelike.Data.MaterialCatalogDefinition
+  materials:
+  - {fileID: 11400000, guid: 098bb2ddb58e45244b2650edee2c0906, type: 2}
+  - {fileID: 11400000, guid: eaf2e9d3cd2800a4abd80ce712ef71ac, type: 2}
+  - {fileID: 11400000, guid: a86d858d0609bda48b22a8aa02699ea9, type: 2}
+  - {fileID: 11400000, guid: 774bfd822d7fcf1429d8bf7ef8acc61c, type: 2}
+  - {fileID: 11400000, guid: b4ff02242d7b88d4c932396307ba0b93, type: 2}
+  - {fileID: 11400000, guid: 243af0a651ea7fb428e0fe093c592876, type: 2}
+  - {fileID: 11400000, guid: 3ce4c14a2242bec4b940afd5fda7c240, type: 2}
+  - {fileID: 11400000, guid: fbff400f2099c7143ba9d60cb3932596, type: 2}
+  - {fileID: 11400000, guid: d988715e6c031de48b57c8d088ae6752, type: 2}
+  - {fileID: 11400000, guid: 9356871e395f63147aa2504abd295bee, type: 2}

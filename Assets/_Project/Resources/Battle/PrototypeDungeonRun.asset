@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e258ca663e2c1d4fafef5700eb49deb, type: 3}
+  m_Name: PrototypeDungeonRun
+  m_EditorClassIdentifier: TypingRoguelike::TypingRoguelike.Data.DungeonRunDefinition
+  combatEncounter: {fileID: 11400000, guid: 86513d8b01ac9e8488711c1934c72313, type: 2}
+  eliteEncounter: {fileID: 11400000, guid: bc98ff10283c7a84db9f1f4ee128b816, type: 2}
+  bossEncounter: {fileID: 11400000, guid: 4fc1ff427298a1845b5f7ffa70ee459d, type: 2}
+  towerFloors: 15
+  pathLayers: 6
+  branchWidth: 3
+  restNodesPerFloorMin: 1
+  restNodesPerFloorMax: 2
+  restHealFraction: 0.15
+  combatEnemyHpMultiplier: 0.72
+  partyAttackCoefficient: 1
+  partyDefenseCoefficient: 0.5
+  partyLuckJackpotBonusPerPoint: 0.0005
+  combatCoinReward: 8
+  eliteCoinReward: 15
+  treasureCoinReward: 10
+  treasureOffersCard: 1
+  treasureMaterialMin: 1
+  treasureMaterialMax: 2
+  treasureRelicChance: 0
+  merchantHealCost: 10
+  merchantHealFraction: 0.12
+  merchantCardCost: 22
+  merchantRelicOfferChance: 0.5
+  merchantRelicCost: 60
+  sharedRewardPool: {fileID: 11400000, guid: f4e8c2b19d3a4f5e8b7c6d5e4f3a2b1c, type: 2}
+  rewardChoiceCount: 3
+  eliteEnemyHpMultiplier: 1.35
+  eliteEnemyDamageMultiplier: 1.15

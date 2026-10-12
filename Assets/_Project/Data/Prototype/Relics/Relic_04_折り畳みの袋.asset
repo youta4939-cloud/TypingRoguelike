@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c5992bffb65dae41a7d65f3d929a2a9, type: 3}
+  m_Name: "Relic_04_\u6298\u308A\u7573\u307F\u306E\u888B"
+  m_EditorClassIdentifier: TypingRoguelike::TypingRoguelike.Data.RelicDefinition
+  relicId: 4
+  displayName: "\u6298\u308A\u7573\u307F\u306E\u888B"
+  effectText: "\u30D0\u30C3\u30AF\u30D1\u30C3\u30AF\u67A0+2"
+  dangerEncounterReductionPercent: 0
+  backpackSlotBonus: 2
+  playerDamageBonusPercent: 0
+  hubShopPriceShards: 50
+  developMaterialCost: 9
