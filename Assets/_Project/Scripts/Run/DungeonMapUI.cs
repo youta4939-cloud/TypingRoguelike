@@ -22,6 +22,8 @@ namespace TypingRoguelike.Run
         static readonly Color InkLight = new Color(0.55f, 0.44f, 0.34f, 0.48f);
         static readonly Color SkippedTint = new Color(0.62f, 0.56f, 0.5f, 1f);
         const float RevealSeconds = 0.3f;
+        const float LargeLineThickness = 8f;
+        const float MiniLineThickness = 3f;
 
         static readonly DungeonNodeType[] LegendOrder =
         {
@@ -105,7 +107,7 @@ namespace TypingRoguelike.Run
             _revealAllNodes = revealAllNodes || debugRevealMap;
             _visibleRows = Mathf.Max(0, visibleRows);
             _currentLayer = dungeon.Current?.Layer ?? 0;
-            CloseOverlay();
+            ReleasePause();
             HideMinimap();
             EnsureRoot(host);
             HideModal();
@@ -159,6 +161,38 @@ namespace TypingRoguelike.Run
             if (_minimapPanel != null)
                 UnityEngine.Object.Destroy(_minimapPanel);
             _minimapPanel = BuildMinimapPanel();
+        }
+
+        /// <summary>イベント・商人・休憩の文章中。ミニマップは出さず、右上の「Tab：地図」だけ残す。</summary>
+        public void ShowMapTabHint(Transform host, DungeonRunState dungeon, int visibleRows, bool revealAllNodes)
+        {
+            if (host == null || dungeon == null)
+                return;
+
+            _host = host;
+            _dungeon = dungeon;
+            _revealAllNodes = revealAllNodes;
+            _visibleRows = Mathf.Max(0, visibleRows);
+            _currentLayer = dungeon.Current?.Layer ?? 0;
+            ReleasePause();
+            if (_mapPanel != null)
+            {
+                UnityEngine.Object.Destroy(_mapPanel);
+                _mapPanel = null;
+            }
+
+            EnsureRoot(host);
+            EnsureMinimapRoot();
+            if (_minimapPanel != null)
+                UnityEngine.Object.Destroy(_minimapPanel);
+            _minimapPanel = BuildMapTabHint();
+        }
+
+        public void ReleasePause()
+        {
+            CloseOverlay();
+            if (Time.timeScale <= 0f)
+                Time.timeScale = 1f;
         }
 
         public void Refresh(
@@ -483,7 +517,7 @@ namespace TypingRoguelike.Run
             LayoutRebuilder.ForceRebuildLayoutImmediate(area);
 
             var reachable = new HashSet<int>(dungeon.GetReachableNext().Select(node => node.Id));
-            var brush = MapNodeIcons.BrushStrokeTexture();
+            var brush = MapNodeIcons.Catalog != null ? MapNodeIcons.Catalog.brushLine : null;
             foreach (var from in dungeon.Nodes.Values)
             {
                 foreach (var nextId in from.Next)
@@ -500,7 +534,7 @@ namespace TypingRoguelike.Run
                     if (brush != null)
                     {
                         CreateBrushLine(routesRoot, area, positions[from.Id], positions[nextId], color,
-                            available ? 18f : 15f, fromRadius, toRadius, brush, justWalked);
+                            LargeLineThickness, brush, justWalked);
                     }
                     else if (available)
                     {
@@ -899,41 +933,64 @@ namespace TypingRoguelike.Run
         }
 
         void CreateBrushLine(
-            RectTransform routesRoot,
+            RectTransform parent,
             RectTransform area,
             Vector2 fromAnchor,
             Vector2 toAnchor,
             Color color,
             float thickness,
-            float insetFromPixels,
-            float insetToPixels,
-            Texture2D brush,
+            Sprite brush,
             bool animate)
         {
+            if (brush == null)
+                return;
+
             var a = AnchorFractionToLocal(area, fromAnchor);
             var b = AnchorFractionToLocal(area, toAnchor);
             var delta = b - a;
             var length = delta.magnitude;
-            if (length < 6f)
+            if (length < 2f)
                 return;
 
-            var direction = delta / length;
-            var startInset = Mathf.Min(insetFromPixels, length * 0.42f);
-            var endInset = Mathf.Min(insetToPixels, length * 0.42f);
-            if (startInset + endInset >= length - 2f)
+            var rt = CreateRect(parent, "BrushLine", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
+            rt.pivot = new Vector2(0f, 0.5f);
+            rt.anchoredPosition = a;
+            rt.sizeDelta = new Vector2(animate ? 0f : length, thickness);
+            rt.localEulerAngles = new Vector3(0f, 0f, Mathf.Atan2(delta.y, delta.x) * Mathf.Rad2Deg);
+
+            var image = rt.gameObject.AddComponent<Image>();
+            image.sprite = brush;
+            image.type = Image.Type.Tiled;
+            image.useSpriteMesh = false;
+            image.color = color;
+            image.raycastTarget = false;
+            var pixelsPerUnit = Mathf.Max(0.01f, image.pixelsPerUnit);
+            image.pixelsPerUnitMultiplier = Mathf.Max(0.01f, brush.rect.height / (thickness * pixelsPerUnit));
+            var material = BrushUiMaterial();
+            if (material != null)
+                image.material = material;
+            if (animate)
+                rt.gameObject.AddComponent<MapBrushGrow>().Play(length, RevealSeconds);
+        }
+
+        static Material _brushUiMaterial;
+
+        static Material BrushUiMaterial()
+        {
+            if (_brushUiMaterial != null)
+                return _brushUiMaterial;
+            var loaded = Resources.Load<Material>("Map/MapBrushUi");
+            if (loaded != null)
             {
-                startInset = length * 0.22f;
-                endInset = length * 0.22f;
+                _brushUiMaterial = new Material(loaded) { hideFlags = HideFlags.HideAndDontSave };
+                return _brushUiMaterial;
             }
 
-            a += direction * startInset;
-            b -= direction * endInset;
-            if ((b - a).magnitude < 4f)
-                return;
-
-            var rt = CreateRect(routesRoot, "BrushLine", Vector2.zero, Vector2.one);
-            var stroke = rt.gameObject.AddComponent<MapBrushLine>();
-            stroke.Setup(a, b, thickness, color, brush, animate, RevealSeconds);
+            var shader = Shader.Find("TypingRoguelike/MapBrushUi");
+            if (shader == null)
+                return null;
+            _brushUiMaterial = new Material(shader) { hideFlags = HideFlags.HideAndDontSave };
+            return _brushUiMaterial;
         }
 
         void AddHover(GameObject target, DungeonMapNode node, bool canClick)
@@ -1173,6 +1230,23 @@ namespace TypingRoguelike.Run
             return panel.gameObject;
         }
 
+        GameObject BuildMapTabHint()
+        {
+            var panel = CreateRect(_minimapRoot, "MapTabHint", new Vector2(0.80f, 0.935f), new Vector2(0.985f, 0.985f));
+            var image = panel.gameObject.AddComponent<Image>();
+            image.color = new Color(0.05f, 0.04f, 0.03f, 0.78f);
+            BattleUITheme.EnsureSprite(image);
+            var button = panel.gameObject.AddComponent<Button>();
+            button.targetGraphic = image;
+            button.navigation = new Navigation { mode = Navigation.Mode.None };
+            button.onClick.AddListener(ToggleOverlay);
+            var label = CreateLabel(panel, "Caption", "Tab：地図", 16, TextAnchor.MiddleCenter,
+                Vector2.zero, Vector2.one, BattleUITheme.Gold);
+            label.fontStyle = FontStyle.Bold;
+            label.raycastTarget = false;
+            return panel.gameObject;
+        }
+
         void DrawMinimap(RectTransform area)
         {
             if (_dungeon?.Nodes == null)
@@ -1193,7 +1267,7 @@ namespace TypingRoguelike.Run
                 positions[node.Id] = new Vector2(Mathf.Clamp(x, 0.08f, 0.92f), Mathf.Clamp(y, 0.1f, 0.9f));
             }
 
-            var brush = MapNodeIcons.BrushStrokeTexture();
+            var brush = MapNodeIcons.Catalog != null ? MapNodeIcons.Catalog.brushLine : null;
             var reveal = _animateReveal;
             _animateReveal = false;
             foreach (var from in nodes)
@@ -1210,7 +1284,7 @@ namespace TypingRoguelike.Run
                     if (brush != null)
                     {
                         CreateBrushLine(area, area, positions[from.Id], positions[nextId], color,
-                            choice ? 5f : 3.5f, NodeRadius(from, true), NodeRadius(to, true), brush, false);
+                            MiniLineThickness, brush, false);
                     }
                     else
                     {
@@ -1259,9 +1333,11 @@ namespace TypingRoguelike.Run
 
             _currentLayer = _dungeon.Current?.Layer ?? 0;
             _pausedByOverlay = true;
-            _savedTimeScale = Time.timeScale;
+            _savedTimeScale = Time.timeScale > 0f ? Time.timeScale : 1f;
             Time.timeScale = 0f;
             IsOverlayOpen = true;
+            if (_minimapPanel != null)
+                _minimapPanel.SetActive(false);
 
             RunOverlayUI.EnsureGlobalEventSystem();
             var go = new GameObject("DungeonMapOverlayCanvas");
@@ -1305,6 +1381,8 @@ namespace TypingRoguelike.Run
             }
 
             IsOverlayOpen = false;
+            if (_minimapPanel != null)
+                _minimapPanel.SetActive(true);
         }
 
         void EnsureRoot(Transform host)
@@ -1468,175 +1546,36 @@ namespace TypingRoguelike.Run
         }
     }
 
-    /// <summary>
-    /// 筆の線。LineRenderer が太さ・色・繰り返しを持ち、
-    /// オーバーレイのキャンバスにはそのメッシュを載せて描く。
-    /// </summary>
-    public sealed class MapBrushLine : MaskableGraphic
+    sealed class MapBrushGrow : MonoBehaviour
     {
-        LineRenderer _line;
-        Vector2 _start;
-        Vector2 _end;
-        float _width = 12f;
-        float _drawn = 1f;
-        float _tileLength = 64f;
-        bool _animate;
-        float _animStart;
+        RectTransform _rect;
+        float _length;
+        float _start;
         float _duration = 0.3f;
-        Mesh _baked;
-        Material _ownedMaterial;
-        static Camera _bakeCamera;
 
-        public void Setup(Vector2 start, Vector2 end, float width, Color ink, Texture2D brush, bool animate, float duration)
+        public void Play(float length, float duration)
         {
-            _start = start;
-            _end = end;
-            _width = width;
+            _rect = transform as RectTransform;
+            _length = length;
             _duration = Mathf.Max(0.05f, duration);
-            _animate = animate;
-            _drawn = animate ? 0f : 1f;
-            _animStart = Time.unscaledTime;
-            color = ink;
-            raycastTarget = false;
-            var aspect = brush != null && brush.height > 0 ? brush.width / (float)brush.height : 8f;
-            _tileLength = Mathf.Max(8f, width * aspect);
-
-            var child = new GameObject("LineRenderer");
-            child.transform.SetParent(transform, false);
-            _line = child.AddComponent<LineRenderer>();
-            _line.useWorldSpace = false;
-            _line.loop = false;
-            _line.positionCount = 2;
-            _line.numCornerVertices = 0;
-            _line.numCapVertices = 2;
-            _line.alignment = LineAlignment.TransformZ;
-            _line.textureMode = LineTextureMode.Tile;
-            _line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-            _line.receiveShadows = false;
-            _line.forceRenderingOff = true;
-            _line.startWidth = _line.endWidth = width;
-            _line.startColor = _line.endColor = ink;
-            var shader = Shader.Find("UI/Default");
-            if (shader != null)
-            {
-                _ownedMaterial = new Material(shader);
-                _ownedMaterial.mainTexture = brush;
-                _line.sharedMaterial = _ownedMaterial;
-            }
-
-            _baked = new Mesh { name = "BrushBake" };
-            ApplyLine();
-            SetVerticesDirty();
+            _start = Time.unscaledTime;
         }
-
-        public override Texture mainTexture =>
-            _line != null && _line.sharedMaterial != null ? _line.sharedMaterial.mainTexture : s_WhiteTexture;
 
         void Update()
         {
-            if (!_animate)
+            if (_rect == null)
+            {
+                enabled = false;
                 return;
-            var t = Mathf.Clamp01((Time.unscaledTime - _animStart) / _duration);
-            _drawn = t * t * (3f - 2f * t);
-            ApplyLine();
-            SetVerticesDirty();
+            }
+
+            var t = Mathf.Clamp01((Time.unscaledTime - _start) / _duration);
+            var eased = t * t * (3f - 2f * t);
+            var size = _rect.sizeDelta;
+            size.x = _length * eased;
+            _rect.sizeDelta = size;
             if (t >= 1f)
-                _animate = false;
-        }
-
-        void ApplyLine()
-        {
-            if (_line == null)
-                return;
-            var end = Vector2.Lerp(_start, _end, _drawn);
-            _line.SetPosition(0, new Vector3(_start.x, _start.y, 0f));
-            _line.SetPosition(1, new Vector3(end.x, end.y, 0f));
-        }
-
-        protected override void OnPopulateMesh(VertexHelper vh)
-        {
-            vh.Clear();
-            if (_drawn <= 0.001f)
-                return;
-            if (!TryAddBakedMesh(vh))
-                AddFallbackQuad(vh);
-        }
-
-        bool TryAddBakedMesh(VertexHelper vh)
-        {
-            if (_line == null || _baked == null)
-                return false;
-            var camera = BakeCamera;
-            if (camera == null)
-                return false;
-            _line.BakeMesh(_baked, camera, false);
-            var verts = _baked.vertices;
-            if (verts == null || verts.Length < 3)
-                return false;
-
-            var end = Vector2.Lerp(_start, _end, _drawn);
-            var mid = (_start + end) * 0.5f;
-            var sum = Vector3.zero;
-            for (var i = 0; i < verts.Length; i++)
-                sum += verts[i];
-            var meshMid = (Vector2)(sum / verts.Length);
-            if ((meshMid - mid).sqrMagnitude > (_width * 6f + 40f) * (_width * 6f + 40f))
-                return false;
-
-            var uvs = _baked.uv;
-            var tris = _baked.triangles;
-            if (tris == null || tris.Length < 3)
-                return false;
-            for (var i = 0; i < verts.Length; i++)
-            {
-                var uv = uvs != null && i < uvs.Length ? uvs[i] : Vector2.zero;
-                vh.AddVert(verts[i], color, uv);
-            }
-
-            for (var i = 0; i + 2 < tris.Length; i += 3)
-                vh.AddTriangle(tris[i], tris[i + 1], tris[i + 2]);
-            return true;
-        }
-
-        void AddFallbackQuad(VertexHelper vh)
-        {
-            var end = Vector2.Lerp(_start, _end, _drawn);
-            var delta = end - _start;
-            var length = delta.magnitude;
-            if (length < 1f)
-                return;
-            var dir = delta / length;
-            var normal = new Vector2(-dir.y, dir.x) * (_width * 0.5f);
-            var repeats = _tileLength > 1f ? length / _tileLength : 1f;
-            vh.AddVert(_start - normal, color, new Vector2(0f, 0f));
-            vh.AddVert(_start + normal, color, new Vector2(0f, 1f));
-            vh.AddVert(end + normal, color, new Vector2(repeats, 1f));
-            vh.AddVert(end - normal, color, new Vector2(repeats, 0f));
-            vh.AddTriangle(0, 1, 2);
-            vh.AddTriangle(0, 2, 3);
-        }
-
-        static Camera BakeCamera
-        {
-            get
-            {
-                if (_bakeCamera != null)
-                    return _bakeCamera;
-                var go = new GameObject("MapBrushBakeCamera") { hideFlags = HideFlags.HideAndDontSave };
-                _bakeCamera = go.AddComponent<Camera>();
-                _bakeCamera.enabled = false;
-                _bakeCamera.orthographic = true;
-                return _bakeCamera;
-            }
-        }
-
-        protected override void OnDestroy()
-        {
-            if (_ownedMaterial != null)
-                Destroy(_ownedMaterial);
-            if (_baked != null)
-                Destroy(_baked);
-            base.OnDestroy();
+                enabled = false;
         }
     }
 

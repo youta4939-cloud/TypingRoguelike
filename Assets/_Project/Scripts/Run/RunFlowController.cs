@@ -188,6 +188,7 @@ namespace TypingRoguelike.Run
 
         void ShowMap()
         {
+            _mapUi.ReleasePause();
             if (TryBeginRunDeath(fromBattle: false))
                 return;
 
@@ -203,6 +204,17 @@ namespace TypingRoguelike.Run
         {
             var revealAll = RelicRunModifiers.Compute(_exploration, ResolveRelicCatalog()).RevealsAllNodes || _debugRevealMap;
             _mapUi.ShowMinimap(transform, _dungeon, _visibleRows, revealAll);
+        }
+
+        void ShowMapTabHint()
+        {
+            var revealAll = RelicRunModifiers.Compute(_exploration, ResolveRelicCatalog()).RevealsAllNodes || _debugRevealMap;
+            _mapUi.ShowMapTabHint(transform, _dungeon, _visibleRows, revealAll);
+        }
+
+        void ShowRouteMap()
+        {
+            ShowMap();
         }
 
         /// <summary>マップイベント等から狂気度を変更。発狂したら true。</summary>
@@ -802,11 +814,11 @@ namespace TypingRoguelike.Run
             var frac = dungeonRun != null ? dungeonRun.restHealFraction : 0.3f;
             _party.HealFraction(frac);
             MarkCurrentCleared();
-            ShowMap();
+            ShowMapTabHint();
             _mapUi.ShowModal(
                 "休息",
                 $"焚き火で休んだ。HP が最大の {(int)(frac * 100)}% 回復した。\n{FormatHpLine()}",
-                new (string, Action)[] { ("マップに戻る", null) });
+                new (string, Action)[] { ("マップに戻る", ShowRouteMap) });
             _mapUi.Refresh(_dungeon, _party, _exploration, _madness);
         }
 
@@ -920,7 +932,7 @@ namespace TypingRoguelike.Run
                     () =>
                     {
                         _merchantRelicSoldNodeId = nodeId;
-                        ShowSideMap();
+                        ShowMapTabHint();
                         _mapUi.ShowModal(
                             "取引完了",
                             $"「{offer.displayName}」を装備した。\n{offer.effectText}\n{FormatCoinLine()}",
@@ -934,7 +946,7 @@ namespace TypingRoguelike.Run
             }
 
             actions.Add(("立ち去る", CompleteNodeAndReturnToMap));
-            ShowSideMap();
+            ShowMapTabHint();
             _mapUi.ShowModal("行商人", body, actions);
         }
 
@@ -1128,11 +1140,11 @@ namespace TypingRoguelike.Run
             var frac = dungeonRun != null ? dungeonRun.merchantHealFraction : 0.12f;
             _party.HealFraction(frac);
             MarkCurrentCleared();
-            ShowMap();
+            ShowMapTabHint();
             _mapUi.ShowModal(
                 "取引完了",
                 $"ポーションを飲んだ。\n{FormatHpLine()}\n{FormatCoinLine()}",
-                new (string, Action)[] { ("マップに戻る", null) });
+                new (string, Action)[] { ("マップに戻る", ShowRouteMap) });
             _mapUi.Refresh(_dungeon, _party, _exploration, _madness);
         }
 
@@ -1149,10 +1161,11 @@ namespace TypingRoguelike.Run
 
         void ShowInsufficientCoins(int cost)
         {
+            ShowMapTabHint();
             _mapUi.ShowModal(
                 "塔片が足りない",
                 $"必要 {cost} 塔片 / 所持 {_party.RunCoins} 塔片",
-                new (string, Action)[] { ("戻る", null) });
+                new (string, Action)[] { ("店に戻る", ResolveMerchantNode) });
         }
 
         void ResolveElevatorNode()
@@ -1594,11 +1607,17 @@ namespace TypingRoguelike.Run
                 partyNames);
             if (choices.Count == 0)
             {
-                ShowMap();
-                _mapUi.ShowModal(
-                    "刻印",
-                    "入手できる新しい刻印はなかった。",
-                    new (string, Action)[] { ("マップに戻る", CompleteNodeAndReturnToMap) });
+                if (coinCostOnPick > 0)
+                {
+                    ShowMapTabHint();
+                    _mapUi.ShowModal(
+                        "刻印",
+                        "入手できる新しい刻印はなかった。",
+                        new (string, Action)[] { ("店に戻る", ResolveMerchantNode) });
+                    return;
+                }
+
+                CompleteNodeAndReturnToMap("刻印", "入手できる新しい刻印はなかった。");
                 return;
             }
 
@@ -1688,12 +1707,7 @@ namespace TypingRoguelike.Run
 
         void CompleteNodeAndReturnToMap(string modalTitle, string modalBody)
         {
-            StartCoroutine(ReturnToMapRoutine(modalTitle, modalBody));
-        }
-
-        IEnumerator ReturnToMapRoutine(string modalTitle = null, string modalBody = null)
-        {
-            yield return null;
+            _mapUi.ReleasePause();
             _overlay.HideAll();
             DestroyBattleIfAny();
             MarkCurrentCleared();
@@ -1703,7 +1717,7 @@ namespace TypingRoguelike.Run
                 _mapUi.ShowModal(
                     modalTitle,
                     modalBody ?? string.Empty,
-                    new (string, Action)[] { ("マップに戻る", null) });
+                    new (string, Action)[] { ("マップに戻る", ShowRouteMap) });
             }
         }
 
@@ -1828,7 +1842,7 @@ namespace TypingRoguelike.Run
             }
 
             var names = PartyNames();
-            ShowSideMap();
+            ShowMapTabHint();
             _events.Show(transform, ev, query, names, OnEventOption, () => FinishEvent(clearNode: false));
         }
 

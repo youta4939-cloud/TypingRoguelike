@@ -93,7 +93,6 @@ namespace TypingRoguelike.Run
             _catalog != null ? _catalog : _catalog = Resources.Load<MapNodeIconCatalog>("Map/MapNodeIconCatalog");
 
         static MapNodeIconCatalog _catalog;
-        static Texture2D _brushMask;
 
         public static MapNodeVisual Resolve(DungeonNodeType type, bool known, bool mini = false)
         {
@@ -149,36 +148,6 @@ namespace TypingRoguelike.Run
             if (entry != null && !string.IsNullOrEmpty(entry.fallbackGlyph))
                 return entry.fallbackGlyph;
             return DefaultGlyph(type);
-        }
-
-        /// <summary>筆線の形（アルファ）を白にして、墨色と橙を乗せられるようにする。</summary>
-        public static Texture2D BrushStrokeTexture()
-        {
-            var sprite = Catalog != null ? Catalog.brushLine : null;
-            var source = sprite != null ? sprite.texture : null;
-            if (source == null)
-                return null;
-            if (_brushMask != null)
-                return _brushMask;
-
-            try
-            {
-                var pixels = source.GetPixels32();
-                for (var i = 0; i < pixels.Length; i++)
-                    pixels[i] = new Color32(255, 255, 255, pixels[i].a);
-                var mask = new Texture2D(source.width, source.height, TextureFormat.RGBA32, false);
-                mask.SetPixels32(pixels);
-                mask.wrapMode = TextureWrapMode.Repeat;
-                mask.filterMode = FilterMode.Bilinear;
-                mask.Apply(false, true);
-                _brushMask = mask;
-                return _brushMask;
-            }
-            catch (Exception)
-            {
-                source.wrapMode = TextureWrapMode.Repeat;
-                return source;
-            }
         }
 
         static MapNodeShape DefaultKind(DungeonNodeType type) => type switch
