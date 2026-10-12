@@ -21,13 +21,25 @@ namespace TypingRoguelike.Run
         public Sprite picture;
         public string fallbackGlyph = "?";
         public Color color = Color.white;
+        public Sprite stamp;
+        public Sprite stampMini;
+
+        public Sprite StampFor(bool mini) => mini ? stampMini : stamp;
     }
 
-    /// <summary>マス種類と、形の画像・中の絵の対応。画像が空なら仮の図形と1字を使う。</summary>
+    /// <summary>マス種類と判子画像の対応。判子が空のときだけ仮の図形と1字を使う。</summary>
     [CreateAssetMenu(fileName = "MapNodeIconCatalog", menuName = "TypingRoguelike/Map Node Icon Catalog")]
     public sealed class MapNodeIconCatalog : ScriptableObject
     {
         public MapNodeIconEntry[] entries;
+        public Sprite paper;
+        public Sprite brushLine;
+        public Sprite glow;
+        public Sprite pin;
+        public Sprite stampUnknown;
+        public Sprite stampDone;
+        public Sprite stampDoneMini;
+        public Sprite[] inks;
 
         public MapNodeIconEntry Find(DungeonNodeType type)
         {
@@ -41,6 +53,16 @@ namespace TypingRoguelike.Run
 
             return null;
         }
+
+        public Sprite Ink(int index)
+        {
+            if (inks == null || inks.Length == 0)
+                return null;
+            var i = index % inks.Length;
+            if (i < 0)
+                i += inks.Length;
+            return inks[i];
+        }
     }
 
     public readonly struct MapNodeVisual
@@ -51,8 +73,9 @@ namespace TypingRoguelike.Run
         public string Glyph { get; }
         public Color Color { get; }
         public bool Known { get; }
+        public Sprite Stamp { get; }
 
-        public MapNodeVisual(Sprite shape, Sprite picture, MapNodeShape shapeKind, string glyph, Color color, bool known)
+        public MapNodeVisual(Sprite shape, Sprite picture, MapNodeShape shapeKind, string glyph, Color color, bool known, Sprite stamp = null)
         {
             Shape = shape;
             Picture = picture;
@@ -60,6 +83,7 @@ namespace TypingRoguelike.Run
             Glyph = glyph;
             Color = color;
             Known = known;
+            Stamp = stamp;
         }
     }
 
@@ -69,11 +93,25 @@ namespace TypingRoguelike.Run
             _catalog != null ? _catalog : _catalog = Resources.Load<MapNodeIconCatalog>("Map/MapNodeIconCatalog");
 
         static MapNodeIconCatalog _catalog;
+        static Texture2D _brushMask;
 
-        public static MapNodeVisual Resolve(DungeonNodeType type, bool known)
+        public static MapNodeVisual Resolve(DungeonNodeType type, bool known, bool mini = false)
         {
+            var catalog = Catalog;
             if (!known)
             {
+                if (catalog != null && catalog.stampUnknown != null)
+                {
+                    return new MapNodeVisual(
+                        catalog.stampUnknown,
+                        null,
+                        MapNodeShape.Circle,
+                        "",
+                        new Color(0.45f, 0.36f, 0.28f),
+                        false,
+                        catalog.stampUnknown);
+                }
+
                 return new MapNodeVisual(
                     MapNodeShapes.Get(MapNodeShape.Circle),
                     null,
@@ -83,7 +121,20 @@ namespace TypingRoguelike.Run
                     false);
             }
 
-            var entry = Catalog != null ? Catalog.Find(type) : null;
+            var entry = catalog != null ? catalog.Find(type) : null;
+            var stamp = entry?.StampFor(mini);
+            if (stamp != null)
+            {
+                return new MapNodeVisual(
+                    stamp,
+                    null,
+                    entry.shape,
+                    "",
+                    entry.color,
+                    true,
+                    stamp);
+            }
+
             var kind = entry != null ? entry.shape : DefaultKind(type);
             var shape = entry != null && entry.shapeSprite != null ? entry.shapeSprite : MapNodeShapes.Get(kind);
             var picture = entry != null ? entry.picture : null;
@@ -92,7 +143,43 @@ namespace TypingRoguelike.Run
             return new MapNodeVisual(shape, picture, kind, glyph, color, true);
         }
 
-        public static string Glyph(DungeonNodeType type) => Resolve(type, true).Glyph;
+        public static string Glyph(DungeonNodeType type)
+        {
+            var entry = Catalog != null ? Catalog.Find(type) : null;
+            if (entry != null && !string.IsNullOrEmpty(entry.fallbackGlyph))
+                return entry.fallbackGlyph;
+            return DefaultGlyph(type);
+        }
+
+        /// <summary>筆線の形（アルファ）を白にして、墨色と橙を乗せられるようにする。</summary>
+        public static Texture2D BrushStrokeTexture()
+        {
+            var sprite = Catalog != null ? Catalog.brushLine : null;
+            var source = sprite != null ? sprite.texture : null;
+            if (source == null)
+                return null;
+            if (_brushMask != null)
+                return _brushMask;
+
+            try
+            {
+                var pixels = source.GetPixels32();
+                for (var i = 0; i < pixels.Length; i++)
+                    pixels[i] = new Color32(255, 255, 255, pixels[i].a);
+                var mask = new Texture2D(source.width, source.height, TextureFormat.RGBA32, false);
+                mask.SetPixels32(pixels);
+                mask.wrapMode = TextureWrapMode.Repeat;
+                mask.filterMode = FilterMode.Bilinear;
+                mask.Apply(false, true);
+                _brushMask = mask;
+                return _brushMask;
+            }
+            catch (Exception)
+            {
+                source.wrapMode = TextureWrapMode.Repeat;
+                return source;
+            }
+        }
 
         static MapNodeShape DefaultKind(DungeonNodeType type) => type switch
         {

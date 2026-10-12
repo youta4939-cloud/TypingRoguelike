@@ -18,6 +18,10 @@ namespace TypingRoguelike.Run
         const float MapMarginBottom = 0.07f;
         const float MapMarginTop = 0.08f;
         static readonly Color ChoiceOrange = new Color(1f, 0.48f, 0.08f, 1f);
+        static readonly Color InkDark = new Color(0.16f, 0.11f, 0.08f, 0.96f);
+        static readonly Color InkLight = new Color(0.55f, 0.44f, 0.34f, 0.48f);
+        static readonly Color SkippedTint = new Color(0.62f, 0.56f, 0.5f, 1f);
+        const float RevealSeconds = 0.3f;
 
         static readonly DungeonNodeType[] LegendOrder =
         {
@@ -56,10 +60,17 @@ namespace TypingRoguelike.Run
         GameObject _overlayPanel;
         bool _pausedByOverlay;
         float _savedTimeScale = 1f;
+        int _presentedLayer = -1;
+        bool _animateReveal;
+        int _revealFromLayer = -1;
+        readonly List<CanvasGroup> _fadeInks = new List<CanvasGroup>();
+        readonly List<CanvasGroup> _fadeStamps = new List<CanvasGroup>();
 
         public static bool IsOverlayOpen { get; private set; }
 
-        bool IsNodeKnown(DungeonMapNode node)
+        bool IsNodeKnown(DungeonMapNode node) => IsKnownAt(node, _currentLayer);
+
+        bool IsKnownAt(DungeonMapNode node, int layer)
         {
             if (node == null)
                 return false;
@@ -69,7 +80,7 @@ namespace TypingRoguelike.Run
                 return true;
             if (node.Revealed)
                 return true;
-            return node.Layer <= _currentLayer + Mathf.Max(0, _visibleRows);
+            return node.Layer <= layer + Mathf.Max(0, _visibleRows);
         }
 
         Font UiFont => _font ??= BattleUITheme.Font;
@@ -413,21 +424,33 @@ namespace TypingRoguelike.Run
                 var (glyph, name, desc, color) = entries[i];
                 var yMax = 0.97f - i * rowHeight;
                 var row = CreateRect(body, $"Legend_{i}", new Vector2(0.03f, yMax - rowHeight), new Vector2(0.97f, yMax));
-                var legendShape = glyph == "?"
-                    ? MapNodeShapes.Get(MapNodeShape.Circle)
-                    : MapNodeIcons.Resolve(LegendOrder[i - 1], true).Shape;
+                var legendArt = i == 0
+                    ? MapNodeIcons.Catalog != null ? MapNodeIcons.Catalog.stampUnknown : null
+                    : MapNodeIcons.Resolve(LegendOrder[i - 1], true).Stamp;
 
                 var icon = CreateRect(row, "Icon", new Vector2(0, 0.5f), new Vector2(0, 0.5f));
-                icon.sizeDelta = glyph == "椅" ? new Vector2(52, 32) : new Vector2(44, 44);
+                var wide = legendArt != null && legendArt.rect.height > 1f && legendArt.rect.width / legendArt.rect.height > 1.4f;
+                icon.sizeDelta = wide ? new Vector2(64, 32) : glyph == "椅" ? new Vector2(52, 32) : new Vector2(44, 44);
                 icon.anchoredPosition = new Vector2(28, 0);
-                var legendImage = CreateImage(icon, "Ring", legendShape, color, Vector2.zero, Vector2.one);
-                legendImage.preserveAspect = true;
-                var inner = CreateImage(icon, "Inner", BattleUISprites.Circle, new Color(0.03f, 0.035f, 0.07f, 1f),
-                    Vector2.zero, Vector2.one);
-                inner.rectTransform.offsetMin = new Vector2(4, 4);
-                inner.rectTransform.offsetMax = new Vector2(-4, -4);
-                var glyphText = CreateLabel(icon, "Glyph", glyph, 20, TextAnchor.MiddleCenter, Vector2.zero, Vector2.one, color);
-                glyphText.fontStyle = FontStyle.Bold;
+                if (legendArt != null)
+                {
+                    var stamp = CreateImage(icon, "Stamp", legendArt, Color.white, Vector2.zero, Vector2.one);
+                    stamp.preserveAspect = true;
+                }
+                else
+                {
+                    var legendShape = glyph == "?"
+                        ? MapNodeShapes.Get(MapNodeShape.Circle)
+                        : MapNodeIcons.Resolve(LegendOrder[i - 1], true).Shape;
+                    var legendImage = CreateImage(icon, "Ring", legendShape, color, Vector2.zero, Vector2.one);
+                    legendImage.preserveAspect = true;
+                    var inner = CreateImage(icon, "Inner", BattleUISprites.Circle, new Color(0.03f, 0.035f, 0.07f, 1f),
+                        Vector2.zero, Vector2.one);
+                    inner.rectTransform.offsetMin = new Vector2(4, 4);
+                    inner.rectTransform.offsetMax = new Vector2(-4, -4);
+                    var glyphText = CreateLabel(icon, "Glyph", glyph, 20, TextAnchor.MiddleCenter, Vector2.zero, Vector2.one, color);
+                    glyphText.fontStyle = FontStyle.Bold;
+                }
 
                 var nameText = CreateLabel(row, "Name", name, 15, TextAnchor.LowerLeft,
                     new Vector2(0.3f, 0.5f), new Vector2(1, 0.95f), BattleUITheme.TextPrimary);
@@ -446,17 +469,21 @@ namespace TypingRoguelike.Run
 
         void BuildTowerMap(Transform parent, DungeonRunState dungeon, int topLayer, Action<int> onNodeSelected, bool interactive)
         {
+            BeginRevealPass();
             var area = CreateRect(parent, "TowerArea", Vector2.zero, Vector2.one);
+            var span = Mathf.Max(1, topLayer);
+            PlaceFloorPaper(area, topLayer);
+            BuildFloorGuides(area, topLayer, MapNodeIcons.Catalog != null && MapNodeIcons.Catalog.paper != null);
+
             var positions = dungeon.Nodes.Values.ToDictionary(node => node.Id,
-                node => NodePosition(node, Mathf.Max(1, topLayer)));
+                node => NodePosition(node, span));
 
             var routesRoot = CreateRect(area, "Routes", Vector2.zero, Vector2.one);
-            routesRoot.SetAsFirstSibling();
-
             Canvas.ForceUpdateCanvases();
             LayoutRebuilder.ForceRebuildLayoutImmediate(area);
 
             var reachable = new HashSet<int>(dungeon.GetReachableNext().Select(node => node.Id));
+            var brush = MapNodeIcons.BrushStrokeTexture();
             foreach (var from in dungeon.Nodes.Values)
             {
                 foreach (var nextId in from.Next)
@@ -465,11 +492,17 @@ namespace TypingRoguelike.Run
                         continue;
 
                     var available = from.Id == dungeon.CurrentNodeId && reachable.Contains(nextId);
-                    var traveled = from.Cleared && to.Cleared;
-                    var fromRadius = NodeSize * (from.Type == DungeonNodeType.Boss ? 0.65f : 0.5f);
-                    var toRadius = NodeSize * (to.Type == DungeonNodeType.Boss ? 0.65f : 0.5f);
-
-                    if (available)
+                    var traveled = from.Cleared && (to.Cleared || to.Id == dungeon.CurrentNodeId);
+                    var justWalked = _animateReveal && traveled && to.Id == dungeon.CurrentNodeId && from.Cleared;
+                    var color = available ? ChoiceOrange : traveled ? InkDark : InkLight;
+                    var fromRadius = NodeRadius(from, mini: false);
+                    var toRadius = NodeRadius(to, mini: false);
+                    if (brush != null)
+                    {
+                        CreateBrushLine(routesRoot, area, positions[from.Id], positions[nextId], color,
+                            available ? 18f : 15f, fromRadius, toRadius, brush, justWalked);
+                    }
+                    else if (available)
                     {
                         CreateRouteSegment(
                             routesRoot, area, positions[from.Id], positions[nextId],
@@ -478,32 +511,43 @@ namespace TypingRoguelike.Run
                             routesRoot, area, positions[from.Id], positions[nextId],
                             ChoiceOrange, 5f, fromRadius, toRadius, dashed: false);
                     }
-                    else if (traveled)
-                    {
-                        CreateRouteSegment(
-                            routesRoot, area, positions[from.Id], positions[nextId],
-                            new Color(0.35f, 0.92f, 0.65f, 0.88f), 4f, fromRadius, toRadius, dashed: false);
-                    }
                     else
                     {
-                        var alpha = IsNodeKnown(from) || IsNodeKnown(to) || from.Cleared ? 0.62f : 0.38f;
                         CreateRouteSegment(
                             routesRoot, area, positions[from.Id], positions[nextId],
-                            new Color(0.58f, 0.62f, 0.82f, alpha), 3.2f, fromRadius, toRadius, dashed: true);
+                            color, traveled ? 4f : 3.2f, fromRadius, toRadius, dashed: !traveled);
                     }
                 }
             }
 
-            BuildFloorGuides(area, topLayer);
+            for (var layer = 0; layer <= topLayer; layer++)
+                PlaceRowInk(area, layer, LayerY(layer, span), mini: false);
 
             foreach (var node in dungeon.Nodes.Values.OrderBy(node => node.Layer))
             {
-                var isCurrent = node.Id == dungeon.CurrentNodeId;
                 var choice = reachable.Contains(node.Id);
                 var canClick = interactive && choice;
-                CreateNode(area, node, positions[node.Id], isCurrent, canClick, choice,
+                PaintNode(area, node, positions[node.Id], mini: false, choice, canClick,
                     () => onNodeSelected?.Invoke(node.Id));
             }
+
+            if (_animateReveal && (_fadeInks.Count > 0 || _fadeStamps.Count > 0))
+            {
+                var playback = area.gameObject.AddComponent<MapRevealPlayback>();
+                playback.Play(_fadeInks, _fadeStamps, RevealSeconds);
+            }
+
+            _animateReveal = false;
+        }
+
+        void BeginRevealPass()
+        {
+            var layer = _currentLayer;
+            _animateReveal = _presentedLayer >= 0 && layer > _presentedLayer;
+            _revealFromLayer = _presentedLayer;
+            _presentedLayer = layer;
+            _fadeInks.Clear();
+            _fadeStamps.Clear();
         }
 
         static Vector2 AnchorFractionToLocal(RectTransform area, Vector2 anchorFraction)
@@ -600,97 +644,166 @@ namespace TypingRoguelike.Run
             BattleUITheme.EnsureSprite(img);
         }
 
-        void BuildFloorGuides(RectTransform area, int topLayer)
+        void BuildFloorGuides(RectTransform area, int topLayer, bool onPaper)
         {
             for (var layer = 0; layer <= topLayer; layer++)
             {
                 var y = LayerY(layer, Mathf.Max(1, topLayer));
-                var line = CreateImage(area, $"FloorGuide_{layer}", BattleUISprites.HorizontalGradient,
-                    new Color(0.4f, 0.44f, 0.7f, 0.08f), new Vector2(0.02f, y), new Vector2(0.98f, y));
-                line.rectTransform.sizeDelta = new Vector2(0, 2);
+                if (!onPaper)
+                {
+                    var line = CreateImage(area, $"FloorGuide_{layer}", BattleUISprites.HorizontalGradient,
+                        new Color(0.4f, 0.44f, 0.7f, 0.08f), new Vector2(0.02f, y), new Vector2(0.98f, y));
+                    line.rectTransform.sizeDelta = new Vector2(0, 2);
+                }
 
                 var label = layer == 0 ? "入口" : layer == topLayer ? "ボス" : $"{layer}段";
                 var text = CreateLabel(area, $"FloorLabel_{layer}", label, 13, TextAnchor.MiddleLeft,
-                    new Vector2(0.015f, y), new Vector2(0.12f, y), new Color(0.6f, 0.64f, 0.82f, 0.7f));
+                    new Vector2(0.015f, y), new Vector2(0.12f, y),
+                    onPaper ? new Color(0.28f, 0.18f, 0.12f, 0.85f) : new Color(0.6f, 0.64f, 0.82f, 0.7f));
                 text.rectTransform.sizeDelta = new Vector2(0, 24);
             }
         }
 
-        void CreateNode(RectTransform area, DungeonMapNode node, Vector2 position, bool isCurrent, bool canClick,
-            bool choice, Action onClick)
+        void PlaceFloorPaper(RectTransform area, int topLayer)
         {
-            var revealed = IsNodeKnown(node);
-            var visual = MapNodeIcons.Resolve(node.Type, revealed);
-            var accent = choice ? ChoiceOrange : visual.Color;
-            var isBoss = node.Type == DungeonNodeType.Boss && revealed;
-            var size = NodePixelSize(visual.ShapeKind, isBoss);
-            var dimmed = !isCurrent && !choice;
+            var paper = MapNodeIcons.Catalog != null ? MapNodeIcons.Catalog.paper : null;
+            if (paper == null)
+                return;
 
-            var rootRt = CreateRect(area, $"Node_{node.Id}", position, position);
+            var span = Mathf.Max(1, topLayer);
+            var y0 = LayerY(0, span);
+            var y1 = LayerY(topLayer, span);
+            var padY = Mathf.Max(0.035f, (y1 - y0) / span * 0.55f);
+            var image = CreateImage(area, "FloorPaper", paper, Color.white,
+                new Vector2(0.03f, Mathf.Max(0.01f, y0 - padY)),
+                new Vector2(0.97f, Mathf.Min(0.99f, y1 + padY)));
+            image.type = Image.Type.Sliced;
+            image.pixelsPerUnitMultiplier = 1f;
+            image.raycastTarget = false;
+        }
+
+        void PlaceRowInk(RectTransform area, int layer, float y, bool mini)
+        {
+            if (_dungeon == null)
+                return;
+
+            var onLayer = _dungeon.Nodes.Values.Where(node => node.Layer == layer).ToList();
+            if (onLayer.Count == 0)
+                return;
+
+            var anyUnknown = onLayer.Any(node => !IsNodeKnown(node));
+            var openedThisStep = _animateReveal && !mini && !anyUnknown &&
+                                 onLayer.Any(node => !IsKnownAt(node, _revealFromLayer));
+            if (!anyUnknown && !openedThisStep)
+                return;
+
+            var catalog = MapNodeIcons.Catalog;
+            var sprite = catalog != null ? catalog.Ink(RowInkIndex(layer, onLayer)) : null;
+            if (sprite == null)
+                return;
+
+            var height = mini ? 34f : 128f;
+            var ink = CreateImage(area, $"Ink_{layer}", sprite, Color.white,
+                new Vector2(mini ? 0.04f : 0.05f, y), new Vector2(mini ? 0.96f : 0.95f, y));
+            ink.rectTransform.sizeDelta = new Vector2(0f, height);
+            ink.preserveAspect = false;
+            ink.raycastTarget = false;
+            var group = ink.gameObject.AddComponent<CanvasGroup>();
+            group.alpha = 1f;
+            group.blocksRaycasts = false;
+            group.interactable = false;
+            if (openedThisStep)
+                _fadeInks.Add(group);
+        }
+
+        int RowInkIndex(int layer, List<DungeonMapNode> onLayer)
+        {
+            var id = int.MaxValue;
+            foreach (var node in onLayer)
+            {
+                if (node.Id < id)
+                    id = node.Id;
+            }
+
+            if (id == int.MaxValue)
+                id = layer;
+            var floor = _dungeon != null ? _dungeon.Floor : 0;
+            var hash = unchecked(floor * 7919 + layer * 104729 + id * 17);
+            return (int)((uint)hash % 4);
+        }
+
+        void PaintNode(RectTransform area, DungeonMapNode node, Vector2 position, bool mini, bool choice, bool canClick,
+            Action onClick)
+        {
+            var known = IsNodeKnown(node);
+            var visual = MapNodeIcons.Resolve(node.Type, known, mini);
+            var isCurrent = node.Id == _dungeon.CurrentNodeId;
+            var skipped = node.Layer < _currentLayer && !node.Cleared;
+            var fadeIn = _animateReveal && !mini && known && !IsKnownAt(node, _revealFromLayer);
+            var stamp = visual.Stamp;
+            var onPaper = !mini && MapNodeIcons.Catalog != null && MapNodeIcons.Catalog.paper != null;
+            var size = stamp != null
+                ? StampPixelSize(stamp, mini)
+                : mini ? MiniSize(visual.ShapeKind) : NodePixelSize(visual.ShapeKind, node.Type == DungeonNodeType.Boss && known);
+
+            var rootRt = CreateRect(area, mini ? $"Mini_{node.Id}" : $"Node_{node.Id}", position, position);
             rootRt.sizeDelta = size;
             var group = rootRt.gameObject.AddComponent<CanvasGroup>();
-            group.alpha = dimmed ? (node.Cleared ? 0.75f : 0.55f) : 1f;
+            group.alpha = fadeIn ? 0f : skipped ? 0.5f : 1f;
+            if (fadeIn)
+                _fadeStamps.Add(group);
 
-            var glow = BattleUIChrome.CreateGlow(rootRt, "Glow", new Vector2(-0.55f, -0.55f), new Vector2(1.55f, 1.55f),
-                new Color(accent.r, accent.g, accent.b, choice || isCurrent ? 0.45f : 0.06f));
+            var tint = skipped ? SkippedTint : Color.white;
+            Image hit = null;
+            if (choice)
+                PlaceChoiceGlow(rootRt);
 
-            var ring = CreateImage(rootRt, "Ring", visual.Shape,
-                choice ? ChoiceOrange : visual.Color, Vector2.zero, Vector2.one);
-            ring.preserveAspect = true;
-            ring.raycastTarget = true;
-            var innerColor = node.Cleared
-                ? new Color(0.06f, 0.14f, 0.11f, 1f)
-                : new Color(0.025f, 0.03f, 0.065f, 1f);
-            var inner = CreateImage(rootRt, "Inner", visual.Shape, innerColor, Vector2.zero, Vector2.one);
-            inner.preserveAspect = true;
-            var ringWidth = isCurrent ? 6f : choice ? 5f : 3f;
-            inner.rectTransform.offsetMin = new Vector2(ringWidth, ringWidth);
-            inner.rectTransform.offsetMax = new Vector2(-ringWidth, -ringWidth);
-
-            if (revealed && visual.Picture != null)
+            if (stamp != null)
             {
-                var picture = CreateImage(rootRt, "Picture", visual.Picture, Color.white, Vector2.zero, Vector2.one);
-                picture.preserveAspect = true;
-                picture.rectTransform.offsetMin = new Vector2(ringWidth + 6f, ringWidth + 6f);
-                picture.rectTransform.offsetMax = new Vector2(-(ringWidth + 6f), -(ringWidth + 6f));
+                hit = CreateImage(rootRt, "Stamp", stamp, tint, Vector2.zero, Vector2.one);
+                hit.preserveAspect = true;
+                hit.raycastTarget = canClick;
             }
             else
             {
-                var glyph = CreateLabel(rootRt, "Glyph", visual.Glyph, isBoss ? 36 : 28,
-                    TextAnchor.MiddleCenter, Vector2.zero, Vector2.one,
-                    revealed ? visual.Color : new Color(0.75f, 0.78f, 0.88f));
-                glyph.fontStyle = FontStyle.Bold;
-                BattleUITheme.AddTextShadow(glyph, new Color(0, 0, 0, 0.9f), new Vector2(2, -2));
+                var accent = choice ? ChoiceOrange : visual.Color;
+                if (skipped)
+                    accent = new Color(accent.r * 0.45f, accent.g * 0.45f, accent.b * 0.45f, accent.a);
+                hit = CreateImage(rootRt, "Ring", visual.Shape, accent, Vector2.zero, Vector2.one);
+                hit.preserveAspect = true;
+                hit.raycastTarget = canClick;
+                if (!mini)
+                {
+                    var glyph = CreateLabel(rootRt, "Glyph", string.IsNullOrEmpty(visual.Glyph) ? "?" : visual.Glyph,
+                        node.Type == DungeonNodeType.Boss ? 36 : 28,
+                        TextAnchor.MiddleCenter, Vector2.zero, Vector2.one,
+                        known ? visual.Color : new Color(0.75f, 0.78f, 0.88f));
+                    glyph.fontStyle = FontStyle.Bold;
+                    BattleUITheme.AddTextShadow(glyph, new Color(0, 0, 0, 0.9f), new Vector2(2, -2));
+                }
             }
 
-            var caption = CreateLabel(rootRt, "Caption", revealed ? NodeCaption(node) : "未判明", 13,
-                TextAnchor.UpperCenter, new Vector2(-0.6f, -0.42f), new Vector2(1.6f, -0.04f),
-                revealed ? BattleUITheme.TextPrimary : BattleUITheme.TextMuted);
-            BattleUITheme.AddTextShadow(caption, new Color(0, 0, 0, 0.95f), new Vector2(1.5f, -1.5f));
+            if (known && node.Cleared && node.Type != DungeonNodeType.Start)
+                PlaceDoneStamp(rootRt, mini);
 
-            if (node.Cleared && !isCurrent && node.Type != DungeonNodeType.Start)
+            if (!mini)
             {
-                var badge = CreateRect(rootRt, "ClearedBadge", new Vector2(1, 1), new Vector2(1, 1));
-                badge.sizeDelta = new Vector2(26, 26);
-                badge.anchoredPosition = new Vector2(-4, -4);
-                CreateImage(badge, "Bg", BattleUISprites.Circle, BattleUITheme.AccentAlly, Vector2.zero, Vector2.one);
-                CreateLabel(badge, "Text", "済", 12, TextAnchor.MiddleCenter, Vector2.zero, Vector2.one, Color.black)
-                    .fontStyle = FontStyle.Bold;
+                var captionColor = onPaper
+                    ? known ? new Color(0.24f, 0.15f, 0.1f, 1f) : new Color(0.38f, 0.3f, 0.22f, 1f)
+                    : known ? BattleUITheme.TextPrimary : BattleUITheme.TextMuted;
+                var caption = CreateLabel(rootRt, "Caption", known ? NodeCaption(node) : "未判明", 13,
+                    TextAnchor.UpperCenter, new Vector2(-0.6f, -0.42f), new Vector2(1.6f, -0.04f), captionColor);
+                BattleUITheme.AddTextShadow(caption, new Color(1f, 0.96f, 0.9f, onPaper ? 0.65f : 0.95f),
+                    new Vector2(1.2f, -1.2f));
             }
 
-            Image marker = null;
             if (isCurrent)
-            {
-                var markerRt = CreateRect(rootRt, "PartyMarker", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f));
-                markerRt.sizeDelta = new Vector2(24, 24);
-                markerRt.anchoredPosition = new Vector2(0, 20);
-                marker = CreateImage(markerRt, "Gem", BattleUISprites.Diamond, BattleUITheme.Gold, Vector2.zero, Vector2.one);
-            }
+                PlacePin(rootRt, mini);
 
-            if (canClick)
+            if (canClick && hit != null)
             {
                 var btn = rootRt.gameObject.AddComponent<Button>();
-                btn.targetGraphic = ring;
+                btn.targetGraphic = hit;
                 btn.onClick.AddListener(() => onClick());
                 var colors = btn.colors;
                 colors.highlightedColor = new Color(1.25f, 1.25f, 1.25f, 1f);
@@ -698,13 +811,129 @@ namespace TypingRoguelike.Run
                 btn.colors = colors;
             }
 
-            AddHover(rootRt.gameObject, node, canClick);
+            if (!mini)
+                AddHover(rootRt.gameObject, node, canClick);
+        }
 
-            if (canClick || isCurrent)
+        void PlaceChoiceGlow(RectTransform rootRt)
+        {
+            var glowSprite = MapNodeIcons.Catalog != null ? MapNodeIcons.Catalog.glow : null;
+            if (glowSprite != null)
             {
+                var glow = CreateImage(rootRt, "Glow", glowSprite, Color.white,
+                    new Vector2(-0.4f, -0.4f), new Vector2(1.4f, 1.4f));
+                glow.preserveAspect = true;
                 var pulse = rootRt.gameObject.AddComponent<RunNodePulse>();
-                pulse.Configure(glow, marker, isCurrent ? 1.05f : 1.08f);
+                pulse.ConfigureGlow(glow);
+                return;
             }
+
+            var fallback = BattleUIChrome.CreateGlow(rootRt, "Glow", new Vector2(-0.55f, -0.55f), new Vector2(1.55f, 1.55f),
+                new Color(ChoiceOrange.r, ChoiceOrange.g, ChoiceOrange.b, 0.45f));
+            var legacy = rootRt.gameObject.AddComponent<RunNodePulse>();
+            legacy.Configure(fallback, null, 1.06f);
+        }
+
+        void PlaceDoneStamp(RectTransform rootRt, bool mini)
+        {
+            var catalog = MapNodeIcons.Catalog;
+            var done = catalog == null ? null : mini ? catalog.stampDoneMini : catalog.stampDone;
+            if (done != null)
+            {
+                var overlay = CreateImage(rootRt, "Done", done, Color.white, Vector2.zero, Vector2.one);
+                overlay.preserveAspect = true;
+                return;
+            }
+
+            if (mini)
+                return;
+
+            var badge = CreateRect(rootRt, "ClearedBadge", new Vector2(1, 1), new Vector2(1, 1));
+            badge.sizeDelta = new Vector2(26, 26);
+            badge.anchoredPosition = new Vector2(-4, -4);
+            CreateImage(badge, "Bg", BattleUISprites.Circle, BattleUITheme.AccentAlly, Vector2.zero, Vector2.one);
+            CreateLabel(badge, "Text", "済", 12, TextAnchor.MiddleCenter, Vector2.zero, Vector2.one, Color.black)
+                .fontStyle = FontStyle.Bold;
+        }
+
+        void PlacePin(RectTransform rootRt, bool mini)
+        {
+            var pin = MapNodeIcons.Catalog != null ? MapNodeIcons.Catalog.pin : null;
+            if (pin != null)
+            {
+                var rt = CreateRect(rootRt, "Pin", new Vector2(0.5f, 0.78f), new Vector2(0.5f, 0.78f));
+                rt.pivot = new Vector2(0.5f, 0.08f);
+                rt.sizeDelta = mini ? new Vector2(14f, 30f) : new Vector2(36f, 78f);
+                var image = rt.gameObject.AddComponent<Image>();
+                image.sprite = pin;
+                image.preserveAspect = true;
+                image.raycastTarget = false;
+                return;
+            }
+
+            var markerRt = CreateRect(rootRt, "PartyMarker", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f));
+            markerRt.sizeDelta = mini ? new Vector2(10f, 10f) : new Vector2(24f, 24f);
+            markerRt.anchoredPosition = new Vector2(0, mini ? 8f : 20f);
+            CreateImage(markerRt, "Gem", BattleUISprites.Diamond, BattleUITheme.Gold, Vector2.zero, Vector2.one);
+        }
+
+        static Vector2 StampPixelSize(Sprite sprite, bool mini)
+        {
+            var aspect = sprite.rect.width / Mathf.Max(1f, sprite.rect.height);
+            var height = mini
+                ? aspect > 1.4f ? 16f : 22f
+                : aspect > 1.4f ? 72f : 84f;
+            return new Vector2(height * aspect, height);
+        }
+
+        float NodeRadius(DungeonMapNode node, bool mini)
+        {
+            var visual = MapNodeIcons.Resolve(node.Type, IsNodeKnown(node), mini);
+            if (visual.Stamp != null)
+            {
+                var size = StampPixelSize(visual.Stamp, mini);
+                return Mathf.Min(size.x, size.y) * 0.46f;
+            }
+
+            return (mini ? 12f : NodeSize) * (node.Type == DungeonNodeType.Boss ? 0.65f : 0.5f);
+        }
+
+        void CreateBrushLine(
+            RectTransform routesRoot,
+            RectTransform area,
+            Vector2 fromAnchor,
+            Vector2 toAnchor,
+            Color color,
+            float thickness,
+            float insetFromPixels,
+            float insetToPixels,
+            Texture2D brush,
+            bool animate)
+        {
+            var a = AnchorFractionToLocal(area, fromAnchor);
+            var b = AnchorFractionToLocal(area, toAnchor);
+            var delta = b - a;
+            var length = delta.magnitude;
+            if (length < 6f)
+                return;
+
+            var direction = delta / length;
+            var startInset = Mathf.Min(insetFromPixels, length * 0.42f);
+            var endInset = Mathf.Min(insetToPixels, length * 0.42f);
+            if (startInset + endInset >= length - 2f)
+            {
+                startInset = length * 0.22f;
+                endInset = length * 0.22f;
+            }
+
+            a += direction * startInset;
+            b -= direction * endInset;
+            if ((b - a).magnitude < 4f)
+                return;
+
+            var rt = CreateRect(routesRoot, "BrushLine", Vector2.zero, Vector2.one);
+            var stroke = rt.gameObject.AddComponent<MapBrushLine>();
+            stroke.Setup(a, b, thickness, color, brush, animate, RevealSeconds);
         }
 
         void AddHover(GameObject target, DungeonMapNode node, bool canClick)
@@ -964,39 +1193,46 @@ namespace TypingRoguelike.Run
                 positions[node.Id] = new Vector2(Mathf.Clamp(x, 0.08f, 0.92f), Mathf.Clamp(y, 0.1f, 0.9f));
             }
 
+            var brush = MapNodeIcons.BrushStrokeTexture();
+            var reveal = _animateReveal;
+            _animateReveal = false;
             foreach (var from in nodes)
             {
                 foreach (var nextId in from.Next)
                 {
                     if (!positions.ContainsKey(nextId) || !positions.ContainsKey(from.Id))
                         continue;
+                    if (!_dungeon.Nodes.TryGetValue(nextId, out var to))
+                        continue;
                     var choice = from.Id == _dungeon.CurrentNodeId && reachable.Contains(nextId);
-                    var color = choice
-                        ? ChoiceOrange
-                        : new Color(0.55f, 0.58f, 0.72f, 0.7f);
-                    CreateRouteSegment(area, area, positions[from.Id], positions[nextId], color, choice ? 4f : 2f,
-                        12f, 12f, dashed: !choice);
+                    var traveled = from.Cleared && (to.Cleared || to.Id == _dungeon.CurrentNodeId);
+                    var color = choice ? ChoiceOrange : traveled ? InkDark : InkLight;
+                    if (brush != null)
+                    {
+                        CreateBrushLine(area, area, positions[from.Id], positions[nextId], color,
+                            choice ? 5f : 3.5f, NodeRadius(from, true), NodeRadius(to, true), brush, false);
+                    }
+                    else
+                    {
+                        CreateRouteSegment(area, area, positions[from.Id], positions[nextId], color, choice ? 4f : 2f,
+                            12f, 12f, dashed: !choice && !traveled);
+                    }
                 }
+            }
+
+            for (var row = minLayer; row <= maxLayer; row++)
+            {
+                var y = Mathf.Lerp(0.16f, 0.84f, (row - minLayer) / (float)span);
+                PlaceRowInk(area, row, y, mini: true);
             }
 
             foreach (var node in nodes)
             {
-                var known = IsNodeKnown(node);
-                var visual = MapNodeIcons.Resolve(node.Type, known);
                 var choice = reachable.Contains(node.Id);
-                var size = MiniSize(visual.ShapeKind);
-                var rt = CreateRect(area, $"Mini_{node.Id}", positions[node.Id], positions[node.Id]);
-                rt.sizeDelta = size;
-                var image = CreateImage(rt, "Shape", visual.Shape, choice ? ChoiceOrange : visual.Color,
-                    Vector2.zero, Vector2.one);
-                image.preserveAspect = true;
-                if (node.Id == _dungeon.CurrentNodeId)
-                {
-                    var mark = CreateRect(rt, "Here", new Vector2(0.5f, 1.15f), new Vector2(0.5f, 1.15f));
-                    mark.sizeDelta = new Vector2(10f, 10f);
-                    CreateImage(mark, "Gem", BattleUISprites.Diamond, BattleUITheme.Gold, Vector2.zero, Vector2.one);
-                }
+                PaintNode(area, node, positions[node.Id], mini: true, choice, false, null);
             }
+
+            _animateReveal = reveal;
         }
 
         static Vector2 MiniSize(MapNodeShape shape) => shape switch
@@ -1196,6 +1432,7 @@ namespace TypingRoguelike.Run
         float _maxScale = 1.03f;
         Vector3 _baseScale;
         float _phase;
+        bool _glowOnly;
 
         public void Configure(Image glow, Image gem, float maxScale)
         {
@@ -1204,20 +1441,273 @@ namespace TypingRoguelike.Run
             _maxScale = maxScale;
             _baseScale = transform.localScale;
             _phase = UnityEngine.Random.value * Mathf.PI * 2f;
+            _glowOnly = false;
+        }
+
+        public void ConfigureGlow(Image glow)
+        {
+            _glow = glow;
+            _gem = null;
+            _glowOnly = true;
+            _phase = UnityEngine.Random.value * Mathf.PI * 2f;
         }
 
         void Update()
         {
-            var wave = (Mathf.Sin(Time.unscaledTime * 2.8f + _phase) + 1f) * 0.5f;
-            transform.localScale = _baseScale * Mathf.Lerp(1f, _maxScale, wave);
+            var wave = (Mathf.Sin(Time.unscaledTime * (_glowOnly ? 1.15f : 2.8f) + _phase) + 1f) * 0.5f;
+            if (!_glowOnly)
+                transform.localScale = _baseScale * Mathf.Lerp(1f, _maxScale, wave);
             if (_glow != null)
             {
                 var color = _glow.color;
-                color.a = Mathf.Lerp(0.08f, 0.34f, wave);
+                color.a = _glowOnly ? Mathf.Lerp(0.28f, 0.92f, wave) : Mathf.Lerp(0.08f, 0.34f, wave);
                 _glow.color = color;
             }
-            if (_gem != null)
+            if (!_glowOnly && _gem != null)
                 _gem.transform.localEulerAngles = new Vector3(0, 0, Time.unscaledTime * 24f);
+        }
+    }
+
+    /// <summary>
+    /// 筆の線。LineRenderer が太さ・色・繰り返しを持ち、
+    /// オーバーレイのキャンバスにはそのメッシュを載せて描く。
+    /// </summary>
+    public sealed class MapBrushLine : MaskableGraphic
+    {
+        LineRenderer _line;
+        Vector2 _start;
+        Vector2 _end;
+        float _width = 12f;
+        float _drawn = 1f;
+        float _tileLength = 64f;
+        bool _animate;
+        float _animStart;
+        float _duration = 0.3f;
+        Mesh _baked;
+        Material _ownedMaterial;
+        static Camera _bakeCamera;
+
+        public void Setup(Vector2 start, Vector2 end, float width, Color ink, Texture2D brush, bool animate, float duration)
+        {
+            _start = start;
+            _end = end;
+            _width = width;
+            _duration = Mathf.Max(0.05f, duration);
+            _animate = animate;
+            _drawn = animate ? 0f : 1f;
+            _animStart = Time.unscaledTime;
+            color = ink;
+            raycastTarget = false;
+            var aspect = brush != null && brush.height > 0 ? brush.width / (float)brush.height : 8f;
+            _tileLength = Mathf.Max(8f, width * aspect);
+
+            var child = new GameObject("LineRenderer");
+            child.transform.SetParent(transform, false);
+            _line = child.AddComponent<LineRenderer>();
+            _line.useWorldSpace = false;
+            _line.loop = false;
+            _line.positionCount = 2;
+            _line.numCornerVertices = 0;
+            _line.numCapVertices = 2;
+            _line.alignment = LineAlignment.TransformZ;
+            _line.textureMode = LineTextureMode.Tile;
+            _line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            _line.receiveShadows = false;
+            _line.forceRenderingOff = true;
+            _line.startWidth = _line.endWidth = width;
+            _line.startColor = _line.endColor = ink;
+            var shader = Shader.Find("UI/Default");
+            if (shader != null)
+            {
+                _ownedMaterial = new Material(shader);
+                _ownedMaterial.mainTexture = brush;
+                _line.sharedMaterial = _ownedMaterial;
+            }
+
+            _baked = new Mesh { name = "BrushBake" };
+            ApplyLine();
+            SetVerticesDirty();
+        }
+
+        public override Texture mainTexture =>
+            _line != null && _line.sharedMaterial != null ? _line.sharedMaterial.mainTexture : s_WhiteTexture;
+
+        void Update()
+        {
+            if (!_animate)
+                return;
+            var t = Mathf.Clamp01((Time.unscaledTime - _animStart) / _duration);
+            _drawn = t * t * (3f - 2f * t);
+            ApplyLine();
+            SetVerticesDirty();
+            if (t >= 1f)
+                _animate = false;
+        }
+
+        void ApplyLine()
+        {
+            if (_line == null)
+                return;
+            var end = Vector2.Lerp(_start, _end, _drawn);
+            _line.SetPosition(0, new Vector3(_start.x, _start.y, 0f));
+            _line.SetPosition(1, new Vector3(end.x, end.y, 0f));
+        }
+
+        protected override void OnPopulateMesh(VertexHelper vh)
+        {
+            vh.Clear();
+            if (_drawn <= 0.001f)
+                return;
+            if (!TryAddBakedMesh(vh))
+                AddFallbackQuad(vh);
+        }
+
+        bool TryAddBakedMesh(VertexHelper vh)
+        {
+            if (_line == null || _baked == null)
+                return false;
+            var camera = BakeCamera;
+            if (camera == null)
+                return false;
+            _line.BakeMesh(_baked, camera, false);
+            var verts = _baked.vertices;
+            if (verts == null || verts.Length < 3)
+                return false;
+
+            var end = Vector2.Lerp(_start, _end, _drawn);
+            var mid = (_start + end) * 0.5f;
+            var sum = Vector3.zero;
+            for (var i = 0; i < verts.Length; i++)
+                sum += verts[i];
+            var meshMid = (Vector2)(sum / verts.Length);
+            if ((meshMid - mid).sqrMagnitude > (_width * 6f + 40f) * (_width * 6f + 40f))
+                return false;
+
+            var uvs = _baked.uv;
+            var tris = _baked.triangles;
+            if (tris == null || tris.Length < 3)
+                return false;
+            for (var i = 0; i < verts.Length; i++)
+            {
+                var uv = uvs != null && i < uvs.Length ? uvs[i] : Vector2.zero;
+                vh.AddVert(verts[i], color, uv);
+            }
+
+            for (var i = 0; i + 2 < tris.Length; i += 3)
+                vh.AddTriangle(tris[i], tris[i + 1], tris[i + 2]);
+            return true;
+        }
+
+        void AddFallbackQuad(VertexHelper vh)
+        {
+            var end = Vector2.Lerp(_start, _end, _drawn);
+            var delta = end - _start;
+            var length = delta.magnitude;
+            if (length < 1f)
+                return;
+            var dir = delta / length;
+            var normal = new Vector2(-dir.y, dir.x) * (_width * 0.5f);
+            var repeats = _tileLength > 1f ? length / _tileLength : 1f;
+            vh.AddVert(_start - normal, color, new Vector2(0f, 0f));
+            vh.AddVert(_start + normal, color, new Vector2(0f, 1f));
+            vh.AddVert(end + normal, color, new Vector2(repeats, 1f));
+            vh.AddVert(end - normal, color, new Vector2(repeats, 0f));
+            vh.AddTriangle(0, 1, 2);
+            vh.AddTriangle(0, 2, 3);
+        }
+
+        static Camera BakeCamera
+        {
+            get
+            {
+                if (_bakeCamera != null)
+                    return _bakeCamera;
+                var go = new GameObject("MapBrushBakeCamera") { hideFlags = HideFlags.HideAndDontSave };
+                _bakeCamera = go.AddComponent<Camera>();
+                _bakeCamera.enabled = false;
+                _bakeCamera.orthographic = true;
+                return _bakeCamera;
+            }
+        }
+
+        protected override void OnDestroy()
+        {
+            if (_ownedMaterial != null)
+                Destroy(_ownedMaterial);
+            if (_baked != null)
+                Destroy(_baked);
+            base.OnDestroy();
+        }
+    }
+
+    sealed class MapRevealPlayback : MonoBehaviour
+    {
+        CanvasGroup[] _inks;
+        CanvasGroup[] _stamps;
+        float _start;
+        float _duration = 0.3f;
+
+        public void Play(List<CanvasGroup> inks, List<CanvasGroup> stamps, float duration)
+        {
+            _inks = inks != null ? inks.ToArray() : Array.Empty<CanvasGroup>();
+            _stamps = stamps != null ? stamps.ToArray() : Array.Empty<CanvasGroup>();
+            _duration = Mathf.Max(0.05f, duration);
+            _start = Time.unscaledTime;
+            foreach (var stamp in _stamps)
+            {
+                if (stamp != null)
+                    stamp.alpha = 0f;
+            }
+        }
+
+        void Update()
+        {
+            var t = Mathf.Clamp01((Time.unscaledTime - _start) / _duration);
+            var eased = t * t * (3f - 2f * t);
+            if (_inks != null)
+            {
+                foreach (var ink in _inks)
+                {
+                    if (ink == null)
+                        continue;
+                    ink.alpha = 1f - eased;
+                    ink.transform.localScale = Vector3.one * Mathf.Lerp(1f, 1.12f, eased);
+                }
+            }
+
+            if (_stamps != null)
+            {
+                foreach (var stamp in _stamps)
+                {
+                    if (stamp != null)
+                        stamp.alpha = eased;
+                }
+            }
+
+            if (t < 1f)
+                return;
+
+            if (_inks != null)
+            {
+                foreach (var ink in _inks)
+                {
+                    if (ink == null)
+                        continue;
+                    ink.alpha = 0f;
+                    ink.transform.localScale = Vector3.one;
+                }
+            }
+
+            if (_stamps != null)
+            {
+                foreach (var stamp in _stamps)
+                {
+                    if (stamp != null)
+                        stamp.alpha = 1f;
+                }
+            }
+
+            enabled = false;
         }
     }
 
