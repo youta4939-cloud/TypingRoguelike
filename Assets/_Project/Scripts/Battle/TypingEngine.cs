@@ -168,6 +168,14 @@ namespace TypingRoguelike.Battle
             return new TypingWordEntry(display, inputs.ToArray());
         }
 
+        /// <summary>戦闘のローマ字揺れ（si/shi、ん の nn など）を広げる。</summary>
+        public static string[] ExpandInputVariants(string canonical)
+        {
+            if (string.IsNullOrWhiteSpace(canonical))
+                return Array.Empty<string>();
+            return ExpandRomajiVariants(canonical.Trim().ToLowerInvariant()).ToArray();
+        }
+
         static IEnumerable<string> ExpandRomajiVariants(string canonical)
         {
             var results = new HashSet<string>();

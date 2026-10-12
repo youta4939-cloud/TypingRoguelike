@@ -132,6 +132,81 @@ namespace TypingRoguelike.Run
         }
 
         /// <summary>死亡後のエレベ再入: 当該エレベのみ表示し、そこから探索開始。</summary>
+        public List<string> SeenEventIds { get; } = new();
+
+        public void ClearSeenEvents() => SeenEventIds.Clear();
+
+        public void ReplaceSeenEvents(IReadOnlyList<string> ids)
+        {
+            SeenEventIds.Clear();
+            if (ids == null)
+                return;
+            foreach (var id in ids)
+            {
+                if (!string.IsNullOrEmpty(id) && !SeenEventIds.Contains(id))
+                    SeenEventIds.Add(id);
+            }
+        }
+
+        public void RememberEvent(string id)
+        {
+            if (!string.IsNullOrEmpty(id) && !SeenEventIds.Contains(id))
+                SeenEventIds.Add(id);
+        }
+
+        public bool HasRowAfterNext()
+        {
+            var cur = Current;
+            if (cur == null)
+                return false;
+            foreach (var nextId in cur.Next)
+            {
+                if (_nodes.TryGetValue(nextId, out var next) && next.Next.Count > 0)
+                    return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>次の段を飛ばし、その次の段へ進める。飛ばした段は踏破にしない。二重には飛ばさない。</summary>
+        public bool TrySkipNextRow(DungeonMapNode from)
+        {
+            if (from == null || from.Next.Count == 0)
+                return false;
+
+            var alreadySkipped = true;
+            foreach (var nextId in from.Next)
+            {
+                if (!_nodes.TryGetValue(nextId, out var next) || next.Layer < from.Layer + 2)
+                {
+                    alreadySkipped = false;
+                    break;
+                }
+            }
+
+            if (alreadySkipped)
+                return false;
+
+            var far = new List<int>();
+            foreach (var nextId in from.Next)
+            {
+                if (!_nodes.TryGetValue(nextId, out var mid))
+                    continue;
+                foreach (var farId in mid.Next)
+                {
+                    if (!far.Contains(farId))
+                        far.Add(farId);
+                }
+            }
+
+            if (far.Count == 0)
+                return false;
+
+            from.Next.Clear();
+            from.Next.AddRange(far);
+            return true;
+        }
+
         public bool TrySpawnAtElevator(int elevatorNodeId)
         {
             if (!_nodes.TryGetValue(elevatorNodeId, out var elevator) ||

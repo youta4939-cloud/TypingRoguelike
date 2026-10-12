@@ -38,6 +38,14 @@ namespace TypingRoguelike.Run
         string _pendingTreasureRelicLine;
         bool _awaitingTreasureModal;
         int _merchantRelicSoldNodeId = -1;
+        readonly EventScreenUI _events = new();
+        EventDefinition _activeEvent;
+        EventOutcome _activeOutcome;
+        int _effectCursor;
+        readonly List<string> _effectNotes = new();
+        readonly HashSet<int> _chosenCardIds = new();
+        bool _eventStartsBattle;
+        bool _eventFromDebug;
 
         public RunPartyState Party => _party;
         public RunMadnessState Madness => _madness;
@@ -99,6 +107,7 @@ namespace TypingRoguelike.Run
             _runResultRecorded = false;
             _clearedNodesThisRun = 0;
             _exploration.Clear();
+            _dungeon.ClearSeenEvents();
 
             MetaProgression.ClearActiveTowerRun(_profile);
             _profile.revealedTowerNodeIds ??= new List<int>();
@@ -150,6 +159,7 @@ namespace TypingRoguelike.Run
 
             if (restoreNodeId.HasValue && !_dungeon.TryRestoreCurrentNode(restoreNodeId.Value))
                 Debug.LogWarning($"保存ノード {restoreNodeId} を復元できませんでした。入口に戻します。");
+            ReapplyRowSkips();
         }
 
         void ShowMap()
@@ -162,6 +172,7 @@ namespace TypingRoguelike.Run
             var revealAll = RelicRunModifiers.Compute(_exploration, ResolveRelicCatalog()).RevealsAllNodes;
             _mapUi.Show(transform, _dungeon, _party, _exploration, _madness, OnMapNodeSelected, AbandonRun,
                 OpenRunLoadout, OpenRunRelicManage, OpenRunPartyStats, revealAll);
+            EventDebugUI.Ensure(transform, BuildEventDebugHooks());
         }
 
         /// <summary>マップイベント等から狂気度を変更。発狂したら true。</summary>
@@ -184,6 +195,7 @@ namespace TypingRoguelike.Run
             if (_profile == null || !_profile.towerRunActive)
                 return;
 
+            SyncSeenEventsToProfile();
             MetaProgression.SaveActiveTowerRun(
                 _profile,
                 _runSeed,
@@ -325,6 +337,7 @@ namespace TypingRoguelike.Run
             _runResultRecorded = false;
             _clearedNodesThisRun = 0;
             _exploration.Clear();
+            _dungeon.ClearSeenEvents();
 
             MetaProgression.ClearActiveTowerRun(_profile);
             _profile.revealedTowerNodeIds ??= new List<int>();
@@ -380,6 +393,8 @@ namespace TypingRoguelike.Run
             }
 
             RestoreActiveRunState();
+            if (TryStartPendingEventBattle())
+                return;
             LoadFloorMap(_profile.towerRunFloor, _profile.towerRunNodeId);
             ShowMap();
         }
@@ -427,11 +442,14 @@ namespace TypingRoguelike.Run
                 _profile.towerRunMaterialStacks);
             if (_exploration.MaterialCount == 0 && _profile.towerRunMaterials > 0)
                 _exploration.RestoreLegacyMaterialCount(_profile.towerRunMaterials);
+            _dungeon.ReplaceSeenEvents(_profile.towerRunSeenEventIds);
         }
 
         void ContinueActiveRun(int floor, bool fromElevator)
         {
             RestoreActiveRunState();
+            if (TryStartPendingEventBattle())
+                return;
             if (fromElevator)
             {
                 LoadFloorMap(floor, restoreNodeId: null, forceElevatorOnFloor: true);
@@ -521,6 +539,10 @@ namespace TypingRoguelike.Run
                 case DungeonNodeType.Event:
                     ResolveEventNode();
                     break;
+                case DungeonNodeType.EventV2:
+                    Debug.Log($"EventV2 に入った。node={node.Id} layer={node.Layer}");
+                    BeginEvent(null, fromDebug: false);
+                    break;
                 case DungeonNodeType.Merchant:
                     ResolveMerchantNode();
                     break;
@@ -533,8 +555,24 @@ namespace TypingRoguelike.Run
             }
         }
 
+        void ResolveEmptyEventNode()
+        {
+            MarkCurrentCleared();
+            ShowMap();
+            var reason = EventDatabase.All.Count == 0
+                ? "出来事の定義が1件も読み込めていない。"
+                : "条件を満たす出来事が無かった。";
+            _mapUi.ShowModal(
+                "イベント",
+                reason,
+                new (string, Action)[] { ("マップに戻る", null) });
+            _mapUi.Refresh(_dungeon, _party, _exploration, _madness);
+        }
+
         void ResolveNormalNode()
         {
+            var current = _dungeon.Current;
+            Debug.Log($"ResolveNormalNode type={current?.Type} id={current?.Id}");
             MarkCurrentCleared();
             ShowMap();
             _mapUi.ShowModal(
@@ -1136,6 +1174,7 @@ namespace TypingRoguelike.Run
             if (enc == null)
             {
                 Debug.LogWarning("エンカウント定義がありません。");
+                ClearPendingEventBattle();
                 CompleteNodeAndReturnToMap();
                 return;
             }
@@ -1162,6 +1201,7 @@ namespace TypingRoguelike.Run
             catch (Exception ex)
             {
                 Debug.LogError($"戦闘 UI の初期化に失敗: {ex.Message}\n{ex.StackTrace}");
+                ClearPendingEventBattle();
                 CompleteNodeAndReturnToMap();
             }
         }
@@ -1271,6 +1311,7 @@ namespace TypingRoguelike.Run
             _overlay.HideAll();
             SyncJackpotFromBattle();
             DestroyBattleIfAny();
+            ClearPendingEventBattle();
             MarkCurrentCleared();
             PersistActiveRun();
             ShowMap();
@@ -1320,6 +1361,7 @@ namespace TypingRoguelike.Run
 
         void CompleteTowerRun()
         {
+            ArchiveSeenEvents();
             // TODO 未決事項2: 最終階踏破の魔石報酬は未決。RecordRunResult(true) の呼び出しは変えない。
             _overlay.HideAll();
             DestroyBattleIfAny();
@@ -1367,6 +1409,7 @@ namespace TypingRoguelike.Run
         /// <summary>全滅。刻印・レリック・塔片を失い、マップを作り直す。魔石は増えない。</summary>
         void ApplyWipe()
         {
+            ArchiveSeenEvents();
             // TODO 未決事項5: 素材も探索インベントリごと消える。全滅で素材を失うかは未決。
             _exploration.Clear();
             _party.ResetAcquiredSkillCards();
@@ -1382,6 +1425,9 @@ namespace TypingRoguelike.Run
                 yield break;
 
             _defeatHandling = true;
+            _events.Hide();
+            _activeEvent = null;
+            _activeOutcome = null;
             if (fromBattle)
                 yield return new WaitForSecondsRealtime(1.2f);
 
@@ -1553,6 +1599,509 @@ namespace TypingRoguelike.Run
             return MetaProgression.RegisterRunResult(
                 _profile, cleared, _clearedNodesThisRun, extracted);
         }
+
+        EventQuery BuildEventQuery() => new()
+        {
+            Floor = _dungeon != null ? Mathf.Max(1, _dungeon.Floor) : 1,
+            Cards = CountAcquiredCards(),
+            Coins = _party.RunCoins,
+            Relics = _exploration.EquippedRelicCount(),
+            Hp = _party.CurrentHp,
+            MaxHp = _party.MaxHp,
+            HasNextRow = _dungeon.HasRowAfterNext(),
+            SeenIds = _dungeon.SeenEventIds,
+            PreviousRunIds = _profile?.previousRunEventIds
+        };
+
+        int CountAcquiredCards()
+        {
+            var count = 0;
+            foreach (var member in _party.Members)
+            {
+                if (member?.slot0 != null) count++;
+                if (member?.slot1 != null) count++;
+            }
+
+            return count;
+        }
+
+        EventDebugHooks BuildEventDebugHooks() => new()
+        {
+            All = () => EventDatabase.All,
+            ConditionMet = ev => EventRules.ConditionMet(ev?.condition, BuildEventQuery()),
+            Start = ev => BeginEvent(ev, fromDebug: true),
+            AddMadness = delta =>
+            {
+                if (!ApplyMadnessDeltaFromEvent(delta))
+                    _mapUi.Refresh(_dungeon, _party, _exploration, _madness);
+            },
+            AddHp = delta =>
+            {
+                _party.ApplyHpDelta(delta);
+                PersistActiveRun();
+                if (_party.IsRunDead)
+                    TryBeginRunDeath(fromBattle: false);
+                else
+                    _mapUi.Refresh(_dungeon, _party, _exploration, _madness);
+            },
+            AddCoins = delta =>
+            {
+                if (delta >= 0)
+                    _party.AddCoins(delta);
+                else
+                    _party.TrySpendCoins(Mathf.Min(_party.RunCoins, -delta));
+                PersistActiveRun();
+                _mapUi.Refresh(_dungeon, _party, _exploration, _madness);
+            }
+        };
+
+        void BeginEvent(EventDefinition forced, bool fromDebug)
+        {
+            if (fromDebug && _activeEvent != null)
+                return;
+
+            if (!fromDebug && EventDatabase.All.Count == 0)
+                EventDatabase.Reload();
+
+            var query = BuildEventQuery();
+            var ev = forced ?? EventDatabase.Pick(query);
+            if (ev == null)
+            {
+                Debug.LogWarning(
+                    $"EventV2 の候補が0件。定義={EventDatabase.All.Count} 階={query.Floor} " +
+                    $"カード={query.Cards} 通貨={query.Coins} レリック={query.Relics}");
+                if (!fromDebug)
+                    ResolveEmptyEventNode();
+                return;
+            }
+
+            _eventFromDebug = fromDebug;
+            _activeEvent = ev;
+            _activeOutcome = null;
+            _eventStartsBattle = false;
+            if (!fromDebug)
+            {
+                _dungeon.RememberEvent(ev.id);
+                SyncSeenEventsToProfile();
+                PersistActiveRun();
+            }
+
+            var names = PartyNames();
+            _events.Show(transform, ev, query, names, OnEventOption, () => FinishEvent(clearNode: false));
+        }
+
+        void OnEventOption(int index)
+        {
+            var options = _activeEvent?.options;
+            if (options == null || index < 0 || index >= options.Count)
+            {
+                FinishEvent(clearNode: !_eventFromDebug);
+                return;
+            }
+
+            _activeOutcome = EventRules.Roll(options[index], BuildEventQuery());
+            if (_activeOutcome == null)
+            {
+                FinishEvent(clearNode: !_eventFromDebug);
+                return;
+            }
+
+            _effectCursor = 0;
+            _effectNotes.Clear();
+            _chosenCardIds.Clear();
+            _eventStartsBattle = false;
+            ContinueEventEffects();
+        }
+
+        void ContinueEventEffects()
+        {
+            var effects = _activeOutcome?.effects;
+            while (effects != null && _effectCursor < effects.Count)
+            {
+                var effect = effects[_effectCursor];
+                _effectCursor++;
+                if (effect == null || string.IsNullOrEmpty(effect.type))
+                    continue;
+
+                switch (effect.type.Trim().ToLowerInvariant())
+                {
+                    case "madness":
+                        if (ApplyEventMadness(effect))
+                            return;
+                        break;
+                    case "hp":
+                        if (ApplyEventHp(effect))
+                            return;
+                        break;
+                    case "coins_percent":
+                        ApplyEventCoins(effect);
+                        break;
+                    case "card_gain":
+                        ApplyEventCardGain();
+                        return;
+                    case "card_upgrade_choose":
+                        PromptEventCard(upgrade: true);
+                        return;
+                    case "card_remove_choose":
+                        PromptEventCard(upgrade: false);
+                        return;
+                    case "relic_gain":
+                        ApplyEventRelicGain();
+                        return;
+                    case "relic_lose_random":
+                        ApplyEventRelicLoss();
+                        break;
+                    case "battle":
+                        _eventStartsBattle = true;
+                        _effectNotes.Add("戦闘開始");
+                        break;
+                    case "skip_row":
+                        ApplyEventSkip();
+                        break;
+                    case "reveal_floor":
+                        RevealEventNodes(null);
+                        _effectNotes.Add("この階を開示");
+                        break;
+                    case "reveal_elevator":
+                        RevealEventNodes(DungeonNodeType.Elevator);
+                        _effectNotes.Add("エレベーターを開示");
+                        break;
+                    case "reveal_treasure":
+                        RevealEventNodes(DungeonNodeType.Treasure);
+                        _effectNotes.Add("宝箱を開示");
+                        break;
+                }
+            }
+
+            ShowEventResult();
+        }
+
+        bool ApplyEventMadness(EventEffect effect)
+        {
+            var delta = EventRules.ScaleFixed(effect.value, _dungeon.Floor);
+            _effectNotes.Add($"狂気 {Signed(delta)}");
+            if (!ApplyMadnessDeltaFromEvent(delta))
+                return false;
+            _events.Hide();
+            return true;
+        }
+
+        bool ApplyEventHp(EventEffect effect)
+        {
+            var delta = EventRules.ScaleFixed(effect.value, _dungeon.Floor);
+            _party.ApplyHpDelta(delta);
+            _effectNotes.Add($"HP {Signed(delta)}");
+            PersistActiveRun();
+            if (!_party.IsRunDead)
+                return false;
+            _events.Hide();
+            TryBeginRunDeath(fromBattle: false);
+            return true;
+        }
+
+        void ApplyEventCoins(EventEffect effect)
+        {
+            var delta = EventRules.CoinDelta(_party.RunCoins, effect.value);
+            if (delta >= 0)
+                _party.AddCoins(delta);
+            else
+                _party.TrySpendCoins(Mathf.Min(_party.RunCoins, -delta));
+            _effectNotes.Add($"通貨 {Signed(delta)}（所持金の{Mathf.Abs(effect.value)}%）");
+        }
+
+        void ApplyEventCardGain()
+        {
+            var names = PartyNames();
+            var choices = CardRewardPicker.PickChoices(
+                ResolveRewardPool(), 1, null, _party.GetMaxedSkillIds(), names);
+            if (choices.Count == 0)
+            {
+                _effectNotes.Add("入手できる刻印がない");
+                ContinueEventEffects();
+                return;
+            }
+
+            var card = choices[0];
+            var outcome = _party.TryEquipReward(card, out var memberIndex, out var newLevel);
+            switch (outcome)
+            {
+                case RewardEquipOutcome.NeedReplace:
+                    _events.Hide();
+                    _overlay.ShowReplaceSlot(transform, _party, memberIndex, card, () =>
+                    {
+                        _effectNotes.Add($"刻印 {card.displayName}");
+                        ContinueEventEffects();
+                    }, () =>
+                    {
+                        _effectNotes.Add("刻印を見送った");
+                        ContinueEventEffects();
+                    }, cardSlotsOnly: true);
+                    return;
+                case RewardEquipOutcome.LeveledUp:
+                    _effectNotes.Add($"{card.displayName} Lv.{newLevel}");
+                    break;
+                case RewardEquipOutcome.Equipped:
+                    _effectNotes.Add($"刻印 {card.displayName}");
+                    break;
+                default:
+                    _effectNotes.Add("刻印は入らなかった");
+                    break;
+            }
+
+            ContinueEventEffects();
+        }
+
+        void PromptEventCard(bool upgrade)
+        {
+            var choices = new List<EventCardChoice>();
+            for (var memberIndex = 0; memberIndex < _party.Members.Count; memberIndex++)
+            {
+                var member = _party.Members[memberIndex];
+                for (var slot = 0; slot <= 1; slot++)
+                {
+                    var skill = member.GetSlot(slot);
+                    if (skill == null || _chosenCardIds.Contains(skill.skillId))
+                        continue;
+                    if (upgrade && member.GetSlotLevel(slot) >= SkillProgression.MaxLevel)
+                        continue;
+                    var who = member.character?.characterName ?? "仲間";
+                    choices.Add(new EventCardChoice(
+                        memberIndex, slot, $"{who}  {skill.displayName}  Lv.{member.GetSlotLevel(slot)}"));
+                }
+            }
+
+            if (choices.Count == 0)
+            {
+                _effectNotes.Add("選べる刻印がない");
+                ContinueEventEffects();
+                return;
+            }
+
+            _events.ShowCardPick(transform, upgrade ? "強化する刻印" : "外す刻印", choices, choice =>
+            {
+                if (choice.MemberIndex < 0)
+                {
+                    _effectNotes.Add("選べる刻印がない");
+                    ContinueEventEffects();
+                    return;
+                }
+
+                var member = _party.Members[choice.MemberIndex];
+                var skill = member.GetSlot(choice.SlotIndex);
+                if (skill == null)
+                {
+                    ContinueEventEffects();
+                    return;
+                }
+
+                _chosenCardIds.Add(skill.skillId);
+                if (upgrade && member.TryLevelUp(skill, out var level) && level <= SkillProgression.MaxLevel)
+                    _effectNotes.Add($"{skill.displayName} Lv.{level}");
+                else if (!upgrade)
+                {
+                    _party.ClearEquippedSlot(choice.MemberIndex, choice.SlotIndex);
+                    _effectNotes.Add($"{skill.displayName} を外した");
+                }
+                else
+                    _effectNotes.Add($"{skill.displayName} は最大");
+
+                ContinueEventEffects();
+            });
+        }
+
+        void ApplyEventRelicGain()
+        {
+            var relic = PickRandomRelic();
+            if (relic == null)
+            {
+                _effectNotes.Add("レリックがない");
+                ContinueEventEffects();
+                return;
+            }
+
+            PromptRelicEquip(relic, 0, () =>
+            {
+                _effectNotes.Add($"レリック {relic.displayName}");
+                ContinueEventEffects();
+            }, ContinueEventEffects);
+        }
+
+        void ApplyEventRelicLoss()
+        {
+            var slots = new List<int>();
+            for (var i = 0; i < RunExplorationInventory.RelicSlotCount; i++)
+            {
+                if (_exploration.GetEquippedRelicId(i) >= 0)
+                    slots.Add(i);
+            }
+
+            if (slots.Count == 0)
+            {
+                _effectNotes.Add("外すレリックがない");
+                return;
+            }
+
+            var slot = slots[UnityEngine.Random.Range(0, slots.Count)];
+            var name = ResolveRelicCatalog()?.FindById(_exploration.GetEquippedRelicId(slot))?.displayName ?? "レリック";
+            _exploration.DiscardEquippedRelic(slot);
+            OnRelicsChanged();
+            _effectNotes.Add($"{name} を失った");
+        }
+
+        RelicDefinition PickRandomRelic()
+        {
+            var relics = ResolveRelicCatalog()?.relics;
+            if (relics == null)
+                return null;
+            var list = relics.Where(relic => relic != null).ToList();
+            if (list.Count == 0)
+                return null;
+            var free = list.Where(relic => !_exploration.IsRelicEquipped(relic.relicId)).ToList();
+            var pool = free.Count > 0 ? free : list;
+            return pool[UnityEngine.Random.Range(0, pool.Count)];
+        }
+
+        void ApplyEventSkip()
+        {
+            var node = _dungeon.Current;
+            if (node != null && _dungeon.TrySkipNextRow(node))
+            {
+                _profile.towerRunSkipFromNodeIds ??= new List<int>();
+                if (!_profile.towerRunSkipFromNodeIds.Contains(node.Id))
+                    _profile.towerRunSkipFromNodeIds.Add(node.Id);
+                _effectNotes.Add("次の段を飛ばした");
+                PersistActiveRun();
+                return;
+            }
+
+            _effectNotes.Add("先の段がない");
+        }
+
+        void RevealEventNodes(DungeonNodeType? type)
+        {
+            foreach (var node in _dungeon.Nodes.Values)
+            {
+                if (type.HasValue && node.Type != type.Value)
+                    continue;
+                node.Revealed = true;
+                MetaProgression.RevealTowerNode(_profile, node.Id);
+            }
+        }
+
+        void ShowEventResult()
+        {
+            PersistActiveRun();
+            var text = string.IsNullOrEmpty(_activeOutcome?.text) ? "……" : _activeOutcome.text;
+            var confirm = _eventStartsBattle ? "戦闘開始" : "マップへ戻る";
+            _events.ShowResult(transform, text, string.Join("、", _effectNotes), confirm, OnEventConfirm);
+        }
+
+        void OnEventConfirm()
+        {
+            var battle = _eventStartsBattle;
+            var clearNode = !_eventFromDebug;
+            _events.Hide();
+            _activeEvent = null;
+            _activeOutcome = null;
+            _eventFromDebug = false;
+            _eventStartsBattle = false;
+            if (battle)
+            {
+                var node = _dungeon.Current;
+                if (node == null)
+                {
+                    ClearPendingEventBattle();
+                    ShowMap();
+                    return;
+                }
+
+                if (clearNode && _profile != null)
+                {
+                    _profile.towerRunEventBattlePending = true;
+                    PersistActiveRun();
+                }
+
+                StartBattleForNode(node, ResolveCombatEncounter(), BuildCombatMods());
+                return;
+            }
+
+            FinishEvent(clearNode);
+        }
+
+        void FinishEvent(bool clearNode)
+        {
+            _events.Hide();
+            _activeEvent = null;
+            _activeOutcome = null;
+            _eventFromDebug = false;
+            if (clearNode)
+                CompleteNodeAndReturnToMap();
+            else
+                ShowMap();
+        }
+
+        bool TryStartPendingEventBattle()
+        {
+            if (_profile == null || !_profile.towerRunEventBattlePending)
+                return false;
+            if (_party.IsRunDead)
+            {
+                ClearPendingEventBattle();
+                return false;
+            }
+
+            LoadFloorMap(Mathf.Max(1, _profile.towerRunFloor), _profile.towerRunNodeId);
+            var node = _dungeon.Current;
+            if (node == null)
+            {
+                ClearPendingEventBattle();
+                PersistActiveRun();
+                return false;
+            }
+
+            StartBattleForNode(node, ResolveCombatEncounter(), BuildCombatMods());
+            return true;
+        }
+
+        void ClearPendingEventBattle()
+        {
+            if (_profile != null)
+                _profile.towerRunEventBattlePending = false;
+        }
+
+        List<string> PartyNames() => _party.Members
+            .Select(member => member.character?.characterName)
+            .Where(name => !string.IsNullOrEmpty(name))
+            .ToList();
+
+        void SyncSeenEventsToProfile()
+        {
+            if (_profile == null)
+                return;
+            _profile.towerRunSeenEventIds = new List<string>(_dungeon.SeenEventIds);
+        }
+
+        void ArchiveSeenEvents()
+        {
+            if (_profile == null)
+                return;
+            _profile.previousRunEventIds = new List<string>(_dungeon.SeenEventIds);
+            _dungeon.ClearSeenEvents();
+            _profile.towerRunSeenEventIds = new List<string>();
+        }
+
+        void ReapplyRowSkips()
+        {
+            if (_profile?.towerRunSkipFromNodeIds == null)
+                return;
+            foreach (var id in _profile.towerRunSkipFromNodeIds)
+            {
+                if (_dungeon.Nodes.TryGetValue(id, out var node))
+                    _dungeon.TrySkipNextRow(node);
+            }
+        }
+
+        static string Signed(int value) => value > 0 ? $"+{value}" : value.ToString();
 
         void DestroyBattleIfAny()
         {

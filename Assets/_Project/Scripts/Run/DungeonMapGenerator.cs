@@ -6,9 +6,11 @@ using UnityEngine;
 
 namespace TypingRoguelike.Run
 {
-    /// <summary>マス種: Normal / Danger / Rest / Merchant / Treasure / Event / Elevator / Boss。</summary>
+    /// <summary>マス種: Normal / Danger / Rest / Merchant / Treasure / Event / EventV2 / Elevator / Boss。</summary>
     public static class DungeonMapGenerator
     {
+        /// <summary>道中マスが EventV2 になる割合。調整用。</summary>
+        public const float EventV2Chance = 0.2f;
         public sealed class Result
         {
             public List<DungeonMapNode> Nodes = new();
@@ -63,7 +65,31 @@ namespace TypingRoguelike.Run
 
             WireEdges(byLayer, rng, width);
             BalanceRestNodes(result, config, rng);
+            LogNodeTypeCounts(result);
             return result;
+        }
+
+        /// <summary>生成結果のマス種類ごとの数。Console で EventV2 の有無を見る。</summary>
+        static void LogNodeTypeCounts(Result result)
+        {
+            var counts = new Dictionary<DungeonNodeType, int>();
+            if (result?.Nodes != null)
+            {
+                foreach (var node in result.Nodes)
+                {
+                    counts.TryGetValue(node.Type, out var count);
+                    counts[node.Type] = count + 1;
+                }
+            }
+
+            var parts = new List<string>();
+            foreach (DungeonNodeType type in Enum.GetValues(typeof(DungeonNodeType)))
+            {
+                counts.TryGetValue(type, out var count);
+                parts.Add($"{type}={count}");
+            }
+
+            Debug.Log("マップ生成 マス種類: " + string.Join(", ", parts));
         }
 
         static void BalanceRestNodes(Result result, DungeonRunDefinition config, System.Random rng)
@@ -103,6 +129,9 @@ namespace TypingRoguelike.Run
 
         static DungeonNodeType RollNodeType(System.Random rng, int layer, int pathLayers)
         {
+            if (rng.NextDouble() < EventV2Chance)
+                return DungeonNodeType.EventV2;
+
             if (layer == pathLayers)
             {
                 var late = rng.Next(100);

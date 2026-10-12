@@ -313,6 +313,20 @@ namespace TypingRoguelike.Run
             RunHpInitialized = true;
         }
 
+        public void ApplyHpDelta(int delta)
+        {
+            if (!RunHpInitialized)
+                return;
+            CurrentHp = Mathf.Clamp(CurrentHp + delta, 0f, MaxHp);
+        }
+
+        public void ClearEquippedSlot(int memberIndex, int slotIndex)
+        {
+            if (!IsValidSlot(memberIndex, slotIndex) || slotIndex == MemberRunState.InnateSlotIndex)
+                return;
+            _members[memberIndex].SetSlot(slotIndex, null);
+        }
+
         public void SetCurrentHp(float hp)
         {
             if (!RunHpInitialized)

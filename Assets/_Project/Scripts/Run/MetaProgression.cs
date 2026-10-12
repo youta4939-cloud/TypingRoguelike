@@ -52,6 +52,10 @@ namespace TypingRoguelike.Run
         public List<int> towerRunBackpackRelicIds = new();
         public int towerRunMaterials;
         public List<MaterialStackSave> towerRunMaterialStacks = new();
+        public List<string> towerRunSeenEventIds = new();
+        public List<string> previousRunEventIds = new();
+        public List<int> towerRunSkipFromNodeIds = new();
+        public bool towerRunEventBattlePending;
 
         public bool IsUnlocked(int skillId) => unlockedSkillIds.Contains(skillId);
     }
@@ -321,6 +325,11 @@ namespace TypingRoguelike.Run
             data.towerRunEquippedRelicIds.Clear();
             data.towerRunBackpackRelicIds ??= new List<int>();
             data.towerRunBackpackRelicIds.Clear();
+            data.towerRunSeenEventIds ??= new List<string>();
+            data.towerRunSeenEventIds.Clear();
+            data.towerRunSkipFromNodeIds ??= new List<int>();
+            data.towerRunSkipFromNodeIds.Clear();
+            data.towerRunEventBattlePending = false;
             Save(data);
         }
 
@@ -371,6 +380,9 @@ namespace TypingRoguelike.Run
             data.towerRunBackpackRelicIds ??= new List<int>();
             data.warehouseMaterialStacks ??= new List<MaterialStackSave>();
             data.towerRunMaterialStacks ??= new List<MaterialStackSave>();
+            data.towerRunSeenEventIds ??= new List<string>();
+            data.previousRunEventIds ??= new List<string>();
+            data.towerRunSkipFromNodeIds ??= new List<int>();
 
             if (data.version < 2)
             {

@@ -25,6 +25,7 @@ namespace TypingRoguelike.Run
             DungeonNodeType.Treasure,
             DungeonNodeType.Merchant,
             DungeonNodeType.Event,
+            DungeonNodeType.EventV2,
             DungeonNodeType.Elevator,
             DungeonNodeType.Boss
         };
@@ -673,6 +674,7 @@ namespace TypingRoguelike.Run
             DungeonNodeType.Combat => "戦",
             DungeonNodeType.Elite => "強",
             DungeonNodeType.Event => "事",
+            DungeonNodeType.EventV2 => "話",
             _ => "?"
         };
 
@@ -689,6 +691,7 @@ namespace TypingRoguelike.Run
             DungeonNodeType.Combat => "戦闘",
             DungeonNodeType.Elite => "強敵",
             DungeonNodeType.Event => "出来事",
+            DungeonNodeType.EventV2 => "イベント",
             _ => "未判明"
         };
 
@@ -739,6 +742,7 @@ namespace TypingRoguelike.Run
             DungeonNodeType.Combat => "魔物と戦う。勝利で塔片を獲得",
             DungeonNodeType.Elite => "手強い敵。塔片は多め",
             DungeonNodeType.Event => "まれに現れる。レリックを1つ拾える",
+            DungeonNodeType.EventV2 => "その階の出来事が起きる",
             _ => string.Empty
         };
 
@@ -755,6 +759,7 @@ namespace TypingRoguelike.Run
             DungeonNodeType.Combat => new Color(0.66f, 0.7f, 0.86f),
             DungeonNodeType.Elite => new Color(0.96f, 0.28f, 0.36f),
             DungeonNodeType.Event => BattleUITheme.Arcane,
+            DungeonNodeType.EventV2 => new Color(0.72f, 0.48f, 0.95f),
             _ => BattleUITheme.TextMuted
         };
 
