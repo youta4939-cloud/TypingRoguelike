@@ -295,10 +295,15 @@ namespace TypingRoguelike.Battle
         }
 
         /// <summary>単語1完了ごとに1回抽選。外れ時は完了文字数 × 1文字あたり加算。</summary>
-        public bool RegisterWordAndRoll(float bonusJackpotChance, int completedCharacterCount)
+        public bool RegisterWordAndRoll(
+            float bonusJackpotChance,
+            int completedCharacterCount,
+            float? debugRollChanceOverride = null)
         {
             LastBonusJackpotChanceApplied = Mathf.Max(0f, bonusJackpotChance);
-            var rollChance = ResolveRollChance(LastBonusJackpotChanceApplied);
+            var rollChance = debugRollChanceOverride.HasValue
+                ? Mathf.Clamp01(debugRollChanceOverride.Value)
+                : ResolveRollChance(LastBonusJackpotChanceApplied);
             var won = UnityEngine.Random.value < rollChance;
             if (!won)
             {

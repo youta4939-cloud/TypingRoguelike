@@ -91,6 +91,15 @@ namespace TypingRoguelike.Run
             }, BattleUITheme.TextPrimary);
             wholeLabel = wholeButton.GetComponentInChildren<Text>();
             y -= 0.055f;
+            Text jackpotLabel = null;
+            var jackpotButton = CreateButton(_list.transform, JackpotDebugLabel(), new Vector2(0.04f, y - 0.045f), new Vector2(0.96f, y), () =>
+            {
+                RunDebugState.JackpotRollForce10Percent = !RunDebugState.JackpotRollForce10Percent;
+                if (jackpotLabel != null)
+                    jackpotLabel.text = JackpotDebugLabel();
+            }, BattleUITheme.TextPrimary);
+            jackpotLabel = jackpotButton.GetComponentInChildren<Text>();
+            y -= 0.055f;
             y = AddStatRow(y, "狂気", 100, _hooks.AddMadness);
             y = AddStatRow(y, "HP", 30, _hooks.AddHp);
             y = AddStatRow(y, "通貨", 50, _hooks.AddCoins);
@@ -124,6 +133,11 @@ namespace TypingRoguelike.Run
 
         static string WholeMapLabel() =>
             _hooks.ShowWholeMap != null && _hooks.ShowWholeMap() ? "全体表示をやめる" : "マップ全体を表示";
+
+        static string JackpotDebugLabel() =>
+            RunDebugState.JackpotRollForce10Percent
+                ? "JACKPOT 当選率: 10% 固定（ON）"
+                : "JACKPOT 当選率: 10% 固定（OFF）";
 
         static Text AddLabeledValue(float y, string text)
         {

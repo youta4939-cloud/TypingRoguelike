@@ -388,7 +388,10 @@ namespace TypingRoguelike.Battle
 
                     _wordsSinceJackpot.Add(string.IsNullOrEmpty(completed.DisplayText) ? "？" : completed.DisplayText);
                     var bonusJackpot = CurrentJackpotRollBonus();
-                    var jackpotWon = _jackpot.RegisterWordAndRoll(bonusJackpot, completed.InputLength);
+                    var jackpotWon = _jackpot.RegisterWordAndRoll(
+                        bonusJackpot,
+                        completed.InputLength,
+                        RunDebugState.JackpotRollChanceOverride);
                     PersistJackpotAccumulation();
                     RefreshJackpotMeter();
                     if (jackpotWon)
@@ -1377,7 +1380,15 @@ namespace TypingRoguelike.Battle
             var luck = _jackpotLuckBonusPerWord + (_madness?.BonusJackpotChance ?? 0f);
             var relicBonus = RelicJackpotActive() ? Mathf.Max(0f, _encounterMods.JackpotChanceBonus) : 0f;
             var roll = _jackpot.ResolveRollChance(luck + relicBonus);
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            if (RunDebugState.JackpotRollChanceOverride is float forced)
+                roll = forced;
+#endif
             var line = $"次 {FormatJackpotChancePercent(roll)} ＝ 蓄積 {FormatJackpotChancePercent(_jackpot.BaseAccumulatedChance)}";
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            if (RunDebugState.JackpotRollForce10Percent)
+                line += "\n（DEBUG: 当選率 10% 固定）";
+#endif
             if (luck > 0f)
                 line += $" ＋ 運 {FormatJackpotChancePercent(luck)}";
             if (_encounterMods.JackpotMadnessThreshold > 0)
