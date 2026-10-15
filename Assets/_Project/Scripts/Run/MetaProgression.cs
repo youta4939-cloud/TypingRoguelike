@@ -307,7 +307,7 @@ namespace TypingRoguelike.Run
             Save(data);
         }
 
-        static void RollTowerSeed(MetaProgressData data)
+        public static void RollTowerSeed(MetaProgressData data)
         {
             var next = unchecked(data.towerSeed * 1103515245 + 12345);
             if (next == 0)

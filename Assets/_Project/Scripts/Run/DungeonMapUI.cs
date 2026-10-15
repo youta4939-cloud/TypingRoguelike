@@ -20,10 +20,13 @@ namespace TypingRoguelike.Run
         static readonly Color ChoiceOrange = new Color(1f, 0.48f, 0.08f, 1f);
         static readonly Color InkDark = new Color(0.16f, 0.11f, 0.08f, 0.96f);
         static readonly Color InkLight = new Color(0.55f, 0.44f, 0.34f, 0.48f);
+        static readonly Color InkLightFaint = new Color(0.55f, 0.44f, 0.34f, 0.22f);
         static readonly Color SkippedTint = new Color(0.62f, 0.56f, 0.5f, 1f);
         const float RevealSeconds = 0.3f;
         const float LargeLineThickness = 8f;
+        const float LargeLineThicknessChoice = 10.5f;
         const float MiniLineThickness = 3f;
+        const float MiniLineThicknessChoice = 4.5f;
 
         static readonly DungeonNodeType[] LegendOrder =
         {
@@ -54,7 +57,6 @@ namespace TypingRoguelike.Run
         string _defaultHint;
         bool _revealAllNodes;
         int _currentLayer;
-        int _visibleRows = 1;
         Transform _host;
         DungeonRunState _dungeon;
         RectTransform _minimapRoot;
@@ -62,9 +64,11 @@ namespace TypingRoguelike.Run
         GameObject _overlayPanel;
         bool _pausedByOverlay;
         float _savedTimeScale = 1f;
-        int _presentedLayer = -1;
         bool _animateReveal;
-        int _revealFromLayer = -1;
+        bool _hasPresentedMap;
+        HashSet<int> _reachableNextIds = new HashSet<int>();
+        HashSet<int> _revealSnapshotIds = new HashSet<int>();
+        HashSet<int> _previousKnownNodeIds = new HashSet<int>();
         readonly List<CanvasGroup> _fadeInks = new List<CanvasGroup>();
         readonly List<CanvasGroup> _fadeStamps = new List<CanvasGroup>();
 
@@ -82,8 +86,11 @@ namespace TypingRoguelike.Run
                 return true;
             if (node.Revealed)
                 return true;
-            return node.Layer <= layer + Mathf.Max(0, _visibleRows);
+            return _reachableNextIds != null && _reachableNextIds.Contains(node.Id);
         }
+
+        bool NewlyRevealedNode(DungeonMapNode node) =>
+            node != null && _animateReveal && IsNodeKnown(node) && !_revealSnapshotIds.Contains(node.Id);
 
         Font UiFont => _font ??= BattleUITheme.Font;
 
@@ -99,13 +106,11 @@ namespace TypingRoguelike.Run
             Action onOpenRelics = null,
             Action onOpenPartyStats = null,
             bool revealAllNodes = false,
-            int visibleRows = 1,
             bool debugRevealMap = false)
         {
             _host = host;
             _dungeon = dungeon;
             _revealAllNodes = revealAllNodes || debugRevealMap;
-            _visibleRows = Mathf.Max(0, visibleRows);
             _currentLayer = dungeon.Current?.Layer ?? 0;
             ReleasePause();
             HideMinimap();
@@ -140,7 +145,7 @@ namespace TypingRoguelike.Run
         }
 
         /// <summary>道選び以外の画面。右上に前後1段だけのミニマップを出す。</summary>
-        public void ShowMinimap(Transform host, DungeonRunState dungeon, int visibleRows, bool revealAllNodes)
+        public void ShowMinimap(Transform host, DungeonRunState dungeon, bool revealAllNodes)
         {
             if (host == null || dungeon == null)
                 return;
@@ -148,7 +153,6 @@ namespace TypingRoguelike.Run
             _host = host;
             _dungeon = dungeon;
             _revealAllNodes = revealAllNodes;
-            _visibleRows = Mathf.Max(0, visibleRows);
             _currentLayer = dungeon.Current?.Layer ?? 0;
             CloseOverlay();
             if (_mapPanel != null)
@@ -164,7 +168,7 @@ namespace TypingRoguelike.Run
         }
 
         /// <summary>イベント・商人・休憩の文章中。ミニマップは出さず、右上の「Tab：地図」だけ残す。</summary>
-        public void ShowMapTabHint(Transform host, DungeonRunState dungeon, int visibleRows, bool revealAllNodes)
+        public void ShowMapTabHint(Transform host, DungeonRunState dungeon, bool revealAllNodes)
         {
             if (host == null || dungeon == null)
                 return;
@@ -172,7 +176,6 @@ namespace TypingRoguelike.Run
             _host = host;
             _dungeon = dungeon;
             _revealAllNodes = revealAllNodes;
-            _visibleRows = Mathf.Max(0, visibleRows);
             _currentLayer = dungeon.Current?.Layer ?? 0;
             ReleasePause();
             if (_mapPanel != null)
@@ -503,6 +506,7 @@ namespace TypingRoguelike.Run
 
         void BuildTowerMap(Transform parent, DungeonRunState dungeon, int topLayer, Action<int> onNodeSelected, bool interactive)
         {
+            _reachableNextIds = new HashSet<int>(dungeon.GetReachableNext().Select(node => node.Id));
             BeginRevealPass();
             var area = CreateRect(parent, "TowerArea", Vector2.zero, Vector2.one);
             var span = Mathf.Max(1, topLayer);
@@ -516,7 +520,7 @@ namespace TypingRoguelike.Run
             Canvas.ForceUpdateCanvases();
             LayoutRebuilder.ForceRebuildLayoutImmediate(area);
 
-            var reachable = new HashSet<int>(dungeon.GetReachableNext().Select(node => node.Id));
+            var reachable = _reachableNextIds;
             var brush = MapNodeIcons.Catalog != null ? MapNodeIcons.Catalog.brushLine : null;
             foreach (var from in dungeon.Nodes.Values)
             {
@@ -528,34 +532,36 @@ namespace TypingRoguelike.Run
                     var available = from.Id == dungeon.CurrentNodeId && reachable.Contains(nextId);
                     var traveled = from.Cleared && (to.Cleared || to.Id == dungeon.CurrentNodeId);
                     var justWalked = _animateReveal && traveled && to.Id == dungeon.CurrentNodeId && from.Cleared;
-                    var color = available ? ChoiceOrange : traveled ? InkDark : InkLight;
                     var fromRadius = NodeRadius(from, mini: false);
                     var toRadius = NodeRadius(to, mini: false);
                     if (brush != null)
                     {
+                        var thickness = available ? LargeLineThicknessChoice : traveled ? LargeLineThickness : LargeLineThickness * 0.55f;
+                        var color = available ? ChoiceOrange : traveled ? InkDark : InkLightFaint;
                         CreateBrushLine(routesRoot, area, positions[from.Id], positions[nextId], color,
-                            LargeLineThickness, brush, justWalked);
+                            thickness, brush, justWalked);
                     }
                     else if (available)
                     {
                         CreateRouteSegment(
                             routesRoot, area, positions[from.Id], positions[nextId],
-                            new Color(ChoiceOrange.r, ChoiceOrange.g, ChoiceOrange.b, 0.35f), 11f, fromRadius, toRadius, dashed: false);
+                            new Color(ChoiceOrange.r, ChoiceOrange.g, ChoiceOrange.b, 0.42f), 13f, fromRadius, toRadius, dashed: false);
                         CreateRouteSegment(
                             routesRoot, area, positions[from.Id], positions[nextId],
-                            ChoiceOrange, 5f, fromRadius, toRadius, dashed: false);
+                            ChoiceOrange, 6.5f, fromRadius, toRadius, dashed: false);
                     }
                     else
                     {
+                        var color = traveled ? InkDark : InkLightFaint;
                         CreateRouteSegment(
                             routesRoot, area, positions[from.Id], positions[nextId],
-                            color, traveled ? 4f : 3.2f, fromRadius, toRadius, dashed: !traveled);
+                            color, traveled ? 4f : 2.2f, fromRadius, toRadius, dashed: !traveled);
                     }
                 }
             }
 
-            for (var layer = 0; layer <= topLayer; layer++)
-                PlaceRowInk(area, layer, LayerY(layer, span), mini: false);
+            foreach (var node in dungeon.Nodes.Values.OrderBy(node => node.Layer))
+                PlaceNodeInk(area, node, positions[node.Id], mini: false);
 
             foreach (var node in dungeon.Nodes.Values.OrderBy(node => node.Layer))
             {
@@ -576,10 +582,20 @@ namespace TypingRoguelike.Run
 
         void BeginRevealPass()
         {
-            var layer = _currentLayer;
-            _animateReveal = _presentedLayer >= 0 && layer > _presentedLayer;
-            _revealFromLayer = _presentedLayer;
-            _presentedLayer = layer;
+            var currentKnown = new HashSet<int>();
+            if (_dungeon?.Nodes != null)
+            {
+                foreach (var node in _dungeon.Nodes.Values)
+                {
+                    if (IsKnownAt(node, 0))
+                        currentKnown.Add(node.Id);
+                }
+            }
+
+            _revealSnapshotIds = _hasPresentedMap ? new HashSet<int>(_previousKnownNodeIds) : new HashSet<int>();
+            _animateReveal = _hasPresentedMap && currentKnown.Except(_revealSnapshotIds).Any();
+            _previousKnownNodeIds = currentKnown;
+            _hasPresentedMap = true;
             _fadeInks.Clear();
             _fadeStamps.Clear();
         }
@@ -716,53 +732,40 @@ namespace TypingRoguelike.Run
             image.raycastTarget = false;
         }
 
-        void PlaceRowInk(RectTransform area, int layer, float y, bool mini)
+        void PlaceNodeInk(RectTransform area, DungeonMapNode node, Vector2 position, bool mini)
         {
-            if (_dungeon == null)
+            if (node == null)
                 return;
 
-            var onLayer = _dungeon.Nodes.Values.Where(node => node.Layer == layer).ToList();
-            if (onLayer.Count == 0)
-                return;
-
-            var anyUnknown = onLayer.Any(node => !IsNodeKnown(node));
-            var openedThisStep = _animateReveal && !mini && !anyUnknown &&
-                                 onLayer.Any(node => !IsKnownAt(node, _revealFromLayer));
-            if (!anyUnknown && !openedThisStep)
+            var known = IsNodeKnown(node);
+            var newlyRevealed = NewlyRevealedNode(node);
+            if (known && !newlyRevealed)
                 return;
 
             var catalog = MapNodeIcons.Catalog;
-            var sprite = catalog != null ? catalog.Ink(RowInkIndex(layer, onLayer)) : null;
+            var sprite = catalog != null ? catalog.Ink(NodeInkIndex(node.Id)) : null;
             if (sprite == null)
                 return;
 
-            var height = mini ? 34f : 128f;
-            var ink = CreateImage(area, $"Ink_{layer}", sprite, Color.white,
-                new Vector2(mini ? 0.04f : 0.05f, y), new Vector2(mini ? 0.96f : 0.95f, y));
-            ink.rectTransform.sizeDelta = new Vector2(0f, height);
-            ink.preserveAspect = false;
+            var radius = NodeRadius(node, mini);
+            var size = radius * (mini ? 3.2f : 3.6f);
+            var ink = CreateImage(area, mini ? $"InkMini_{node.Id}" : $"Ink_{node.Id}", sprite, Color.white,
+                position, position);
+            ink.rectTransform.sizeDelta = new Vector2(size, size);
+            ink.preserveAspect = true;
             ink.raycastTarget = false;
             var group = ink.gameObject.AddComponent<CanvasGroup>();
             group.alpha = 1f;
             group.blocksRaycasts = false;
             group.interactable = false;
-            if (openedThisStep)
+            if (newlyRevealed)
                 _fadeInks.Add(group);
         }
 
-        int RowInkIndex(int layer, List<DungeonMapNode> onLayer)
+        int NodeInkIndex(int nodeId)
         {
-            var id = int.MaxValue;
-            foreach (var node in onLayer)
-            {
-                if (node.Id < id)
-                    id = node.Id;
-            }
-
-            if (id == int.MaxValue)
-                id = layer;
             var floor = _dungeon != null ? _dungeon.Floor : 0;
-            var hash = unchecked(floor * 7919 + layer * 104729 + id * 17);
+            var hash = unchecked(floor * 7919 + nodeId * 104729);
             return (int)((uint)hash % 4);
         }
 
@@ -773,7 +776,7 @@ namespace TypingRoguelike.Run
             var visual = MapNodeIcons.Resolve(node.Type, known, mini);
             var isCurrent = node.Id == _dungeon.CurrentNodeId;
             var skipped = node.Layer < _currentLayer && !node.Cleared;
-            var fadeIn = _animateReveal && !mini && known && !IsKnownAt(node, _revealFromLayer);
+            var fadeIn = !mini && NewlyRevealedNode(node);
             var stamp = visual.Stamp;
             var onPaper = !mini && MapNodeIcons.Catalog != null && MapNodeIcons.Catalog.paper != null;
             var size = stamp != null
@@ -1005,7 +1008,7 @@ namespace TypingRoguelike.Run
                 _detailTitle.text = known ? NodeHoverTitle(node) : "未判明のマス";
                 var body = known
                     ? NodeHoverDescription(node)
-                    : "先の段は、近づくまで種類が分からない。";
+                    : "道がつながった先の1マスだけ種類が分かる。それ以外は未判明のまま。";
                 if (node.Cleared && node.Type != DungeonNodeType.Start)
                     body += "\n\n（今回の探索で通過済み）";
                 else if (canClick)
@@ -1252,12 +1255,13 @@ namespace TypingRoguelike.Run
             if (_dungeon?.Nodes == null)
                 return;
 
+            _reachableNextIds = new HashSet<int>(_dungeon.GetReachableNext().Select(node => node.Id));
             var layer = _dungeon.Current?.Layer ?? 0;
             var nodes = _dungeon.Nodes.Values.Where(node => Mathf.Abs(node.Layer - layer) <= 1).ToList();
             var minLayer = nodes.Select(node => node.Layer).DefaultIfEmpty(layer).Min();
             var maxLayer = nodes.Select(node => node.Layer).DefaultIfEmpty(layer).Max();
             var span = Mathf.Max(1, maxLayer - minLayer);
-            var reachable = new HashSet<int>(_dungeon.GetReachableNext().Select(node => node.Id));
+            var reachable = _reachableNextIds;
             var positions = new Dictionary<int, Vector2>();
             foreach (var node in nodes)
             {
@@ -1280,25 +1284,24 @@ namespace TypingRoguelike.Run
                         continue;
                     var choice = from.Id == _dungeon.CurrentNodeId && reachable.Contains(nextId);
                     var traveled = from.Cleared && (to.Cleared || to.Id == _dungeon.CurrentNodeId);
-                    var color = choice ? ChoiceOrange : traveled ? InkDark : InkLight;
+                    var color = choice ? ChoiceOrange : traveled ? InkDark : InkLightFaint;
                     if (brush != null)
                     {
+                        var thickness = choice ? MiniLineThicknessChoice : traveled ? MiniLineThickness : MiniLineThickness * 0.65f;
                         CreateBrushLine(area, area, positions[from.Id], positions[nextId], color,
-                            MiniLineThickness, brush, false);
+                            thickness, brush, false);
                     }
                     else
                     {
-                        CreateRouteSegment(area, area, positions[from.Id], positions[nextId], color, choice ? 4f : 2f,
+                        CreateRouteSegment(area, area, positions[from.Id], positions[nextId], color,
+                            choice ? MiniLineThicknessChoice : traveled ? 2.5f : 1.6f,
                             12f, 12f, dashed: !choice && !traveled);
                     }
                 }
             }
 
-            for (var row = minLayer; row <= maxLayer; row++)
-            {
-                var y = Mathf.Lerp(0.16f, 0.84f, (row - minLayer) / (float)span);
-                PlaceRowInk(area, row, y, mini: true);
-            }
+            foreach (var node in nodes)
+                PlaceNodeInk(area, node, positions[node.Id], mini: true);
 
             foreach (var node in nodes)
             {

@@ -46,8 +46,6 @@ namespace TypingRoguelike.Run
         readonly HashSet<int> _chosenCardIds = new();
         bool _eventStartsBattle;
         bool _eventFromDebug;
-        /// <summary>今いる段の先に種類を出す段数。強化で増やす。</summary>
-        int _visibleRows = 1;
         bool _debugRevealMap;
 
         public RunPartyState Party => _party;
@@ -127,7 +125,6 @@ namespace TypingRoguelike.Run
 
             _runSeed = _profile.towerSeed;
             _elevatorFloor = 1 + PositiveModulo(_runSeed, TotalFloors);
-            _visibleRows = 1;
             _debugRevealMap = false;
             GenerateFirstFloor();
             ActivateAndSaveRun();
@@ -189,23 +186,33 @@ namespace TypingRoguelike.Run
                 return;
 
             ExplorationPartyPassives.ApplyMapHints(_party, _dungeon, _runSeed);
+            RevealReachableMapNodes();
             SyncMadnessCapFromRelics();
             var revealAll = RelicRunModifiers.Compute(_exploration, ResolveRelicCatalog()).RevealsAllNodes;
             _mapUi.Show(transform, _dungeon, _party, _exploration, _madness, OnMapNodeSelected, AbandonRun,
-                OpenRunLoadout, OpenRunRelicManage, OpenRunPartyStats, revealAll, _visibleRows, _debugRevealMap);
+                OpenRunLoadout, OpenRunRelicManage, OpenRunPartyStats, revealAll, _debugRevealMap);
             EventDebugUI.Ensure(transform, BuildEventDebugHooks());
+        }
+
+        void RevealReachableMapNodes()
+        {
+            foreach (var node in _dungeon.GetReachableNext())
+            {
+                node.Revealed = true;
+                MetaProgression.RevealTowerNode(_profile, node.Id);
+            }
         }
 
         void ShowSideMap()
         {
             var revealAll = RelicRunModifiers.Compute(_exploration, ResolveRelicCatalog()).RevealsAllNodes || _debugRevealMap;
-            _mapUi.ShowMinimap(transform, _dungeon, _visibleRows, revealAll);
+            _mapUi.ShowMinimap(transform, _dungeon, revealAll);
         }
 
         void ShowMapTabHint()
         {
             var revealAll = RelicRunModifiers.Compute(_exploration, ResolveRelicCatalog()).RevealsAllNodes || _debugRevealMap;
-            _mapUi.ShowMapTabHint(transform, _dungeon, _visibleRows, revealAll);
+            _mapUi.ShowMapTabHint(transform, _dungeon, revealAll);
         }
 
         void ShowRouteMap()
@@ -445,7 +452,6 @@ namespace TypingRoguelike.Run
 
             _runSeed = _profile.towerSeed;
             _elevatorFloor = 1 + PositiveModulo(_runSeed, TotalFloors);
-            _visibleRows = 1;
             _debugRevealMap = false;
             LoadFloorMap(floor, restoreNodeId: null, forceElevatorOnFloor: true);
 
@@ -1559,6 +1565,7 @@ namespace TypingRoguelike.Run
             _profile.revealedTowerNodeIds.Clear();
             _profile.clearedTowerNodeIds ??= new List<int>();
             _profile.clearedTowerNodeIds.Clear();
+            MetaProgression.RollTowerSeed(_profile);
             MetaProgression.Save(_profile);
             RecordRunResult(true);
             _mapUi.Hide();
@@ -1843,12 +1850,6 @@ namespace TypingRoguelike.Run
                     _party.TrySpendCoins(Mathf.Min(_party.RunCoins, -delta));
                 PersistActiveRun();
                 _mapUi.Refresh(_dungeon, _party, _exploration, _madness);
-            },
-            VisibleRows = () => _visibleRows,
-            AddVisibleRows = delta =>
-            {
-                _visibleRows = Mathf.Clamp(_visibleRows + delta, 0, 8);
-                ShowMap();
             },
             ShowWholeMap = () => _debugRevealMap,
             ToggleWholeMap = () =>

@@ -15,8 +15,6 @@ namespace TypingRoguelike.Run
         public Action<int> AddMadness;
         public Action<int> AddHp;
         public Action<int> AddCoins;
-        public Func<int> VisibleRows;
-        public Action<int> AddVisibleRows;
         public Func<bool> ShowWholeMap;
         public Action ToggleWholeMap;
     }
@@ -67,21 +65,6 @@ namespace TypingRoguelike.Run
             _list = CreatePanel(_root, "EventList", new Vector2(0.62f, 0.08f), new Vector2(0.98f, 0.92f),
                 new Color(0.03f, 0.04f, 0.08f, 0.96f));
             var y = 0.90f;
-            Text rowsLabel = null;
-            rowsLabel = AddLabeledValue(y, VisibleRowsLabel());
-            CreateButton(_list.transform, "-", new Vector2(0.62f, y - 0.04f), new Vector2(0.74f, y), () =>
-            {
-                _hooks.AddVisibleRows?.Invoke(-1);
-                if (rowsLabel != null)
-                    rowsLabel.text = VisibleRowsLabel();
-            }, BattleUITheme.TextPrimary);
-            CreateButton(_list.transform, "+", new Vector2(0.76f, y - 0.04f), new Vector2(0.88f, y), () =>
-            {
-                _hooks.AddVisibleRows?.Invoke(1);
-                if (rowsLabel != null)
-                    rowsLabel.text = VisibleRowsLabel();
-            }, BattleUITheme.TextPrimary);
-            y -= 0.05f;
             Text wholeLabel = null;
             var wholeButton = CreateButton(_list.transform, WholeMapLabel(), new Vector2(0.04f, y - 0.045f), new Vector2(0.96f, y), () =>
             {
@@ -128,8 +111,6 @@ namespace TypingRoguelike.Run
                 y -= 0.05f;
             }
         }
-
-        static string VisibleRowsLabel() => $"見える段 {_hooks.VisibleRows?.Invoke() ?? 1}";
 
         static string WholeMapLabel() =>
             _hooks.ShowWholeMap != null && _hooks.ShowWholeMap() ? "全体表示をやめる" : "マップ全体を表示";
