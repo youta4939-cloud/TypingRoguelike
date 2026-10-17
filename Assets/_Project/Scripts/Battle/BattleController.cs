@@ -454,9 +454,7 @@ namespace TypingRoguelike.Battle
             if (_typingAudio == null || _jackpotPlaying || _runMenuOpen || _countdownActive || _isPaused)
                 return;
 
-            if (result.Completed.HasValue)
-                _typingAudio.PlayComplete();
-            else if (result.Advanced)
+            if (result.Completed.HasValue || result.Advanced)
                 _typingAudio.PlayCorrect();
             else if (result.Missed)
                 _typingAudio.PlayMiss();
@@ -954,9 +952,9 @@ namespace TypingRoguelike.Battle
             if (_outcomeHandled)
                 return;
 
-            StartCoroutine(FlashDamageOverlay());
-            if (_ui?.EnemyStage != null)
-                StartCoroutine(ShakeRect(_ui.EnemyHitRoot != null ? _ui.EnemyHitRoot : _ui.EnemyStage, 0.3f, 8f));
+            _ui?.BigMouth?.PlayAttack();
+            _ui?.EnemyBiteFx?.Play();
+            StartCoroutine(BiteImpact());
 
             var damageTaken = Mathf.Max(1f, _enemyAttackDamage - _damageReduction);
             _playerHp = Mathf.Max(0f, _playerHp - damageTaken);
@@ -980,13 +978,21 @@ namespace TypingRoguelike.Battle
             _onDefeat?.Invoke();
         }
 
-        IEnumerator FlashDamageOverlay()
+        IEnumerator BiteImpact()
         {
-            if (_ui?.DamageOverlay == null)
+            yield return new WaitForSecondsRealtime(0.11f);
+            var rt = _ui?.EnemyHitRoot != null ? _ui.EnemyHitRoot : _ui?.EnemyStage;
+            if (rt != null)
+                StartCoroutine(ShakeRect(rt, 0.08f, 2.5f));
+
+            var bar = _ui?.PlayerHpBar;
+            if (bar == null)
                 yield break;
-            _ui.DamageOverlay.color = new Color(1, 0, 0, 0.55f);
-            yield return new WaitForSecondsRealtime(0.12f);
-            _ui.DamageOverlay.color = new Color(1, 0, 0, 0);
+            var original = bar.color;
+            bar.color = Color.Lerp(original, new Color(1f, 0.42f, 0.38f), 0.75f);
+            yield return new WaitForSecondsRealtime(0.07f);
+            if (bar != null)
+                bar.color = original;
         }
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
@@ -1414,11 +1420,13 @@ namespace TypingRoguelike.Battle
                 return;
             if (_ui.PlayerHpText != null)
                 _ui.PlayerHpText.text = $"{(int)_playerHp} / {(int)_maxPlayerHp}";
-            if (_ui.EnemyHpText != null)
+            if (_ui.EnemyHpGauge != null)
+                _ui.EnemyHpGauge.SetHP(Mathf.RoundToInt(_enemyHp), Mathf.Max(1, Mathf.RoundToInt(_maxEnemyHp)));
+            else if (_ui.EnemyHpText != null)
                 _ui.EnemyHpText.text = $"HP {(int)_enemyHp} / {(int)_maxEnemyHp}";
             if (_ui.PlayerHpBar != null)
                 _ui.PlayerHpBar.fillAmount = _maxPlayerHp > 0 ? _playerHp / _maxPlayerHp : 0;
-            if (_ui.EnemyHpBar != null)
+            if (_ui.EnemyHpGauge == null && _ui.EnemyHpBar != null)
                 _ui.EnemyHpBar.fillAmount = _maxEnemyHp > 0 ? _enemyHp / _maxEnemyHp : 0;
         }
 

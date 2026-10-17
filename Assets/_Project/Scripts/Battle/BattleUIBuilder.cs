@@ -19,6 +19,7 @@ namespace TypingRoguelike.Battle
         public Text AttackBarLabel;
         public Image PlayerHpBar;
         public Image EnemyHpBar;
+        public BossHpGauge EnemyHpGauge;
         public Image AttackBar;
         public Image EnemyAttackRing;
         public Image EnemyAttackRingTrack;
@@ -43,6 +44,8 @@ namespace TypingRoguelike.Battle
         public RectTransform EnemyStage;
         public RectTransform EnemyHitRoot;
         public Image EnemyAura;
+        public BigMouthIdle BigMouth;
+        public EnemyBiteFx EnemyBiteFx;
         public GameObject CountdownOverlay;
         public Image CountdownRing;
         public Text CountdownText;
@@ -193,6 +196,9 @@ namespace TypingRoguelike.Battle
 
         static void BuildBattleBackdrop(RectTransform bg, BattleVisualContext visuals)
         {
+            if (BattleParallaxBackdrop.TryBuild(bg))
+                return;
+
             var backgroundSprite = Resources.Load<Sprite>("Battle/Art/Backgrounds/Battle_Background");
             if (backgroundSprite != null)
             {
@@ -414,27 +420,32 @@ namespace TypingRoguelike.Battle
             refs.EnemyAura = CreateCenteredImage(refs.EnemyHitRoot, "EnemyAura", new Vector2(0f, 20f), new Vector2(380f, 380f),
                 BattleUISprites.RadialGlow, new Color(0.88f, 0.08f, 0.18f, 0.12f));
 
-            var bossImgGo = new GameObject("BossIllustration");
-            bossImgGo.transform.SetParent(refs.EnemyHitRoot, false);
-            var bossRt = bossImgGo.AddComponent<RectTransform>();
-            bossRt.anchorMin = new Vector2(0.08f, 0.02f);
-            bossRt.anchorMax = new Vector2(0.92f, 0.96f);
-            bossRt.offsetMin = Vector2.zero;
-            bossRt.offsetMax = Vector2.zero;
-            refs.BossPortrait = bossImgGo.AddComponent<Image>();
-            refs.BossPortrait.sprite = visuals.BossIllustration;
-            refs.BossPortrait.preserveAspect = true;
-            refs.BossPortrait.color = visuals.BossIllustration != null
-                ? Color.white
-                : new Color(1f, 1f, 1f, 0f);
-            refs.BossPortrait.raycastTarget = false;
-            var bossShadow = bossImgGo.AddComponent<Shadow>();
-            bossShadow.effectColor = new Color(0f, 0f, 0f, 0.6f);
-            bossShadow.effectDistance = new Vector2(0f, -10f);
+            refs.BigMouth = BigMouthAssembler.CreateUi(refs.EnemyHitRoot);
+            if (refs.BigMouth == null)
+            {
+                var bossImgGo = new GameObject("BossIllustration");
+                bossImgGo.transform.SetParent(refs.EnemyHitRoot, false);
+                var bossRt = bossImgGo.AddComponent<RectTransform>();
+                bossRt.anchorMin = new Vector2(0.08f, 0.02f);
+                bossRt.anchorMax = new Vector2(0.92f, 0.96f);
+                bossRt.offsetMin = Vector2.zero;
+                bossRt.offsetMax = Vector2.zero;
+                refs.BossPortrait = bossImgGo.AddComponent<Image>();
+                refs.BossPortrait.sprite = visuals.BossIllustration;
+                refs.BossPortrait.preserveAspect = true;
+                refs.BossPortrait.color = visuals.BossIllustration != null
+                    ? Color.white
+                    : new Color(1f, 1f, 1f, 0f);
+                refs.BossPortrait.raycastTarget = false;
+                var bossShadow = bossImgGo.AddComponent<Shadow>();
+                bossShadow.effectColor = new Color(0f, 0f, 0f, 0.6f);
+                bossShadow.effectDistance = new Vector2(0f, -10f);
+            }
 
+            var showEmoji = refs.BigMouth == null && visuals.BossIllustration == null;
             refs.EnemyEmoji = CreateLabel(refs.EnemyHitRoot, "EnemyEmoji", visuals.BossEmojiNormal, 160,
                 TextAnchor.MiddleCenter, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero,
-                visuals.BossIllustration == null ? BattleUITheme.TextPrimary : Color.clear);
+                showEmoji ? BattleUITheme.TextPrimary : Color.clear);
             refs.EnemyEmoji.raycastTarget = false;
 
             var popupLayer = new GameObject("EnemyDamagePopups");
@@ -444,6 +455,8 @@ namespace TypingRoguelike.Battle
             refs.EnemyDamagePopupRoot.anchorMax = Vector2.one;
             refs.EnemyDamagePopupRoot.offsetMin = Vector2.zero;
             refs.EnemyDamagePopupRoot.offsetMax = Vector2.zero;
+
+            refs.EnemyBiteFx = EnemyBiteFx.Create(focus);
         }
 
         /// <summary>手前の味方側スロット。将来「飛んで着地して攻撃」の出発／着地に使う。</summary>
@@ -468,32 +481,27 @@ namespace TypingRoguelike.Battle
                 ? "BOSS"
                 : visuals.BossDisplayName.ToUpperInvariant();
 
-            var plate = CreateTopCentered(refs.RootCard, "BossPlate", -20f, new Vector2(900f, 86f));
+            var plate = CreateTopCentered(refs.RootCard, "BossPlate", -4f, new Vector2(820f, 36f));
+            plate.anchorMin = plate.anchorMax = new Vector2(0.687f, 1f);
             var bg = plate.gameObject.AddComponent<Image>();
-            BattleUITheme.StylePanel(bg, new Color(0.015f, 0.012f, 0.035f, 0.82f));
+            BattleUITheme.StylePanel(bg, new Color(0.015f, 0.012f, 0.035f, 0.72f));
             bg.raycastTarget = false;
-            CreateRule(plate, "RuleTop", 1f, new Color(BattleUITheme.Gold.r, BattleUITheme.Gold.g, BattleUITheme.Gold.b, 0.65f));
-            CreateRule(plate, "RuleBottom", 0f, new Color(0.9f, 0.2f, 0.25f, 0.5f));
 
             CreateLabel(plate, "Tag", "ENEMY", 12, TextAnchor.MiddleLeft,
-                new Vector2(0.03f, 0.5f), new Vector2(0.3f, 0.95f), Vector2.zero, Vector2.zero,
+                new Vector2(0.03f, 0f), new Vector2(0.22f, 1f), Vector2.zero, Vector2.zero,
                 new Color(0.95f, 0.45f, 0.45f, 0.9f)).fontStyle = FontStyle.Bold;
-            var name = CreateLabel(plate, "BossName", $"◆  {title}  ◆", 24, TextAnchor.MiddleCenter,
-                new Vector2(0.2f, 0.48f), new Vector2(0.8f, 1f), Vector2.zero, Vector2.zero, BattleUITheme.TextPrimary);
+            var name = CreateLabel(plate, "BossName", $"◆  {title}  ◆", 22, TextAnchor.MiddleCenter,
+                new Vector2(0.18f, 0f), new Vector2(0.97f, 1f), Vector2.zero, Vector2.zero, BattleUITheme.TextPrimary);
             name.fontStyle = FontStyle.Bold;
             BattleUITheme.AddTextShadow(name, new Color(0, 0, 0, 0.95f), new Vector2(2, -2));
 
-            refs.EnemyHpBar = CreateBar(plate, "EnemyHpBar", new Vector2(0.03f, 0.1f), new Vector2(0.97f, 0.44f),
-                BattleUITheme.BarTrack, new Color(0.92f, 0.14f, 0.2f));
-            refs.EnemyHpText = CreateLabel(plate, "EnemyHp", "HP 1000 / 1000", 15, TextAnchor.MiddleCenter,
-                new Vector2(0.03f, 0.1f), new Vector2(0.97f, 0.44f), Vector2.zero, Vector2.zero, Color.white);
-            refs.EnemyHpText.fontStyle = FontStyle.Bold;
-            BattleUITheme.AddTextShadow(refs.EnemyHpText, new Color(0, 0, 0, 1f), new Vector2(1, -1));
+            refs.EnemyHpGauge = BossHpGauge.Create(refs.RootCard, new Vector2(0.687f, 1f), -42f, 0.78f);
         }
 
         static void BuildBattleLog(BattleUIRefs refs)
         {
-            var plate = CreateTopCentered(refs.RootCard, "BattleLog", -112f, new Vector2(720f, 34f));
+            var plate = CreateTopCentered(refs.RootCard, "BattleLog", -228f, new Vector2(720f, 34f));
+            plate.anchorMin = plate.anchorMax = new Vector2(0.687f, 1f);
             var bg = plate.gameObject.AddComponent<Image>();
             BattleUITheme.StylePanel(bg, new Color(0f, 0f, 0f, 0.55f));
             bg.raycastTarget = false;
@@ -540,20 +548,6 @@ namespace TypingRoguelike.Battle
             rt.anchoredPosition = new Vector2(0f, y);
             rt.sizeDelta = size;
             return rt;
-        }
-
-        static void CreateRule(Transform parent, string name, float anchorY, Color color)
-        {
-            var go = new GameObject(name);
-            go.transform.SetParent(parent, false);
-            var rt = go.AddComponent<RectTransform>();
-            rt.anchorMin = new Vector2(0f, anchorY);
-            rt.anchorMax = new Vector2(1f, anchorY);
-            rt.pivot = new Vector2(0.5f, 0.5f);
-            rt.sizeDelta = new Vector2(0f, 2f);
-            var img = go.AddComponent<Image>();
-            BattleUITheme.StylePanel(img, color);
-            img.raycastTarget = false;
         }
 
         static void BuildCountdownOverlay(BattleUIRefs refs)

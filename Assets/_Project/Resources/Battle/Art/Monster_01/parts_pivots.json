@@ -1,0 +1,123 @@
+{
+ "canvas": {
+  "w": 345,
+  "h": 520,
+  "origin_in_source": [
+   0,
+   140
+  ],
+  "source": "057367919d7adb6193b4c88d61837e273e4005e4abe36ed698b809b6342dd363.jpg",
+  "coords": "pixels, origin top-left of canvas, y down",
+  "flipped_horizontally": true,
+  "note": "Mirrored: x' = W-1-x. _L/_R = screen left/right AFTER flip. 05_arm_L <- old 06_arm_R, 06_arm_R <- old 05_arm_L, 07_earring_L <- old 08_earring_R, 08_earring_R <- old 07_earring_L."
+ },
+ "parts": {
+  "01_body_skin": {
+   "pivot": [
+    179,
+    460
+   ],
+   "note": "feet/ground centre; scale for breathing",
+   "flipped_from": "01_body_skin"
+  },
+  "02_mouth_inner": {
+   "pivot": [
+    174,
+    224
+   ],
+   "parent": "01_body_skin",
+   "flipped_from": "02_mouth_inner"
+  },
+  "03_teeth_upper": {
+   "pivot": [
+    174,
+    160
+   ],
+   "parent": "01_body_skin",
+   "flipped_from": "03_teeth_upper"
+  },
+  "04_teeth_lower": {
+   "pivot": [
+    174,
+    232
+   ],
+   "parent": "01_body_skin",
+   "bone": "jaw_hinge",
+   "flipped_from": "04_teeth_lower"
+  },
+  "05_arm_L": {
+   "pivot": [
+    132,
+    226
+   ],
+   "parent": "01_body_skin",
+   "bones": {
+    "shoulder": [
+     132,
+     226
+    ],
+    "elbow": [
+     78,
+     261
+    ],
+    "hand": [
+     49,
+     230
+    ]
+   },
+   "flipped_from": "06_arm_R"
+  },
+  "06_arm_R": {
+   "pivot": [
+    216,
+    226
+   ],
+   "parent": "01_body_skin",
+   "bones": {
+    "shoulder": [
+     216,
+     226
+    ],
+    "elbow": [
+     267,
+     261
+    ],
+    "hand": [
+     299,
+     230
+    ]
+   },
+   "flipped_from": "05_arm_L"
+  },
+  "07_earring_L": {
+   "pivot": [
+    71,
+    140
+   ],
+   "parent": "01_body_skin",
+   "flipped_from": "08_earring_R"
+  },
+  "08_earring_R": {
+   "pivot": [
+    286,
+    137
+   ],
+   "parent": "01_body_skin",
+   "flipped_from": "07_earring_L"
+  },
+  "09_legs": {
+   "pivot": [
+    179,
+    408
+   ],
+   "flipped_from": "09_legs"
+  },
+  "10_shadow": {
+   "pivot": [
+    179,
+    475
+   ],
+   "flipped_from": "10_shadow"
+  }
+ }
+}

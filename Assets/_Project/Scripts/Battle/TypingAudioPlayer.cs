@@ -6,31 +6,93 @@ namespace TypingRoguelike.Battle
     [DisallowMultipleComponent]
     public sealed class TypingAudioPlayer : MonoBehaviour
     {
+        const int VoiceCount = 6;
+
         TypingAudioDefinition _def;
-        AudioSource _source;
+        AudioSource[] _voices;
+        int _voiceIndex;
+        AudioClip[] _keyClips;
         AudioClip _procCorrect;
         AudioClip _procMiss;
         AudioClip _procComplete;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        static void ApplyOutputBuffer()
+        {
+            var config = AudioSettings.GetConfiguration();
+            if (config.dspBufferSize == 512)
+                return;
+
+            config.dspBufferSize = 512;
+            AudioSettings.Reset(config);
+        }
 
         public void Setup(TypingAudioDefinition definition)
         {
             _def = definition != null
                 ? definition
                 : ScriptableObject.CreateInstance<TypingAudioDefinition>();
-            EnsureSource();
+            ApplyOutputBuffer();
+            EnsureVoices();
+            EnsureKeyClips();
             EnsureProceduralClips();
         }
 
-        void EnsureSource()
+        void EnsureKeyClips()
         {
-            if (_source != null)
+            var assigned = _def != null ? _def.keyClips : null;
+            if (assigned != null && assigned.Length > 0)
+            {
+                var filled = 0;
+                for (var i = 0; i < assigned.Length; i++)
+                {
+                    if (assigned[i] != null)
+                        filled++;
+                }
+
+                if (filled > 0)
+                    _keyClips = assigned;
+            }
+
+            if (_keyClips == null || _keyClips.Length == 0)
+                _keyClips = Resources.LoadAll<AudioClip>("Battle/Audio/KeyTouch");
+            PreloadKeyClips();
+        }
+
+        void PreloadKeyClips()
+        {
+            if (_keyClips == null)
                 return;
-            _source = gameObject.GetComponent<AudioSource>();
-            if (_source == null)
-                _source = gameObject.AddComponent<AudioSource>();
-            _source.playOnAwake = false;
-            _source.loop = false;
-            _source.spatialBlend = 0f;
+
+            for (var i = 0; i < _keyClips.Length; i++)
+            {
+                var clip = _keyClips[i];
+                if (clip != null && clip.loadState != AudioDataLoadState.Loaded)
+                    clip.LoadAudioData();
+            }
+        }
+
+        void EnsureVoices()
+        {
+            if (_voices != null && _voices.Length == VoiceCount)
+                return;
+
+            _voices = new AudioSource[VoiceCount];
+            for (var i = 0; i < VoiceCount; i++)
+            {
+                var src = gameObject.AddComponent<AudioSource>();
+                src.playOnAwake = false;
+                src.loop = false;
+                src.spatialBlend = 0f;
+                src.dopplerLevel = 0f;
+                src.priority = 0;
+                src.bypassEffects = true;
+                src.bypassListenerEffects = true;
+                src.bypassReverbZones = true;
+                src.ignoreListenerPause = true;
+                src.pitch = 1f;
+                _voices[i] = src;
+            }
         }
 
         void EnsureProceduralClips()
@@ -45,26 +107,49 @@ namespace TypingRoguelike.Battle
 
         public void PlayCorrect()
         {
-            PlayResolve(_def?.correctClip ?? _procCorrect, _def?.correctVolume ?? 0.35f, 0.97f, 1.04f);
+            PlayResolve(PickKeyClip() ?? _def?.correctClip ?? _procCorrect, _def?.correctVolume ?? 1f);
+        }
+
+        AudioClip PickKeyClip()
+        {
+            if (_keyClips == null || _keyClips.Length == 0)
+                return null;
+
+            for (var attempt = 0; attempt < _keyClips.Length; attempt++)
+            {
+                var clip = _keyClips[Random.Range(0, _keyClips.Length)];
+                if (clip != null)
+                    return clip;
+            }
+
+            return null;
         }
 
         public void PlayMiss()
         {
-            PlayResolve(_def?.missClip ?? _procMiss, _def?.missVolume ?? 0.45f, 0.92f, 0.98f);
+            PlayResolve(_def?.missClip ?? _procMiss, _def?.missVolume ?? 0.45f);
         }
 
         public void PlayComplete()
         {
-            PlayResolve(_def?.completeClip ?? _procComplete, _def?.completeVolume ?? 0.5f, 0.98f, 1.06f);
+            PlayResolve(_def?.completeClip ?? _procComplete, _def?.completeVolume ?? 0.5f);
         }
 
-        void PlayResolve(AudioClip clip, float volume, float pitchMin, float pitchMax)
+        void PlayResolve(AudioClip clip, float volume)
         {
-            if (clip == null || _source == null)
+            if (clip == null || _voices == null || _voices.Length == 0)
                 return;
 
-            _source.pitch = Random.Range(pitchMin, pitchMax);
-            _source.PlayOneShot(clip, Mathf.Clamp01(volume));
+            var src = _voices[_voiceIndex];
+            _voiceIndex = (_voiceIndex + 1) % _voices.Length;
+            if (src == null)
+                return;
+
+            src.pitch = 1f;
+            src.clip = clip;
+            src.volume = Mathf.Clamp01(volume);
+            src.timeSamples = 0;
+            src.Play();
         }
 
         static AudioClip CreateToneClip(string name, float frequencyHz, float durationSeconds)

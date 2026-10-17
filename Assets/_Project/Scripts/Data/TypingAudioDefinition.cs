@@ -6,12 +6,14 @@ namespace TypingRoguelike.Data
     public sealed class TypingAudioDefinition : ScriptableObject
     {
         [Header("Clips（未設定なら仮ビープ）")]
+        [Tooltip("正しい1打ごとに、この中からランダム。空なら Resources/Battle/Audio/KeyTouch を使う")]
+        public AudioClip[] keyClips;
         public AudioClip correctClip;
         public AudioClip missClip;
         public AudioClip completeClip;
 
         [Header("Volume")]
-        [Range(0f, 1f)] public float correctVolume = 0.35f;
+        [Range(0f, 1f)] public float correctVolume = 1f;
         [Range(0f, 1f)] public float missVolume = 0.45f;
         [Range(0f, 1f)] public float completeVolume = 0.5f;
 

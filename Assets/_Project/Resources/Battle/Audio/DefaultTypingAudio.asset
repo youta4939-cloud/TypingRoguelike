@@ -12,10 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36fa7c4142d029b43bb6fd8438fb02ad, type: 3}
   m_Name: DefaultTypingAudio
   m_EditorClassIdentifier: TypingRoguelike::TypingRoguelike.Data.TypingAudioDefinition
+  keyClips: []
   correctClip: {fileID: 0}
   missClip: {fileID: 0}
   completeClip: {fileID: 0}
-  correctVolume: 0.35
+  correctVolume: 1
   missVolume: 0.45
   completeVolume: 0.5
   useProceduralFallback: 1
