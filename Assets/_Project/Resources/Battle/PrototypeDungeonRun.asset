@@ -22,6 +22,9 @@ MonoBehaviour:
   rowNodeCountMax: 5
   restNodesPerFloorMin: 1
   restNodesPerFloorMax: 2
+  minCombatNodesOnEveryRoute: 2
+  maxConsecutiveCombatNodes: 2
+  nodeWeightCombat: 28
   restHealFraction: 0.15
   combatEnemyHpMultiplier: 0.72
   partyAttackCoefficient: 1

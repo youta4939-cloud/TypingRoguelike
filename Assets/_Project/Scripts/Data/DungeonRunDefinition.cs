@@ -24,8 +24,13 @@ namespace TypingRoguelike.Data
         [Tooltip("1 階層マップに置く焚き火の目安（生成後に危険マスから置き換える）")]
         [Range(0, 3)] public int restNodesPerFloorMin = 1;
         [Range(0, 3)] public int restNodesPerFloorMax = 2;
+        [Tooltip("スタートからエレベーター（その層に無ければボス）まで、どのルートも戦闘マスをこの回数以上通る")]
+        [Range(0, 8)] public int minCombatNodesOnEveryRoute = 2;
+        [Tooltip("戦闘マスがこの回数より多く連続するルートは作らない")]
+        [Range(1, 8)] public int maxConsecutiveCombatNodes = 2;
 
         [Header("道中マスの割合（%）全段共通")]
+        [Range(0f, 100f)] public float nodeWeightCombat = 28f;
         [Range(0f, 100f)] public float nodeWeightDanger = 40f;
         [Range(0f, 100f)] public float nodeWeightEvent = 22f;
         [Range(0f, 100f)] public float nodeWeightMerchant = 14f;

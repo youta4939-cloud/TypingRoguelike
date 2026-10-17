@@ -1113,7 +1113,7 @@ namespace TypingRoguelike.Run
             DungeonNodeType.Treasure => "塔片と刻印（選択）を獲得",
             DungeonNodeType.Elevator => "拠点へ帰還（探索は中断・再開可）",
             DungeonNodeType.Boss => "撃破で踏破。カードを持ち帰れる",
-            DungeonNodeType.Combat => "魔物と戦う。勝利で塔片を獲得",
+            DungeonNodeType.Combat => "踏むと必ず戦闘。勝利で塔片を獲得",
             DungeonNodeType.Elite => "手強い敵。塔片は多め",
             DungeonNodeType.Event => "まれに現れる。レリックを1つ拾える",
             DungeonNodeType.EventV2 => "その階の出来事が起きる",

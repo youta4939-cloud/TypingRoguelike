@@ -615,7 +615,7 @@ namespace TypingRoguelike.Run
                     ResolveDangerNode(node);
                     break;
                 case DungeonNodeType.Combat:
-                    StartLegacyBattleNode(node, forceElite: false);
+                    StartGuaranteedCombat(node);
                     break;
                 case DungeonNodeType.Elite:
                     StartLegacyBattleNode(node, forceElite: true);
@@ -838,7 +838,13 @@ namespace TypingRoguelike.Run
                 _lastDangerBattleUsedElite ? BuildEliteMods() : BuildCombatMods());
         }
 
-        /// <summary>v1.2 以前のマス種互換。新規生成マップでは出ない。</summary>
+        /// <summary>戦闘マスは遭遇率を振らない。踏んだら必ず戦闘。</summary>
+        void StartGuaranteedCombat(DungeonMapNode node)
+        {
+            StartLegacyBattleNode(node, forceElite: false);
+        }
+
+        /// <summary>v1.2 以前の強敵マス互換。戦闘マスもここから入る。</summary>
         void StartLegacyBattleNode(DungeonMapNode node, bool forceElite)
         {
             _lastDangerBattleUsedElite = forceElite;

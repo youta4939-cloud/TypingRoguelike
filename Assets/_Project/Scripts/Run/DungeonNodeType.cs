@@ -10,7 +10,7 @@ namespace TypingRoguelike.Run
         Treasure,
         Elevator,
         Boss,
-        /// <summary>v1.2 廃止。セーブ互換のみ。</summary>
+        /// <summary>踏むと必ず戦闘。値は v1.2 以前のまま（セーブ互換）。</summary>
         Combat,
         /// <summary>v1.2 廃止。セーブ互換のみ。</summary>
         Elite,

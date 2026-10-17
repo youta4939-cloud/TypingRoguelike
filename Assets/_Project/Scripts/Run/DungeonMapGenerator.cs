@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace TypingRoguelike.Run
 {
-    /// <summary>マス種: Danger / EventV2 / Merchant / Treasure / Mystery / Rest / Elevator / Boss。Normal は抽選しない。</summary>
+    /// <summary>マス種: Combat（確定戦闘）/ Danger / EventV2 / Merchant / Treasure / Mystery / Rest / Elevator / Boss。Normal は抽選しない。</summary>
     public static class DungeonMapGenerator
     {
         public sealed class Result
@@ -17,7 +17,10 @@ namespace TypingRoguelike.Run
         }
 
         public const int GridColumns = 5;
+        public const int DefaultMinCombatNodesOnEveryRoute = 2;
+        public const int DefaultMaxConsecutiveCombatNodes = 2;
         const int MaxGenerateAttempts = 50;
+        const int MaxCombatRouteAttempts = 20;
 
         public static Result Generate(
             DungeonRunDefinition config,
@@ -25,19 +28,59 @@ namespace TypingRoguelike.Run
             int idBase = 0,
             bool placeElevator = false)
         {
-            var rng = seed.HasValue ? new System.Random(seed.Value) : new System.Random();
+            var baseSeed = seed ?? new System.Random().Next();
+            Result last = null;
+            for (var attempt = 0; attempt < MaxCombatRouteAttempts; attempt++)
+            {
+                var trySeed = unchecked(baseSeed + attempt);
+                var map = GenerateLayout(config, trySeed, idBase, placeElevator);
+                if (map == null)
+                    continue;
+
+                if (TrySatisfyCombatRoutes(map, config, placeElevator))
+                {
+                    LogNodeTypeCounts(map);
+                    if (attempt > 0)
+                    {
+                        Debug.Log(
+                            $"マップ生成: 戦闘ルート条件を満たすためシードを +{attempt} した（seed={trySeed}）。");
+                    }
+
+                    return map;
+                }
+
+                last = map;
+            }
+
+            Debug.LogWarning(
+                $"マップ生成: 戦闘ルート条件を{MaxCombatRouteAttempts}回試しても満たせなかった。このマップを使う。seed={baseSeed}");
+            if (last != null)
+            {
+                LogNodeTypeCounts(last);
+                return last;
+            }
+
+            return GenerateLegacy(config, baseSeed, idBase, placeElevator);
+        }
+
+        static Result GenerateLayout(
+            DungeonRunDefinition config,
+            int seed,
+            int idBase,
+            bool placeElevator)
+        {
+            var rng = new System.Random(seed);
             for (var attempt = 0; attempt < MaxGenerateAttempts; attempt++)
             {
                 var varied = TryGenerateVaried(config, rng, idBase, placeElevator);
                 if (varied == null)
                     continue;
-                LogNodeTypeCounts(varied);
-                Debug.Log($"マップ生成: 行数ランダム（試行 {attempt + 1}）");
+                Debug.Log($"マップ生成: 行数ランダム（試行 {attempt + 1}、seed={seed}）");
                 return varied;
             }
 
             Debug.LogWarning("マップ生成: 50回試して条件を満たせなかった。従来の等間隔生成に戻す。");
-            return GenerateLegacy(config, seed ?? rng.Next(), idBase, placeElevator);
+            return GenerateLegacy(config, seed, idBase, placeElevator);
         }
 
         static Result GenerateLegacy(
@@ -555,6 +598,7 @@ namespace TypingRoguelike.Run
         {
             return PickWeighted(rng, new[]
             {
+                (DungeonNodeType.Combat, config != null ? config.nodeWeightCombat : 28f),
                 (DungeonNodeType.Danger, config != null ? config.nodeWeightDanger : 40f),
                 (DungeonNodeType.EventV2, config != null ? config.nodeWeightEvent : 22f),
                 (DungeonNodeType.Merchant, config != null ? config.nodeWeightMerchant : 14f),
@@ -685,6 +729,329 @@ namespace TypingRoguelike.Run
             var targetCol = Mathf.Clamp(preferredColumn + jitter, 0, layer[layer.Count - 1].Column);
             var (node, _) = PickTargetNode(layer, targetCol);
             return node;
+        }
+
+        /// <summary>
+        /// スタートからエレベーター（無ければボス）までの全ルートが戦闘マスを最低 N 回通り、
+        /// スタートからボスまでのどのルートも戦闘が M 回より多く続かないようにマス種を入れ替える。
+        /// 危険マスの遭遇率はそのまま残す。
+        /// </summary>
+        static bool TrySatisfyCombatRoutes(Result map, DungeonRunDefinition config, bool placeElevator)
+        {
+            if (map?.Nodes == null || map.Nodes.Count == 0)
+                return false;
+
+            var minCount = config != null
+                ? Mathf.Max(0, config.minCombatNodesOnEveryRoute)
+                : DefaultMinCombatNodesOnEveryRoute;
+            var maxConsecutive = config != null
+                ? Mathf.Max(1, config.maxConsecutiveCombatNodes)
+                : DefaultMaxConsecutiveCombatNodes;
+
+            var byId = map.Nodes.ToDictionary(node => node.Id);
+            if (!byId.TryGetValue(map.StartNodeId, out var start) ||
+                !byId.TryGetValue(map.BossNodeId, out var boss))
+                return false;
+
+            var elevator = placeElevator
+                ? map.Nodes.FirstOrDefault(node => node.Type == DungeonNodeType.Elevator)
+                : null;
+            var quotaDest = elevator ?? boss;
+            var quotaPaths = EnumeratePaths(start, quotaDest, byId);
+            var fullPaths = quotaDest.Id == boss.Id
+                ? quotaPaths
+                : EnumeratePaths(start, boss, byId);
+            if (quotaPaths.Count == 0 || fullPaths.Count == 0)
+                return false;
+
+            var guardLimit = map.Nodes.Count * 4;
+            for (var guard = 0; guard < guardLimit; guard++)
+            {
+                if (MeetsMinimum(quotaPaths, minCount) && !HasExcessStreak(fullPaths, maxConsecutive))
+                    return true;
+
+                if (HasExcessStreak(fullPaths, maxConsecutive))
+                {
+                    if (!DemoteOneExcess(fullPaths, maxConsecutive, boss.Layer - 1))
+                        return false;
+                    continue;
+                }
+
+                var promote = PickPromotion(quotaPaths, fullPaths, minCount, maxConsecutive);
+                if (promote == null)
+                {
+                    if (!DemoteBlocker(quotaPaths, fullPaths, minCount, boss.Layer - 1))
+                        return false;
+                    continue;
+                }
+
+                SetCombat(promote);
+            }
+
+            return MeetsMinimum(quotaPaths, minCount) && !HasExcessStreak(fullPaths, maxConsecutive);
+        }
+
+        static List<DungeonMapNode[]> EnumeratePaths(
+            DungeonMapNode start,
+            DungeonMapNode dest,
+            Dictionary<int, DungeonMapNode> byId)
+        {
+            var result = new List<DungeonMapNode[]>();
+            var trail = new List<DungeonMapNode>();
+            Walk(start);
+            return result;
+
+            void Walk(DungeonMapNode node)
+            {
+                trail.Add(node);
+                if (node.Id == dest.Id)
+                {
+                    result.Add(trail.ToArray());
+                }
+                else
+                {
+                    foreach (var nextId in node.Next)
+                    {
+                        if (byId.TryGetValue(nextId, out var child))
+                            Walk(child);
+                    }
+                }
+
+                trail.RemoveAt(trail.Count - 1);
+            }
+        }
+
+        static bool MeetsMinimum(List<DungeonMapNode[]> paths, int minCount)
+        {
+            foreach (var path in paths)
+            {
+                if (CountCombat(path) < minCount)
+                    return false;
+            }
+
+            return true;
+        }
+
+        static bool HasExcessStreak(List<DungeonMapNode[]> paths, int maxConsecutive)
+        {
+            foreach (var path in paths)
+            {
+                if (FirstExcessIndex(path, maxConsecutive) >= 0)
+                    return true;
+            }
+
+            return false;
+        }
+
+        static int CountCombat(DungeonMapNode[] path)
+        {
+            var count = 0;
+            foreach (var node in path)
+            {
+                if (node.Type == DungeonNodeType.Combat)
+                    count++;
+            }
+
+            return count;
+        }
+
+        static int FirstExcessIndex(DungeonMapNode[] path, int maxConsecutive)
+        {
+            var run = 0;
+            for (var i = 0; i < path.Length; i++)
+            {
+                if (path[i].Type != DungeonNodeType.Combat)
+                {
+                    run = 0;
+                    continue;
+                }
+
+                run++;
+                if (run > maxConsecutive)
+                    return i;
+            }
+
+            return -1;
+        }
+
+        /// <summary>
+        /// 戦闘を足したいマスの前後がすでに戦闘で、連続上限を超えてしまうとき、
+        /// より出口側の戦闘を一度危険マスに戻して隙間を空ける。
+        /// </summary>
+        static bool DemoteBlocker(
+            List<DungeonMapNode[]> quotaPaths,
+            List<DungeonMapNode[]> fullPaths,
+            int minCount,
+            int pathLayers)
+        {
+            DungeonMapNode best = null;
+            foreach (var path in quotaPaths)
+            {
+                if (CountCombat(path) >= minCount)
+                    continue;
+
+                foreach (var node in path)
+                {
+                    if (node.Type == DungeonNodeType.Combat || !CanRelabel(node))
+                        continue;
+
+                    foreach (var full in fullPaths)
+                    {
+                        var index = Array.IndexOf(full, node);
+                        if (index < 0)
+                            continue;
+
+                        for (var i = index - 1; i >= 0 && full[i].Type == DungeonNodeType.Combat; i--)
+                            Consider(full[i]);
+                        for (var i = index + 1; i < full.Length && full[i].Type == DungeonNodeType.Combat; i++)
+                            Consider(full[i]);
+                    }
+                }
+            }
+
+            if (best == null)
+                return false;
+
+            SetDanger(best, pathLayers);
+            return true;
+
+            void Consider(DungeonMapNode candidate)
+            {
+                if (!CanRelabel(candidate))
+                    return;
+                if (best == null ||
+                    candidate.Layer > best.Layer ||
+                    (candidate.Layer == best.Layer && candidate.Id > best.Id))
+                    best = candidate;
+            }
+        }
+
+        static bool DemoteOneExcess(List<DungeonMapNode[]> paths, int maxConsecutive, int pathLayers)
+        {
+            foreach (var path in paths)
+            {
+                var index = FirstExcessIndex(path, maxConsecutive);
+                if (index < 0)
+                    continue;
+
+                for (var i = index; i >= 0 && path[i].Type == DungeonNodeType.Combat; i--)
+                {
+                    if (!CanRelabel(path[i]))
+                        continue;
+                    SetDanger(path[i], pathLayers);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        static DungeonMapNode PickPromotion(
+            List<DungeonMapNode[]> quotaPaths,
+            List<DungeonMapNode[]> fullPaths,
+            int minCount,
+            int maxConsecutive)
+        {
+            var needy = new List<DungeonMapNode[]>();
+            foreach (var path in quotaPaths)
+            {
+                if (CountCombat(path) < minCount)
+                    needy.Add(path);
+            }
+
+            DungeonMapNode best = null;
+            var bestNeedy = -1;
+            var bestPreference = int.MinValue;
+            foreach (var path in needy)
+            {
+                foreach (var node in path)
+                {
+                    if (node.Type == DungeonNodeType.Combat || !CanRelabel(node))
+                        continue;
+                    if (!PromotionKeepsStreak(node, fullPaths, maxConsecutive))
+                        continue;
+
+                    var covered = 0;
+                    foreach (var needyPath in needy)
+                    {
+                        if (Array.IndexOf(needyPath, node) >= 0)
+                            covered++;
+                    }
+
+                    var preference = RelabelPreference(node.Type);
+                    if (covered > bestNeedy ||
+                        (covered == bestNeedy && preference > bestPreference) ||
+                        (covered == bestNeedy && preference == bestPreference &&
+                         (best == null || node.Id < best.Id)))
+                    {
+                        best = node;
+                        bestNeedy = covered;
+                        bestPreference = preference;
+                    }
+                }
+            }
+
+            return best;
+        }
+
+        static bool PromotionKeepsStreak(DungeonMapNode node, List<DungeonMapNode[]> paths, int maxConsecutive)
+        {
+            foreach (var path in paths)
+            {
+                var index = Array.IndexOf(path, node);
+                if (index < 0)
+                    continue;
+
+                var before = 0;
+                for (var i = index - 1; i >= 0 && path[i].Type == DungeonNodeType.Combat; i--)
+                    before++;
+                var after = 0;
+                for (var i = index + 1; i < path.Length && path[i].Type == DungeonNodeType.Combat; i++)
+                    after++;
+                if (before + 1 + after > maxConsecutive)
+                    return false;
+            }
+
+            return true;
+        }
+
+        static bool CanRelabel(DungeonMapNode node)
+        {
+            return node.Type != DungeonNodeType.Start &&
+                   node.Type != DungeonNodeType.Boss &&
+                   node.Type != DungeonNodeType.Elevator;
+        }
+
+        static int RelabelPreference(DungeonNodeType type)
+        {
+            switch (type)
+            {
+                case DungeonNodeType.Danger: return 6;
+                case DungeonNodeType.Mystery: return 5;
+                case DungeonNodeType.EventV2: return 4;
+                case DungeonNodeType.Treasure: return 3;
+                case DungeonNodeType.Merchant: return 2;
+                case DungeonNodeType.Normal: return 1;
+                case DungeonNodeType.Rest: return 0;
+                default: return 1;
+            }
+        }
+
+        static void SetCombat(DungeonMapNode node)
+        {
+            node.Type = DungeonNodeType.Combat;
+            node.DangerEncounterPercent = 0;
+            node.DangerElitePreview = null;
+        }
+
+        static void SetDanger(DungeonMapNode node, int pathLayers)
+        {
+            node.Type = DungeonNodeType.Danger;
+            node.DangerElitePreview = null;
+            node.DangerEncounterPercent = RollDangerEncounterPercent(
+                new System.Random(unchecked(node.Id * 397 + node.Layer)),
+                node.Layer,
+                pathLayers);
         }
     }
 }
