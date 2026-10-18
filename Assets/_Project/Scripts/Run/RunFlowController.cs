@@ -23,6 +23,8 @@ namespace TypingRoguelike.Run
 
         BattleController _battle;
         LayerConfig _layerConfig;
+        BoardCatalog _boards;
+        YakuCatalog _yaku;
         int _runSeed;
         int _clearedNodesThisRun;
         MetaProgressData _profile;
@@ -56,6 +58,8 @@ namespace TypingRoguelike.Run
             if (dungeonRun == null)
                 dungeonRun = Resources.Load<DungeonRunDefinition>("Battle/PrototypeDungeonRun");
             _layerConfig = LayerConfig.LoadOrFallback();
+            _boards = BoardCatalog.LoadOrFallback();
+            _yaku = YakuCatalog.LoadOrFallback();
 
             if (fallbackEncounter == null)
                 fallbackEncounter = Resources.Load<BattleEncounterDefinition>("Battle/PrototypeCombatEncounter")
@@ -124,16 +128,31 @@ namespace TypingRoguelike.Run
             _madness.ResetForNewRun(ComputeFullMadnessCap());
 
             _runSeed = _profile.towerSeed;
-            GenerateFirstFloor();
-            ActivateAndSaveRun();
-            ShowMap();
+            OpenBoardPreparation(1, startAtElevator: false);
         }
 
         int TotalFloors => Mathf.Clamp(_layerConfig != null ? _layerConfig.totalLayers : 15, 1, 99);
 
-        void GenerateFirstFloor() => LoadLayer(1, restoreIndex: 0, startAtElevator: false);
+        void GenerateFirstFloor() => OpenBoardPreparation(1, startAtElevator: false);
 
-        void LoadLayer(int floor, int restoreIndex, bool startAtElevator)
+        BoardPreset ResolveBoard(string presetId)
+        {
+            var found = _boards != null ? _boards.Find(presetId) : null;
+            if (found != null)
+                return found;
+            if (_boards?.presets != null)
+            {
+                foreach (var preset in _boards.presets)
+                {
+                    if (preset != null)
+                        return preset;
+                }
+            }
+
+            return null;
+        }
+
+        void LoadLayer(int floor, int restoreIndex, bool startAtElevator, BoardPreset board, bool preFourthHealApplied)
         {
             var index = restoreIndex;
             if (index < 0 || index >= LayerSquares.Count)
@@ -147,10 +166,98 @@ namespace TypingRoguelike.Run
                 TotalFloors,
                 _runSeed,
                 _layerConfig,
+                board != null ? board.ToGrid() : null,
+                board != null ? board.presetId : "",
+                _yaku,
                 index,
                 _profile.clearedTowerNodeIds,
-                startAtElevator);
+                startAtElevator,
+                preFourthHealApplied);
             RememberClearedSquares();
+        }
+
+        void OpenBoardPreparation(int layer, bool startAtElevator)
+        {
+            var presets = _boards?.presets ?? System.Array.Empty<BoardPreset>();
+            var choices = new BoardChoice[presets.Length];
+            for (var i = 0; i < presets.Length; i++)
+            {
+                var preset = presets[i];
+                var grid = preset != null ? preset.ToGrid() : null;
+                var reason = "";
+                var selectable = preset != null && LayerSquares.MeetsMinimums(grid, _layerConfig, layer, out reason);
+                choices[i] = new BoardChoice
+                {
+                    Name = preset != null && !string.IsNullOrEmpty(preset.displayName) ? preset.displayName : "盤面",
+                    Odds = grid != null ? BoardGrid.DescribeOdds(grid) : "",
+                    Selectable = selectable,
+                    Reason = selectable ? "" : reason
+                };
+            }
+
+            _pathUi.ShowBoardPreparation(
+                transform,
+                layer,
+                TotalFloors,
+                LayerSquares.FixedSquare(layer, _layerConfig),
+                LayerSquares.DescribeMinimums(_layerConfig, layer),
+                choices,
+                index => ConfirmBoard(index >= 0 && index < presets.Length ? presets[index] : null, layer, startAtElevator),
+                () => ReelDraw.LogThousandRolls(_boards));
+        }
+
+        void ConfirmBoard(BoardPreset board, int layer, bool startAtElevator)
+        {
+            if (board == null)
+                return;
+
+            _profile.clearedTowerNodeIds?.Clear();
+            _profile.towerRunPreFourthHealApplied = false;
+            LoadLayer(layer, restoreIndex: 0, startAtElevator, board, preFourthHealApplied: startAtElevator);
+            if (!startAtElevator)
+                GrantFlatYakuCoins();
+            if (_profile.towerRunActive)
+                PersistActiveRun();
+            else
+                ActivateAndSaveRun();
+
+            if (!startAtElevator && _dungeon.ActiveYaku != null)
+            {
+                var yaku = _dungeon.ActiveYaku;
+                _pathUi.ShowModal(
+                    "役",
+                    $"{yaku.displayName}\n{yaku.DescribeEffect()}",
+                    new (string, System.Action)[] { ("進む", ShowMap) });
+                return;
+            }
+
+            ShowMap();
+        }
+
+        void GrantFlatYakuCoins()
+        {
+            var yaku = _dungeon.ActiveYaku;
+            if (yaku == null || yaku.bonus != YakuBonusKind.FlatCoins)
+                return;
+            var amount = Mathf.Max(0, Mathf.RoundToInt(yaku.bonusValue));
+            if (amount > 0)
+                _party.AddCoins(amount);
+        }
+
+        void TryApplyPreFourthHeal()
+        {
+            var yaku = _dungeon.ActiveYaku;
+            if (yaku == null || yaku.bonus != YakuBonusKind.HealBeforeFourth || _dungeon.PreFourthHealApplied)
+                return;
+            if (_dungeon.Squares == null || _dungeon.Squares.Length < LayerSquares.Count)
+                return;
+            if (!_dungeon.Squares[2].Cleared || _dungeon.Squares[3].Cleared)
+                return;
+
+            _dungeon.MarkPreFourthHealApplied();
+            var fraction = yaku.bonusValue <= 0f ? 0.2f : yaku.bonusValue;
+            _party.HealFraction(fraction);
+            PersistActiveRun();
         }
 
         void RememberClearedSquares()
@@ -175,6 +282,7 @@ namespace TypingRoguelike.Run
                 return;
 
             SyncMadnessCapFromRelics();
+            TryApplyPreFourthHeal();
             if (TryPresentLayerExit())
                 return;
 
@@ -213,14 +321,7 @@ namespace TypingRoguelike.Run
                 return;
             }
 
-            var next = _dungeon.Floor + 1;
-            _pathUi.ShowPreparation(transform, _dungeon.Floor, next, TotalFloors, () =>
-            {
-                _profile.clearedTowerNodeIds?.Clear();
-                LoadLayer(next, restoreIndex: 0, startAtElevator: false);
-                PersistActiveRun();
-                ShowMap();
-            });
+            OpenBoardPreparation(_dungeon.Floor + 1, startAtElevator: false);
         }
 
         void ShowSideMap()
@@ -265,6 +366,8 @@ namespace TypingRoguelike.Run
                 return;
 
             SyncSeenEventsToProfile();
+            _profile.towerRunBoardId = _dungeon.BoardId ?? "";
+            _profile.towerRunPreFourthHealApplied = _dungeon.PreFourthHealApplied;
             MetaProgression.SaveActiveTowerRun(
                 _profile,
                 _runSeed,
@@ -463,16 +566,14 @@ namespace TypingRoguelike.Run
             _madness.ResetForNewRun(ComputeFullMadnessCap());
 
             _runSeed = _profile.towerSeed;
-            LoadLayer(floor, restoreIndex: 0, startAtElevator: true);
-            if (_dungeon.Squares == null || _dungeon.Squares.Length == 0 ||
-                _dungeon.Squares[LayerSquares.Count - 1].Type != DungeonNodeType.Elevator)
+            if (LayerSquares.FixedSquare(floor, _layerConfig) != DungeonNodeType.Elevator)
             {
                 Debug.LogWarning($"階 {floor} の4マス目がエレベーターではない。1 層から開始します。");
-                GenerateFirstFloor();
+                OpenBoardPreparation(1, startAtElevator: false);
+                return;
             }
 
-            ActivateAndSaveRun();
-            ShowMap();
+            OpenBoardPreparation(floor, startAtElevator: true);
         }
 
         void ResumeActiveTowerRun()
@@ -486,7 +587,12 @@ namespace TypingRoguelike.Run
             RestoreActiveRunState();
             if (TryStartPendingEventBattle())
                 return;
-            LoadLayer(_profile.towerRunFloor, _profile.towerRunNodeId, startAtElevator: false);
+            LoadLayer(
+                _profile.towerRunFloor,
+                _profile.towerRunNodeId,
+                startAtElevator: false,
+                ResolveBoard(_profile.towerRunBoardId),
+                _profile.towerRunPreFourthHealApplied);
             ShowMap();
         }
 
@@ -539,16 +645,30 @@ namespace TypingRoguelike.Run
                 return;
             if (fromElevator)
             {
-                LoadLayer(floor, restoreIndex: 0, startAtElevator: true);
-                if (_dungeon.Squares == null || _dungeon.Squares.Length == 0 ||
-                    _dungeon.Squares[LayerSquares.Count - 1].Type != DungeonNodeType.Elevator)
+                if (LayerSquares.FixedSquare(floor, _layerConfig) != DungeonNodeType.Elevator)
                 {
                     Debug.LogWarning($"階 {floor} の4マス目がエレベーターではない。1 層から開始します。");
-                    GenerateFirstFloor();
+                    OpenBoardPreparation(1, startAtElevator: false);
+                    return;
                 }
+
+                if (string.IsNullOrEmpty(_profile.towerRunBoardId) || floor != _profile.towerRunFloor)
+                {
+                    OpenBoardPreparation(floor, startAtElevator: true);
+                    return;
+                }
+
+                LoadLayer(floor, restoreIndex: 0, startAtElevator: true, ResolveBoard(_profile.towerRunBoardId), preFourthHealApplied: true);
             }
             else
-                LoadLayer(floor, restoreIndex: 0, startAtElevator: false);
+            {
+                LoadLayer(
+                    floor,
+                    restoreIndex: 0,
+                    startAtElevator: false,
+                    ResolveBoard(_profile.towerRunBoardId),
+                    _profile.towerRunPreFourthHealApplied);
+            }
 
             MetaProgression.SaveActiveTowerRun(
                 _profile,
@@ -717,7 +837,7 @@ namespace TypingRoguelike.Run
 
         void ResolveTreasureNode()
         {
-            var coins = dungeonRun != null ? dungeonRun.treasureCoinReward : 10;
+            var coins = _dungeon.ScaleCoinGain(dungeonRun != null ? dungeonRun.treasureCoinReward : 10);
             var offersCard = dungeonRun == null || dungeonRun.treasureOffersCard;
             var matMin = dungeonRun != null ? dungeonRun.treasureMaterialMin : 1;
             var matMax = dungeonRun != null ? Mathf.Max(matMin, dungeonRun.treasureMaterialMax) : 2;
@@ -1325,12 +1445,13 @@ namespace TypingRoguelike.Run
             if (cur.Type is DungeonNodeType.Combat or DungeonNodeType.MidBoss)
             {
                 var elite = cur.Type == DungeonNodeType.MidBoss;
-                return dungeonRun != null
+                var reward = dungeonRun != null
                     ? elite ? dungeonRun.eliteCoinReward : dungeonRun.combatCoinReward
                     : elite ? 15 : 8;
+                return _dungeon.ScaleCoinGain(reward);
             }
 
-            return dungeonRun != null ? dungeonRun.combatCoinReward : 8;
+            return _dungeon.ScaleCoinGain(dungeonRun != null ? dungeonRun.combatCoinReward : 8);
         }
 
         IEnumerator CombatVictoryRoutine(int coins)
@@ -1461,6 +1582,10 @@ namespace TypingRoguelike.Run
                 count = 3;
             if (fallbackEncounter != null && dungeonRun == null && fallbackEncounter.rewardChoiceCount > 0)
                 count = fallbackEncounter.rewardChoiceCount;
+            if (_dungeon.Current?.Type == DungeonNodeType.Combat &&
+                _dungeon.ActiveYaku != null &&
+                _dungeon.ActiveYaku.bonus == YakuBonusKind.CombatCardChoices)
+                count += Mathf.Max(1, Mathf.RoundToInt(_dungeon.ActiveYaku.bonusValue));
 
             var partyNames = _party.Members
                 .Select(m => m.character?.characterName)
@@ -1819,7 +1944,10 @@ namespace TypingRoguelike.Run
         {
             var delta = EventRules.CoinDelta(_party.RunCoins, effect.value);
             if (delta >= 0)
+            {
+                delta = _dungeon.ScaleCoinGain(delta);
                 _party.AddCoins(delta);
+            }
             else
                 _party.TrySpendCoins(Mathf.Min(_party.RunCoins, -delta));
             _effectNotes.Add($"通貨 {Signed(delta)}（所持金の{Mathf.Abs(effect.value)}%）");
@@ -2039,7 +2167,12 @@ namespace TypingRoguelike.Run
                 return false;
             }
 
-            LoadLayer(Mathf.Max(1, _profile.towerRunFloor), _profile.towerRunNodeId, startAtElevator: false);
+            LoadLayer(
+                Mathf.Max(1, _profile.towerRunFloor),
+                _profile.towerRunNodeId,
+                startAtElevator: false,
+                ResolveBoard(_profile.towerRunBoardId),
+                _profile.towerRunPreFourthHealApplied);
             var node = _dungeon.Current;
             if (node == null)
             {

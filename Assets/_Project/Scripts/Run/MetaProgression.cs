@@ -37,6 +37,8 @@ namespace TypingRoguelike.Run
         public int towerRunSeed;
         public int towerRunFloor = 1;
         public int towerRunNodeId;
+        public string towerRunBoardId;
+        public bool towerRunPreFourthHealApplied;
         public int towerRunCoins;
         public float towerRunCurrentHp;
         public float towerRunMaxHp;
@@ -314,6 +316,8 @@ namespace TypingRoguelike.Run
             data.towerRunSeed = 0;
             data.towerRunFloor = 1;
             data.towerRunNodeId = 0;
+            data.towerRunBoardId = "";
+            data.towerRunPreFourthHealApplied = false;
             data.towerRunCoins = 0;
             data.towerRunCurrentHp = 0;
             data.towerRunMaxHp = 0;
@@ -389,6 +393,7 @@ namespace TypingRoguelike.Run
             data.towerRunSeenEventIds ??= new List<string>();
             data.previousRunEventIds ??= new List<string>();
             data.towerRunSkipFromNodeIds ??= new List<int>();
+            data.towerRunBoardId ??= "";
 
             if (data.version < 2)
             {

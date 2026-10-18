@@ -16,3 +16,8 @@ MonoBehaviour:
   elevatorEvery: 3
   bossEvery: 5
   trapHpLossFraction: 0.1
+  columnMinimums:
+  - fromLayer: 1
+    toLayer: 99
+    type: 0
+    minimumPerColumn: 3

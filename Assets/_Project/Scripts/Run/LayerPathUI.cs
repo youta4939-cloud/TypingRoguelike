@@ -17,6 +17,14 @@ namespace TypingRoguelike.Run
         Text _madnessText;
         Image _hpFill;
         Image _madnessFill;
+        int _prepIndex;
+        int _prepLayer;
+        int _prepTotal;
+        DungeonNodeType _prepFourth;
+        string _prepMinimums;
+        BoardChoice[] _prepChoices;
+        System.Action<int> _prepConfirm;
+        System.Action _prepDebug;
 
         public void Show(
             Transform host,
@@ -47,20 +55,26 @@ namespace TypingRoguelike.Run
             BuildSquares(body, dungeon, onSquareSelected);
         }
 
-        public void ShowPreparation(Transform host, int clearedLayer, int nextLayer, int totalLayers, Action onNext)
+        public void ShowBoardPreparation(
+            Transform host,
+            int nextLayer,
+            int totalLayers,
+            DungeonNodeType fourth,
+            string minimums,
+            BoardChoice[] choices,
+            Action<int> onConfirm,
+            Action onDebugRolls)
         {
             EnsureRoot(host);
-            HideModal();
-            if (_panel != null)
-            {
-                UnityEngine.Object.Destroy(_panel);
-                _panel = null;
-            }
-
-            ShowModal(
-                "準備",
-                $"{clearedLayer} 層を抜けた。\n次は {nextLayer} / {totalLayers} 層。",
-                new (string, Action)[] { ("次へ", onNext) });
+            _prepLayer = nextLayer;
+            _prepTotal = totalLayers;
+            _prepFourth = fourth;
+            _prepMinimums = minimums ?? "";
+            _prepChoices = choices ?? System.Array.Empty<BoardChoice>();
+            _prepConfirm = onConfirm;
+            _prepDebug = onDebugRolls;
+            _prepIndex = FirstSelectable(_prepChoices);
+            RebuildBoardPreparation();
         }
 
         public void ReleasePause()
@@ -142,6 +156,95 @@ namespace TypingRoguelike.Run
             }
 
             ReleasePause();
+        }
+
+        void RebuildBoardPreparation()
+        {
+            HideModal();
+            if (_panel != null)
+                UnityEngine.Object.Destroy(_panel);
+
+            _panel = CreateFullScreen("BoardPrep", new Color(0.012f, 0.014f, 0.035f, 1f));
+            var window = BattleUIChrome.CreateLuxuryWindow(
+                _panel.transform, "PrepWindow", new Vector2(0.06f, 0.06f), new Vector2(0.94f, 0.94f),
+                $"{_prepLayer} / {_prepTotal} 層の準備", BattleUITheme.Gold);
+            var body = window.Find("Body");
+            if (body == null)
+                return;
+
+            var selected = _prepIndex >= 0 && _prepChoices != null && _prepIndex < _prepChoices.Length
+                ? _prepChoices[_prepIndex]
+                : null;
+            CreateLabel(body, "Fourth",
+                $"4マス目：{SquareName(_prepFourth)}\n{_prepMinimums}",
+                20, TextAnchor.UpperLeft, new Vector2(0.34f, 0.78f), new Vector2(0.96f, 0.96f), BattleUITheme.TextPrimary);
+
+            var odds = selected != null ? selected.Odds : "盤面を選ぶと、出現割合を表示する。";
+            if (selected != null && !selected.Selectable)
+                odds = selected.Reason + "\n\n" + odds;
+            CreateLabel(body, "Odds", odds, 18, TextAnchor.UpperLeft,
+                new Vector2(0.34f, 0.18f), new Vector2(0.96f, 0.76f), BattleUITheme.TextPrimary);
+
+            var count = _prepChoices?.Length ?? 0;
+            for (var i = 0; i < count; i++)
+            {
+                var index = i;
+                var choice = _prepChoices[i];
+                var yMax = 0.92f - i * 0.16f;
+                var label = choice.Selectable ? choice.Name : $"{choice.Name}\n選べない";
+                var color = index == _prepIndex
+                    ? new Color(1f, 0.48f, 0.08f, 1f)
+                    : choice.Selectable
+                        ? new Color(0.2f, 0.16f, 0.12f, 1f)
+                        : new Color(0.18f, 0.18f, 0.2f, 1f);
+                if (!choice.Selectable)
+                {
+                    var plate = CreateRect(body, "Locked", new Vector2(0.04f, yMax - 0.13f), new Vector2(0.3f, yMax));
+                    var image = plate.gameObject.AddComponent<Image>();
+                    image.color = color;
+                    BattleUITheme.EnsureSprite(image);
+                    CreateLabel(plate, "Text", label, 18, TextAnchor.MiddleCenter, Vector2.zero, Vector2.one,
+                        BattleUITheme.TextMuted);
+                    continue;
+                }
+
+                CreateButton(body, label, new Vector2(0.04f, yMax - 0.13f), new Vector2(0.3f, yMax), () =>
+                {
+                    _prepIndex = index;
+                    RebuildBoardPreparation();
+                }, color);
+            }
+
+            var canGo = selected != null && selected.Selectable;
+            if (canGo)
+            {
+                CreateButton(body, "次へ", new Vector2(0.34f, 0.03f), new Vector2(0.62f, 0.14f), () =>
+                {
+                    var confirm = _prepConfirm;
+                    var index = _prepIndex;
+                    confirm?.Invoke(index);
+                });
+            }
+            else
+            {
+                CreateLabel(body, "NeedPick", "条件を満たす盤面を選ぶ", 18, TextAnchor.MiddleCenter,
+                    new Vector2(0.34f, 0.03f), new Vector2(0.62f, 0.14f), BattleUITheme.TextMuted);
+            }
+
+            CreateButton(body, "1000回抽選をログ", new Vector2(0.66f, 0.03f), new Vector2(0.96f, 0.14f), () => _prepDebug?.Invoke());
+        }
+
+        static int FirstSelectable(BoardChoice[] choices)
+        {
+            if (choices == null)
+                return -1;
+            for (var i = 0; i < choices.Length; i++)
+            {
+                if (choices[i] != null && choices[i].Selectable)
+                    return i;
+            }
+
+            return -1;
         }
 
         void BuildStatus(
@@ -318,5 +421,13 @@ namespace TypingRoguelike.Run
             DungeonNodeType.Elevator => new Color(0.72f, 0.52f, 0.16f, 1f),
             _ => new Color(0.25f, 0.25f, 0.28f, 1f)
         };
+    }
+
+    public sealed class BoardChoice
+    {
+        public string Name;
+        public string Odds;
+        public bool Selectable;
+        public string Reason;
     }
 }

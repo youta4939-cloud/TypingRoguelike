@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TypingRoguelike.Data;
 
 namespace TypingRoguelike.Run
 {
@@ -23,6 +24,9 @@ namespace TypingRoguelike.Run
         public int TotalFloors { get; private set; } = 1;
         public int CurrentIndex { get; private set; }
         public LayerSquare[] Squares { get; private set; } = System.Array.Empty<LayerSquare>();
+        public string BoardId { get; private set; }
+        public YakuDefinition ActiveYaku { get; private set; }
+        public bool PreFourthHealApplied { get; private set; }
         public List<string> SeenEventIds { get; } = new();
 
         public LayerSquare Current =>
@@ -52,14 +56,23 @@ namespace TypingRoguelike.Run
             int floor,
             int totalFloors,
             int runSeed,
-            Data.LayerConfig config,
+            LayerConfig config,
+            BoardGrid board,
+            string boardId,
+            YakuCatalog yakuCatalog,
             int restoreIndex,
             IReadOnlyCollection<int> clearedSquareIndices,
-            bool startAtElevator)
+            bool startAtElevator,
+            bool preFourthHealApplied)
         {
             Floor = System.Math.Max(1, floor);
             TotalFloors = System.Math.Max(1, totalFloors);
-            var types = LayerSquares.DrawSquares(Floor, runSeed, config);
+            BoardId = boardId ?? "";
+            PreFourthHealApplied = preFourthHealApplied;
+            var types = LayerSquares.DrawSquares(Floor, runSeed, config, board);
+            ActiveYaku = types.Length >= 3
+                ? YakuEvaluator.Evaluate(types[0], types[1], types[2], yakuCatalog)
+                : null;
             Squares = new LayerSquare[types.Length];
             for (var i = 0; i < types.Length; i++)
                 Squares[i] = new LayerSquare(i, types[i]);
@@ -113,6 +126,16 @@ namespace TypingRoguelike.Run
         {
             if (Current != null)
                 Current.Cleared = true;
+        }
+
+        public void MarkPreFourthHealApplied() => PreFourthHealApplied = true;
+
+        public int ScaleCoinGain(int amount)
+        {
+            if (amount <= 0 || ActiveYaku == null || ActiveYaku.bonus != YakuBonusKind.CoinGainPercent)
+                return amount;
+            var percent = ActiveYaku.bonusValue <= 0f ? 0.5f : ActiveYaku.bonusValue;
+            return UnityEngine.Mathf.Max(0, UnityEngine.Mathf.RoundToInt(amount * (1f + percent)));
         }
 
         public bool HasRowAfterNext()
