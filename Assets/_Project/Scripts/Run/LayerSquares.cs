@@ -11,6 +11,7 @@ namespace TypingRoguelike.Run
         {
             config ??= LayerConfig.RuntimeFallback();
             board ??= BoardGrid.Parse("BBBRRSTEE", "BBBRRSTEE", "BBBRRSTEE");
+            // ラン・層・盤面でシードが変わる。同じ組み合わせは同じ結果になり、再開してもマスが変わらない。
             var rng = new System.Random(unchecked(runSeed * 397 ^ layer * 7919 ^ board.ContentHash()));
             var squares = new DungeonNodeType[Count];
             var road = ReelDraw.DrawRoad(rng, board);

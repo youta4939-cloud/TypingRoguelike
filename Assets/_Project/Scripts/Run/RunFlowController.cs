@@ -203,7 +203,7 @@ namespace TypingRoguelike.Run
                 LayerSquares.DescribeMinimums(_layerConfig, layer),
                 choices,
                 index => ConfirmBoard(index >= 0 && index < presets.Length ? presets[index] : null, layer, startAtElevator),
-                () => ReelDraw.LogThousandRolls(_boards));
+                () => ReelDraw.LogThousandRolls(_boards, _yaku));
         }
 
         void ConfirmBoard(BoardPreset board, int layer, bool startAtElevator)
