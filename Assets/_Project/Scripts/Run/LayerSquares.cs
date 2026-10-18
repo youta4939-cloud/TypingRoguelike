@@ -23,29 +23,44 @@ namespace TypingRoguelike.Run
 
         public static bool MeetsMinimums(BoardGrid grid, LayerConfig config, int layer, out string reason)
         {
-            reason = null;
+            var lines = ShortageLines(grid, config, layer);
             if (grid == null)
             {
                 reason = "盤面が無い";
                 return false;
             }
 
+            if (lines.Count == 0)
+            {
+                reason = null;
+                return true;
+            }
+
+            reason = string.Join("\n", lines);
+            return false;
+        }
+
+        public static System.Collections.Generic.List<string> ShortageLines(BoardGrid grid, LayerConfig config, int layer)
+        {
+            var lines = new System.Collections.Generic.List<string>();
+            if (grid == null)
+                return lines;
             var rules = config != null ? config.MinimumsFor(layer) : null;
             if (rules == null)
-                return true;
+                return lines;
             foreach (var rule in rules)
             {
                 for (var column = 0; column < BoardGrid.Columns; column++)
                 {
-                    var count = grid.Count(column, rule.type);
-                    if (count >= rule.minimumPerColumn)
+                    var have = grid.Count(column, rule.type);
+                    var need = rule.minimumPerColumn;
+                    if (have >= need)
                         continue;
-                    reason = $"{LayerPathUI.SquareName(rule.type)}が{column + 1}列目に{count}（必要{rule.minimumPerColumn}）";
-                    return false;
+                    lines.Add($"{LayerPathUI.SquareName(rule.type)}が{column + 1}列目にあと{need - have}マス足りない");
                 }
             }
 
-            return true;
+            return lines;
         }
 
         public static string DescribeMinimums(LayerConfig config, int layer)

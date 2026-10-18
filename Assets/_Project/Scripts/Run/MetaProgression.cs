@@ -38,6 +38,8 @@ namespace TypingRoguelike.Run
         public int towerRunFloor = 1;
         public int towerRunNodeId;
         public string towerRunBoardId;
+        public string reelLayout;
+        public bool reelDebugUnlocked;
         public bool towerRunPreFourthHealApplied;
         public int towerRunCoins;
         public float towerRunCurrentHp;
@@ -327,6 +329,8 @@ namespace TypingRoguelike.Run
             data.towerRunFloor = 1;
             data.towerRunNodeId = 0;
             data.towerRunBoardId = "";
+            data.reelLayout = "";
+            data.reelDebugUnlocked = false;
             data.towerRunPreFourthHealApplied = false;
             data.towerRunCoins = 0;
             data.towerRunCurrentHp = 0;
@@ -405,6 +409,7 @@ namespace TypingRoguelike.Run
             data.previousRunEventIds ??= new List<string>();
             data.towerRunSkipFromNodeIds ??= new List<int>();
             data.towerRunBoardId ??= "";
+            data.reelLayout ??= "";
             data.characterTrust ??= new List<CharacterTrustSave>();
             data.opinionLastAbsentId ??= "";
             if (data.opinionCombatEnemyHpScale <= 0f)

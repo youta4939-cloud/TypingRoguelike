@@ -20,6 +20,7 @@ namespace TypingRoguelike.Run
         readonly DungeonRunState _dungeon = new();
         readonly RunOverlayUI _overlay = new();
         readonly LayerPathUI _pathUi = new();
+        readonly ReelBuildUI _reel = new();
 
         BattleController _battle;
         LayerConfig _layerConfig;
@@ -159,13 +160,14 @@ namespace TypingRoguelike.Run
                 index = 0;
             }
 
+            var custom = !string.IsNullOrEmpty(_profile?.reelLayout);
             _dungeon.SetFloor(
                 floor,
                 TotalFloors,
                 _runSeed,
                 _layerConfig,
-                board != null ? board.ToGrid() : null,
-                board != null ? board.presetId : "",
+                GridForLayer(board),
+                custom ? "custom" : (board != null ? board.presetId : ""),
                 _yaku,
                 index,
                 _profile.clearedTowerNodeIds,
@@ -174,35 +176,69 @@ namespace TypingRoguelike.Run
             RememberClearedSquares();
         }
 
+        BoardGrid GridForLayer(BoardPreset board)
+        {
+            var catalog = ReelPartCatalog.Load();
+            var saved = ReelLayout.Parse(_profile?.reelLayout, catalog);
+            if (saved != null)
+                return saved.ToGrid(catalog);
+            if (board != null)
+                return board.ToGrid();
+            return ReelLayout.BalanceStarter(catalog).ToGrid(catalog);
+        }
+
         void OpenBoardPreparation(int layer, bool startAtElevator)
         {
-            var presets = _boards?.presets ?? System.Array.Empty<BoardPreset>();
-            var choices = new BoardChoice[presets.Length];
-            for (var i = 0; i < presets.Length; i++)
-            {
-                var preset = presets[i];
-                var grid = preset != null ? preset.ToGrid() : null;
-                var reason = "";
-                var selectable = preset != null && LayerSquares.MeetsMinimums(grid, _layerConfig, layer, out reason);
-                choices[i] = new BoardChoice
-                {
-                    Name = preset != null && !string.IsNullOrEmpty(preset.displayName) ? preset.displayName : "盤面",
-                    Odds = grid != null ? BoardGrid.DescribeOdds(grid) : "",
-                    Selectable = selectable,
-                    Reason = selectable ? "" : reason
-                };
-            }
-
-            _pathUi.ShowBoardPreparation(
+            _pathUi.Hide();
+            var catalog = ReelPartCatalog.Load();
+            var layout = ReelLayout.Parse(_profile?.reelLayout, catalog) ?? ReelLayout.BalanceStarter(catalog);
+            _reel.Show(
                 transform,
+                catalog,
+                layout,
+                _profile != null && _profile.reelDebugUnlocked,
                 layer,
                 TotalFloors,
                 LayerSquares.FixedSquare(layer, _layerConfig),
-                LayerSquares.DescribeMinimums(_layerConfig, layer),
-                choices,
-                index => ConfirmBoard(index >= 0 && index < presets.Length ? presets[index] : null, layer, startAtElevator),
-                () => ReelDraw.LogThousandRolls(_boards, _yaku),
-                _trust.Gauges(_profile));
+                _layerConfig,
+                _boards,
+                (built, unlocked) => ConfirmBuiltBoard(built, unlocked, layer, startAtElevator),
+                grid => ReelDraw.LogThousandRolls(grid, "作った盤面", _yaku));
+        }
+
+        void ConfirmBuiltBoard(ReelLayout layout, bool debugUnlocked, int layer, bool startAtElevator)
+        {
+            if (layout == null || _profile == null)
+                return;
+            var catalog = ReelPartCatalog.Load();
+            var grid = layout.ToGrid(catalog);
+            if (!LayerSquares.MeetsMinimums(grid, _layerConfig, layer, out _))
+                return;
+
+            _profile.reelLayout = layout.Serialize();
+            _profile.reelDebugUnlocked = debugUnlocked;
+            _profile.towerRunBoardId = "custom";
+            _profile.clearedTowerNodeIds?.Clear();
+            _profile.towerRunPreFourthHealApplied = false;
+            LoadLayer(layer, restoreIndex: 0, startAtElevator, board: null, preFourthHealApplied: startAtElevator);
+            if (!startAtElevator)
+                GrantFlatYakuCoins();
+            if (_profile.towerRunActive)
+                PersistActiveRun();
+            else
+                ActivateAndSaveRun();
+
+            if (!startAtElevator && _dungeon.ActiveYaku != null)
+            {
+                var yaku = _dungeon.ActiveYaku;
+                _pathUi.ShowModal(
+                    "役",
+                    $"{yaku.displayName}\n{yaku.DescribeEffect()}",
+                    new (string, System.Action)[] { ("進む", ShowMap) });
+                return;
+            }
+
+            ShowMap();
         }
 
         void ConfirmBoard(BoardPreset board, int layer, bool startAtElevator)

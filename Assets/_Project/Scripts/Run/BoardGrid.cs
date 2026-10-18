@@ -14,6 +14,25 @@ namespace TypingRoguelike.Run
 
         public DungeonNodeType Get(int column, int row) => _cells[column, row];
 
+        public void Set(int column, int row, DungeonNodeType type)
+        {
+            if (column < 0 || column >= Columns || row < 0 || row >= Rows)
+                return;
+            _cells[column, row] = type;
+        }
+
+        public static BoardGrid All(DungeonNodeType type)
+        {
+            var grid = new BoardGrid();
+            for (var column = 0; column < Columns; column++)
+            {
+                for (var row = 0; row < Rows; row++)
+                    grid._cells[column, row] = type;
+            }
+
+            return grid;
+        }
+
         public int Count(int column, DungeonNodeType type)
         {
             var count = 0;
