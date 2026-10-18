@@ -14,9 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: TypingRoguelike::TypingRoguelike.Data.RelicDefinition
   relicId: 6
   displayName: "\u9759\u6B69\u306E\u8B77\u7B26"
-  effectText: "\u6575\u906D\u9047\u7387-5%"
-  dangerEncounterReductionPercent: 5
+  effectText: "\u52B9\u679C\u306F\u306A\u3044"
   backpackSlotBonus: 0
   playerDamageBonusPercent: 0
-  hubShopPriceShards: 40
-  developMaterialCost: 6
+  hubShopPriceShards: 0
+  developMaterialCost: 0

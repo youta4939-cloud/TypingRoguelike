@@ -86,7 +86,6 @@ namespace TypingRoguelike.Run
                 $"運　　{TotalLuck} × {Coeff(runConfig?.partyLuckJackpotBonusPerPoint, 0.0005f):0.####} → JACKPOT +{JackpotLuckBonusPerWord * 100f:0.1}% / 語");
 
             if (relicMods.PlayerDamageBonusPercent > 0 ||
-                relicMods.DangerEncounterReductionPercent > 0 ||
                 relicMods.MadnessMaxBonus > 0 ||
                 relicMods.JackpotMadnessThreshold > 0 ||
                 relicMods.RevealsAllNodes ||
@@ -96,8 +95,6 @@ namespace TypingRoguelike.Run
                 sb.AppendLine("【装備レリック（塔内）】");
                 if (relicMods.PlayerDamageBonusPercent > 0)
                     sb.AppendLine($"与ダメ +{relicMods.PlayerDamageBonusPercent}%");
-                if (relicMods.DangerEncounterReductionPercent > 0)
-                    sb.AppendLine($"遭遇率 -{relicMods.DangerEncounterReductionPercent}%");
                 if (relicMods.MadnessMaxBonus > 0)
                     sb.AppendLine($"狂気上限 +{relicMods.MadnessMaxBonus}");
                 if (relicMods.JackpotMadnessThreshold > 0)

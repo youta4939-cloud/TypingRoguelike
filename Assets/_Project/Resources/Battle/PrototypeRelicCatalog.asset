@@ -17,10 +17,8 @@ MonoBehaviour:
   relics:
   - {fileID: 11400000, guid: b8447545cd1f5084da7bc4c145ccd76d, type: 2}
   - {fileID: 11400000, guid: 12cfd6b9cf941374cab91e6665398fd0, type: 2}
-  - {fileID: 11400000, guid: f7eb7227928860b47abedc6dd3640eba, type: 2}
   - {fileID: 11400000, guid: a5bf2ffe88ab7774684f2ac7f487fb2a, type: 2}
   - {fileID: 11400000, guid: 75b099820d85ace42a85dfc722ea9351, type: 2}
-  - {fileID: 11400000, guid: 5853da09899d5794bb561e03768caf16, type: 2}
   - {fileID: 11400000, guid: c3a91e04b7d24f6a9e1c8b0d5f2a4710, type: 2}
   - {fileID: 11400000, guid: d4b02f15c8e3507b0f2d9c1e603b5821, type: 2}
   - {fileID: 11400000, guid: e5c13026d9f4618c103ead2f714c6932, type: 2}

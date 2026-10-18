@@ -29,7 +29,6 @@ namespace TypingRoguelike.Run
         MetaProgressData _profile;
         bool _runResultRecorded;
         bool _defeatHandling;
-        bool _lastDangerBattleUsedElite;
         int _pendingMaterialId = -1;
         string _pendingTreasureMaterialLog;
         int _pendingTreasureCoins;
@@ -37,6 +36,8 @@ namespace TypingRoguelike.Run
         string _pendingTreasureRelicMsg;
         string _pendingTreasureRelicLine;
         bool _awaitingTreasureModal;
+        bool _cardRewardMustTake;
+        Action _afterCardReward;
         int _merchantRelicSoldNodeId = -1;
         readonly EventScreenUI _events = new();
         EventDefinition _activeEvent;
@@ -140,7 +141,6 @@ namespace TypingRoguelike.Run
                 dungeonRun, floorSeed, NodeIdBaseForFloor(1), _elevatorFloor == 1);
             _dungeon.BeginTower(
                 _mapData, floorSeed, TotalFloors, _profile.revealedTowerNodeIds, _profile.clearedTowerNodeIds);
-            ApplySavedMysteryResolutions();
         }
 
         void LoadFloorMap(int floor, int? restoreNodeId, bool forceElevatorOnFloor = false)
@@ -159,24 +159,7 @@ namespace TypingRoguelike.Run
 
             if (restoreNodeId.HasValue && !_dungeon.TryRestoreCurrentNode(restoreNodeId.Value))
                 Debug.LogWarning($"保存ノード {restoreNodeId} を復元できませんでした。入口に戻します。");
-            ApplySavedMysteryResolutions();
             ReapplyRowSkips();
-        }
-
-        void ApplySavedMysteryResolutions()
-        {
-            if (_profile?.towerRunMysteryNodes == null)
-                return;
-            foreach (var saved in _profile.towerRunMysteryNodes)
-            {
-                if (saved == null || !_dungeon.Nodes.TryGetValue(saved.nodeId, out var node))
-                    continue;
-                if (!Enum.IsDefined(typeof(DungeonNodeType), saved.resolvedType))
-                    continue;
-                node.Type = (DungeonNodeType)saved.resolvedType;
-                if (node.Type == DungeonNodeType.Danger)
-                    node.DangerEncounterPercent = Mathf.Clamp(saved.dangerPercent, 1, 99);
-            }
         }
 
         void ShowMap()
@@ -185,7 +168,7 @@ namespace TypingRoguelike.Run
             if (TryBeginRunDeath(fromBattle: false))
                 return;
 
-            ExplorationPartyPassives.ApplyMapHints(_party, _dungeon, _runSeed);
+            ExplorationPartyPassives.ApplyMapHints(_party, _dungeon);
             RevealReachableMapNodes();
             SyncMadnessCapFromRelics();
             var revealAll = RelicRunModifiers.Compute(_exploration, ResolveRelicCatalog()).RevealsAllNodes;
@@ -612,7 +595,8 @@ namespace TypingRoguelike.Run
                     ResolveNormalNode();
                     break;
                 case DungeonNodeType.Danger:
-                    ResolveDangerNode(node);
+                    node.Type = DungeonNodeType.EventV2;
+                    BeginEvent(null, fromDebug: false);
                     break;
                 case DungeonNodeType.Combat:
                     StartGuaranteedCombat(node);
@@ -637,7 +621,8 @@ namespace TypingRoguelike.Run
                     BeginEvent(null, fromDebug: false);
                     break;
                 case DungeonNodeType.Mystery:
-                    ResolveMysteryNode(node);
+                    node.Type = DungeonNodeType.EventV2;
+                    BeginEvent(null, fromDebug: false);
                     break;
                 case DungeonNodeType.Merchant:
                     ResolveMerchantNode();
@@ -678,167 +663,7 @@ namespace TypingRoguelike.Run
             _mapUi.Refresh(_dungeon, _party, _exploration, _madness);
         }
 
-        void ResolveDangerNode(DungeonMapNode node)
-        {
-            var rate = Mathf.Clamp(node.DangerEncounterPercent, 1, 99);
-            var passives = ExplorationPartyPassives.Compute(_party);
-            var reduction = _exploration.TotalDangerReduction(ResolveRelicCatalog()) +
-                            passives.CautiousReductionPercent;
-            var effectiveRate = Mathf.Max(0, rate - reduction);
-
-            if (passives.DangerSense && !node.DangerElitePreview.HasValue)
-                node.DangerElitePreview =
-                    ExplorationPartyPassives.RollDangerElitePreview(_runSeed, _dungeon.Floor, node.Id);
-
-            ShowMap();
-            _mapUi.ShowModal(
-                "危険地帯",
-                BuildDangerApproachMessage(rate, reduction, effectiveRate, passives.CautiousReductionPercent, node),
-                new (string, Action)[] { ("進む…", () => RollDangerEncounter(node, rate, effectiveRate)) });
-            _mapUi.Refresh(_dungeon, _party, _exploration, _madness);
-        }
-
-        static string BuildDangerApproachMessage(
-            int rate,
-            int totalReduction,
-            int effectiveRate,
-            int passiveReduction,
-            DungeonMapNode node)
-        {
-            var lines = $"遭遇率 {rate}% …";
-            if (totalReduction > 0)
-            {
-                lines += $"\n（軽減 -{totalReduction}% → 実効 {effectiveRate}%）";
-                if (passiveReduction > 0)
-                    lines += $"\n　うちパッシブ -{passiveReduction}%";
-            }
-
-            if (node.DangerElitePreview.HasValue)
-                lines += node.DangerElitePreview.Value
-                    ? "\n\n危険察知: 強敵の気配。"
-                    : "\n\n危険察知: 通常程度の敵。";
-
-            lines += "\n\n足元に不穏な気配が漂っている。";
-            return lines;
-        }
-
-        void RollDangerEncounter(DungeonMapNode node, int displayRate, int effectiveRate)
-        {
-            var roll = UnityEngine.Random.Range(0, 100);
-            var encountered = roll < effectiveRate;
-            if (encountered)
-            {
-                _mapUi.ShowModal(
-                    "危険地帯",
-                    $"遭遇率 {displayRate}% …\n\n敵が表れた！",
-                    new (string, Action)[] { ("戦闘開始", () => StartDangerBattle(node)) });
-                return;
-            }
-
-            ResolveDangerMiss(node);
-        }
-
-        void ResolveMysteryNode(DungeonMapNode node)
-        {
-            var type = DungeonMapGenerator.RollMysteryContents(dungeonRun, new System.Random());
-            node.Type = type;
-            if (type == DungeonNodeType.Danger)
-            {
-                var pathLayers = dungeonRun != null ? dungeonRun.pathLayers : 5;
-                node.DangerEncounterPercent = DungeonMapGenerator.RollDangerEncounterPercent(
-                    new System.Random(unchecked(_runSeed + node.Id * 104729)), node.Layer, pathLayers);
-            }
-
-            _profile.towerRunMysteryNodes ??= new List<MysteryNodeSave>();
-            _profile.towerRunMysteryNodes.RemoveAll(saved => saved != null && saved.nodeId == node.Id);
-            _profile.towerRunMysteryNodes.Add(new MysteryNodeSave
-            {
-                nodeId = node.Id,
-                resolvedType = (int)type,
-                dangerPercent = node.DangerEncounterPercent
-            });
-            PersistActiveRun();
-
-            switch (type)
-            {
-                case DungeonNodeType.Danger:
-                    ResolveDangerNode(node);
-                    break;
-                case DungeonNodeType.EventV2:
-                    BeginEvent(null, fromDebug: false);
-                    break;
-                case DungeonNodeType.Merchant:
-                    ResolveMerchantNode();
-                    break;
-                default:
-                    ResolveDangerNode(node);
-                    break;
-            }
-        }
-
-        void ResolveDangerMiss(DungeonMapNode node)
-        {
-            var roll = UnityEngine.Random.Range(0, 100);
-            var kind = roll < 35 ? "madness" : roll < 70 ? "coins" : "hp";
-            var floor = _dungeon != null ? Mathf.Max(1, _dungeon.Floor) : 1;
-            var text = DangerLineCatalog.Pick(kind, _profile?.towerRunLastDangerLine);
-            if (_profile != null)
-                _profile.towerRunLastDangerLine = text;
-
-            if (kind == "madness")
-            {
-                var delta = EventRules.ScaleFixed(20, floor);
-                if (ApplyMadnessDeltaFromEvent(delta))
-                    return;
-                ShowDangerMiss(text, $"狂気 +{delta}");
-                return;
-            }
-
-            if (kind == "hp")
-            {
-                var delta = EventRules.ScaleOnes(-5, floor);
-                _party.ApplyHpDelta(delta);
-                if (_party.IsRunDead)
-                {
-                    PersistActiveRun();
-                    TryBeginRunDeath(fromBattle: false);
-                    return;
-                }
-
-                ShowDangerMiss(text, $"HP −{Mathf.Abs(delta)}");
-                return;
-            }
-
-            var coins = Mathf.Max(10, Mathf.RoundToInt(_party.RunCoins * 0.05f));
-            _party.AddCoins(coins);
-            ShowDangerMiss(text, $"通貨 +{coins}");
-        }
-
-        void ShowDangerMiss(string text, string effect)
-        {
-            MarkCurrentCleared();
-            PersistActiveRun();
-            ShowMap();
-            _mapUi.ShowModal(
-                "危険地帯",
-                $"{text}\n{effect}",
-                new (string, Action)[] { ("マップに戻る", null) });
-            _mapUi.Refresh(_dungeon, _party, _exploration, _madness);
-        }
-
-        void StartDangerBattle(DungeonMapNode node)
-        {
-            _lastDangerBattleUsedElite = node.DangerElitePreview ??
-                                         ExplorationPartyPassives.RollDangerElitePreview(
-                                             _runSeed, _dungeon.Floor, node.Id);
-            _mapUi.Hide();
-            StartBattleForNode(
-                node,
-                _lastDangerBattleUsedElite ? ResolveEliteEncounter() : ResolveCombatEncounter(),
-                _lastDangerBattleUsedElite ? BuildEliteMods() : BuildCombatMods());
-        }
-
-        /// <summary>戦闘マスは遭遇率を振らない。踏んだら必ず戦闘。</summary>
+        /// <summary>戦闘マスは踏んだら必ず戦闘。</summary>
         void StartGuaranteedCombat(DungeonMapNode node)
         {
             StartLegacyBattleNode(node, forceElite: false);
@@ -847,7 +672,6 @@ namespace TypingRoguelike.Run
         /// <summary>v1.2 以前の強敵マス互換。戦闘マスもここから入る。</summary>
         void StartLegacyBattleNode(DungeonMapNode node, bool forceElite)
         {
-            _lastDangerBattleUsedElite = forceElite;
             _mapUi.Hide();
             StartBattleForNode(
                 node,
@@ -921,7 +745,7 @@ namespace TypingRoguelike.Run
                 $"古い財貨と刻印の残片を見つけた。\n{lootLines}{_pendingTreasureRelicMsg}\n\n刻印を1枚選べる。",
                 new (string, Action)[]
                 {
-                    ("刻印を選ぶ", () => OfferCardReward(coinCostOnPick: 0)),
+                    ("刻印を選ぶ", () => OfferCardReward()),
                     ("塔片だけ持ち帰る", CompleteNodeAndReturnToMap)
                 });
             _mapUi.Refresh(_dungeon, _party, _exploration, _madness);
@@ -963,22 +787,19 @@ namespace TypingRoguelike.Run
         void ResolveMerchantNode()
         {
             var healCost = dungeonRun != null ? dungeonRun.merchantHealCost : 10;
-            var cardCost = dungeonRun != null ? dungeonRun.merchantCardCost : 22;
             var relicCost = dungeonRun != null ? dungeonRun.merchantRelicCost : 60;
             var healPct = (int)((dungeonRun != null ? dungeonRun.merchantHealFraction : 0.12f) * 100f);
             var nodeId = _dungeon.Current?.Id ?? 0;
             var relic = MerchantOffersRelic(nodeId) ? PickOfferedRelic(nodeId, 17) : null;
             var body =
                 $"旅の商人が荷を広げている。\n{FormatCoinLine()}\n装備 {CountEquippedRelics()} / 3\n\n" +
-                $"・体力回復（最大HPの{healPct}%）… {healCost} 塔片\n" +
-                $"・刻印を1枚購入 … {cardCost} 塔片";
+                $"・体力回復（最大HPの{healPct}%）… {healCost} 塔片";
             if (relic != null)
                 body += $"\n・レリック「{relic.displayName}」… {relicCost} 塔片\n　{relic.effectText}";
 
             var actions = new List<(string, Action)>
             {
-                ($"体力回復（{healCost}塔片）", () => TryMerchantHeal(healCost)),
-                ($"刻印購入（{cardCost}塔片）", () => TryMerchantCard(cardCost))
+                ($"体力回復（{healCost}塔片）", () => TryMerchantHeal(healCost))
             };
             if (relic != null)
             {
@@ -1204,17 +1025,6 @@ namespace TypingRoguelike.Run
                 $"ポーションを飲んだ。\n{FormatHpLine()}\n{FormatCoinLine()}",
                 new (string, Action)[] { ("マップに戻る", ShowRouteMap) });
             _mapUi.Refresh(_dungeon, _party, _exploration, _madness);
-        }
-
-        void TryMerchantCard(int cost)
-        {
-            if (_party.RunCoins < cost)
-            {
-                ShowInsufficientCoins(cost);
-                return;
-            }
-
-            OfferCardReward(coinCostOnPick: cost);
         }
 
         void ShowInsufficientCoins(int cost)
@@ -1479,7 +1289,7 @@ namespace TypingRoguelike.Run
             if (IsTowerBossVictory())
             {
                 MarkCurrentCleared();
-                StartCoroutine(FinishBossVictory());
+                StartCoroutine(BossVictoryRoutine());
                 return;
             }
 
@@ -1488,16 +1298,29 @@ namespace TypingRoguelike.Run
             StartCoroutine(CombatVictoryRoutine(coins));
         }
 
+        IEnumerator BossVictoryRoutine()
+        {
+            yield return null;
+            _overlay.HideAll();
+            SyncJackpotFromBattle();
+            DestroyBattleIfAny();
+            ClearPendingEventBattle();
+            PersistActiveRun();
+            OfferCardReward(
+                mustTake: true,
+                notice: "塔の主を倒した。刻印を1枚選ぶ。",
+                onFinished: () => StartCoroutine(FinishBossVictory()));
+        }
+
         int GrantCoinsForCurrentBattle()
         {
             var cur = _dungeon.Current;
             if (cur == null)
                 return dungeonRun != null ? dungeonRun.combatCoinReward : 8;
 
-            if (cur.Type is DungeonNodeType.Danger or DungeonNodeType.Combat or DungeonNodeType.Elite)
+            if (cur.Type is DungeonNodeType.Combat or DungeonNodeType.Elite)
             {
-                var elite = cur.Type == DungeonNodeType.Elite ||
-                            (cur.Type == DungeonNodeType.Danger && _lastDangerBattleUsedElite);
+                var elite = cur.Type == DungeonNodeType.Elite;
                 return dungeonRun != null
                     ? elite ? dungeonRun.eliteCoinReward : dungeonRun.combatCoinReward
                     : elite ? 15 : 8;
@@ -1515,12 +1338,9 @@ namespace TypingRoguelike.Run
             ClearPendingEventBattle();
             MarkCurrentCleared();
             PersistActiveRun();
-            ShowMap();
-            _mapUi.ShowModal(
-                "戦闘勝利",
-                $"塔片 +{coins}\n{FormatCoinLine()}\n{FormatHpLine()}",
-                new (string, Action)[] { ("マップに戻る", null) });
-            _mapUi.Refresh(_dungeon, _party, _exploration, _madness);
+            OfferCardReward(
+                mustTake: true,
+                notice: $"戦闘に勝った。塔片 +{coins}。刻印を1枚選ぶ。");
         }
 
         bool IsTowerBossVictory()
@@ -1642,18 +1462,23 @@ namespace TypingRoguelike.Run
             _defeatHandling = false;
         }
 
-        void OfferCardReward(int coinCostOnPick = 0)
+        void OfferCardReward(bool mustTake = false, string notice = null, Action onFinished = null)
         {
+            _cardRewardMustTake = mustTake;
+            _afterCardReward = onFinished;
+
             var pool = ResolveRewardPool();
             if (pool == null)
             {
                 Debug.LogWarning("報酬プール未設定。Tools → Generate Prototype Data を実行してください。");
-                CompleteNodeAndReturnToMap();
+                FinishCardReward();
                 return;
             }
 
             var count = dungeonRun != null ? dungeonRun.rewardChoiceCount : 3;
-            if (fallbackEncounter != null && count <= 0)
+            if (count <= 0)
+                count = 3;
+            if (fallbackEncounter != null && dungeonRun == null && fallbackEncounter.rewardChoiceCount > 0)
                 count = fallbackEncounter.rewardChoiceCount;
 
             var partyNames = _party.Members
@@ -1668,17 +1493,7 @@ namespace TypingRoguelike.Run
                 partyNames);
             if (choices.Count == 0)
             {
-                if (coinCostOnPick > 0)
-                {
-                    ShowMapTabHint();
-                    _mapUi.ShowModal(
-                        "刻印",
-                        "入手できる新しい刻印はなかった。",
-                        new (string, Action)[] { ("店に戻る", ResolveMerchantNode) });
-                    return;
-                }
-
-                CompleteNodeAndReturnToMap("刻印", "入手できる新しい刻印はなかった。");
+                FinishCardReward("刻印", "入手できる新しい刻印はなかった。");
                 return;
             }
 
@@ -1689,23 +1504,39 @@ namespace TypingRoguelike.Run
                     transform,
                     _party,
                     choices,
-                    card =>
-                    {
-                        if (coinCostOnPick > 0 && !_party.TrySpendCoins(coinCostOnPick))
-                        {
-                            ShowInsufficientCoins(coinCostOnPick);
-                            return;
-                        }
-
-                        HandleRewardCard(card);
-                    },
-                    CompleteNodeAndReturnToMap);
+                    HandleRewardCard,
+                    mustTake ? null : () => FinishCardReward(),
+                    notice);
             }
             catch (Exception ex)
             {
                 Debug.LogError($"カード報酬 UI: {ex.Message}");
-                CompleteNodeAndReturnToMap();
+                FinishCardReward();
             }
+        }
+
+        void FinishCardReward(string modalTitle = null, string modalBody = null)
+        {
+            var next = _afterCardReward;
+            _afterCardReward = null;
+            _cardRewardMustTake = false;
+            if (next == null)
+            {
+                CompleteNodeAndReturnToMap(modalTitle, modalBody);
+                return;
+            }
+
+            if (string.IsNullOrEmpty(modalTitle))
+            {
+                next();
+                return;
+            }
+
+            ShowMap();
+            _mapUi.ShowModal(
+                modalTitle,
+                modalBody ?? string.Empty,
+                new (string, Action)[] { ("続ける", next) });
         }
 
         SkillCardPoolDefinition ResolveRewardPool()
@@ -1722,7 +1553,7 @@ namespace TypingRoguelike.Run
         {
             if (card == null)
             {
-                CompleteNodeAndReturnToMap();
+                FinishCardReward();
                 return;
             }
 
@@ -1731,16 +1562,16 @@ namespace TypingRoguelike.Run
             {
                 case RewardEquipOutcome.Equipped:
                     Debug.Log($"カード自動装備: {card.displayName}");
-                    CompleteNodeAndReturnToMap();
+                    FinishCardReward();
                     break;
                 case RewardEquipOutcome.LeveledUp:
-                    CompleteNodeAndReturnToMap(
+                    FinishCardReward(
                         "刻印強化",
                         $"{card.displayName}\nLv.{newLevel - 1} → Lv.{newLevel}\n" +
                         $"{SkillProgression.Describe(card, newLevel - 1)}\n→ {SkillProgression.Describe(card, newLevel)}");
                     break;
                 case RewardEquipOutcome.AlreadyMax:
-                    CompleteNodeAndReturnToMap(
+                    FinishCardReward(
                         "刻印",
                         $"{card.displayName} はすでに Lv.{SkillProgression.MaxLevel} です。");
                     break;
@@ -1750,16 +1581,14 @@ namespace TypingRoguelike.Run
                         _party,
                         memberIndex,
                         card,
-                        CompleteNodeAndReturnToMap,
-                        CompleteNodeAndReturnToMap,
+                        () => FinishCardReward(),
+                        _cardRewardMustTake ? null : () => FinishCardReward(),
                         cardSlotsOnly: true);
                     break;
                 case RewardEquipOutcome.NoMatchingMember:
-                    ShowMap();
-                    _mapUi.ShowModal(
+                    FinishCardReward(
                         "刻印",
-                        $"{card.displayName} を装備できる仲間がパーティにいない。",
-                        new (string, Action)[] { ("マップに戻る", CompleteNodeAndReturnToMap) });
+                        $"{card.displayName} を装備できる仲間がパーティにいない。");
                     break;
             }
         }

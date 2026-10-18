@@ -38,8 +38,7 @@ namespace TypingRoguelike.Run
             BossNodeId = map.BossNodeId;
             foreach (var n in map.Nodes)
             {
-                n.Revealed = n.Type is DungeonNodeType.Start or DungeonNodeType.Boss ||
-                             (revealedNodeIds != null && revealedNodeIds.Contains(n.Id));
+                n.Revealed = true;
                 n.Cleared = n.Type == DungeonNodeType.Start ||
                             (clearedNodeIds != null && clearedNodeIds.Contains(n.Id));
                 _nodes[n.Id] = n;
@@ -131,7 +130,7 @@ namespace TypingRoguelike.Run
             return true;
         }
 
-        /// <summary>死亡後のエレベ再入: 当該エレベのみ表示し、そこから探索開始。</summary>
+        /// <summary>死亡後のエレベ再入。マップは開示したまま、エレベーターから探索を始める。</summary>
         public List<string> SeenEventIds { get; } = new();
 
         public void ClearSeenEvents() => SeenEventIds.Clear();
@@ -212,9 +211,6 @@ namespace TypingRoguelike.Run
             if (!_nodes.TryGetValue(elevatorNodeId, out var elevator) ||
                 elevator.Type != DungeonNodeType.Elevator)
                 return false;
-
-            foreach (var node in _nodes.Values)
-                node.Revealed = node.Id == elevatorNodeId;
 
             _currentNodeId = elevatorNodeId;
             return true;

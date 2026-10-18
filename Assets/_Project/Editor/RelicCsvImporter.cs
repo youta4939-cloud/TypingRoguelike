@@ -105,7 +105,6 @@ namespace TypingRoguelike.EditorTools
             public string EffectText;
             public int BackpackSlotBonus;
             public int PlayerDamageBonusPercent;
-            public int DangerEncounterReductionPercent;
             public int HubShopPriceShards;
             public int DevelopMaterialCost;
             public int MadnessMaxBonus;
@@ -130,7 +129,6 @@ namespace TypingRoguelike.EditorTools
                         case "effectText": row.EffectText = val; break;
                         case "backpackSlotBonus": row.BackpackSlotBonus = ParseInt(val); break;
                         case "playerDamageBonusPercent": row.PlayerDamageBonusPercent = ParseInt(val); break;
-                        case "dangerEncounterReductionPercent": row.DangerEncounterReductionPercent = ParseInt(val); break;
                         case "hubShopPriceShards": row.HubShopPriceShards = ParseInt(val); break;
                         case "developMaterialCost": row.DevelopMaterialCost = ParseInt(val); break;
                         case "madnessMaxBonus": row.MadnessMaxBonus = ParseInt(val); break;
@@ -153,7 +151,6 @@ namespace TypingRoguelike.EditorTools
                 relic.effectText = EffectText;
                 relic.backpackSlotBonus = BackpackSlotBonus;
                 relic.playerDamageBonusPercent = PlayerDamageBonusPercent;
-                relic.dangerEncounterReductionPercent = DangerEncounterReductionPercent;
                 relic.hubShopPriceShards = HubShopPriceShards;
                 relic.developMaterialCost = DevelopMaterialCost;
                 relic.madnessMaxBonus = MadnessMaxBonus;

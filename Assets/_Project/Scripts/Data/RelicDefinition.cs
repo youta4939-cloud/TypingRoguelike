@@ -10,8 +10,6 @@ namespace TypingRoguelike.Data
         [TextArea(2, 4)] public string effectText;
 
         [Header("効果（装備中のみ。同種は加算）")]
-        [Tooltip("Danger 遭遇率から減算（%）")]
-        [Range(0, 40)] public int dangerEncounterReductionPercent;
         [Tooltip("レリックバックパック上限の加算")]
         [Range(0, 12)] public int backpackSlotBonus;
         [Tooltip("戦闘の与ダメージ加算（%）")]

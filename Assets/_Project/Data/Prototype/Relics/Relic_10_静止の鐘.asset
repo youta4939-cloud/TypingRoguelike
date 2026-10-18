@@ -15,7 +15,6 @@ MonoBehaviour:
   relicId: 10
   displayName: "\u9759\u6B62\u306E\u9418"
   effectText: "\u6226\u95D8\u958B\u59CB\u6642\u3001\u6575\u306E\u653B\u6483\u309210\u79D2\u6B62\u3081\u308B"
-  dangerEncounterReductionPercent: 0
   backpackSlotBonus: 0
   playerDamageBonusPercent: 0
   hubShopPriceShards: 0

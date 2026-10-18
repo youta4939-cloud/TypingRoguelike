@@ -39,7 +39,6 @@ MonoBehaviour:
   treasureRelicChance: 0
   merchantHealCost: 10
   merchantHealFraction: 0.12
-  merchantCardCost: 22
   merchantRelicOfferChance: 0.5
   merchantRelicCost: 60
   sharedRewardPool: {fileID: 11400000, guid: f4e8c2b19d3a4f5e8b7c6d5e4f3a2b1c, type: 2}

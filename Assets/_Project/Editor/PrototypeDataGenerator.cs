@@ -158,8 +158,7 @@ namespace TypingRoguelike.EditorTools
             alice.defense = 3;
             alice.luck = 2;
             alice.innateSkill = skills[0];
-            alice.explorationPassive = ExplorationPassiveKind.Cautious;
-            alice.explorationPassiveValue = 5;
+            alice.explorationPassive = ExplorationPassiveKind.None;
             EditorUtility.SetDirty(alice);
 
             var ellen = LoadOrCreate<CharacterDefinition>($"{Root}/Characters/Char_Ellen.asset");
@@ -179,7 +178,7 @@ namespace TypingRoguelike.EditorTools
             luna.defense = 3;
             luna.luck = 8;
             luna.innateSkill = skills[6];
-            luna.explorationPassive = ExplorationPassiveKind.DangerSense;
+            luna.explorationPassive = ExplorationPassiveKind.None;
             EditorUtility.SetDirty(luna);
 
             return new[] { alice, ellen, luna };
@@ -404,7 +403,6 @@ namespace TypingRoguelike.EditorTools
             run.treasureCoinReward = 10;
             run.merchantHealCost = 10;
             run.merchantHealFraction = 0.12f;
-            run.merchantCardCost = 22;
             run.rewardChoiceCount = 3;
             run.eliteEnemyHpMultiplier = 1.35f;
             run.eliteEnemyDamageMultiplier = 1.15f;

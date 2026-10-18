@@ -19,7 +19,5 @@ namespace TypingRoguelike.Data
 
         [Header("探索パッシブ（編成内で同種は1人のみ有効）")]
         public ExplorationPassiveKind explorationPassive = ExplorationPassiveKind.None;
-        [Tooltip("Cautious 時: Danger 遭遇率から引く%")]
-        public int explorationPassiveValue;
     }
 }

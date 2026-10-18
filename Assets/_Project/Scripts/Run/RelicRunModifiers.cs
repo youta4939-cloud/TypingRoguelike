@@ -4,7 +4,6 @@ namespace TypingRoguelike.Run
 {
     public readonly struct RelicRunModifiers
     {
-        public int DangerEncounterReductionPercent { get; }
         public int BackpackSlotBonus { get; }
         public int PlayerDamageBonusPercent { get; }
         public int MadnessMaxBonus { get; }
@@ -16,7 +15,6 @@ namespace TypingRoguelike.Run
         public float OpeningEnemyStopSeconds { get; }
 
         public RelicRunModifiers(
-            int dangerReduction,
             int backpackBonus,
             int damageBonusPercent,
             int madnessMaxBonus,
@@ -27,7 +25,6 @@ namespace TypingRoguelike.Run
             bool exclusiveEquipped,
             float openingEnemyStopSeconds)
         {
-            DangerEncounterReductionPercent = dangerReduction;
             BackpackSlotBonus = backpackBonus;
             PlayerDamageBonusPercent = damageBonusPercent;
             MadnessMaxBonus = madnessMaxBonus;
@@ -57,7 +54,6 @@ namespace TypingRoguelike.Run
                     exclusive = true;
             }
 
-            var danger = 0;
             var backpack = 0;
             var damage = 0;
             var madness = 0;
@@ -74,7 +70,6 @@ namespace TypingRoguelike.Run
                 if (exclusive && !def.exclusiveEquip)
                     continue;
 
-                danger += def.dangerEncounterReductionPercent;
                 backpack += def.backpackSlotBonus;
                 damage += def.playerDamageBonusPercent;
                 madness += def.madnessMaxBonus;
@@ -93,7 +88,7 @@ namespace TypingRoguelike.Run
             }
 
             return new RelicRunModifiers(
-                danger, backpack, damage, madness, threshold, chance, jackpotDamage, reveal, exclusive, stop);
+                backpack, damage, madness, threshold, chance, jackpotDamage, reveal, exclusive, stop);
         }
     }
 }

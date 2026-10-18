@@ -65,9 +65,6 @@ namespace TypingRoguelike.Run
             return AcquireRelicResult.Backpack;
         }
 
-        public int TotalDangerReduction(RelicCatalogDefinition catalog) =>
-            RelicRunModifiers.Compute(this, catalog).DangerEncounterReductionPercent;
-
         public IEnumerable<int> EnumerateAllRelicIds()
         {
             for (var i = 0; i < RelicSlotCount; i++)

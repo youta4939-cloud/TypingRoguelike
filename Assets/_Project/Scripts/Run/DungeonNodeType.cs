@@ -4,6 +4,7 @@ namespace TypingRoguelike.Run
     {
         Start,
         Normal,
+        /// <summary>廃止。番号は残して、古いセーブのマス種類がずれないようにする。</summary>
         Danger,
         Rest,
         Merchant,
@@ -18,7 +19,7 @@ namespace TypingRoguelike.Run
         Event,
         /// <summary>JSON の出来事。旧 Event の値は変えない。</summary>
         EventV2,
-        /// <summary>踏むまで中身が分からない。末尾追加で既存の値は変えない。</summary>
+        /// <summary>廃止。番号は残して、古いセーブのマス種類がずれないようにする。</summary>
         Mystery,
     }
 }

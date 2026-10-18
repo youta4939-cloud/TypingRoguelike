@@ -19,5 +19,4 @@ MonoBehaviour:
   attack: 5
   defense: 3
   luck: 8
-  explorationPassive: 3
-  explorationPassiveValue: 0
+  explorationPassive: 0

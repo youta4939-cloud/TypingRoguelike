@@ -245,7 +245,8 @@ namespace TypingRoguelike.Run
             RunPartyState party,
             IReadOnlyList<SkillDefinition> choices,
             Action<SkillDefinition> onPicked,
-            Action onDecline = null)
+            Action onDecline = null,
+            string notice = null)
         {
             EnsureRoot(host);
             HideAll();
@@ -261,7 +262,11 @@ namespace TypingRoguelike.Run
                 new Vector2(0.1f, 0.86f), new Vector2(0.9f, 0.98f), Vector2.zero, Vector2.zero, BattleUITheme.TextPrimary);
             title.fontStyle = FontStyle.Bold;
             BattleUITheme.AddTextShadow(title, new Color(0, 0, 0, 0.95f), new Vector2(3, -3));
-            CreateLabel(body, "Sub", "空き枠へ自動装備。同じ刻印は Lv.3 まで強化。満杯なら入れ替え（初期スキルは残る）", 14, TextAnchor.UpperCenter,
+            CreateLabel(body, "Sub",
+                string.IsNullOrEmpty(notice)
+                    ? "空き枠へ自動装備。同じ刻印は Lv.3 まで強化。満杯なら入れ替え（初期スキルは残る）"
+                    : notice,
+                14, TextAnchor.UpperCenter,
                 new Vector2(0.06f, 0.79f), new Vector2(0.94f, 0.87f), Vector2.zero, Vector2.zero, BattleUITheme.TextMuted);
 
             var partySummary = CreateSubPanel(body, "CurrentLoadout", new Vector2(0.025f, 0.05f), new Vector2(0.31f, 0.76f));
