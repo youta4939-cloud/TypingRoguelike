@@ -241,34 +241,6 @@ namespace TypingRoguelike.Run
             ShowMap();
         }
 
-        void ConfirmBoard(BoardPreset board, int layer, bool startAtElevator)
-        {
-            if (board == null)
-                return;
-
-            _profile.clearedTowerNodeIds?.Clear();
-            _profile.towerRunPreFourthHealApplied = false;
-            LoadLayer(layer, restoreIndex: 0, startAtElevator, board, preFourthHealApplied: startAtElevator);
-            if (!startAtElevator)
-                GrantFlatYakuCoins();
-            if (_profile.towerRunActive)
-                PersistActiveRun();
-            else
-                ActivateAndSaveRun();
-
-            if (!startAtElevator && _dungeon.ActiveYaku != null)
-            {
-                var yaku = _dungeon.ActiveYaku;
-                _pathUi.ShowModal(
-                    "役",
-                    $"{yaku.displayName}\n{yaku.DescribeEffect()}",
-                    new (string, System.Action)[] { ("進む", ShowMap) });
-                return;
-            }
-
-            ShowMap();
-        }
-
         void GrantFlatYakuCoins()
         {
             var yaku = _dungeon.ActiveYaku;
