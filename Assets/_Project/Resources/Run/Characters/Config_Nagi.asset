@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11aa22bb33cc44dd55ee66ff77889901, type: 3}
+  m_Name: Config_Nagi
+  m_EditorClassIdentifier: TypingRoguelike::TypingRoguelike.Data.CharacterConfig
+  characterId: nagi
+  displayName: ナギ
+  personality: 2
+  tiers:
+  - requiredTrust: 25
+    label: 攻撃+5%（コンボの仮）
+    effects:
+    - kind: 1
+      value: 0.05
+  - requiredTrust: 50
+    label: 戦闘の刻印の選択肢+1
+    effects:
+    - kind: 6
+      value: 1
+  - requiredTrust: 75
+    label: 攻撃+10%（コンボの仮）
+    effects:
+    - kind: 1
+      value: 0.1
+  - requiredTrust: 100
+    label: 敵の次の攻撃までの時間を表示
+    effects:
+    - kind: 7
+      value: 1

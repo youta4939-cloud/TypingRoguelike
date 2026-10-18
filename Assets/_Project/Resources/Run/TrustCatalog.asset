@@ -1,0 +1,135 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11aa22bb33cc44dd55ee66ff77889904, type: 3}
+  m_Name: TrustCatalog
+  m_EditorClassIdentifier: TypingRoguelike::TypingRoguelike.Data.TrustCatalog
+  rules: {fileID: 11400000, guid: 22aa33bb44cc55dd66ee77ff88990011, type: 2}
+  characters:
+  - {fileID: 11400000, guid: 22aa33bb44cc55dd66ee77ff88990012, type: 2}
+  - {fileID: 11400000, guid: 22aa33bb44cc55dd66ee77ff88990013, type: 2}
+  - {fileID: 11400000, guid: 22aa33bb44cc55dd66ee77ff88990014, type: 2}
+  lines: {fileID: 11400000, guid: 22aa33bb44cc55dd66ee77ff88990015, type: 2}
+  events:
+  - tile: 0
+    sceneName: 骨をかじる音
+    sceneText: 通路の先で、何かが骨をかじる音がする。まだこちらに気づいていないが、数は分からない。
+    choiceA:
+      body: 先に仕掛ける
+      stance: 0
+      knowledge: 0
+      effect: 4
+      effectValue: -0.1
+      effect2: 5
+      effectValue2: -2
+    choiceB:
+      body: 様子を見る
+      stance: 1
+      knowledge: 1
+      effect: 5
+      effectValue: 3
+      effect2: 6
+      effectValue2: -0.2
+  - tile: 1
+    sceneName: 湧き水のある小部屋
+    sceneText: 石の割れ目から、澄んだ水が湧いている。奥からはもっと強い水音がするが、暗くて先が見えない。
+    choiceA:
+      body: 水脈を探る
+      stance: 0
+      knowledge: 1
+      effect: 1
+      effectValue: 30
+      effect2: 0
+      effectValue2: 0
+    choiceB:
+      body: ここで休む
+      stance: 1
+      knowledge: 0
+      effect: 3
+      effectValue: 0.1
+      effect2: 0
+      effectValue2: 0
+  - tile: 2
+    sceneName: 亡者の露店
+    sceneText: 布を広げた亡者が、黙って品を並べている。背中の袋にも何か入っているようだが、こちらを見ようとしない。
+    choiceA:
+      body: 袋を見せてもらう
+      stance: 0
+      knowledge: 0
+      effect: 1
+      effectValue: 30
+      effect2: 0
+      effectValue2: 0
+    choiceB:
+      body: 並んだ品を見る
+      stance: 1
+      knowledge: 1
+      effect: 3
+      effectValue: 0.1
+      effect2: 0
+      effectValue2: 0
+  - tile: 3
+    sceneName: 鎖の巻かれた箱
+    sceneText: 床に、鎖で何重にも縛られた箱がある。鎖は、内側から引きちぎられかけている。
+    choiceA:
+      body: 鎖を解く
+      stance: 0
+      knowledge: 0
+      effect: 1
+      effectValue: 30
+      effect2: 0
+      effectValue2: 0
+    choiceB:
+      body: そっとしておく
+      stance: 1
+      knowledge: 1
+      effect: 3
+      effectValue: 0.1
+      effect2: 0
+      effectValue2: 0
+  - tile: 4
+    sceneName: 壁の向こうの声
+    sceneText: 壁の向こうから、誰かが呼んでいる。聞き覚えがある気もするし、ない気もする。
+    choiceA:
+      body: 声をたどる
+      stance: 0
+      knowledge: 0
+      effect: 2
+      effectValue: 1
+      effect2: 0
+      effectValue2: 0
+    choiceB:
+      body: 耳をふさぐ
+      stance: 1
+      knowledge: 1
+      effect: 3
+      effectValue: 0.1
+      effect2: 0
+      effectValue2: 0
+  - tile: 5
+    sceneName: 色の違う石畳
+    sceneText: 足元の石畳が、一枚だけ色が違う。避けて通るには、崩れかけた壁際を伝うしかない。
+    choiceA:
+      body: 駆け抜ける
+      stance: 0
+      knowledge: 1
+      effect: 1
+      effectValue: 30
+      effect2: 0
+      effectValue2: 0
+    choiceB:
+      body: 壁際を伝う
+      stance: 1
+      knowledge: 0
+      effect: 3
+      effectValue: 0.1
+      effect2: 0
+      effectValue2: 0

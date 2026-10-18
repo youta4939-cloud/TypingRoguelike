@@ -64,6 +64,15 @@ namespace TypingRoguelike.Run
         public List<string> previousRunEventIds = new();
         public List<int> towerRunSkipFromNodeIds = new();
         public bool towerRunEventBattlePending;
+        public List<CharacterTrustSave> characterTrust = new();
+        public string opinionLastAbsentId;
+        public int opinionDrawSerial;
+        public int opinionPendingCardChoices;
+        public int opinionResolvedFloor;
+        public int opinionResolvedIndex = -1;
+        public float opinionCombatEnemyHpScale = 1f;
+        public float opinionCombatOpeningSeconds;
+        public float opinionCombatCoinScale = 1f;
 
         public bool IsUnlocked(int skillId) => unlockedSkillIds.Contains(skillId);
     }
@@ -296,6 +305,7 @@ namespace TypingRoguelike.Run
             data.clearedTowerNodeIds ??= new List<int>();
             data.clearedTowerNodeIds.Clear();
             RollTowerSeed(data);
+            TrustRoster.Wipe(data);
             Save(data);
         }
 
@@ -340,6 +350,7 @@ namespace TypingRoguelike.Run
             data.towerRunSkipFromNodeIds ??= new List<int>();
             data.towerRunSkipFromNodeIds.Clear();
             data.towerRunEventBattlePending = false;
+            data.opinionPendingCardChoices = 0;
             Save(data);
         }
 
@@ -394,6 +405,12 @@ namespace TypingRoguelike.Run
             data.previousRunEventIds ??= new List<string>();
             data.towerRunSkipFromNodeIds ??= new List<int>();
             data.towerRunBoardId ??= "";
+            data.characterTrust ??= new List<CharacterTrustSave>();
+            data.opinionLastAbsentId ??= "";
+            if (data.opinionCombatEnemyHpScale <= 0f)
+                data.opinionCombatEnemyHpScale = 1f;
+            if (data.opinionCombatCoinScale <= 0f)
+                data.opinionCombatCoinScale = 1f;
 
             if (data.version < 2)
             {

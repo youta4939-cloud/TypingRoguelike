@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11aa22bb33cc44dd55ee66ff77889901, type: 3}
+  m_Name: Config_Momo
+  m_EditorClassIdentifier: TypingRoguelike::TypingRoguelike.Data.CharacterConfig
+  characterId: momo
+  displayName: モモ
+  personality: 1
+  tiers:
+  - requiredTrust: 25
+    label: 被ダメージ−10%
+    effects:
+    - kind: 3
+      value: 0.1
+  - requiredTrust: 50
+    label: 被ダメージ−10%＋戦闘後HP5%回復
+    effects:
+    - kind: 3
+      value: 0.1
+    - kind: 4
+      value: 0.05
+  - requiredTrust: 75
+    label: 被ダメージ−20%
+    effects:
+    - kind: 3
+      value: 0.2
+  - requiredTrust: 100
+    label: 被ダメージ−20%＋ミスの被弾を1回無効
+    effects:
+    - kind: 3
+      value: 0.2
+    - kind: 5
+      value: 1

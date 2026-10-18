@@ -15,6 +15,12 @@ namespace TypingRoguelike.Battle
         public float JackpotDamageMultiplier;
         /// <summary>戦闘開始後、敵の攻撃カウントを止める秒数。</summary>
         public float OpeningEnemyStopSeconds;
+        /// <summary>最初の攻撃までの時間を足す。負ならその分早くなる。</summary>
+        public float OpeningAttackTimeDeltaSeconds;
+        /// <summary>0 なら 1.0 扱い。信頼度パッシブの被ダメージ軽減。</summary>
+        public float DamageTakenMultiplier;
+        public bool NegateMissHit;
+        public bool ShowEnemyAttackTime;
 
         public static EncounterBattleModifiers None => default;
 

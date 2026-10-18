@@ -51,6 +51,10 @@ namespace TypingRoguelike.Battle
         float _enemyAttackSlowRemaining;
         int _enemyAttackSlowPercent;
         float _enemyStopRemaining;
+        bool _negateMissHit;
+        bool _missHitArmed;
+        bool _negateMissUsed;
+        bool _showEnemyAttackTime;
         bool _isEnraged;
         bool _isGameOver;
         bool _isPaused;
@@ -98,6 +102,10 @@ namespace TypingRoguelike.Battle
             _onDefeat = onDefeat;
             _onInsanity = onInsanity;
             _encounterMods = mods;
+            _negateMissHit = mods.NegateMissHit;
+            _showEnemyAttackTime = mods.ShowEnemyAttackTime;
+            _missHitArmed = false;
+            _negateMissUsed = false;
             _damageReduction = partyStats.DamageReduction;
             _jackpotLuckBonusPerWord = partyStats.JackpotLuckBonusPerWord;
             _outcomeHandled = false;
@@ -291,12 +299,38 @@ namespace TypingRoguelike.Battle
                 _enemyAttackSlowRemaining = 0f;
                 _enemyAttackSlowPercent = 0;
                 _enemyStopRemaining = Mathf.Max(0f, _encounterMods.OpeningEnemyStopSeconds);
+                ApplyOpeningAttackDelta(_encounterMods.OpeningAttackTimeDeltaSeconds);
                 _enragedSpeed = e.enragedAttackSpeed * speedMul;
                 _enrageHpFraction = e.enrageHpFraction;
                 _emojiNormal = e.emojiNormal;
                 _emojiEnraged = e.emojiEnraged;
                 _emojiDefeated = e.emojiDefeated;
             }
+        }
+
+        void ApplyOpeningAttackDelta(float deltaSeconds)
+        {
+            if (Mathf.Approximately(deltaSeconds, 0f))
+                return;
+            if (deltaSeconds > 0f)
+            {
+                _enemyStopRemaining += deltaSeconds;
+                return;
+            }
+
+            var sooner = -deltaSeconds;
+            if (_enemyStopRemaining > 0f)
+            {
+                var used = Mathf.Min(_enemyStopRemaining, sooner);
+                _enemyStopRemaining -= used;
+                sooner -= used;
+            }
+
+            if (sooner <= 0f || _tickInterval <= 0f)
+                return;
+            var speed = Mathf.Max(0.01f, _enemySpeed);
+            var units = sooner * speed / _tickInterval;
+            _enemyTimer = Mathf.Max(speed, _enemyTimer - units);
         }
 
         void Update()
@@ -320,6 +354,7 @@ namespace TypingRoguelike.Battle
             {
                 _enemyStopRemaining -= Time.deltaTime;
                 HoldStoppedAttackBar();
+                RefreshAttackCountdown(_enemyStopRemaining);
                 if (_enemyStopRemaining <= 0f)
                 {
                     _enemyStopRemaining = 0f;
@@ -372,6 +407,8 @@ namespace TypingRoguelike.Battle
                     continue;
 
                 var keyResult = _typing.ProcessKey(c);
+                if (keyResult.Missed)
+                    _missHitArmed = true;
                 PlayTypingSound(keyResult);
                 if (keyResult.Completed.HasValue)
                 {
@@ -534,6 +571,7 @@ namespace TypingRoguelike.Battle
 
                 if (_ui.AttackBarLabel != null)
                     _ui.AttackBarLabel.color = danger ? new Color(1f, 0.32f, 0.28f) : BattleUITheme.TextMuted;
+                RefreshAttackCountdown(0f);
             }
         }
 
@@ -947,16 +985,38 @@ namespace TypingRoguelike.Battle
             rt.anchoredPosition = start;
         }
 
+        void RefreshAttackCountdown(float extraStop)
+        {
+            if (!_showEnemyAttackTime || _ui?.AttackBarLabel == null)
+                return;
+            if (extraStop > 0f)
+            {
+                _ui.AttackBarLabel.text = $"停止 {extraStop:0.0}秒";
+                return;
+            }
+
+            var speed = Mathf.Max(0.01f, _enemySpeed * EnemyAttackSpeedMultiplier());
+            var seconds = Mathf.Max(0f, _enemyTimer / speed * Mathf.Max(0.01f, _tickInterval));
+            _ui.AttackBarLabel.text = $"{seconds:0.0}秒";
+        }
+
         void EnemyAttack()
         {
             if (_outcomeHandled)
                 return;
+            if (_negateMissHit && !_negateMissUsed && _missHitArmed)
+            {
+                _negateMissUsed = true;
+                SetLog("ミスの被弾を無効にした。");
+                return;
+            }
 
             _ui?.BigMouth?.PlayAttack();
             _ui?.EnemyBiteFx?.Play();
             StartCoroutine(BiteImpact());
 
-            var damageTaken = Mathf.Max(1f, _enemyAttackDamage - _damageReduction);
+            var takenMul = _encounterMods.DamageTakenMultiplier > 0f ? _encounterMods.DamageTakenMultiplier : 1f;
+            var damageTaken = Mathf.Max(1f, (_enemyAttackDamage - _damageReduction) * takenMul);
             _playerHp = Mathf.Max(0f, _playerHp - damageTaken);
             RefreshHpBars();
 

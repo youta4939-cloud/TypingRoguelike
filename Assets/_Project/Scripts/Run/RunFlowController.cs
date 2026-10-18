@@ -25,6 +25,8 @@ namespace TypingRoguelike.Run
         LayerConfig _layerConfig;
         BoardCatalog _boards;
         YakuCatalog _yaku;
+        TrustRoster _trust;
+        System.Random _opinionRng;
         int _runSeed;
         int _clearedNodesThisRun;
         MetaProgressData _profile;
@@ -48,6 +50,7 @@ namespace TypingRoguelike.Run
         readonly HashSet<int> _chosenCardIds = new();
         bool _eventStartsBattle;
         bool _eventFromDebug;
+        string _pendingOpinionSummary;
 
         public RunPartyState Party => _party;
         public RunMadnessState Madness => _madness;
@@ -68,6 +71,7 @@ namespace TypingRoguelike.Run
             var partyDef = ResolvePartyDefinition();
             _party.InitializeForNewDungeonRun(partyDef);
             _profile = MetaProgression.Load();
+            _trust = new TrustRoster(TrustCatalog.LoadOrFallback(), _profile);
         }
 
         void Start()
@@ -128,6 +132,8 @@ namespace TypingRoguelike.Run
             _madness.ResetForNewRun(ComputeFullMadnessCap());
 
             _runSeed = _profile.towerSeed;
+            _opinionRng = null;
+            _trust.ResetRunCounters(_profile);
             OpenBoardPreparation(1, startAtElevator: false);
         }
 
@@ -203,7 +209,8 @@ namespace TypingRoguelike.Run
                 LayerSquares.DescribeMinimums(_layerConfig, layer),
                 choices,
                 index => ConfirmBoard(index >= 0 && index < presets.Length ? presets[index] : null, layer, startAtElevator),
-                () => ReelDraw.LogThousandRolls(_boards, _yaku));
+                () => ReelDraw.LogThousandRolls(_boards, _yaku),
+                _trust.Gauges(_profile));
         }
 
         void ConfirmBoard(BoardPreset board, int layer, bool startAtElevator)
@@ -287,7 +294,7 @@ namespace TypingRoguelike.Run
                 return;
 
             _pathUi.Show(transform, _dungeon, _party, _exploration, _madness, OnMapNodeSelected, AbandonRun,
-                OpenRunLoadout, OpenRunRelicManage, OpenRunPartyStats);
+                OpenRunLoadout, OpenRunRelicManage, OpenRunPartyStats, _trust.Gauges(_profile), OpenTrustDebug);
             EventDebugUI.Ensure(transform, BuildEventDebugHooks());
         }
 
@@ -566,6 +573,8 @@ namespace TypingRoguelike.Run
             _madness.ResetForNewRun(ComputeFullMadnessCap());
 
             _runSeed = _profile.towerSeed;
+            _opinionRng = null;
+            _trust.ResetRunCounters(_profile);
             if (LayerSquares.FixedSquare(floor, _layerConfig) != DungeonNodeType.Elevator)
             {
                 Debug.LogWarning($"階 {floor} の4マス目がエレベーターではない。1 層から開始します。");
@@ -716,8 +725,18 @@ namespace TypingRoguelike.Run
             var node = _dungeon.Current;
             if (node == null)
                 return;
-            _pathUi.Hide();
+            if (node.Index < LayerSquares.Count - 1)
+            {
+                BeginOpinion(node);
+                return;
+            }
 
+            EnterSquare(node);
+        }
+
+        void EnterSquare(LayerSquare node)
+        {
+            _pathUi.Hide();
             switch (node.Type)
             {
                 case DungeonNodeType.Combat:
@@ -736,7 +755,7 @@ namespace TypingRoguelike.Run
                     ResolveTreasureNode();
                     break;
                 case DungeonNodeType.Event:
-                    BeginEvent(null, fromDebug: false);
+                    ResolveStoryEventNode();
                     break;
                 case DungeonNodeType.Trap:
                     ResolveTrapNode();
@@ -753,6 +772,136 @@ namespace TypingRoguelike.Run
             }
         }
 
+        void BeginOpinion(LayerSquare node)
+        {
+            if (_profile != null &&
+                _profile.opinionResolvedFloor == _dungeon.Floor &&
+                _profile.opinionResolvedIndex == node.Index)
+            {
+                EnterSquare(node);
+                return;
+            }
+
+            var roll = _trust.Roll(node.Type, _party, _profile, OpinionRng());
+            if (roll == null)
+            {
+                EnterSquare(node);
+                return;
+            }
+
+            if (_profile != null)
+                _profile.opinionDrawSerial++;
+            _pathUi.ShowOpinion(
+                _trust.BuildScreen(roll, _profile, _dungeon.Floor, node.Index, node.Type),
+                index => CommitOpinion(roll, index, node));
+        }
+
+        void CommitOpinion(OpinionRollResult roll, int choiceIndex, LayerSquare node)
+        {
+            var result = _trust.Commit(roll, choiceIndex, _dungeon.Floor, _profile, OpinionRng());
+            _profile.opinionResolvedFloor = _dungeon.Floor;
+            _profile.opinionResolvedIndex = node.Index;
+            ApplyOpinionEffect(result, node.Type);
+            if (_profile.towerRunActive)
+                PersistActiveRun();
+            else
+                MetaProgression.Save(_profile);
+            _pendingOpinionSummary = result != null ? result.Summary : "";
+            EnterSquare(node);
+        }
+
+        void ApplyOpinionEffect(OpinionCommitResult result, DungeonNodeType tile)
+        {
+            if (result == null || _profile == null)
+                return;
+            _profile.opinionCombatEnemyHpScale = 1f;
+            _profile.opinionCombatOpeningSeconds = 0f;
+            _profile.opinionCombatCoinScale = 1f;
+            ApplyImmediateOpinionEffect(result.Effect, result.EffectValue, tile);
+            ApplyImmediateOpinionEffect(result.Effect2, result.EffectValue2, tile);
+        }
+
+        void ApplyImmediateOpinionEffect(OpinionEffectKind kind, float value, DungeonNodeType tile)
+        {
+            switch (kind)
+            {
+                case OpinionEffectKind.Coins:
+                    var coins = Mathf.Max(0, Mathf.RoundToInt(value));
+                    if (coins > 0)
+                        _party.AddCoins(coins);
+                    break;
+                case OpinionEffectKind.HealFraction:
+                    _party.HealFraction(value);
+                    break;
+                case OpinionEffectKind.CardChoices:
+                    _profile.opinionPendingCardChoices += Mathf.Max(1, Mathf.RoundToInt(value));
+                    break;
+                case OpinionEffectKind.EnemyHpFraction when tile == DungeonNodeType.Combat:
+                    _profile.opinionCombatEnemyHpScale *= Mathf.Max(0.05f, 1f + value);
+                    break;
+                case OpinionEffectKind.OpeningAttackSeconds when tile == DungeonNodeType.Combat:
+                    _profile.opinionCombatOpeningSeconds += value;
+                    break;
+                case OpinionEffectKind.BattleCoinFraction when tile == DungeonNodeType.Combat:
+                    _profile.opinionCombatCoinScale *= Mathf.Max(0f, 1f + value);
+                    break;
+            }
+        }
+
+        string TakeOpinionSummary()
+        {
+            var text = _pendingOpinionSummary;
+            _pendingOpinionSummary = null;
+            return string.IsNullOrWhiteSpace(text) ? "" : text.Trim();
+        }
+
+        void ResolveStoryEventNode()
+        {
+            var note = TakeOpinionSummary();
+            MarkCurrentCleared();
+            ShowMap();
+            _pathUi.ShowModal(
+                "出来事",
+                string.IsNullOrEmpty(note) ? "先へ進んだ。" : note,
+                new (string, Action)[] { ("マップに戻る", null) });
+            _pathUi.Refresh(_dungeon, _party, _exploration, _madness);
+        }
+
+        void OpenTrustDebug()
+        {
+            _pathUi.ShowTrustDebug(_trust.Gauges(_profile), (id, value) =>
+            {
+                var notice = _trust.SetTrust(id, value, _profile);
+                MetaProgression.Save(_profile);
+                if (!string.IsNullOrEmpty(notice))
+                {
+                    _pathUi.ShowModal("パッシブ", notice, new (string, Action)[] { ("戻る", ShowMap) });
+                    return;
+                }
+
+                ShowMap();
+            });
+        }
+
+        void ApplyTrustPostBattleHeal()
+        {
+            var heal = _trust.CollectBattle(_profile).PostBattleHealFraction;
+            if (heal <= 0f)
+                return;
+            _party.HealFraction(heal);
+        }
+
+        System.Random OpinionRng()
+        {
+            if (_opinionRng == null)
+            {
+                var serial = _profile != null ? _profile.opinionDrawSerial : 0;
+                _opinionRng = new System.Random(unchecked(_runSeed * 397 ^ (serial + 1) * 7919));
+            }
+
+            return _opinionRng;
+        }
+
         void ResolveTrapNode()
         {
             var fraction = _layerConfig != null ? _layerConfig.trapHpLossFraction : 0.1f;
@@ -765,7 +914,11 @@ namespace TypingRoguelike.Run
                 return;
             }
 
-            CompleteNodeAndReturnToMap("罠", $"罠が作動した。HP が {loss} 減った。\n{FormatHpLine()}");
+            var note = TakeOpinionSummary();
+            var body = $"罠が作動した。HP が {loss} 減った。\n{FormatHpLine()}";
+            if (!string.IsNullOrEmpty(note))
+                body = note + "\n\n" + body;
+            CompleteNodeAndReturnToMap("罠", body);
         }
 
         void ResolveEmptyEventNode()
@@ -828,9 +981,13 @@ namespace TypingRoguelike.Run
 
             MarkCurrentCleared();
             ShowMapTabHint();
+            var note = TakeOpinionSummary();
+            var restBody = $"焚き火で休んだ。HP が最大の {(int)(frac * 100)}% 回復した。{madnessLine}\n{FormatHpLine()}";
+            if (!string.IsNullOrEmpty(note))
+                restBody = note + "\n\n" + restBody;
             _pathUi.ShowModal(
                 "休息",
-                $"焚き火で休んだ。HP が最大の {(int)(frac * 100)}% 回復した。{madnessLine}\n{FormatHpLine()}",
+                restBody,
                 new (string, Action)[] { ("マップに戻る", ShowRouteMap) });
             _pathUi.Refresh(_dungeon, _party, _exploration, _madness);
         }
@@ -858,7 +1015,9 @@ namespace TypingRoguelike.Run
         {
             _awaitingTreasureModal = false;
             ShowMap();
+            var note = TakeOpinionSummary();
             var lootLines =
+                (string.IsNullOrEmpty(note) ? "" : note + "\n\n") +
                 $"塔片 +{_pendingTreasureCoins}\n{_pendingTreasureMaterialLog}{_pendingTreasureRelicLine}\n{FormatCoinLine()}";
 
             if (!_pendingTreasureOffersCard)
@@ -923,7 +1082,9 @@ namespace TypingRoguelike.Run
             var healPct = (int)((dungeonRun != null ? dungeonRun.merchantHealFraction : 0.12f) * 100f);
             var nodeId = _dungeon.Floor * 10 + (_dungeon.Current?.Id ?? 0);
             var relic = MerchantOffersRelic(nodeId) ? PickOfferedRelic(nodeId, 17) : null;
+            var note = TakeOpinionSummary();
             var body =
+                (string.IsNullOrEmpty(note) ? "" : note + "\n\n") +
                 $"旅の商人が荷を広げている。\n{FormatCoinLine()}\n装備 {CountEquippedRelics()} / 3\n\n" +
                 $"・体力回復（最大HPの{healPct}%）… {healCost} 塔片";
             if (relic != null)
@@ -1195,6 +1356,7 @@ namespace TypingRoguelike.Run
             _madness.ClearDeviceCapPenalty();
             SyncMadnessCapFromRelics();
             // TODO 未決事項5: 素材は倉庫へ移さず、探索の所持のまま保存する。
+            _trust.LogEnd("帰還", _profile);
             MetaProgression.BankRunCoins(_profile, _party);
             _party.ClearRunCoins();
             MetaProgression.SaveActiveTowerRun(
@@ -1316,7 +1478,9 @@ namespace TypingRoguelike.Run
             _pathUi.Hide();
             SyncMadnessCapFromRelics();
             ApplyRelicBattleModifiers(ref mods);
+            ApplyTrustBattleModifiers(ref mods);
             ApplyFloorStrengthBand(ref mods);
+            ApplyOpinionCombatModifiers(ref mods, node);
             DestroyBattleIfAny();
             var root = new GameObject("BattleRoot");
             root.transform.SetParent(transform, false);
@@ -1352,6 +1516,19 @@ namespace TypingRoguelike.Run
             mods.OpeningEnemyStopSeconds = relic.OpeningEnemyStopSeconds;
         }
 
+        void ApplyTrustBattleModifiers(ref EncounterBattleModifiers mods)
+        {
+            var bonus = _trust.CollectBattle(_profile);
+            var relicMul = mods.PlayerDamageMultiplier > 0f ? mods.PlayerDamageMultiplier : 1f;
+            mods.PlayerDamageMultiplier = relicMul * (1f + bonus.AttackBonus);
+            if (bonus.DamageTakenReduction > 0f)
+                mods.DamageTakenMultiplier = 1f - bonus.DamageTakenReduction;
+            if (bonus.OpeningFreezeSeconds > 0f)
+                mods.OpeningEnemyStopSeconds += bonus.OpeningFreezeSeconds;
+            mods.NegateMissHit = bonus.NegateMissHit;
+            mods.ShowEnemyAttackTime = bonus.ShowEnemyAttackTime;
+        }
+
         /// <summary>5層ごとに敵HP・攻撃を一段上げる。1–5層は基準、6–10層、11–15層。</summary>
         void ApplyFloorStrengthBand(ref EncounterBattleModifiers mods)
         {
@@ -1362,6 +1539,29 @@ namespace TypingRoguelike.Run
 
             mods.EnemyHpMultiplier *= 1f + band * 0.45f;
             mods.EnemyDamageMultiplier *= 1f + band * 0.3f;
+        }
+
+        void ApplyOpinionCombatModifiers(ref EncounterBattleModifiers mods, LayerSquare node)
+        {
+            if (node == null || node.Type != DungeonNodeType.Combat || _profile == null)
+                return;
+            var hpScale = _profile.opinionCombatEnemyHpScale <= 0f ? 1f : _profile.opinionCombatEnemyHpScale;
+            if (!Mathf.Approximately(hpScale, 1f))
+                mods.EnemyHpMultiplier *= hpScale;
+            mods.OpeningAttackTimeDeltaSeconds += _profile.opinionCombatOpeningSeconds;
+            var note = TakeOpinionSummary();
+            if (string.IsNullOrEmpty(note))
+                return;
+            mods.StartLogMessage = mods.HasLogOverride ? mods.StartLogMessage + "\n" + note : note;
+        }
+
+        void ClearOpinionCombatMods()
+        {
+            if (_profile == null)
+                return;
+            _profile.opinionCombatEnemyHpScale = 1f;
+            _profile.opinionCombatOpeningSeconds = 0f;
+            _profile.opinionCombatCoinScale = 1f;
         }
 
         EncounterBattleModifiers BuildCombatMods() => new()
@@ -1410,8 +1610,10 @@ namespace TypingRoguelike.Run
             }
 
             _battle?.SetRunMenuOpen(true);
+            ApplyTrustPostBattleHeal();
             if (IsTowerBossVictory())
             {
+                ClearOpinionCombatMods();
                 MarkCurrentCleared();
                 StartCoroutine(BossVictoryRoutine());
                 return;
@@ -1419,6 +1621,7 @@ namespace TypingRoguelike.Run
 
             var coins = GrantCoinsForCurrentBattle();
             _party.AddCoins(coins);
+            ClearOpinionCombatMods();
             StartCoroutine(CombatVictoryRoutine(coins));
         }
 
@@ -1448,7 +1651,11 @@ namespace TypingRoguelike.Run
                 var reward = dungeonRun != null
                     ? elite ? dungeonRun.eliteCoinReward : dungeonRun.combatCoinReward
                     : elite ? 15 : 8;
-                return _dungeon.ScaleCoinGain(reward);
+                reward = _dungeon.ScaleCoinGain(reward);
+                if (!elite && _profile != null && _profile.opinionCombatCoinScale > 0f &&
+                    !Mathf.Approximately(_profile.opinionCombatCoinScale, 1f))
+                    reward = Mathf.Max(0, Mathf.RoundToInt(reward * _profile.opinionCombatCoinScale));
+                return reward;
             }
 
             return _dungeon.ScaleCoinGain(dungeonRun != null ? dungeonRun.combatCoinReward : 8);
@@ -1493,6 +1700,9 @@ namespace TypingRoguelike.Run
             _profile.revealedTowerNodeIds.Clear();
             _profile.clearedTowerNodeIds ??= new List<int>();
             _profile.clearedTowerNodeIds.Clear();
+            _trust.LogEnd("クリア", _profile);
+            _trust.ResetRunCounters(_profile);
+            _opinionRng = null;
             MetaProgression.RollTowerSeed(_profile);
             MetaProgression.Save(_profile);
             RecordRunResult(true);
@@ -1539,6 +1749,8 @@ namespace TypingRoguelike.Run
             _party.ResetAcquiredSkillCards();
             _party.ClearRunCoins();
             _madness.ResetForNewRun(ComputeFullMadnessCap());
+            _trust.LogEnd("全滅", _profile);
+            _opinionRng = null;
             MetaProgression.ApplyDeathReset(_profile);
             RecordRunResult(false);
         }
@@ -1586,6 +1798,13 @@ namespace TypingRoguelike.Run
                 _dungeon.ActiveYaku != null &&
                 _dungeon.ActiveYaku.bonus == YakuBonusKind.CombatCardChoices)
                 count += Mathf.Max(1, Mathf.RoundToInt(_dungeon.ActiveYaku.bonusValue));
+            if (_dungeon.Current?.Type == DungeonNodeType.Combat)
+                count += _trust.CollectBattle(_profile).CombatCardChoices;
+            if (_profile.opinionPendingCardChoices > 0)
+            {
+                count += _profile.opinionPendingCardChoices;
+                _profile.opinionPendingCardChoices = 0;
+            }
 
             var partyNames = _party.Members
                 .Select(m => m.character?.characterName)

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af512d47e90b723dd4f618ea324b5967, type: 3}
   m_Name: Yaku_Trap
   m_EditorClassIdentifier: TypingRoguelike::TypingRoguelike.Data.YakuDefinition
-  displayName: 役なし
+  displayName: 罠で不成立
   pattern: 3
   matchType: 5
   matchCount: 1

@@ -20,7 +20,7 @@ namespace TypingRoguelike.Data
             var catalog = CreateInstance<YakuCatalog>();
             catalog.yaku = new[]
             {
-                Make("役なし", YakuPattern.AnyTrap, DungeonNodeType.Trap, 1, YakuBonusKind.None, 0f),
+                Make("罠で不成立", YakuPattern.AnyTrap, DungeonNodeType.Trap, 1, YakuBonusKind.None, 0f),
                 Make("戦闘×3", YakuPattern.AllSame, DungeonNodeType.Combat, 3, YakuBonusKind.CombatCardChoices, 1f),
                 Make("回復×3", YakuPattern.AllSame, DungeonNodeType.Rest, 3, YakuBonusKind.HealBeforeFourth, 0.2f),
                 Make("宝×3", YakuPattern.AllSame, DungeonNodeType.Treasure, 3, YakuBonusKind.CoinGainPercent, 0.5f),

@@ -1,0 +1,75 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11aa22bb33cc44dd55ee66ff77889903, type: 3}
+  m_Name: OpinionLines
+  m_EditorClassIdentifier: TypingRoguelike::TypingRoguelike.Data.OpinionLineTable
+  lines:
+  - characterId: akane
+    scene: 0
+    line: ここは押す。止まると負ける。
+    expression: akane_aggressive
+  - characterId: akane
+    scene: 1
+    line: 今は下がる。次で取り返す。
+    expression: akane_defensive
+  - characterId: akane
+    scene: 2
+    line: 意見が揃った。このまま行く。
+    expression: akane_agree
+  - characterId: akane
+    scene: 3
+    line: 任せてくれたな。
+    expression: akane_followed
+  - characterId: akane
+    scene: 4
+    line: わかった。ついていく。
+    expression: akane_ignored
+  - characterId: momo
+    scene: 0
+    line: こわいけど、行くなら一緒に。
+    expression: momo_aggressive
+  - characterId: momo
+    scene: 1
+    line: 危ないよ。休もう。
+    expression: momo_defensive
+  - characterId: momo
+    scene: 2
+    line: 同じ考えでよかった。
+    expression: momo_agree
+  - characterId: momo
+    scene: 3
+    line: 信じてくれて、うれしい。
+    expression: momo_followed
+  - characterId: momo
+    scene: 4
+    line: うん、気をつけて。
+    expression: momo_ignored
+  - characterId: nagi
+    scene: 0
+    line: まだ見たことない。先を見よう。
+    expression: nagi_aggressive
+  - characterId: nagi
+    scene: 1
+    line: 知ってる道の方が安全だ。
+    expression: nagi_defensive
+  - characterId: nagi
+    scene: 2
+    line: ふたりとも同じだね。
+    expression: nagi_agree
+  - characterId: nagi
+    scene: 3
+    line: その選択、記録しておく。
+    expression: nagi_followed
+  - characterId: nagi
+    scene: 4
+    line: へえ、そっちなんだ。
+    expression: nagi_ignored
