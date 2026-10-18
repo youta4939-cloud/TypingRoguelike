@@ -16,8 +16,5 @@ namespace TypingRoguelike.Data
         public int attack = 5;
         public int defense = 4;
         public int luck = 3;
-
-        [Header("探索パッシブ（編成内で同種は1人のみ有効）")]
-        public ExplorationPassiveKind explorationPassive = ExplorationPassiveKind.None;
     }
 }

@@ -19,12 +19,11 @@ namespace TypingRoguelike.Run
         readonly RunMadnessState _madness = new();
         readonly DungeonRunState _dungeon = new();
         readonly RunOverlayUI _overlay = new();
-        readonly DungeonMapUI _mapUi = new();
+        readonly LayerPathUI _pathUi = new();
 
         BattleController _battle;
-        DungeonMapGenerator.Result _mapData;
+        LayerConfig _layerConfig;
         int _runSeed;
-        int _elevatorFloor;
         int _clearedNodesThisRun;
         MetaProgressData _profile;
         bool _runResultRecorded;
@@ -47,7 +46,6 @@ namespace TypingRoguelike.Run
         readonly HashSet<int> _chosenCardIds = new();
         bool _eventStartsBattle;
         bool _eventFromDebug;
-        bool _debugRevealMap;
 
         public RunPartyState Party => _party;
         public RunMadnessState Madness => _madness;
@@ -57,6 +55,7 @@ namespace TypingRoguelike.Run
             Debug.Log("[TypingRoguelike] RunFlowController Awake");
             if (dungeonRun == null)
                 dungeonRun = Resources.Load<DungeonRunDefinition>("Battle/PrototypeDungeonRun");
+            _layerConfig = LayerConfig.LoadOrFallback();
 
             if (fallbackEncounter == null)
                 fallbackEncounter = Resources.Load<BattleEncounterDefinition>("Battle/PrototypeCombatEncounter")
@@ -104,7 +103,7 @@ namespace TypingRoguelike.Run
         void BeginNewRun()
         {
             _overlay.HideAll();
-            _mapUi.Hide();
+            _pathUi.Hide();
             DestroyBattleIfAny();
             _runResultRecorded = false;
             _clearedNodesThisRun = 0;
@@ -125,77 +124,111 @@ namespace TypingRoguelike.Run
             _madness.ResetForNewRun(ComputeFullMadnessCap());
 
             _runSeed = _profile.towerSeed;
-            _elevatorFloor = 1 + PositiveModulo(_runSeed, TotalFloors);
-            _debugRevealMap = false;
             GenerateFirstFloor();
             ActivateAndSaveRun();
             ShowMap();
         }
 
-        int TotalFloors => Mathf.Clamp(dungeonRun != null ? dungeonRun.towerFloors : 15, 1, 99);
+        int TotalFloors => Mathf.Clamp(_layerConfig != null ? _layerConfig.totalLayers : 15, 1, 99);
 
-        void GenerateFirstFloor()
-        {
-            var floorSeed = SeedForFloor(1);
-            _mapData = DungeonMapGenerator.Generate(
-                dungeonRun, floorSeed, NodeIdBaseForFloor(1), _elevatorFloor == 1);
-            _dungeon.BeginTower(
-                _mapData, floorSeed, TotalFloors, _profile.revealedTowerNodeIds, _profile.clearedTowerNodeIds);
-        }
+        void GenerateFirstFloor() => LoadLayer(1, restoreIndex: 0, startAtElevator: false);
 
-        void LoadFloorMap(int floor, int? restoreNodeId, bool forceElevatorOnFloor = false)
+        void LoadLayer(int floor, int restoreIndex, bool startAtElevator)
         {
-            var floorSeed = SeedForFloor(floor);
-            var placeElevator = forceElevatorOnFloor || _elevatorFloor == floor;
-            _mapData = DungeonMapGenerator.Generate(
-                dungeonRun, floorSeed, NodeIdBaseForFloor(floor), placeElevator);
-            _dungeon.SetFloorAndMap(
+            var index = restoreIndex;
+            if (index < 0 || index >= LayerSquares.Count)
+            {
+                Debug.LogWarning($"保存していたマス {restoreIndex} は一本道にない。この層の先頭から始める。");
+                index = 0;
+            }
+
+            _dungeon.SetFloor(
                 floor,
                 TotalFloors,
-                _mapData,
-                floorSeed,
-                _profile.revealedTowerNodeIds,
-                _profile.clearedTowerNodeIds);
+                _runSeed,
+                _layerConfig,
+                index,
+                _profile.clearedTowerNodeIds,
+                startAtElevator);
+            RememberClearedSquares();
+        }
 
-            if (restoreNodeId.HasValue && !_dungeon.TryRestoreCurrentNode(restoreNodeId.Value))
-                Debug.LogWarning($"保存ノード {restoreNodeId} を復元できませんでした。入口に戻します。");
-            ReapplyRowSkips();
+        void RememberClearedSquares()
+        {
+            if (_profile == null)
+                return;
+            _profile.clearedTowerNodeIds ??= new List<int>();
+            _profile.clearedTowerNodeIds.Clear();
+            if (_dungeon.Squares == null)
+                return;
+            foreach (var square in _dungeon.Squares)
+            {
+                if (square.Cleared)
+                    _profile.clearedTowerNodeIds.Add(square.Index);
+            }
         }
 
         void ShowMap()
         {
-            _mapUi.ReleasePause();
+            _pathUi.ReleasePause();
             if (TryBeginRunDeath(fromBattle: false))
                 return;
 
-            ExplorationPartyPassives.ApplyMapHints(_party, _dungeon);
-            RevealReachableMapNodes();
             SyncMadnessCapFromRelics();
-            var revealAll = RelicRunModifiers.Compute(_exploration, ResolveRelicCatalog()).RevealsAllNodes;
-            _mapUi.Show(transform, _dungeon, _party, _exploration, _madness, OnMapNodeSelected, AbandonRun,
-                OpenRunLoadout, OpenRunRelicManage, OpenRunPartyStats, revealAll, _debugRevealMap);
+            if (TryPresentLayerExit())
+                return;
+
+            _pathUi.Show(transform, _dungeon, _party, _exploration, _madness, OnMapNodeSelected, AbandonRun,
+                OpenRunLoadout, OpenRunRelicManage, OpenRunPartyStats);
             EventDebugUI.Ensure(transform, BuildEventDebugHooks());
         }
 
-        void RevealReachableMapNodes()
+        bool TryPresentLayerExit()
         {
-            foreach (var node in _dungeon.GetReachableNext())
+            if (!_dungeon.LayerComplete)
+                return false;
+
+            var last = _dungeon.Squares[LayerSquares.Count - 1];
+            if (last.Type == DungeonNodeType.Elevator)
             {
-                node.Revealed = true;
-                MetaProgression.RevealTowerNode(_profile, node.Id);
+                ShowElevatorChoice();
+                return true;
             }
+
+            if (last.Type == DungeonNodeType.Boss && _dungeon.Floor >= TotalFloors)
+            {
+                CompleteTowerRun();
+                return true;
+            }
+
+            ShowPreparation();
+            return true;
+        }
+
+        void ShowPreparation()
+        {
+            if (_dungeon.Floor >= TotalFloors)
+            {
+                CompleteTowerRun();
+                return;
+            }
+
+            var next = _dungeon.Floor + 1;
+            _pathUi.ShowPreparation(transform, _dungeon.Floor, next, TotalFloors, () =>
+            {
+                _profile.clearedTowerNodeIds?.Clear();
+                LoadLayer(next, restoreIndex: 0, startAtElevator: false);
+                PersistActiveRun();
+                ShowMap();
+            });
         }
 
         void ShowSideMap()
         {
-            var revealAll = RelicRunModifiers.Compute(_exploration, ResolveRelicCatalog()).RevealsAllNodes || _debugRevealMap;
-            _mapUi.ShowMinimap(transform, _dungeon, revealAll);
         }
 
         void ShowMapTabHint()
         {
-            var revealAll = RelicRunModifiers.Compute(_exploration, ResolveRelicCatalog()).RevealsAllNodes || _debugRevealMap;
-            _mapUi.ShowMapTabHint(transform, _dungeon, revealAll);
         }
 
         void ShowRouteMap()
@@ -211,7 +244,7 @@ namespace TypingRoguelike.Run
                 TryBeginRunInsanity(fromBattle: false);
             else
             {
-                _mapUi.Refresh(_dungeon, _party, _exploration, _madness);
+                _pathUi.Refresh(_dungeon, _party, _exploration, _madness);
                 PersistActiveRun();
             }
 
@@ -264,10 +297,6 @@ namespace TypingRoguelike.Run
 
             _madness.SetAccumulatedJackpotChance(_battle.ExportJackpotAccumulatedChance());
         }
-
-        int SeedForFloor(int floor) => unchecked(_runSeed + floor * 7919);
-        static int NodeIdBaseForFloor(int floor) => floor * 1000;
-        static int PositiveModulo(int value, int divisor) => (value & int.MaxValue) % divisor;
 
         void OpenRunLoadout()
         {
@@ -376,7 +405,7 @@ namespace TypingRoguelike.Run
 
         void ShowHub()
         {
-            _mapUi.Hide();
+            _pathUi.Hide();
             DestroyBattleIfAny();
             // TODO 未決事項6: 「中断した探索へ戻る（N階）」を残すかは未決。残したまま、1階と解放済みエレベーター階も同じ探索の再開にする。
             var resumeLabel = _profile.towerRunActive
@@ -413,7 +442,7 @@ namespace TypingRoguelike.Run
             }
 
             _overlay.HideAll();
-            _mapUi.Hide();
+            _pathUi.Hide();
             DestroyBattleIfAny();
             _runResultRecorded = false;
             _clearedNodesThisRun = 0;
@@ -434,33 +463,16 @@ namespace TypingRoguelike.Run
             _madness.ResetForNewRun(ComputeFullMadnessCap());
 
             _runSeed = _profile.towerSeed;
-            _elevatorFloor = 1 + PositiveModulo(_runSeed, TotalFloors);
-            _debugRevealMap = false;
-            LoadFloorMap(floor, restoreNodeId: null, forceElevatorOnFloor: true);
-
-            var elevatorId = FindElevatorNodeIdOnCurrentMap();
-            if (!elevatorId.HasValue || !_dungeon.TrySpawnAtElevator(elevatorId.Value))
+            LoadLayer(floor, restoreIndex: 0, startAtElevator: true);
+            if (_dungeon.Squares == null || _dungeon.Squares.Length == 0 ||
+                _dungeon.Squares[LayerSquares.Count - 1].Type != DungeonNodeType.Elevator)
             {
-                Debug.LogWarning($"階 {floor} にエレベーターが見つからない。1 階相当で開始します。");
+                Debug.LogWarning($"階 {floor} の4マス目がエレベーターではない。1 層から開始します。");
                 GenerateFirstFloor();
             }
 
             ActivateAndSaveRun();
             ShowMap();
-        }
-
-        int? FindElevatorNodeIdOnCurrentMap()
-        {
-            if (_mapData?.Nodes == null)
-                return null;
-
-            foreach (var node in _mapData.Nodes)
-            {
-                if (node.Type == DungeonNodeType.Elevator)
-                    return node.Id;
-            }
-
-            return null;
         }
 
         void ResumeActiveTowerRun()
@@ -474,7 +486,7 @@ namespace TypingRoguelike.Run
             RestoreActiveRunState();
             if (TryStartPendingEventBattle())
                 return;
-            LoadFloorMap(_profile.towerRunFloor, _profile.towerRunNodeId);
+            LoadLayer(_profile.towerRunFloor, _profile.towerRunNodeId, startAtElevator: false);
             ShowMap();
         }
 
@@ -493,13 +505,12 @@ namespace TypingRoguelike.Run
         void RestoreActiveRunState()
         {
             _overlay.HideAll();
-            _mapUi.Hide();
+            _pathUi.Hide();
             DestroyBattleIfAny();
             _runResultRecorded = false;
             _clearedNodesThisRun = _profile.towerRunClearedNodes;
 
             _runSeed = _profile.towerRunSeed != 0 ? _profile.towerRunSeed : _profile.towerSeed;
-            _elevatorFloor = 1 + PositiveModulo(_runSeed, TotalFloors);
 
             var partyDef = ResolvePartyDefinition();
             _party.InitializeForNewDungeonRun(partyDef);
@@ -528,16 +539,16 @@ namespace TypingRoguelike.Run
                 return;
             if (fromElevator)
             {
-                LoadFloorMap(floor, restoreNodeId: null, forceElevatorOnFloor: true);
-                var elevatorId = FindElevatorNodeIdOnCurrentMap();
-                if (!elevatorId.HasValue || !_dungeon.TryRestoreCurrentNode(elevatorId.Value))
+                LoadLayer(floor, restoreIndex: 0, startAtElevator: true);
+                if (_dungeon.Squares == null || _dungeon.Squares.Length == 0 ||
+                    _dungeon.Squares[LayerSquares.Count - 1].Type != DungeonNodeType.Elevator)
                 {
-                    Debug.LogWarning($"階 {floor} にエレベーターが見つからない。1 階相当で開始します。");
+                    Debug.LogWarning($"階 {floor} の4マス目がエレベーターではない。1 層から開始します。");
                     GenerateFirstFloor();
                 }
             }
             else
-                LoadFloorMap(floor, restoreNodeId: null);
+                LoadLayer(floor, restoreIndex: 0, startAtElevator: false);
 
             MetaProgression.SaveActiveTowerRun(
                 _profile,
@@ -559,7 +570,7 @@ namespace TypingRoguelike.Run
 
         void AbandonRun()
         {
-            _mapUi.ShowModal(
+            _pathUi.ShowModal(
                 "探索を放棄しますか？",
                 "放棄すると全滅と同じ扱いになる（刻印・レリック・塔片を失う）。\n拠点へ戻るならエレベーターを使う。",
                 new (string, Action)[]
@@ -572,7 +583,7 @@ namespace TypingRoguelike.Run
         void ConfirmAbandonRun()
         {
             ApplyWipe();
-            _mapUi.Hide();
+            _pathUi.Hide();
             ShowHub();
         }
 
@@ -585,23 +596,14 @@ namespace TypingRoguelike.Run
             var node = _dungeon.Current;
             if (node == null)
                 return;
-            MetaProgression.RevealTowerNode(_profile, node.Id);
-
-            _mapUi.Hide();
+            _pathUi.Hide();
 
             switch (node.Type)
             {
-                case DungeonNodeType.Normal:
-                    ResolveNormalNode();
-                    break;
-                case DungeonNodeType.Danger:
-                    node.Type = DungeonNodeType.EventV2;
-                    BeginEvent(null, fromDebug: false);
-                    break;
                 case DungeonNodeType.Combat:
                     StartGuaranteedCombat(node);
                     break;
-                case DungeonNodeType.Elite:
+                case DungeonNodeType.MidBoss:
                     StartLegacyBattleNode(node, forceElite: true);
                     break;
                 case DungeonNodeType.Boss:
@@ -614,15 +616,10 @@ namespace TypingRoguelike.Run
                     ResolveTreasureNode();
                     break;
                 case DungeonNodeType.Event:
-                    ResolveEventNode();
-                    break;
-                case DungeonNodeType.EventV2:
-                    Debug.Log($"EventV2 に入った。node={node.Id} layer={node.Layer}");
                     BeginEvent(null, fromDebug: false);
                     break;
-                case DungeonNodeType.Mystery:
-                    node.Type = DungeonNodeType.EventV2;
-                    BeginEvent(null, fromDebug: false);
+                case DungeonNodeType.Trap:
+                    ResolveTrapNode();
                     break;
                 case DungeonNodeType.Merchant:
                     ResolveMerchantNode();
@@ -636,6 +633,21 @@ namespace TypingRoguelike.Run
             }
         }
 
+        void ResolveTrapNode()
+        {
+            var fraction = _layerConfig != null ? _layerConfig.trapHpLossFraction : 0.1f;
+            var loss = Mathf.Max(1, Mathf.RoundToInt(_party.MaxHp * Mathf.Clamp01(fraction)));
+            _party.ApplyHpDelta(-loss);
+            PersistActiveRun();
+            if (_party.IsRunDead)
+            {
+                TryBeginRunDeath(fromBattle: false);
+                return;
+            }
+
+            CompleteNodeAndReturnToMap("罠", $"罠が作動した。HP が {loss} 減った。\n{FormatHpLine()}");
+        }
+
         void ResolveEmptyEventNode()
         {
             MarkCurrentCleared();
@@ -643,11 +655,11 @@ namespace TypingRoguelike.Run
             var reason = EventDatabase.All.Count == 0
                 ? "出来事の定義が1件も読み込めていない。"
                 : "条件を満たす出来事が無かった。";
-            _mapUi.ShowModal(
+            _pathUi.ShowModal(
                 "イベント",
                 reason,
                 new (string, Action)[] { ("マップに戻る", null) });
-            _mapUi.Refresh(_dungeon, _party, _exploration, _madness);
+            _pathUi.Refresh(_dungeon, _party, _exploration, _madness);
         }
 
         void ResolveNormalNode()
@@ -656,23 +668,23 @@ namespace TypingRoguelike.Run
             Debug.Log($"ResolveNormalNode type={current?.Type} id={current?.Id}");
             MarkCurrentCleared();
             ShowMap();
-            _mapUi.ShowModal(
+            _pathUi.ShowModal(
                 "探索",
                 "静かな通路を進んだ。",
                 new (string, Action)[] { ("マップに戻る", null) });
-            _mapUi.Refresh(_dungeon, _party, _exploration, _madness);
+            _pathUi.Refresh(_dungeon, _party, _exploration, _madness);
         }
 
         /// <summary>戦闘マスは踏んだら必ず戦闘。</summary>
-        void StartGuaranteedCombat(DungeonMapNode node)
+        void StartGuaranteedCombat(LayerSquare node)
         {
             StartLegacyBattleNode(node, forceElite: false);
         }
 
         /// <summary>v1.2 以前の強敵マス互換。戦闘マスもここから入る。</summary>
-        void StartLegacyBattleNode(DungeonMapNode node, bool forceElite)
+        void StartLegacyBattleNode(LayerSquare node, bool forceElite)
         {
-            _mapUi.Hide();
+            _pathUi.Hide();
             StartBattleForNode(
                 node,
                 forceElite ? ResolveEliteEncounter() : ResolveCombatEncounter(),
@@ -696,11 +708,11 @@ namespace TypingRoguelike.Run
 
             MarkCurrentCleared();
             ShowMapTabHint();
-            _mapUi.ShowModal(
+            _pathUi.ShowModal(
                 "休息",
                 $"焚き火で休んだ。HP が最大の {(int)(frac * 100)}% 回復した。{madnessLine}\n{FormatHpLine()}",
                 new (string, Action)[] { ("マップに戻る", ShowRouteMap) });
-            _mapUi.Refresh(_dungeon, _party, _exploration, _madness);
+            _pathUi.Refresh(_dungeon, _party, _exploration, _madness);
         }
 
         void ResolveTreasureNode()
@@ -732,15 +744,15 @@ namespace TypingRoguelike.Run
             if (!_pendingTreasureOffersCard)
             {
                 MarkCurrentCleared();
-                _mapUi.ShowModal(
+                _pathUi.ShowModal(
                     "宝箱",
                     $"古い財貨を見つけた。\n{lootLines}{_pendingTreasureRelicMsg}",
                     new (string, Action)[] { ("マップに戻る", null) });
-                _mapUi.Refresh(_dungeon, _party, _exploration, _madness);
+                _pathUi.Refresh(_dungeon, _party, _exploration, _madness);
                 return;
             }
 
-            _mapUi.ShowModal(
+            _pathUi.ShowModal(
                 "宝箱",
                 $"古い財貨と刻印の残片を見つけた。\n{lootLines}{_pendingTreasureRelicMsg}\n\n刻印を1枚選べる。",
                 new (string, Action)[]
@@ -748,7 +760,7 @@ namespace TypingRoguelike.Run
                     ("刻印を選ぶ", () => OfferCardReward()),
                     ("塔片だけ持ち帰る", CompleteNodeAndReturnToMap)
                 });
-            _mapUi.Refresh(_dungeon, _party, _exploration, _madness);
+            _pathUi.Refresh(_dungeon, _party, _exploration, _madness);
         }
 
         string TryRollTreasureRelic(out string modalExtra)
@@ -759,7 +771,7 @@ namespace TypingRoguelike.Run
 
         void ResolveEventNode()
         {
-            var nodeId = _dungeon.Current?.Id ?? 0;
+            var nodeId = _dungeon.Floor * 10 + (_dungeon.Current?.Id ?? 0);
             var relic = PickOfferedRelic(nodeId, 901);
             if (relic == null)
             {
@@ -768,7 +780,7 @@ namespace TypingRoguelike.Run
             }
 
             ShowMap();
-            _mapUi.ShowModal(
+            _pathUi.ShowModal(
                 "出来事",
                 $"床に古い遺物が落ちている。\n\n「{relic.displayName}」\n{relic.effectText}\n\n装備 {CountEquippedRelics()} / 3",
                 new (string, Action)[]
@@ -789,7 +801,7 @@ namespace TypingRoguelike.Run
             var healCost = dungeonRun != null ? dungeonRun.merchantHealCost : 10;
             var relicCost = dungeonRun != null ? dungeonRun.merchantRelicCost : 60;
             var healPct = (int)((dungeonRun != null ? dungeonRun.merchantHealFraction : 0.12f) * 100f);
-            var nodeId = _dungeon.Current?.Id ?? 0;
+            var nodeId = _dungeon.Floor * 10 + (_dungeon.Current?.Id ?? 0);
             var relic = MerchantOffersRelic(nodeId) ? PickOfferedRelic(nodeId, 17) : null;
             var body =
                 $"旅の商人が荷を広げている。\n{FormatCoinLine()}\n装備 {CountEquippedRelics()} / 3\n\n" +
@@ -811,7 +823,7 @@ namespace TypingRoguelike.Run
                     {
                         _merchantRelicSoldNodeId = nodeId;
                         ShowMapTabHint();
-                        _mapUi.ShowModal(
+                        _pathUi.ShowModal(
                             "取引完了",
                             $"「{offer.displayName}」を装備した。\n{offer.effectText}\n{FormatCoinLine()}",
                             new (string, Action)[]
@@ -825,7 +837,7 @@ namespace TypingRoguelike.Run
 
             actions.Add(("立ち去る", CompleteNodeAndReturnToMap));
             ShowMapTabHint();
-            _mapUi.ShowModal("行商人", body, actions);
+            _pathUi.ShowModal("行商人", body, actions);
         }
 
         bool MerchantOffersRelic(int nodeId)
@@ -875,7 +887,7 @@ namespace TypingRoguelike.Run
             var catalog = ResolveRelicCatalog();
             if (relic.exclusiveEquip && _exploration.IsRelicEquipped(relic.relicId))
             {
-                _mapUi.ShowModal(
+                _pathUi.ShowModal(
                     "レリック",
                     $"「{relic.displayName}」はすでに装備している。",
                     new (string, Action)[] { ("戻る", onCancel) });
@@ -884,7 +896,7 @@ namespace TypingRoguelike.Run
 
             if (relic.exclusiveEquip && _exploration.EquippedRelicCount() > 0)
             {
-                _mapUi.ShowModal(
+                _pathUi.ShowModal(
                     "単独装備",
                     $"「{relic.displayName}」\n{relic.effectText}\n\n" +
                     "これ以外のレリックは装備できない。\n今の装備を外して替える？\n" +
@@ -900,7 +912,7 @@ namespace TypingRoguelike.Run
             if (RelicRunModifiers.Compute(_exploration, catalog).ExclusiveEquipped)
             {
                 var blocker = ExclusiveRelicName(catalog);
-                _mapUi.ShowModal(
+                _pathUi.ShowModal(
                     "装備できない",
                     $"「{blocker}」を装備中は、他のレリックを持てない。\n" +
                     $"入手「{relic.displayName}」\n{relic.effectText}\n\n" +
@@ -931,7 +943,7 @@ namespace TypingRoguelike.Run
             }
 
             actions.Add(("やめる", onCancel));
-            _mapUi.ShowModal(
+            _pathUi.ShowModal(
                 "装備枠がいっぱい",
                 $"入手「{relic.displayName}」\n{relic.effectText}\n\n" +
                 $"外す相手（この探索では失われる）\n{DescribeEquippedRelics()}\n{FormatCoinLine()}",
@@ -948,7 +960,7 @@ namespace TypingRoguelike.Run
         {
             if (cost > 0 && _party.RunCoins < cost)
             {
-                _mapUi.ShowModal(
+                _pathUi.ShowModal(
                     "塔片が足りない",
                     $"必要 {cost} 塔片 / 所持 {_party.RunCoins} 塔片",
                     new (string, Action)[] { ("戻る", onCancel) });
@@ -1020,17 +1032,17 @@ namespace TypingRoguelike.Run
             _party.HealFraction(frac);
             MarkCurrentCleared();
             ShowMapTabHint();
-            _mapUi.ShowModal(
+            _pathUi.ShowModal(
                 "取引完了",
                 $"ポーションを飲んだ。\n{FormatHpLine()}\n{FormatCoinLine()}",
                 new (string, Action)[] { ("マップに戻る", ShowRouteMap) });
-            _mapUi.Refresh(_dungeon, _party, _exploration, _madness);
+            _pathUi.Refresh(_dungeon, _party, _exploration, _madness);
         }
 
         void ShowInsufficientCoins(int cost)
         {
             ShowMapTabHint();
-            _mapUi.ShowModal(
+            _pathUi.ShowModal(
                 "塔片が足りない",
                 $"必要 {cost} 塔片 / 所持 {_party.RunCoins} 塔片",
                 new (string, Action)[] { ("店に戻る", ResolveMerchantNode) });
@@ -1040,27 +1052,19 @@ namespace TypingRoguelike.Run
         {
             MarkCurrentCleared();
             MetaProgression.UnlockElevatorFloor(_profile, _dungeon.Floor);
-            ShowMap();
-            _mapUi.ShowModal(
-                "帰還エレベーター",
-                $"拠点へ帰還できる。\n現在 {_dungeon.Floor} / {TotalFloors} 階層。\n\n" +
-                "帰還すると塔片は拠点に貯金される。刻印・レリック・踏破情報は残る。",
-                new (string, Action)[]
-                {
-                    ("さらに塔を進む", null),
-                    ("拠点へ帰還", ConfirmElevatorExtract)
-                });
+            PersistActiveRun();
+            ShowElevatorChoice();
         }
 
-        void ConfirmElevatorExtract()
+        void ShowElevatorChoice()
         {
-            _mapUi.ShowModal(
-                "帰還の確認",
-                "拠点で整備したあと、同じ探索へ戻れる。\n塔片は拠点に貯金される。刻印・レリック・踏破情報は残る。",
+            _pathUi.ShowModal(
+                "エレベーター",
+                $"この層はここまで。\n現在 {_dungeon.Floor} / {TotalFloors} 層。\n\n拠点へ帰還するか、次の層へ進む。",
                 new (string, Action)[]
                 {
-                    ("拠点へ帰還する", ReturnToHubFromElevator),
-                    ("まだ塔を続ける", null)
+                    ("拠点へ帰還", ReturnToHubFromElevator),
+                    ("次の層へ", ShowPreparation)
                 });
         }
 
@@ -1162,7 +1166,7 @@ namespace TypingRoguelike.Run
             }));
 
             ShowMap();
-            _mapUi.ShowModal(
+            _pathUi.ShowModal(
                 "バックパック満杯",
                 $"素材枠が6種類に達している。\n「{displayName}」を入れるには何かを捨てる。",
                 actions);
@@ -1179,7 +1183,7 @@ namespace TypingRoguelike.Run
             return n;
         }
 
-        void StartBattleForNode(DungeonMapNode node, BattleEncounterDefinition enc, EncounterBattleModifiers mods)
+        void StartBattleForNode(LayerSquare node, BattleEncounterDefinition enc, EncounterBattleModifiers mods)
         {
             if (enc == null)
             {
@@ -1189,7 +1193,7 @@ namespace TypingRoguelike.Run
                 return;
             }
 
-            _mapUi.Hide();
+            _pathUi.Hide();
             SyncMadnessCapFromRelics();
             ApplyRelicBattleModifiers(ref mods);
             ApplyFloorStrengthBand(ref mods);
@@ -1318,9 +1322,9 @@ namespace TypingRoguelike.Run
             if (cur == null)
                 return dungeonRun != null ? dungeonRun.combatCoinReward : 8;
 
-            if (cur.Type is DungeonNodeType.Combat or DungeonNodeType.Elite)
+            if (cur.Type is DungeonNodeType.Combat or DungeonNodeType.MidBoss)
             {
-                var elite = cur.Type == DungeonNodeType.Elite;
+                var elite = cur.Type == DungeonNodeType.MidBoss;
                 return dungeonRun != null
                     ? elite ? dungeonRun.eliteCoinReward : dungeonRun.combatCoinReward
                     : elite ? 15 : 8;
@@ -1346,16 +1350,7 @@ namespace TypingRoguelike.Run
         bool IsTowerBossVictory()
         {
             var cur = _dungeon.Current;
-            if (cur == null || cur.Type != DungeonNodeType.Boss)
-                return false;
-
-            if (cur.Id != _mapData.BossNodeId)
-            {
-                Debug.LogWarning($"ボス勝利判定をスキップ: nodeId={cur.Id} expected={_mapData.BossNodeId}");
-                return false;
-            }
-
-            return true;
+            return cur != null && cur.Type == DungeonNodeType.Boss;
         }
 
         IEnumerator FinishBossVictory()
@@ -1363,21 +1358,7 @@ namespace TypingRoguelike.Run
             yield return null;
             _overlay.HideAll();
             DestroyBattleIfAny();
-
-            if (_dungeon.Floor >= TotalFloors)
-            {
-                CompleteTowerRun();
-                yield break;
-            }
-
-            var clearedFloor = _dungeon.Floor;
-            var nextFloor = clearedFloor + 1;
-            LoadFloorMap(nextFloor, restoreNodeId: null);
-            ShowMap();
-            _mapUi.ShowModal(
-                $"{clearedFloor}階層 突破！",
-                $"階層ボスを撃破した。\n\n次は {nextFloor} / {TotalFloors} 階層。",
-                new (string, Action)[] { ($"{nextFloor}階層へ進む", null) });
+            ShowPreparation();
         }
 
         void CompleteTowerRun()
@@ -1394,7 +1375,7 @@ namespace TypingRoguelike.Run
             MetaProgression.RollTowerSeed(_profile);
             MetaProgression.Save(_profile);
             RecordRunResult(true);
-            _mapUi.Hide();
+            _pathUi.Hide();
             ShowHub();
         }
 
@@ -1456,7 +1437,7 @@ namespace TypingRoguelike.Run
             _overlay.HideAll();
             DestroyBattleIfAny();
             ApplyWipe();
-            _mapUi.Hide();
+            _pathUi.Hide();
             ShowHub();
             _overlay.ShowDeathNotice(transform, 0, fromInsanity ? "狂気が限界に達し、探索は終わった。" : null);
             _defeatHandling = false;
@@ -1533,7 +1514,7 @@ namespace TypingRoguelike.Run
             }
 
             ShowMap();
-            _mapUi.ShowModal(
+            _pathUi.ShowModal(
                 modalTitle,
                 modalBody ?? string.Empty,
                 new (string, Action)[] { ("続ける", next) });
@@ -1597,18 +1578,28 @@ namespace TypingRoguelike.Run
 
         void CompleteNodeAndReturnToMap(string modalTitle, string modalBody)
         {
-            _mapUi.ReleasePause();
+            _pathUi.ReleasePause();
             _overlay.HideAll();
             DestroyBattleIfAny();
             MarkCurrentCleared();
-            ShowMap();
             if (!string.IsNullOrEmpty(modalTitle))
             {
-                _mapUi.ShowModal(
+                _pathUi.ShowModal(
                     modalTitle,
                     modalBody ?? string.Empty,
-                    new (string, Action)[] { ("マップに戻る", ShowRouteMap) });
+                    new (string, Action)[]
+                    {
+                        ("次へ", () =>
+                        {
+                            if (!TryPresentLayerExit())
+                                ShowMap();
+                        })
+                    });
+                return;
             }
+
+            if (!TryPresentLayerExit())
+                ShowMap();
         }
 
         void MarkCurrentCleared()
@@ -1617,10 +1608,10 @@ namespace TypingRoguelike.Run
             if (current == null)
                 return;
 
-            if (!current.Cleared && current.Type != DungeonNodeType.Start)
+            if (!current.Cleared)
                 _clearedNodesThisRun++;
             _dungeon.MarkCurrentCleared();
-            MetaProgression.MarkTowerNodeCleared(_profile, current.Id);
+            RememberClearedSquares();
         }
 
         int RecordRunResult(bool cleared, bool extracted = false)
@@ -1666,7 +1657,7 @@ namespace TypingRoguelike.Run
             AddMadness = delta =>
             {
                 if (!ApplyMadnessDeltaFromEvent(delta))
-                    _mapUi.Refresh(_dungeon, _party, _exploration, _madness);
+                    _pathUi.Refresh(_dungeon, _party, _exploration, _madness);
             },
             AddHp = delta =>
             {
@@ -1675,7 +1666,7 @@ namespace TypingRoguelike.Run
                 if (_party.IsRunDead)
                     TryBeginRunDeath(fromBattle: false);
                 else
-                    _mapUi.Refresh(_dungeon, _party, _exploration, _madness);
+                    _pathUi.Refresh(_dungeon, _party, _exploration, _madness);
             },
             AddCoins = delta =>
             {
@@ -1684,14 +1675,8 @@ namespace TypingRoguelike.Run
                 else
                     _party.TrySpendCoins(Mathf.Min(_party.RunCoins, -delta));
                 PersistActiveRun();
-                _mapUi.Refresh(_dungeon, _party, _exploration, _madness);
+                _pathUi.Refresh(_dungeon, _party, _exploration, _madness);
             },
-            ShowWholeMap = () => _debugRevealMap,
-            ToggleWholeMap = () =>
-            {
-                _debugRevealMap = !_debugRevealMap;
-                ShowMap();
-            }
         };
 
         void BeginEvent(EventDefinition forced, bool fromDebug)
@@ -1796,19 +1781,10 @@ namespace TypingRoguelike.Run
                         _effectNotes.Add("戦闘開始");
                         break;
                     case "skip_row":
-                        ApplyEventSkip();
-                        break;
                     case "reveal_floor":
-                        RevealEventNodes(null);
-                        _effectNotes.Add("この階を開示");
-                        break;
                     case "reveal_elevator":
-                        RevealEventNodes(DungeonNodeType.Elevator);
-                        _effectNotes.Add("エレベーターを開示");
-                        break;
                     case "reveal_treasure":
-                        RevealEventNodes(DungeonNodeType.Treasure);
-                        _effectNotes.Add("宝箱を開示");
+                        _effectNotes.Add("この効果は使わない");
                         break;
                 }
             }
@@ -2001,33 +1977,6 @@ namespace TypingRoguelike.Run
             return pool[UnityEngine.Random.Range(0, pool.Count)];
         }
 
-        void ApplyEventSkip()
-        {
-            var node = _dungeon.Current;
-            if (node != null && _dungeon.TrySkipNextRow(node))
-            {
-                _profile.towerRunSkipFromNodeIds ??= new List<int>();
-                if (!_profile.towerRunSkipFromNodeIds.Contains(node.Id))
-                    _profile.towerRunSkipFromNodeIds.Add(node.Id);
-                _effectNotes.Add("次の段を飛ばした");
-                PersistActiveRun();
-                return;
-            }
-
-            _effectNotes.Add("先の段がない");
-        }
-
-        void RevealEventNodes(DungeonNodeType? type)
-        {
-            foreach (var node in _dungeon.Nodes.Values)
-            {
-                if (type.HasValue && node.Type != type.Value)
-                    continue;
-                node.Revealed = true;
-                MetaProgression.RevealTowerNode(_profile, node.Id);
-            }
-        }
-
         void ShowEventResult()
         {
             PersistActiveRun();
@@ -2090,7 +2039,7 @@ namespace TypingRoguelike.Run
                 return false;
             }
 
-            LoadFloorMap(Mathf.Max(1, _profile.towerRunFloor), _profile.towerRunNodeId);
+            LoadLayer(Mathf.Max(1, _profile.towerRunFloor), _profile.towerRunNodeId, startAtElevator: false);
             var node = _dungeon.Current;
             if (node == null)
             {
@@ -2128,17 +2077,6 @@ namespace TypingRoguelike.Run
             _profile.previousRunEventIds = new List<string>(_dungeon.SeenEventIds);
             _dungeon.ClearSeenEvents();
             _profile.towerRunSeenEventIds = new List<string>();
-        }
-
-        void ReapplyRowSkips()
-        {
-            if (_profile?.towerRunSkipFromNodeIds == null)
-                return;
-            foreach (var id in _profile.towerRunSkipFromNodeIds)
-            {
-                if (_dungeon.Nodes.TryGetValue(id, out var node))
-                    _dungeon.TrySkipNextRow(node);
-            }
         }
 
         static string Signed(int value) => value > 0 ? $"+{value}" : value.ToString();

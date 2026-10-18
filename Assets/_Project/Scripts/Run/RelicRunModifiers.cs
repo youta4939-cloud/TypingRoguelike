@@ -10,7 +10,6 @@ namespace TypingRoguelike.Run
         public int JackpotMadnessThreshold { get; }
         public float JackpotChanceBonus { get; }
         public float JackpotDamageMultiplier { get; }
-        public bool RevealsAllNodes { get; }
         public bool ExclusiveEquipped { get; }
         public float OpeningEnemyStopSeconds { get; }
 
@@ -21,7 +20,6 @@ namespace TypingRoguelike.Run
             int jackpotMadnessThreshold,
             float jackpotChanceBonus,
             float jackpotDamageMultiplier,
-            bool revealsAllNodes,
             bool exclusiveEquipped,
             float openingEnemyStopSeconds)
         {
@@ -31,7 +29,6 @@ namespace TypingRoguelike.Run
             JackpotMadnessThreshold = jackpotMadnessThreshold;
             JackpotChanceBonus = jackpotChanceBonus;
             JackpotDamageMultiplier = jackpotDamageMultiplier <= 0f ? 1f : jackpotDamageMultiplier;
-            RevealsAllNodes = revealsAllNodes;
             ExclusiveEquipped = exclusiveEquipped;
             OpeningEnemyStopSeconds = openingEnemyStopSeconds;
         }
@@ -60,7 +57,6 @@ namespace TypingRoguelike.Run
             var threshold = 0;
             var chance = 0f;
             var jackpotDamage = 1f;
-            var reveal = false;
             var stop = 0f;
             for (var i = 0; i < equipped.Length; i++)
             {
@@ -73,7 +69,6 @@ namespace TypingRoguelike.Run
                 backpack += def.backpackSlotBonus;
                 damage += def.playerDamageBonusPercent;
                 madness += def.madnessMaxBonus;
-                reveal |= def.revealsAllNodes;
                 if (def.battleStartEnemyStopSeconds > 0f)
                     stop += def.battleStartEnemyStopSeconds;
                 if (def.jackpotMadnessThreshold <= 0)
@@ -88,7 +83,7 @@ namespace TypingRoguelike.Run
             }
 
             return new RelicRunModifiers(
-                backpack, damage, madness, threshold, chance, jackpotDamage, reveal, exclusive, stop);
+                backpack, damage, madness, threshold, chance, jackpotDamage, exclusive, stop);
         }
     }
 }

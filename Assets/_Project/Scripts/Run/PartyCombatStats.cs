@@ -88,7 +88,6 @@ namespace TypingRoguelike.Run
             if (relicMods.PlayerDamageBonusPercent > 0 ||
                 relicMods.MadnessMaxBonus > 0 ||
                 relicMods.JackpotMadnessThreshold > 0 ||
-                relicMods.RevealsAllNodes ||
                 relicMods.OpeningEnemyStopSeconds > 0f)
             {
                 sb.AppendLine();
@@ -104,8 +103,6 @@ namespace TypingRoguelike.Run
                         $"狂気{relicMods.JackpotMadnessThreshold}以上 JACKPOT +{relicMods.JackpotChanceBonus * 100f:0.#}% / 威力×{mul:0.##}");
                 }
 
-                if (relicMods.RevealsAllNodes)
-                    sb.AppendLine(relicMods.ExclusiveEquipped ? "マップ全開示（単独装備）" : "マップ全開示");
                 if (relicMods.OpeningEnemyStopSeconds > 0f)
                     sb.AppendLine($"戦闘開始時 敵停止 {relicMods.OpeningEnemyStopSeconds:0}秒");
             }

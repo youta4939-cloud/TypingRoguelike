@@ -23,6 +23,5 @@ MonoBehaviour:
   jackpotMadnessThreshold: 900
   jackpotChanceBonus: 0.1
   jackpotDamageMultiplier: 0.7
-  revealsAllNodes: 0
   exclusiveEquip: 0
   battleStartEnemyStopSeconds: 0

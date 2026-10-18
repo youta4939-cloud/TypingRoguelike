@@ -111,7 +111,6 @@ namespace TypingRoguelike.EditorTools
             public int JackpotMadnessThreshold;
             public float JackpotChanceBonus;
             public float JackpotDamageMultiplier = 1f;
-            public bool RevealsAllNodes;
             public bool ExclusiveEquip;
             public float BattleStartEnemyStopSeconds;
 
@@ -135,7 +134,6 @@ namespace TypingRoguelike.EditorTools
                         case "jackpotMadnessThreshold": row.JackpotMadnessThreshold = ParseInt(val); break;
                         case "jackpotChanceBonus": row.JackpotChanceBonus = ParseFloat(val); break;
                         case "jackpotDamageMultiplier": row.JackpotDamageMultiplier = ParseFloat(val); break;
-                        case "revealsAllNodes": row.RevealsAllNodes = ParseBool(val); break;
                         case "exclusiveEquip": row.ExclusiveEquip = ParseBool(val); break;
                         case "battleStartEnemyStopSeconds": row.BattleStartEnemyStopSeconds = ParseFloat(val); break;
                     }
@@ -157,7 +155,6 @@ namespace TypingRoguelike.EditorTools
                 relic.jackpotMadnessThreshold = JackpotMadnessThreshold;
                 relic.jackpotChanceBonus = JackpotChanceBonus;
                 relic.jackpotDamageMultiplier = JackpotDamageMultiplier <= 0f ? 1f : JackpotDamageMultiplier;
-                relic.revealsAllNodes = RevealsAllNodes;
                 relic.exclusiveEquip = ExclusiveEquip;
                 relic.battleStartEnemyStopSeconds = BattleStartEnemyStopSeconds;
             }

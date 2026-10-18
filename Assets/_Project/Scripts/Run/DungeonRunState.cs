@@ -1,87 +1,112 @@
 using System.Collections.Generic;
-using System.Linq;
 
 namespace TypingRoguelike.Run
 {
+    public sealed class LayerSquare
+    {
+        public int Index { get; }
+        public DungeonNodeType Type { get; }
+        public bool Cleared { get; set; }
+        public int Id => Index;
+
+        public LayerSquare(int index, DungeonNodeType type)
+        {
+            Index = index;
+            Type = type;
+        }
+    }
+
+    /// <summary>1層ぶんの一本道。マスは常に4つで、若い番号から順に入る。</summary>
     public sealed class DungeonRunState
     {
-        readonly Dictionary<int, DungeonMapNode> _nodes = new();
-        int _currentNodeId;
-        int _seed;
-
         public int Floor { get; private set; } = 1;
         public int TotalFloors { get; private set; } = 1;
-        public int BossNodeId { get; private set; }
-        public int CurrentNodeId => _currentNodeId;
-        public IReadOnlyDictionary<int, DungeonMapNode> Nodes => _nodes;
+        public int CurrentIndex { get; private set; }
+        public LayerSquare[] Squares { get; private set; } = System.Array.Empty<LayerSquare>();
+        public List<string> SeenEventIds { get; } = new();
 
-        public void BeginTower(
-            DungeonMapGenerator.Result map,
-            int seed,
+        public LayerSquare Current =>
+            Squares != null && CurrentIndex >= 0 && CurrentIndex < Squares.Length
+                ? Squares[CurrentIndex]
+                : null;
+
+        public int CurrentNodeId => CurrentIndex;
+
+        public bool LayerComplete
+        {
+            get
+            {
+                if (Squares == null || Squares.Length == 0)
+                    return false;
+                foreach (var square in Squares)
+                {
+                    if (!square.Cleared)
+                        return false;
+                }
+
+                return true;
+            }
+        }
+
+        public void SetFloor(
+            int floor,
             int totalFloors,
-            IReadOnlyCollection<int> revealedNodeIds = null,
-            IReadOnlyCollection<int> clearedNodeIds = null)
+            int runSeed,
+            Data.LayerConfig config,
+            int restoreIndex,
+            IReadOnlyCollection<int> clearedSquareIndices,
+            bool startAtElevator)
         {
-            Floor = 1;
+            Floor = System.Math.Max(1, floor);
             TotalFloors = System.Math.Max(1, totalFloors);
-            LoadMap(map, seed, revealedNodeIds, clearedNodeIds);
-        }
+            var types = LayerSquares.DrawSquares(Floor, runSeed, config);
+            Squares = new LayerSquare[types.Length];
+            for (var i = 0; i < types.Length; i++)
+                Squares[i] = new LayerSquare(i, types[i]);
 
-        public void LoadMap(
-            DungeonMapGenerator.Result map,
-            int seed,
-            IReadOnlyCollection<int> revealedNodeIds = null,
-            IReadOnlyCollection<int> clearedNodeIds = null)
-        {
-            _nodes.Clear();
-            _seed = seed;
-            BossNodeId = map.BossNodeId;
-            foreach (var n in map.Nodes)
+            if (startAtElevator)
             {
-                n.Revealed = true;
-                n.Cleared = n.Type == DungeonNodeType.Start ||
-                            (clearedNodeIds != null && clearedNodeIds.Contains(n.Id));
-                _nodes[n.Id] = n;
-            }
-
-            _currentNodeId = map.StartNodeId;
-            if (_nodes.TryGetValue(_currentNodeId, out var start))
-            {
-                start.Cleared = true;
-                start.Revealed = true;
-            }
-        }
-
-        public DungeonMapNode Current => _nodes.GetValueOrDefault(_currentNodeId);
-
-        public IEnumerable<DungeonMapNode> GetReachableNext()
-        {
-            if (!_nodes.TryGetValue(_currentNodeId, out var cur))
-                yield break;
-
-            foreach (var nextId in cur.Next)
-            {
-                if (_nodes.TryGetValue(nextId, out var next))
-                    yield return next;
-            }
-        }
-
-        public bool CanEnter(int nodeId)
-        {
-            if (!_nodes.TryGetValue(_currentNodeId, out var cur))
-                return false;
-
-            return cur.Next.Contains(nodeId);
-        }
-
-        public void MoveTo(int nodeId)
-        {
-            if (!CanEnter(nodeId))
+                for (var i = 0; i < Squares.Length - 1; i++)
+                    Squares[i].Cleared = true;
+                CurrentIndex = Squares.Length - 1;
                 return;
+            }
 
-            _currentNodeId = nodeId;
-            if (_nodes.TryGetValue(nodeId, out var node))
-                node.Revealed = true;
+            if (clearedSquareIndices != null)
+            {
+                foreach (var index in clearedSquareIndices)
+                {
+                    if (index >= 0 && index < Squares.Length)
+                        Squares[index].Cleared = true;
+                }
+            }
+
+            if (restoreIndex >= 0 && restoreIndex < Squares.Length)
+                CurrentIndex = restoreIndex;
+            else
+                CurrentIndex = 0;
+        }
+
+        public int FirstUnclearedIndex()
+        {
+            if (Squares == null)
+                return -1;
+            for (var i = 0; i < Squares.Length; i++)
+            {
+                if (!Squares[i].Cleared)
+                    return i;
+            }
+
+            return -1;
+        }
+
+        public bool CanEnter(int index) => index == FirstUnclearedIndex();
+
+        public void MoveTo(int index)
+        {
+            if (!CanEnter(index))
+                return;
+            CurrentIndex = index;
         }
 
         public void MarkCurrentCleared()
@@ -90,48 +115,13 @@ namespace TypingRoguelike.Run
                 Current.Cleared = true;
         }
 
-        public bool IsRunComplete =>
-            Current != null &&
-            Current.Id == BossNodeId &&
-            Current.Type == DungeonNodeType.Boss &&
-            Current.Cleared;
-
-        public void AdvanceFloor(
-            DungeonMapGenerator.Result map,
-            int seed,
-            IReadOnlyCollection<int> revealedNodeIds = null,
-            IReadOnlyCollection<int> clearedNodeIds = null)
+        public bool HasRowAfterNext()
         {
-            Floor++;
-            LoadMap(map, seed, revealedNodeIds, clearedNodeIds);
+            var open = FirstUnclearedIndex();
+            if (open < 0)
+                return Floor < TotalFloors;
+            return open < Squares.Length - 1;
         }
-
-        public void SetFloorAndMap(
-            int floor,
-            int totalFloors,
-            DungeonMapGenerator.Result map,
-            int seed,
-            IReadOnlyCollection<int> revealedNodeIds = null,
-            IReadOnlyCollection<int> clearedNodeIds = null)
-        {
-            Floor = System.Math.Max(1, floor);
-            TotalFloors = System.Math.Max(1, totalFloors);
-            LoadMap(map, seed, revealedNodeIds, clearedNodeIds);
-        }
-
-        public bool TryRestoreCurrentNode(int nodeId)
-        {
-            if (!_nodes.ContainsKey(nodeId))
-                return false;
-
-            _currentNodeId = nodeId;
-            if (_nodes.TryGetValue(nodeId, out var node))
-                node.Revealed = true;
-            return true;
-        }
-
-        /// <summary>死亡後のエレベ再入。マップは開示したまま、エレベーターから探索を始める。</summary>
-        public List<string> SeenEventIds { get; } = new();
 
         public void ClearSeenEvents() => SeenEventIds.Clear();
 
@@ -151,69 +141,6 @@ namespace TypingRoguelike.Run
         {
             if (!string.IsNullOrEmpty(id) && !SeenEventIds.Contains(id))
                 SeenEventIds.Add(id);
-        }
-
-        public bool HasRowAfterNext()
-        {
-            var cur = Current;
-            if (cur == null)
-                return false;
-            foreach (var nextId in cur.Next)
-            {
-                if (_nodes.TryGetValue(nextId, out var next) && next.Next.Count > 0)
-                    return true;
-            }
-
-            return false;
-        }
-
-        /// <summary>次の段を飛ばし、その次の段へ進める。飛ばした段は踏破にしない。二重には飛ばさない。</summary>
-        public bool TrySkipNextRow(DungeonMapNode from)
-        {
-            if (from == null || from.Next.Count == 0)
-                return false;
-
-            var alreadySkipped = true;
-            foreach (var nextId in from.Next)
-            {
-                if (!_nodes.TryGetValue(nextId, out var next) || next.Layer < from.Layer + 2)
-                {
-                    alreadySkipped = false;
-                    break;
-                }
-            }
-
-            if (alreadySkipped)
-                return false;
-
-            var far = new List<int>();
-            foreach (var nextId in from.Next)
-            {
-                if (!_nodes.TryGetValue(nextId, out var mid))
-                    continue;
-                foreach (var farId in mid.Next)
-                {
-                    if (!far.Contains(farId))
-                        far.Add(farId);
-                }
-            }
-
-            if (far.Count == 0)
-                return false;
-
-            from.Next.Clear();
-            from.Next.AddRange(far);
-            return true;
-        }
-
-        public bool TrySpawnAtElevator(int elevatorNodeId)
-        {
-            if (!_nodes.TryGetValue(elevatorNodeId, out var elevator) ||
-                elevator.Type != DungeonNodeType.Elevator)
-                return false;
-
-            _currentNodeId = elevatorNodeId;
-            return true;
         }
     }
 }

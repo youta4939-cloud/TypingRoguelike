@@ -21,7 +21,7 @@ namespace TypingRoguelike.Data
         [Tooltip("開発に必要な素材数")]
         public int developMaterialCost;
 
-        [Header("塔内 — 狂気・マップ・開幕")]
+        [Header("塔内 — 狂気・開幕")]
         [Tooltip("装備中、狂気の上限に加算")]
         public int madnessMaxBonus;
         [Tooltip("この狂気以上でジャックポット補正。0 で無効")]
@@ -30,8 +30,6 @@ namespace TypingRoguelike.Data
         public float jackpotChanceBonus;
         [Tooltip("閾値以上のとき、ジャックポット威力に掛ける。1 で変化なし")]
         public float jackpotDamageMultiplier = 1f;
-        [Tooltip("装備中、未踏のマスも種類が見える")]
-        public bool revealsAllNodes;
         [Tooltip("装備中は他のレリックを持てない")]
         public bool exclusiveEquip;
         [Tooltip("戦闘開始時、敵の攻撃カウントを止める秒数")]

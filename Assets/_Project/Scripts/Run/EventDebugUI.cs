@@ -65,15 +65,6 @@ namespace TypingRoguelike.Run
             _list = CreatePanel(_root, "EventList", new Vector2(0.62f, 0.08f), new Vector2(0.98f, 0.92f),
                 new Color(0.03f, 0.04f, 0.08f, 0.96f));
             var y = 0.90f;
-            Text wholeLabel = null;
-            var wholeButton = CreateButton(_list.transform, WholeMapLabel(), new Vector2(0.04f, y - 0.045f), new Vector2(0.96f, y), () =>
-            {
-                _hooks.ToggleWholeMap?.Invoke();
-                if (wholeLabel != null)
-                    wholeLabel.text = WholeMapLabel();
-            }, BattleUITheme.TextPrimary);
-            wholeLabel = wholeButton.GetComponentInChildren<Text>();
-            y -= 0.055f;
             Text jackpotLabel = null;
             var jackpotButton = CreateButton(_list.transform, JackpotDebugLabel(), new Vector2(0.04f, y - 0.045f), new Vector2(0.96f, y), () =>
             {
@@ -111,9 +102,6 @@ namespace TypingRoguelike.Run
                 y -= 0.05f;
             }
         }
-
-        static string WholeMapLabel() =>
-            _hooks.ShowWholeMap != null && _hooks.ShowWholeMap() ? "全体表示をやめる" : "マップ全体を表示";
 
         static string JackpotDebugLabel() =>
             RunDebugState.JackpotRollForce10Percent

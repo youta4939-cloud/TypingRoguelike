@@ -337,8 +337,6 @@ namespace TypingRoguelike.Run
 
             void Update()
             {
-                if (DungeonMapUI.IsOverlayOpen)
-                    return;
                 var keyboard = Keyboard.current;
                 if (keyboard == null)
                     return;

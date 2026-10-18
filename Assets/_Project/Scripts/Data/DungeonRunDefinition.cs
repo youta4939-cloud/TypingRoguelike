@@ -10,31 +10,6 @@ namespace TypingRoguelike.Data
         public BattleEncounterDefinition eliteEncounter;
         public BattleEncounterDefinition bossEncounter;
 
-        [Header("Map")]
-        [Tooltip("今回の塔で登る階層数。本番想定は99、プロトタイプは15")]
-        [Range(1, 99)] public int towerFloors = 15;
-        [Tooltip("1階層内のマップの段数（ボス段を除く）")]
-        [Range(3, 8)] public int pathLayers = 6;
-        [Tooltip("条件を満たせなかったとき、従来の等間隔生成で使う各段のマス数")]
-        [Range(2, 5)] public int branchWidth = 3;
-        [Tooltip("1行のマス数の最小。5列のマス目から選ぶ")]
-        [Range(2, 5)] public int rowNodeCountMin = 2;
-        [Tooltip("1行のマス数の最大")]
-        [Range(2, 5)] public int rowNodeCountMax = 5;
-        [Tooltip("1 階層マップに置く焚き火の目安（生成後に出来事などのマスから置き換える）")]
-        [Range(0, 3)] public int restNodesPerFloorMin = 1;
-        [Range(0, 3)] public int restNodesPerFloorMax = 2;
-        [Tooltip("スタートからエレベーター（その層に無ければボス）まで、どのルートも戦闘マスをこの回数以上通る")]
-        [Range(0, 8)] public int minCombatNodesOnEveryRoute = 2;
-        [Tooltip("戦闘マスがこの回数より多く連続するルートは作らない")]
-        [Range(1, 8)] public int maxConsecutiveCombatNodes = 2;
-
-        [Header("道中マスの割合（%）全段共通")]
-        [Range(0f, 100f)] public float nodeWeightCombat = 28f;
-        [Range(0f, 100f)] public float nodeWeightEvent = 22f;
-        [Range(0f, 100f)] public float nodeWeightMerchant = 14f;
-        [Range(0f, 100f)] public float nodeWeightTreasure = 12f;
-
         [Header("Rest / ラン内通貨（塔片）")]
         [Range(0.05f, 0.35f)] public float restHealFraction = 0.15f;
         [Tooltip("道中戦闘（通常・強敵）の敵 HP 倍率。ボスは別")]

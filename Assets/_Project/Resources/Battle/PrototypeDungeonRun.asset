@@ -15,16 +15,6 @@ MonoBehaviour:
   combatEncounter: {fileID: 11400000, guid: 86513d8b01ac9e8488711c1934c72313, type: 2}
   eliteEncounter: {fileID: 11400000, guid: bc98ff10283c7a84db9f1f4ee128b816, type: 2}
   bossEncounter: {fileID: 11400000, guid: 4fc1ff427298a1845b5f7ffa70ee459d, type: 2}
-  towerFloors: 15
-  pathLayers: 6
-  branchWidth: 3
-  rowNodeCountMin: 2
-  rowNodeCountMax: 5
-  restNodesPerFloorMin: 1
-  restNodesPerFloorMax: 2
-  minCombatNodesOnEveryRoute: 2
-  maxConsecutiveCombatNodes: 2
-  nodeWeightCombat: 28
   restHealFraction: 0.15
   combatEnemyHpMultiplier: 0.72
   partyAttackCoefficient: 1
