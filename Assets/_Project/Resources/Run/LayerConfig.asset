@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8f1a2b34d5e6f708192a3b4c5d6e7f8, type: 3}
   m_Name: LayerConfig
   m_EditorClassIdentifier: TypingRoguelike::TypingRoguelike.Data.LayerConfig
-  totalLayers: 15
+  totalLayers: 20
   elevatorEvery: 3
-  bossEvery: 5
+  bossEvery: 10
   trapHpLossFraction: 0.1
   columnMinimums:
   - fromLayer: 1
     toLayer: 99
     type: 0
-    minimumPerColumn: 3
+    minimumPerColumn: 2

@@ -1,0 +1,291 @@
+{
+ "_note": "記憶の欠片（ピース）。cells は左上原点 (dr=行, dc=列)。回転なし（仕様未定）。count=所持数。",
+ "pieces": [
+  {
+   "id": "p01",
+   "name": "横一・戦闘",
+   "count": 2,
+   "special": false,
+   "fixed_order": false,
+   "unlock": null,
+   "cells": [
+    {
+     "dr": 0,
+     "dc": 0,
+     "type": "battle"
+    },
+    {
+     "dr": 0,
+     "dc": 1,
+     "type": "battle"
+    },
+    {
+     "dr": 0,
+     "dc": 2,
+     "type": "battle"
+    }
+   ],
+   "placeholder": true,
+   "note": "名称・数は仮（語部確認待ち）"
+  },
+  {
+   "id": "p07",
+   "name": "縦一・戦闘",
+   "count": 1,
+   "special": false,
+   "fixed_order": false,
+   "unlock": null,
+   "cells": [
+    {
+     "dr": 0,
+     "dc": 0,
+     "type": "battle"
+    },
+    {
+     "dr": 1,
+     "dc": 0,
+     "type": "battle"
+    },
+    {
+     "dr": 2,
+     "dc": 0,
+     "type": "battle"
+    }
+   ],
+   "placeholder": true,
+   "note": "名称・数は仮（語部確認待ち）"
+  },
+  {
+   "id": "p02",
+   "name": "L字・休息",
+   "count": 2,
+   "special": false,
+   "fixed_order": false,
+   "unlock": null,
+   "cells": [
+    {
+     "dr": 0,
+     "dc": 0,
+     "type": "rest"
+    },
+    {
+     "dr": 1,
+     "dc": 0,
+     "type": "rest"
+    },
+    {
+     "dr": 1,
+     "dc": 1,
+     "type": "rest"
+    }
+   ],
+   "placeholder": true,
+   "note": "名称・数は仮（語部確認待ち）"
+  },
+  {
+   "id": "p03",
+   "name": "L字・宝箱",
+   "count": 1,
+   "special": false,
+   "fixed_order": false,
+   "unlock": null,
+   "cells": [
+    {
+     "dr": 0,
+     "dc": 1,
+     "type": "treasure"
+    },
+    {
+     "dr": 1,
+     "dc": 0,
+     "type": "treasure"
+    },
+    {
+     "dr": 1,
+     "dc": 1,
+     "type": "treasure"
+    }
+   ],
+   "placeholder": true,
+   "note": "名称・数は仮（語部確認待ち）"
+  },
+  {
+   "id": "p04",
+   "name": "横二・ショップ",
+   "count": 2,
+   "special": false,
+   "fixed_order": false,
+   "unlock": null,
+   "cells": [
+    {
+     "dr": 0,
+     "dc": 0,
+     "type": "shop"
+    },
+    {
+     "dr": 0,
+     "dc": 1,
+     "type": "shop"
+    }
+   ],
+   "placeholder": true,
+   "note": "名称・数は仮（語部確認待ち）"
+  },
+  {
+   "id": "p05",
+   "name": "横一・イベント",
+   "count": 3,
+   "special": false,
+   "fixed_order": false,
+   "unlock": null,
+   "cells": [
+    {
+     "dr": 0,
+     "dc": 0,
+     "type": "event"
+    },
+    {
+     "dr": 0,
+     "dc": 1,
+     "type": "event"
+    },
+    {
+     "dr": 0,
+     "dc": 2,
+     "type": "event"
+    }
+   ],
+   "placeholder": true,
+   "note": "名称・数は仮（語部確認待ち）"
+  },
+  {
+   "id": "p06",
+   "name": "特殊・戦休店",
+   "count": 1,
+   "special": true,
+   "fixed_order": true,
+   "unlock": null,
+   "cells": [
+    {
+     "dr": 0,
+     "dc": 0,
+     "type": "battle"
+    },
+    {
+     "dr": 0,
+     "dc": 1,
+     "type": "rest"
+    },
+    {
+     "dr": 0,
+     "dc": 2,
+     "type": "shop"
+    }
+   ],
+   "placeholder": true,
+   "note": "名称・数は仮（語部確認待ち）"
+  },
+  {
+   "id": "p99",
+   "name": "未解放",
+   "locked": true,
+   "unlock": "第2層で解放",
+   "placeholder": true,
+   "cells": [],
+   "count": 0
+  }
+ ],
+ "sample_boards": {
+  "A_normal": [
+   {
+    "piece": "p01",
+    "row": 0,
+    "col": 0
+   },
+   {
+    "piece": "p05",
+    "row": 1,
+    "col": 0
+   },
+   {
+    "piece": "p04",
+    "row": 2,
+    "col": 0
+   },
+   {
+    "piece": "p03",
+    "row": 2,
+    "col": 1
+   },
+   {
+    "piece": "p02",
+    "row": 3,
+    "col": 0
+   },
+   {
+    "piece": "p01",
+    "row": 5,
+    "col": 0
+   }
+  ],
+  "B_before_drop": [
+   {
+    "piece": "p01",
+    "row": 0,
+    "col": 0
+   },
+   {
+    "piece": "p05",
+    "row": 1,
+    "col": 0
+   },
+   {
+    "piece": "p04",
+    "row": 2,
+    "col": 0
+   },
+   {
+    "piece": "p03",
+    "row": 2,
+    "col": 1
+   },
+   {
+    "piece": "p01",
+    "row": 5,
+    "col": 0
+   }
+  ],
+  "C_validation_error": [
+   {
+    "piece": "p01",
+    "row": 0,
+    "col": 0
+   },
+   {
+    "piece": "p05",
+    "row": 1,
+    "col": 0
+   },
+   {
+    "piece": "p04",
+    "row": 2,
+    "col": 0
+   },
+   {
+    "piece": "p03",
+    "row": 2,
+    "col": 1
+   },
+   {
+    "piece": "p02",
+    "row": 3,
+    "col": 0
+   },
+   {
+    "piece": "p06",
+    "row": 5,
+    "col": 0
+   }
+  ]
+ }
+}

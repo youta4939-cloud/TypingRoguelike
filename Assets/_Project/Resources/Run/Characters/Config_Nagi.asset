@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11aa22bb33cc44dd55ee66ff77889901, type: 3}
   m_Name: Config_Nagi
   m_EditorClassIdentifier: TypingRoguelike::TypingRoguelike.Data.CharacterConfig
-  characterId: nagi
-  displayName: ナギ
+  characterId: chara03
+  displayName: chara03
   personality: 2
   tiers:
   - requiredTrust: 25

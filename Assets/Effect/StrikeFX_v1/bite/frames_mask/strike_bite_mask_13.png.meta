@@ -1,0 +1,1157 @@
+fileFormatVersion: 2
+guid: dac4c9415d787a14db0b571ac5b7449d
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -5084811462157940844
+    second: strike_bite_mask_13_0
+  - first:
+      213: -7002734735073135398
+    second: strike_bite_mask_13_1
+  - first:
+      213: 1926004159944939829
+    second: strike_bite_mask_13_2
+  - first:
+      213: -310722709005687213
+    second: strike_bite_mask_13_3
+  - first:
+      213: 4498333037501496228
+    second: strike_bite_mask_13_4
+  - first:
+      213: 6289257007758004612
+    second: strike_bite_mask_13_5
+  - first:
+      213: 2389649665668735534
+    second: strike_bite_mask_13_6
+  - first:
+      213: -5779820515117977037
+    second: strike_bite_mask_13_7
+  - first:
+      213: 1457140027069305077
+    second: strike_bite_mask_13_8
+  - first:
+      213: 5064117632779236696
+    second: strike_bite_mask_13_9
+  - first:
+      213: 8090621640469795984
+    second: strike_bite_mask_13_10
+  - first:
+      213: 2168539304507636304
+    second: strike_bite_mask_13_11
+  - first:
+      213: -4085586748642640708
+    second: strike_bite_mask_13_12
+  - first:
+      213: -6934422271479250399
+    second: strike_bite_mask_13_13
+  - first:
+      213: -5206174292611756032
+    second: strike_bite_mask_13_14
+  - first:
+      213: -2662769487807686113
+    second: strike_bite_mask_13_15
+  - first:
+      213: -3749269685309439460
+    second: strike_bite_mask_13_16
+  - first:
+      213: 6395916337441232436
+    second: strike_bite_mask_13_17
+  - first:
+      213: 2550407492940022247
+    second: strike_bite_mask_13_18
+  - first:
+      213: -990957828236625776
+    second: strike_bite_mask_13_19
+  - first:
+      213: -8498224312118652994
+    second: strike_bite_mask_13_20
+  - first:
+      213: 1172200951419667734
+    second: strike_bite_mask_13_21
+  - first:
+      213: 7654676927776550090
+    second: strike_bite_mask_13_22
+  - first:
+      213: 6305020468150242009
+    second: strike_bite_mask_13_23
+  - first:
+      213: 1657236679655074324
+    second: strike_bite_mask_13_24
+  - first:
+      213: 6400049931708479499
+    second: strike_bite_mask_13_25
+  - first:
+      213: -2048381791778384868
+    second: strike_bite_mask_13_26
+  - first:
+      213: 7318542895251637738
+    second: strike_bite_mask_13_27
+  - first:
+      213: 5495026883807225246
+    second: strike_bite_mask_13_28
+  - first:
+      213: -2948247685588679837
+    second: strike_bite_mask_13_29
+  - first:
+      213: -9182583189543146612
+    second: strike_bite_mask_13_30
+  - first:
+      213: 2281149203912437249
+    second: strike_bite_mask_13_31
+  - first:
+      213: 7128049391143943883
+    second: strike_bite_mask_13_32
+  - first:
+      213: -1477977158018138670
+    second: strike_bite_mask_13_33
+  - first:
+      213: -7753950269298687824
+    second: strike_bite_mask_13_34
+  - first:
+      213: -4049724428629516273
+    second: strike_bite_mask_13_35
+  - first:
+      213: -4658249393157415045
+    second: strike_bite_mask_13_36
+  - first:
+      213: -3512996725461521259
+    second: strike_bite_mask_13_37
+  - first:
+      213: -8583489011150317267
+    second: strike_bite_mask_13_38
+  - first:
+      213: -3813649024701723377
+    second: strike_bite_mask_13_39
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 0
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 0
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: strike_bite_mask_13_0
+      rect:
+        serializedVersion: 2
+        x: 336
+        y: 308
+        width: 9
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 497cd386aee1f69b0800000000000000
+      internalID: -5084811462157940844
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_mask_13_1
+      rect:
+        serializedVersion: 2
+        x: 30
+        y: 239
+        width: 82
+        height: 42
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ad43dab4cd941de90800000000000000
+      internalID: -7002734735073135398
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_mask_13_2
+      rect:
+        serializedVersion: 2
+        x: 120
+        y: 249
+        width: 9
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 539517d349a8aba10800000000000000
+      internalID: 1926004159944939829
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_mask_13_3
+      rect:
+        serializedVersion: 2
+        x: 127
+        y: 255
+        width: 12
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 356a11aa75710bbf0800000000000000
+      internalID: -310722709005687213
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_mask_13_4
+      rect:
+        serializedVersion: 2
+        x: 164
+        y: 248
+        width: 11
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4ab3ead701a4d6e30800000000000000
+      internalID: 4498333037501496228
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_mask_13_5
+      rect:
+        serializedVersion: 2
+        x: 190
+        y: 239
+        width: 11
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4815d883dede74750800000000000000
+      internalID: 6289257007758004612
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_mask_13_6
+      rect:
+        serializedVersion: 2
+        x: 231
+        y: 247
+        width: 10
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e22e0d3c5bdb92120800000000000000
+      internalID: 2389649665668735534
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_mask_13_7
+      rect:
+        serializedVersion: 2
+        x: 250
+        y: 239
+        width: 25
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 332b0e24dd3f9cfa0800000000000000
+      internalID: -5779820515117977037
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_mask_13_8
+      rect:
+        serializedVersion: 2
+        x: 313
+        y: 240
+        width: 35
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5f01875622dc83410800000000000000
+      internalID: 1457140027069305077
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_mask_13_9
+      rect:
+        serializedVersion: 2
+        x: 356
+        y: 250
+        width: 9
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 855399af72c574640800000000000000
+      internalID: 5064117632779236696
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_mask_13_10
+      rect:
+        serializedVersion: 2
+        x: 374
+        y: 247
+        width: 12
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0945a4c1489a74070800000000000000
+      internalID: 8090621640469795984
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_mask_13_11
+      rect:
+        serializedVersion: 2
+        x: 402
+        y: 217
+        width: 22
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 05a76ae0203381e10800000000000000
+      internalID: 2168539304507636304
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_mask_13_12
+      rect:
+        serializedVersion: 2
+        x: 438
+        y: 237
+        width: 39
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cbcbc1c9f741d47c0800000000000000
+      internalID: -4085586748642640708
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_mask_13_13
+      rect:
+        serializedVersion: 2
+        x: 94
+        y: 231
+        width: 6
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1220ce92fabf3cf90800000000000000
+      internalID: -6934422271479250399
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_mask_13_14
+      rect:
+        serializedVersion: 2
+        x: 106
+        y: 227
+        width: 7
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0001b1a7014ffb7b0800000000000000
+      internalID: -5206174292611756032
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_mask_13_15
+      rect:
+        serializedVersion: 2
+        x: 137
+        y: 224
+        width: 10
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f1a59704241fb0bd0800000000000000
+      internalID: -2662769487807686113
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_mask_13_16
+      rect:
+        serializedVersion: 2
+        x: 151
+        y: 222
+        width: 9
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c128dffe51be7fbc0800000000000000
+      internalID: -3749269685309439460
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_mask_13_17
+      rect:
+        serializedVersion: 2
+        x: 81
+        y: 211
+        width: 10
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4365d4a950cd2c850800000000000000
+      internalID: 6395916337441232436
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_mask_13_18
+      rect:
+        serializedVersion: 2
+        x: 122
+        y: 204
+        width: 6
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7e14f292a1ed46320800000000000000
+      internalID: 2550407492940022247
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_mask_13_19
+      rect:
+        serializedVersion: 2
+        x: 153
+        y: 199
+        width: 7
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 09830940b196f32f0800000000000000
+      internalID: -990957828236625776
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_mask_13_20
+      rect:
+        serializedVersion: 2
+        x: 432
+        y: 205
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ebf449e730e301a80800000000000000
+      internalID: -8498224312118652994
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_mask_13_21
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 148
+        width: 27
+        height: 55
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6158eb20e8e744010800000000000000
+      internalID: 1172200951419667734
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_mask_13_22
+      rect:
+        serializedVersion: 2
+        x: 44
+        y: 186
+        width: 11
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: accef7e0c10ea3a60800000000000000
+      internalID: 7654676927776550090
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_mask_13_23
+      rect:
+        serializedVersion: 2
+        x: 139
+        y: 198
+        width: 6
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9da89a9d5beef7750800000000000000
+      internalID: 6305020468150242009
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_mask_13_24
+      rect:
+        serializedVersion: 2
+        x: 391
+        y: 198
+        width: 6
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 41aa69fcaffaff610800000000000000
+      internalID: 1657236679655074324
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_mask_13_25
+      rect:
+        serializedVersion: 2
+        x: 434
+        y: 194
+        width: 10
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b083f34018b81d850800000000000000
+      internalID: 6400049931708479499
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_mask_13_26
+      rect:
+        serializedVersion: 2
+        x: 499
+        y: 197
+        width: 12
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c14dba8fc9fa293e0800000000000000
+      internalID: -2048381791778384868
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_mask_13_27
+      rect:
+        serializedVersion: 2
+        x: 63
+        y: 182
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ae5cee8ecffa09560800000000000000
+      internalID: 7318542895251637738
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_mask_13_28
+      rect:
+        serializedVersion: 2
+        x: 63
+        y: 167
+        width: 14
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e952d8046d1424c40800000000000000
+      internalID: 5495026883807225246
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_mask_13_29
+      rect:
+        serializedVersion: 2
+        x: 85
+        y: 158
+        width: 24
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3638e96b958b517d0800000000000000
+      internalID: -2948247685588679837
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_mask_13_30
+      rect:
+        serializedVersion: 2
+        x: 134
+        y: 113
+        width: 76
+        height: 74
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c8baec29d39e09080800000000000000
+      internalID: -9182583189543146612
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_mask_13_31
+      rect:
+        serializedVersion: 2
+        x: 431
+        y: 165
+        width: 11
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 10eadda6d1548af10800000000000000
+      internalID: 2281149203912437249
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_mask_13_32
+      rect:
+        serializedVersion: 2
+        x: 464
+        y: 172
+        width: 13
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bcef29cb72bebe260800000000000000
+      internalID: 7128049391143943883
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_mask_13_33
+      rect:
+        serializedVersion: 2
+        x: 305
+        y: 156
+        width: 6
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2ddff2efa9b2d7be0800000000000000
+      internalID: -1477977158018138670
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_mask_13_34
+      rect:
+        serializedVersion: 2
+        x: 438
+        y: 170
+        width: 9
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0b04860ff4f646490800000000000000
+      internalID: -7753950269298687824
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_mask_13_35
+      rect:
+        serializedVersion: 2
+        x: 482
+        y: 163
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f00e059a61d7cc7c0800000000000000
+      internalID: -4049724428629516273
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_mask_13_36
+      rect:
+        serializedVersion: 2
+        x: 337
+        y: 145
+        width: 12
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b7f5cad7bd29a5fb0800000000000000
+      internalID: -4658249393157415045
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_mask_13_37
+      rect:
+        serializedVersion: 2
+        x: 382
+        y: 153
+        width: 8
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 59c61c147145f3fc0800000000000000
+      internalID: -3512996725461521259
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_mask_13_38
+      rect:
+        serializedVersion: 2
+        x: 308
+        y: 114
+        width: 9
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d299aecb83251e880800000000000000
+      internalID: -8583489011150317267
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_mask_13_39
+      rect:
+        serializedVersion: 2
+        x: 463
+        y: 116
+        width: 12
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f0d83a8ea62331bc0800000000000000
+      internalID: -3813649024701723377
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      strike_bite_mask_13_0: -5084811462157940844
+      strike_bite_mask_13_1: -7002734735073135398
+      strike_bite_mask_13_10: 8090621640469795984
+      strike_bite_mask_13_11: 2168539304507636304
+      strike_bite_mask_13_12: -4085586748642640708
+      strike_bite_mask_13_13: -6934422271479250399
+      strike_bite_mask_13_14: -5206174292611756032
+      strike_bite_mask_13_15: -2662769487807686113
+      strike_bite_mask_13_16: -3749269685309439460
+      strike_bite_mask_13_17: 6395916337441232436
+      strike_bite_mask_13_18: 2550407492940022247
+      strike_bite_mask_13_19: -990957828236625776
+      strike_bite_mask_13_2: 1926004159944939829
+      strike_bite_mask_13_20: -8498224312118652994
+      strike_bite_mask_13_21: 1172200951419667734
+      strike_bite_mask_13_22: 7654676927776550090
+      strike_bite_mask_13_23: 6305020468150242009
+      strike_bite_mask_13_24: 1657236679655074324
+      strike_bite_mask_13_25: 6400049931708479499
+      strike_bite_mask_13_26: -2048381791778384868
+      strike_bite_mask_13_27: 7318542895251637738
+      strike_bite_mask_13_28: 5495026883807225246
+      strike_bite_mask_13_29: -2948247685588679837
+      strike_bite_mask_13_3: -310722709005687213
+      strike_bite_mask_13_30: -9182583189543146612
+      strike_bite_mask_13_31: 2281149203912437249
+      strike_bite_mask_13_32: 7128049391143943883
+      strike_bite_mask_13_33: -1477977158018138670
+      strike_bite_mask_13_34: -7753950269298687824
+      strike_bite_mask_13_35: -4049724428629516273
+      strike_bite_mask_13_36: -4658249393157415045
+      strike_bite_mask_13_37: -3512996725461521259
+      strike_bite_mask_13_38: -8583489011150317267
+      strike_bite_mask_13_39: -3813649024701723377
+      strike_bite_mask_13_4: 4498333037501496228
+      strike_bite_mask_13_5: 6289257007758004612
+      strike_bite_mask_13_6: 2389649665668735534
+      strike_bite_mask_13_7: -5779820515117977037
+      strike_bite_mask_13_8: 1457140027069305077
+      strike_bite_mask_13_9: 5064117632779236696
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

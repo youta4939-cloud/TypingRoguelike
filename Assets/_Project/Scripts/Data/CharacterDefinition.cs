@@ -12,7 +12,10 @@ namespace TypingRoguelike.Data
         public Sprite battlePortrait;
         public SkillDefinition innateSkill;
 
-        [Header("パーティ合算ステ（RUN中固定）")]
+        [Header("ステータス（RUN中固定）")]
+        [Tooltip("共有HPへの分担。3人の合計がランの最大HP。")]
+        public int hp = 250;
+        [Tooltip("ATK。単語ダメ＝全員のATK合計×係数、スキルダメ＝撃ったキャラのATK×%")]
         public int attack = 5;
         public int defense = 4;
         public int luck = 3;

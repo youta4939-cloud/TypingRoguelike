@@ -1,0 +1,185 @@
+{
+ "canvas": {
+  "w": 1024,
+  "h": 1536,
+  "source": "01M5H71RPN6R2RC6YN40DSFDJP.png (1024x1536, used at native size, no upscale)",
+  "coords": "pixels, origin top-left of canvas, y down. Every PNG is FULL CANVAS: place all at local (0,0), scale 1, same PPU",
+  "draw_order": "back to front = order of 'parts'",
+  "facing": "front / slightly toward screen-left (no flip needed)"
+ },
+ "parts": {
+  "01_shadow": {
+   "pivot": [
+    515,
+    1440
+   ]
+  },
+  "02_legs": {
+   "pivot": [
+    515,
+    1440
+   ],
+   "note": "static"
+  },
+  "03_kimono_lining": {
+   "pivot": [
+    515,
+    650
+   ],
+   "note": "static backing; shows when the hem waves"
+  },
+  "04_kimono": {
+   "pivot": [
+    515,
+    650
+   ],
+   "note": "sway with shader using sway_mask_kimono.png (recommended) or alt_hem_sections"
+  },
+  "05_torso": {
+   "pivot": [
+    515,
+    650
+   ],
+   "note": "root of the upper body; breathing = scaleY 1.000-1.004 at this pivot"
+  },
+  "06_scabbards": {
+   "pivot": [
+    515,
+    650
+   ],
+   "parent": "05_torso",
+   "note": "static with torso"
+  },
+  "07_sash_strip_L": {
+   "pivot": [
+    406,
+    647
+   ],
+   "parent": "05_torso",
+   "swing_deg": 2.5
+  },
+  "08_sash_rope": {
+   "pivot": [
+    433,
+    579
+   ],
+   "parent": "05_torso",
+   "swing_deg": 2.0
+  },
+  "09_sash_strip_R": {
+   "pivot": [
+    523,
+    677
+   ],
+   "parent": "05_torso",
+   "swing_deg": 2.5
+  },
+  "10_arm_R": {
+   "pivot": [
+    718,
+    546
+   ],
+   "parent": "05_torso",
+   "note": "elbow (in sleeve). screen-right arm resting on hilts",
+   "swing_deg": 0.6
+  },
+  "11_arm_L_katana": {
+   "pivot": [
+    316,
+    790
+   ],
+   "parent": "05_torso",
+   "note": "wrist inside sleeve; hand+katana one piece",
+   "swing_deg": 0.6
+  },
+  "12_skull": {
+   "pivot": [
+    498,
+    334
+   ],
+   "parent": "05_torso",
+   "note": "neck",
+   "swing_deg": 0.8
+  },
+  "13_hat": {
+   "pivot": [
+    498,
+    334
+   ],
+   "parent": "12_skull"
+  },
+  "14_hat_talisman_L": {
+   "pivot": [
+    319,
+    240
+   ],
+   "parent": "13_hat",
+   "swing_deg": 6
+  },
+  "15_hat_chain_L_outer": {
+   "pivot": [
+    265,
+    232
+   ],
+   "parent": "13_hat",
+   "swing_deg": 4
+  },
+  "16_hat_chain_L_inner": {
+   "pivot": [
+    364,
+    250
+   ],
+   "parent": "13_hat",
+   "swing_deg": 4
+  },
+  "17_hat_talisman_R": {
+   "pivot": [
+    675,
+    232
+   ],
+   "parent": "13_hat",
+   "swing_deg": 6
+  },
+  "18_hat_chain_R": {
+   "pivot": [
+    743,
+    212
+   ],
+   "parent": "13_hat",
+   "swing_deg": 4
+  }
+ },
+ "alt_hem_sections": {
+  "04a_kimono_hem_L": {
+   "pivot": [
+    320,
+    650
+   ],
+   "swing_deg": 2.0,
+   "note": "use INSTEAD of 04_kimono (not together)"
+  },
+  "04b_kimono_hem_C": {
+   "pivot": [
+    486,
+    650
+   ],
+   "swing_deg": 2.0,
+   "note": "use INSTEAD of 04_kimono (not together)"
+  },
+  "04c_kimono_hem_R": {
+   "pivot": [
+    769,
+    650
+   ],
+   "swing_deg": 2.0,
+   "note": "use INSTEAD of 04_kimono (not together)"
+  }
+ },
+ "sway_mask": {
+  "file": "sway_mask_kimono.png",
+  "for": "04_kimono",
+  "waist_y": 650,
+  "hem_y": 1345,
+  "recommended_amplitude_px": "3-4 at the hem (mask=1)"
+ }
+}

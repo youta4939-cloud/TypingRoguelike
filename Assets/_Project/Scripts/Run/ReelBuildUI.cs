@@ -8,15 +8,15 @@ using UnityEngine.UI;
 
 namespace TypingRoguelike.Run
 {
-    /// <summary>パーツを3列×9行に置いてリールを作る。マイセットの枠だけ空けておく。</summary>
+    /// <summary>パーツを3列×6行に置いてリールを作る。同じパーツは1つだけ。マイセットの枠だけ空けておく。</summary>
     public sealed class ReelBuildUI
     {
         static readonly Color Page = new(0.05f, 0.035f, 0.03f, 1f);
         static readonly Color Panel = new(0.1f, 0.075f, 0.05f, 0.96f);
         static readonly Color Ink = new(0.93f, 0.9f, 0.82f, 1f);
         static readonly Color Muted = new(0.62f, 0.56f, 0.48f, 1f);
-        static readonly Color Valid = new(0.28f, 0.78f, 0.38f, 0.9f);
-        static readonly Color Invalid = new(0.82f, 0.18f, 0.16f, 0.9f);
+        static readonly Color Valid = new(0.45f, 0.95f, 0.5f, 0.42f);
+        static readonly Color Invalid = new(0.95f, 0.22f, 0.18f, 0.48f);
         static readonly Color Penalty = new(0.55f, 0.08f, 0.1f, 1f);
 
         GameObject _root;
@@ -40,6 +40,14 @@ namespace TypingRoguelike.Run
         int _dragLocalX;
         int _dragLocalY;
         Text _dragHold;
+        Text _tip;
+        int _filter;
+        int[,] _counts;
+        YakuCatalog _yaku;
+        readonly List<OddsFlash> _flashes = new();
+        Sheet _sheet;
+
+        enum Sheet { None, Detail, Tools }
 
         public void Show(
             Transform host,
@@ -51,20 +59,28 @@ namespace TypingRoguelike.Run
             DungeonNodeType fourth,
             LayerConfig config,
             BoardCatalog boards,
+            YakuCatalog yaku,
             Action<ReelLayout, bool> onDepart,
             Action<BoardGrid> onDebugRolls)
         {
             _ = totalLayers;
+            ReelBoardSettings.Apply();
             EnsureRoot(host);
             _catalog = catalog ?? ReelPartCatalog.Fallback();
             _layout = layout ?? ReelLayout.BalanceStarter(_catalog);
             _debugUnlocked = debugUnlocked;
+            _layout.KeepWithinOwned(_catalog, _debugUnlocked);
             _layer = layer;
             _fourth = fourth;
             _config = config;
             _boards = boards;
+            _yaku = yaku;
             _onDepart = onDepart;
             _onDebugRolls = onDebugRolls;
+            _counts = CaptureCounts();
+            _flashes.Clear();
+            _sheet = Sheet.None;
+            BindClock();
             Rebuild();
         }
 
@@ -85,87 +101,111 @@ namespace TypingRoguelike.Run
             HideModal();
             _dragging = false;
             _dragHold = null;
+            foreach (var flash in _flashes)
+                flash.Lines.Clear();
             if (_panel != null)
                 UnityEngine.Object.Destroy(_panel);
 
-            _panel = FullScreen("ReelBuild", Page);
-            var title = Label(_panel.transform, "Title", $"リール編成 — 第{_layer}層へ", 32, TextAnchor.MiddleCenter,
-                new Vector2(0.16f, 0.93f), new Vector2(0.84f, 0.995f), BattleUITheme.Gold);
-            title.fontStyle = FontStyle.Bold;
-            Label(_panel.transform, "Sub", "パーツを並べて、1〜3マス目に出るマスを決める", 16, TextAnchor.MiddleCenter,
-                new Vector2(0.2f, 0.905f), new Vector2(0.8f, 0.94f), Muted);
+            _panel = FullScreen("ReelBuild", Color.white, "bg_chamber");
+            var title = Label(_panel.transform, "Title", $"第{_layer}層　リール編成", 28, TextAnchor.MiddleCenter,
+                new Vector2(0.24f, 0.905f), new Vector2(0.76f, 0.985f), BattleUITheme.Gold, true);
+            Emboss(title, new Color(0f, 0f, 0f, 0.85f));
 
-            BuildList(new Vector2(0.015f, 0.025f), new Vector2(0.275f, 0.89f));
-            BuildBoard(new Vector2(0.285f, 0.055f), new Vector2(0.52f, 0.89f));
-            BuildFourth(new Vector2(0.528f, 0.58f), new Vector2(0.635f, 0.89f));
-            BuildReadout(new Vector2(0.645f, 0.025f), new Vector2(0.985f, 0.89f));
+            BuildList(new Vector2(0.012f, 0.135f), new Vector2(0.232f, 0.89f));
+            BuildBoard(new Vector2(0.242f, 0.135f), new Vector2(0.735f, 0.89f));
+            BuildRail(new Vector2(0.745f, 0.135f), new Vector2(0.988f, 0.89f));
+            if (_sheet == Sheet.Detail)
+                BuildDetail();
+            BuildDock();
+            if (_sheet == Sheet.Tools)
+                BuildTools();
+        }
+
+        void OpenSheet(Sheet sheet)
+        {
+            _sheet = _sheet == sheet ? Sheet.None : sheet;
+            Rebuild();
         }
 
         void BuildList(Vector2 min, Vector2 max)
         {
-            var panel = PanelOf(_panel.transform, "PartList", min, max);
+            var panel = PanelOf(_panel.transform, "PartList", min, max, "plate_list");
             _list = panel;
-            Label(panel, "Heading", "パーツ一覧", 22, TextAnchor.MiddleLeft,
-                new Vector2(0.05f, 0.93f), new Vector2(0.7f, 0.99f), BattleUITheme.Gold).fontStyle = FontStyle.Bold;
-            Label(panel, "Hint", "ドラッグで盤面へ", 13, TextAnchor.MiddleRight,
-                new Vector2(0.4f, 0.93f), new Vector2(0.96f, 0.99f), Muted);
+            var heading = Label(panel, "Heading", "パーツ", 18, TextAnchor.MiddleLeft,
+                new Vector2(0.09f, 0.875f), new Vector2(0.42f, 0.935f), BattleUITheme.Gold, true);
+            Emboss(heading, new Color(0f, 0f, 0f, 0.7f));
+            Label(panel, "Hint", "重ねると入れ替わる", 11, TextAnchor.MiddleRight,
+                new Vector2(0.40f, 0.875f), new Vector2(0.92f, 0.935f), Muted);
+            BuildTabs(panel);
 
-            var parts = _catalog.Parts ?? Array.Empty<ReelPart>();
-            var rows = Mathf.Max(1, Mathf.CeilToInt(parts.Length / 2f));
-            var top = 0.91f;
-            var bottom = 0.2f;
+            var parts = VisibleParts();
+            var columns = 3;
+            var rows = Mathf.Max(1, Mathf.CeilToInt(parts.Count / (float)columns));
+            var top = 0.73f;
+            var bottom = 0.16f;
             var rowH = (top - bottom) / rows;
-            for (var i = 0; i < parts.Length; i++)
+            for (var i = 0; i < parts.Count; i++)
             {
                 var part = parts[i];
-                var col = i % 2;
-                var row = i / 2;
-                var xMin = 0.03f + col * 0.485f;
+                var col = i % columns;
+                var row = i / columns;
+                var xMin = 0.08f + col * 0.30f;
                 var yMax = top - row * rowH;
-                var card = PanelOf(panel, "Part_" + part.Id, new Vector2(xMin, yMax - rowH + 0.008f), new Vector2(xMin + 0.46f, yMax - 0.004f));
-                if (part.HasPenalty)
-                    Frame(card.gameObject, BattleUITheme.Gold, 2.5f);
-                var owned = _catalog.Owned(part.Id, _debugUnlocked);
-                var left = owned - _layout.CountOf(part.Id);
-                var locked = part.Locked && !_debugUnlocked;
-                if (locked)
+                var card = Rect(panel, "Part_" + part.Id, new Vector2(xMin, yMax - rowH + 0.008f), new Vector2(xMin + 0.28f, yMax - 0.006f));
+                var plate = card.gameObject.AddComponent<Image>();
+                Paint(plate, part.HasPenalty ? "card_gold" : "card_relic");
+                var placed = _layout.Remaining(_catalog, part.Id, _debugUnlocked) <= 0;
+                if (placed)
                 {
                     var group = card.gameObject.AddComponent<CanvasGroup>();
                     group.alpha = 0.45f;
                     group.blocksRaycasts = true;
                 }
 
-                DrawMini(card, part);
-                Label(card, "Id", part.Id, 14, TextAnchor.UpperLeft, new Vector2(0.4f, 0.62f), new Vector2(0.98f, 0.95f), BattleUITheme.Gold);
-                Label(card, "Name", part.Name, 13, TextAnchor.UpperLeft, new Vector2(0.4f, 0.32f), new Vector2(0.98f, 0.68f), Ink);
-                var hold = Label(card, "Hold", locked ? "鍵" : $"残り{Mathf.Max(0, left)}", 13, TextAnchor.LowerLeft,
-                    new Vector2(0.4f, 0.04f), new Vector2(0.98f, 0.34f), locked ? Muted : Ink);
-                if (!locked && left > 0)
-                    BindDrag(card, part.Id, -1, 0, 0, hold);
+                DrawMini(card, part, true);
+                if (placed)
+                {
+                    var mark = Label(card, "Used", "使用中", 11, TextAnchor.LowerCenter,
+                        new Vector2(0.04f, 0.02f), new Vector2(0.96f, 0.34f), Muted);
+                    mark.fontStyle = FontStyle.Bold;
+                }
+
+                var tip = card.gameObject.AddComponent<ReelPartTip>();
+                tip.Owner = this;
+                tip.Text = part.Name + "\n" + CellList(part);
+                if (!placed)
+                    BindDrag(card, part.Id, -1, 0, 0, null);
             }
 
-            Label(panel, "SetTitle", "マイセット（準備中）", 16, TextAnchor.MiddleLeft,
-                new Vector2(0.04f, 0.145f), new Vector2(0.96f, 0.19f), Muted);
-            for (var i = 0; i < 3; i++)
-            {
-                var xMin = 0.04f + i * 0.32f;
-                var slot = PanelOf(panel, "SetSlot" + (i + 1), new Vector2(xMin, 0.03f), new Vector2(xMin + 0.28f, 0.13f));
-                Label(slot, "Name", $"枠{i + 1}", 14, TextAnchor.MiddleCenter, Vector2.zero, Vector2.one, Muted);
-            }
+            _tip = Label(panel, "Tip", "カーソルを合わせると、名前と中身が出る", 12, TextAnchor.UpperLeft,
+                new Vector2(0.08f, 0.075f), new Vector2(0.92f, 0.15f), Muted);
+            Label(panel, "Locked", $"未解放 {LockedCount()}個", 13, TextAnchor.MiddleLeft,
+                new Vector2(0.08f, 0.03f), new Vector2(0.92f, 0.075f), Muted);
         }
 
         void BuildBoard(Vector2 min, Vector2 max)
         {
-            var panel = PanelOf(_panel.transform, "Board", min, max);
+            var panel = PanelOf(_panel.transform, "Board", min, max, "plate_side");
             for (var column = 0; column < BoardGrid.Columns; column++)
             {
-                var xMin = 0.04f + column * 0.31f;
-                var head = PanelOf(panel, "ColHead" + column, new Vector2(xMin, 0.93f), new Vector2(xMin + 0.29f, 0.99f));
-                Label(head, "Text", $"{column + 1}マス目", 16, TextAnchor.MiddleCenter, Vector2.zero, Vector2.one, BattleUITheme.Gold);
+                var xMin = 0.09f + column * 0.28f;
+                var headText = Label(panel, "Col" + column, $"{column + 1}マス目", 16, TextAnchor.MiddleCenter,
+                    new Vector2(xMin, 0.875f), new Vector2(xMin + 0.26f, 0.935f), BattleUITheme.Gold, true);
+                Emboss(headText, new Color(0f, 0f, 0f, 0.75f));
             }
 
-            var grid = PanelOf(panel, "Cells", new Vector2(0.04f, 0.08f), new Vector2(0.97f, 0.92f));
+            var grid = Rect(panel, "Cells", new Vector2(0.08f, 0.09f), new Vector2(0.92f, 0.86f));
             _board = grid;
+            for (var column = 0; column < BoardGrid.Columns; column++)
+            {
+                var well = Rect(grid, "Well" + column,
+                    new Vector2(column / (float)BoardGrid.Columns, 0f),
+                    new Vector2((column + 1) / (float)BoardGrid.Columns, 1f));
+                var wellImage = well.gameObject.AddComponent<Image>();
+                wellImage.raycastTarget = false;
+                Paint(wellImage, "column_well");
+            }
+
             _highlights = new Image[BoardGrid.Columns, BoardGrid.Rows];
             for (var row = 0; row < BoardGrid.Rows; row++)
             {
@@ -173,10 +213,8 @@ namespace TypingRoguelike.Run
                     BuildCell(grid, column, row);
             }
 
-            Label(panel, "EmptyHint", "空き＝罠", 14, TextAnchor.MiddleLeft,
-                new Vector2(0.04f, 0.01f), new Vector2(0.5f, 0.07f), Muted);
-            Label(panel, "EmptyHint2", "空きマスは罠として出る", 14, TextAnchor.MiddleRight,
-                new Vector2(0.4f, 0.01f), new Vector2(0.97f, 0.07f), Muted);
+            Label(panel, "EmptyHint", "空いたマスは、罠として出る", 13, TextAnchor.MiddleCenter,
+                new Vector2(0.1f, 0.045f), new Vector2(0.9f, 0.1f), Muted);
         }
 
         void BuildCell(RectTransform grid, int column, int row)
@@ -185,7 +223,15 @@ namespace TypingRoguelike.Run
             var xMax = (column + 1) / (float)BoardGrid.Columns;
             var yMax = 1f - row / (float)BoardGrid.Rows;
             var yMin = 1f - (row + 1) / (float)BoardGrid.Rows;
-            var cell = Rect(grid, "Cell", new Vector2(xMin + 0.012f, yMin + 0.012f), new Vector2(xMax - 0.012f, yMax - 0.012f));
+            var inset = 0.16f;
+            var cellMin = new Vector2(Mathf.Lerp(xMin, xMax, inset), Mathf.Lerp(yMin, yMax, inset));
+            var cellMax = new Vector2(Mathf.Lerp(xMin, xMax, 1f - inset), Mathf.Lerp(yMin, yMax, 1f - inset));
+            var shade = Rect(grid, "Shade", new Vector2(cellMin.x + 0.012f, cellMin.y - 0.018f), new Vector2(cellMax.x + 0.012f, cellMax.y - 0.012f));
+            var shadeImage = shade.gameObject.AddComponent<Image>();
+            shadeImage.raycastTarget = false;
+            shadeImage.color = new Color(0f, 0f, 0f, 0.55f);
+            BattleUITheme.EnsureSprite(shadeImage);
+            var cell = Rect(grid, "Cell", cellMin, cellMax);
             var image = cell.gameObject.AddComponent<Image>();
             var index = _layout.FindIndexAt(_catalog, column, row);
             var placement = index >= 0 ? _layout.Placements[index] : null;
@@ -202,14 +248,23 @@ namespace TypingRoguelike.Run
 
             var empty = shape == null;
             var type = empty ? DungeonNodeType.Trap : shape.Type;
-            image.color = empty ? new Color(0.08f, 0.06f, 0.05f, 1f) : TypeColor(type);
-            BattleUITheme.EnsureSprite(image);
-            if (!empty && part.HasPenalty && type != DungeonNodeType.Trap)
-                Frame(cell.gameObject, BattleUITheme.Gold, 2.2f);
-            if (!empty && type == DungeonNodeType.Trap)
-                Frame(cell.gameObject, Penalty, 3f);
-            Label(cell, "Mark", empty ? "罠" : Mark(type), empty ? 14 : 20, TextAnchor.MiddleCenter,
-                Vector2.zero, Vector2.one, empty ? new Color(0.35f, 0.28f, 0.24f, 1f) : Color.white);
+            var art = empty ? ReelBuildArt.Get("socket_empty") : ReelBuildArt.Tile(type);
+            if (art != null)
+            {
+                image.sprite = art;
+                image.preserveAspect = true;
+                image.color = Color.white;
+            }
+            else
+            {
+                image.color = empty ? new Color(0.08f, 0.06f, 0.05f, 1f) : TypeColor(type);
+                BattleUITheme.EnsureSprite(image);
+                Label(cell, "Mark", empty ? "罠" : Mark(type), empty ? 14 : 20, TextAnchor.MiddleCenter,
+                    Vector2.zero, Vector2.one, empty ? new Color(0.35f, 0.28f, 0.24f, 1f) : Color.white);
+            }
+
+            if (!empty && part.HasPenalty)
+                Frame(cell.gameObject, type == DungeonNodeType.Trap ? Penalty : BattleUITheme.Gold, 2.2f);
             var highlight = Rect(cell, "Preview", Vector2.zero, Vector2.one);
             var hi = highlight.gameObject.AddComponent<Image>();
             hi.color = new Color(1f, 1f, 1f, 0f);
@@ -220,60 +275,146 @@ namespace TypingRoguelike.Run
                 BindDrag(cell, placement.PartId, index, shape.X, shape.Y, null);
         }
 
-        void BuildFourth(Vector2 min, Vector2 max)
+        void BuildRail(Vector2 min, Vector2 max)
         {
-            var panel = PanelOf(_panel.transform, "Fourth", min, max);
-            Label(panel, "Head", "4マス目", 16, TextAnchor.MiddleCenter,
-                new Vector2(0.08f, 0.84f), new Vector2(0.92f, 0.98f), BattleUITheme.Gold);
-            var icon = PanelOf(panel, "Icon", new Vector2(0.22f, 0.38f), new Vector2(0.78f, 0.8f));
-            icon.GetComponent<Image>().color = TypeColor(_fourth);
-            Label(icon, "Mark", Mark(_fourth), 28, TextAnchor.MiddleCenter, Vector2.zero, Vector2.one, Color.white);
-            Label(panel, "Name", LayerPathUI.SquareName(_fourth), 20, TextAnchor.MiddleCenter,
-                new Vector2(0.05f, 0.2f), new Vector2(0.95f, 0.38f), Ink).fontStyle = FontStyle.Bold;
-            Label(panel, "Fixed", "固定", 14, TextAnchor.MiddleCenter,
-                new Vector2(0.25f, 0.05f), new Vector2(0.75f, 0.18f), Muted);
+            var rail = Rect(_panel.transform, "Rail", min, max);
+            var icon = Rect(rail, "FourthIcon", new Vector2(0.04f, 0.78f), new Vector2(0.38f, 0.98f));
+            var iconImage = icon.gameObject.AddComponent<Image>();
+            iconImage.raycastTarget = false;
+            var tile = ReelBuildArt.Tile(_fourth);
+            if (tile != null)
+            {
+                iconImage.sprite = tile;
+                iconImage.preserveAspect = true;
+                iconImage.color = Color.white;
+            }
+            else
+            {
+                iconImage.color = TypeColor(_fourth);
+                BattleUITheme.EnsureSprite(iconImage);
+            }
+
+            Label(rail, "FourthHead", "4マス目", 13, TextAnchor.MiddleLeft,
+                new Vector2(0.42f, 0.90f), new Vector2(0.98f, 0.98f), Muted);
+            var fourthName = Label(rail, "FourthName", LayerPathUI.SquareName(_fourth), 20, TextAnchor.MiddleLeft,
+                new Vector2(0.42f, 0.82f), new Vector2(0.98f, 0.91f), Ink, true);
+            Emboss(fourthName, new Color(0f, 0f, 0f, 0.75f));
+            Label(rail, "Advice", ReelBoardSettings.AdviceFor(_fourth), 13, TextAnchor.UpperLeft,
+                new Vector2(0.42f, 0.70f), new Vector2(0.98f, 0.82f), BattleUITheme.Gold);
+
+            var grid = _layout.ToGrid(_catalog);
+            var shortages = LayerSquares.ShortageLines(grid, _config, _layer);
+            Label(rail, "MinLine", MinimumLine(grid), 14, TextAnchor.MiddleLeft,
+                new Vector2(0.04f, 0.62f), new Vector2(0.98f, 0.69f),
+                shortages.Count == 0 ? new Color(0.55f, 0.9f, 0.55f, 1f) : new Color(1f, 0.45f, 0.4f, 1f), true);
+            var empty = _layout.EmptyCells(_catalog);
+            if (empty > 0)
+            {
+                Label(rail, "EmptyLine", $"空き {empty}（罠として出る）", 12, TextAnchor.MiddleLeft,
+                    new Vector2(0.04f, 0.57f), new Vector2(0.98f, 0.62f), Muted);
+            }
+
+            Label(rail, "OddsHead", "出現", 13, TextAnchor.MiddleLeft,
+                new Vector2(0.04f, 0.50f), new Vector2(0.98f, 0.56f), Muted);
+            BuildColumnOdds(rail, grid, 0.48f);
         }
 
-        void BuildReadout(Vector2 min, Vector2 max)
+        void BuildColumnOdds(RectTransform parent, BoardGrid grid, float top)
         {
-            var panel = PanelOf(_panel.transform, "Readout", min, max);
-            var grid = _layout.ToGrid(_catalog);
-            Label(panel, "OddsTitle", "出現割合", 22, TextAnchor.MiddleLeft,
-                new Vector2(0.04f, 0.93f), new Vector2(0.6f, 0.99f), BattleUITheme.Gold).fontStyle = FontStyle.Bold;
-            Label(panel, "OddsHint", "リール1本＝9マス中の数", 13, TextAnchor.MiddleRight,
-                new Vector2(0.4f, 0.93f), new Vector2(0.96f, 0.99f), Muted);
-            Label(panel, "H0", "", 12, TextAnchor.MiddleCenter, new Vector2(0.28f, 0.88f), new Vector2(0.48f, 0.93f), Muted).text = "1マス目";
-            Label(panel, "H1", "2マス目", 12, TextAnchor.MiddleCenter, new Vector2(0.48f, 0.88f), new Vector2(0.7f, 0.93f), Muted);
-            Label(panel, "H2", "3マス目", 12, TextAnchor.MiddleCenter, new Vector2(0.7f, 0.88f), new Vector2(0.96f, 0.93f), Muted);
             var types = BoardGrid.RoadTypes();
+            var rowH = 0.062f;
+            for (var column = 0; column < BoardGrid.Columns; column++)
+            {
+                var xMin = 0.02f + column * 0.33f;
+                var xMax = xMin + 0.31f;
+                Label(parent, "ColOdds" + column, $"{column + 1}", 12, TextAnchor.MiddleCenter,
+                    new Vector2(xMin, top - rowH), new Vector2(xMax, top), BattleUITheme.Gold, true);
+                for (var i = 0; i < types.Length; i++)
+                {
+                    var yMax = top - rowH * (i + 1);
+                    var count = grid.Count(column, types[i]);
+                    var label = Label(parent, "Odds" + column + "_" + i, $"{Mark(types[i])} {OddsText(count, true)}", 11,
+                        TextAnchor.MiddleCenter, new Vector2(xMin, yMax - rowH), new Vector2(xMax, yMax), Ink);
+                    StyleOdds(label, column, i, count);
+                }
+            }
+        }
+
+        void BuildDock()
+        {
+            var dock = Rect(_panel.transform, "Dock", Vector2.zero, Vector2.one);
+            TextLink(dock, "全部外す", new Vector2(0.02f, 0.025f), new Vector2(0.12f, 0.11f), () =>
+            {
+                _layout.Clear();
+                CommitLayout();
+            });
+            TextLink(dock, "くわしく", new Vector2(0.13f, 0.025f), new Vector2(0.22f, 0.11f), () => OpenSheet(Sheet.Detail), _sheet == Sheet.Detail);
+            TextLink(dock, "調整", new Vector2(0.23f, 0.025f), new Vector2(0.30f, 0.11f), () => OpenSheet(Sheet.Tools));
+            TextLink(dock, "マイセット", new Vector2(0.31f, 0.025f), new Vector2(0.42f, 0.11f), () => OpenSheet(Sheet.Tools));
+            var shortages = LayerSquares.ShortageLines(_layout.ToGrid(_catalog), _config, _layer);
+            var ready = shortages.Count == 0;
+            if (ready)
+            {
+                Button(dock, "出発", new Vector2(0.74f, 0.02f), new Vector2(0.97f, 0.115f), TryDepart, "btn_gold", 22, true, true);
+            }
+            else
+            {
+                TextLink(dock, "出発できない", new Vector2(0.74f, 0.02f), new Vector2(0.97f, 0.115f), TryDepart, false, 18,
+                    new Color(1f, 0.45f, 0.4f, 1f));
+            }
+        }
+
+        void BuildDetail()
+        {
+            var window = PanelOf(_panel.transform, "Detail", new Vector2(0.18f, 0.15f), new Vector2(0.82f, 0.88f), "plate_board");
+            var heading = Label(window, "Title", "くわしく", 22, TextAnchor.MiddleLeft,
+                new Vector2(0.08f, 0.88f), new Vector2(0.4f, 0.96f), BattleUITheme.Gold, true);
+            Emboss(heading, new Color(0f, 0f, 0f, 0.75f));
+            TextLink(window, "閉じる", new Vector2(0.78f, 0.88f), new Vector2(0.94f, 0.96f), () => OpenSheet(Sheet.Detail));
+
+            var grid = _layout.ToGrid(_catalog);
+            var types = BoardGrid.RoadTypes();
+            Label(window, "H0", "1マス目", 12, TextAnchor.MiddleCenter, new Vector2(0.28f, 0.82f), new Vector2(0.48f, 0.87f), Muted);
+            Label(window, "H1", "2マス目", 12, TextAnchor.MiddleCenter, new Vector2(0.48f, 0.82f), new Vector2(0.70f, 0.87f), Muted);
+            Label(window, "H2", "3マス目", 12, TextAnchor.MiddleCenter, new Vector2(0.70f, 0.82f), new Vector2(0.94f, 0.87f), Muted);
             for (var i = 0; i < types.Length; i++)
             {
-                var yMax = 0.88f - i * 0.055f;
-                var yMin = yMax - 0.05f;
-                Label(panel, "Type" + i, LayerPathUI.SquareName(types[i]), 14, TextAnchor.MiddleLeft,
-                    new Vector2(0.04f, yMin), new Vector2(0.26f, yMax), Ink);
+                var yMax = 0.81f - i * 0.045f;
+                var yMin = yMax - 0.042f;
+                Label(window, "Type" + i, LayerPathUI.SquareName(types[i]), 14, TextAnchor.MiddleLeft,
+                    new Vector2(0.08f, yMin), new Vector2(0.26f, yMax), Ink);
                 for (var column = 0; column < BoardGrid.Columns; column++)
                 {
+                    var count = grid.Count(column, types[i]);
                     var xMin = 0.28f + column * 0.22f;
-                    Label(panel, "Odds" + i + "_" + column, OddsText(grid.Count(column, types[i])), 13, TextAnchor.MiddleCenter,
-                        new Vector2(xMin, yMin), new Vector2(xMin + 0.2f, yMax), Ink);
+                    var label = Label(window, "DetailOdds" + i + "_" + column, OddsText(count, false), 14, TextAnchor.MiddleCenter,
+                        new Vector2(xMin, yMin), new Vector2(xMin + 0.2f, yMax), Ink, true);
+                    StyleOdds(label, column, i, count);
                 }
             }
 
-            Label(panel, "LegendTitle", "見かけ", 16, TextAnchor.MiddleLeft,
-                new Vector2(0.04f, 0.5f), new Vector2(0.4f, 0.55f), BattleUITheme.Gold);
-            Label(panel, "Legend",
-                "金のフチ　強いパーツ（罠つき）\nふつうのフチ　ふつうのパーツ\n赤のフチと骸　デメリットのマス\n暗い罠　空きマス（罠として出る）\n緑　置ける　　赤　置けない",
-                13, TextAnchor.UpperLeft, new Vector2(0.04f, 0.32f), new Vector2(0.48f, 0.5f), Muted);
+            var shares = YakuEvaluator.Shares(grid, _yaku);
+            var yakuTitle = Label(window, "YakuTitle", "役の確率", 16, TextAnchor.MiddleLeft,
+                new Vector2(0.08f, 0.52f), new Vector2(0.5f, 0.57f), BattleUITheme.Gold, true);
+            Emboss(yakuTitle, new Color(0f, 0f, 0f, 0.7f));
+            Label(window, "YakuHint", $"{BoardGrid.Rows * BoardGrid.Rows * BoardGrid.Rows}通り", 12, TextAnchor.MiddleRight,
+                new Vector2(0.5f, 0.52f), new Vector2(0.94f, 0.57f), Muted);
+            for (var i = 0; i < shares.Count && i < 8; i++)
+            {
+                var yMax = 0.51f - i * 0.032f;
+                Label(window, "Yaku" + i, $"{shares[i].Name}    {shares[i].Percent:0.0}%", 15, TextAnchor.MiddleLeft,
+                    new Vector2(0.08f, yMax - 0.033f), new Vector2(0.94f, yMax), Ink);
+            }
 
-            Label(panel, "MinTitle", "最低マス数チェック", 16, TextAnchor.MiddleLeft,
-                new Vector2(0.5f, 0.5f), new Vector2(0.96f, 0.55f), BattleUITheme.Gold);
+            var minTitle = Label(window, "MinTitle", "最低マス数", 16, TextAnchor.MiddleLeft,
+                new Vector2(0.08f, 0.24f), new Vector2(0.5f, 0.29f), BattleUITheme.Gold, true);
+            Emboss(minTitle, new Color(0f, 0f, 0f, 0.7f));
             var shortages = LayerSquares.ShortageLines(grid, _config, _layer);
             var rules = _config != null ? _config.MinimumsFor(_layer) : new List<LayerTypeMinimum>();
             for (var i = 0; i < rules.Count && i < 4; i++)
             {
                 var rule = rules[i];
-                var yMax = 0.48f - i * 0.07f;
+                var yMax = 0.23f - i * 0.04f;
                 var worst = false;
                 var bits = new List<string>();
                 for (var column = 0; column < BoardGrid.Columns; column++)
@@ -284,52 +425,88 @@ namespace TypingRoguelike.Run
                         worst = true;
                 }
 
-                Label(panel, "Min" + i,
-                    $"{LayerPathUI.SquareName(rule.type)}  {string.Join("  ", bits)}  {(worst ? "不足" : "OK")}",
-                    14, TextAnchor.MiddleLeft, new Vector2(0.5f, yMax - 0.06f), new Vector2(0.96f, yMax),
-                    worst ? new Color(1f, 0.45f, 0.4f, 1f) : new Color(0.55f, 0.85f, 0.55f, 1f));
+                Label(window, "Min" + i,
+                    $"{LayerPathUI.SquareName(rule.type)}  {string.Join("   ", bits)}  {(worst ? "不足" : "足りている")}",
+                    15, TextAnchor.MiddleLeft, new Vector2(0.08f, yMax - 0.038f), new Vector2(0.94f, yMax),
+                    worst ? new Color(1f, 0.45f, 0.4f, 1f) : new Color(0.55f, 0.9f, 0.55f, 1f));
             }
 
             var note = shortages.Count == 0 ? "最低マス数を満たしています。" : string.Join("\n", shortages);
             var empty = _layout.EmptyCells(_catalog);
             if (empty > 0)
                 note += $"\n空きマスが{empty}つあります（空きは罠として出ます）";
-            Label(panel, "MinNote", note, 14, TextAnchor.UpperLeft,
-                new Vector2(0.04f, 0.2f), new Vector2(0.96f, 0.32f), shortages.Count == 0 ? Muted : new Color(1f, 0.55f, 0.45f, 1f));
+            Label(window, "MinNote", note, 13, TextAnchor.UpperLeft,
+                new Vector2(0.1f, 0.11f), new Vector2(0.9f, 0.20f), shortages.Count == 0 ? Muted : new Color(1f, 0.55f, 0.45f, 1f));
+            Label(window, "Legend", "金枠は強いパーツ。緑は置ける場所、赤は置けない場所。", 12, TextAnchor.MiddleLeft,
+                new Vector2(0.1f, 0.07f), new Vector2(0.9f, 0.11f), Muted);
+        }
 
-            Button(panel, _debugUnlocked ? "解放済み" : "全パーツ解放", new Vector2(0.04f, 0.145f), new Vector2(0.28f, 0.19f), () =>
+        void BuildTools()
+        {
+            var dim = FullScreen("ToolsDim", new Color(0f, 0f, 0f, 0.62f));
+            dim.transform.SetParent(_panel.transform, false);
+            var window = PanelOf(_panel.transform, "Tools", new Vector2(0.28f, 0.16f), new Vector2(0.72f, 0.86f), "plate_list");
+            var heading = Label(window, "Title", "調整", 24, TextAnchor.MiddleCenter,
+                new Vector2(0.1f, 0.88f), new Vector2(0.7f, 0.96f), BattleUITheme.Gold, true);
+            Emboss(heading, new Color(0f, 0f, 0f, 0.75f));
+            TextLink(window, "閉じる", new Vector2(0.72f, 0.88f), new Vector2(0.94f, 0.96f), () => OpenSheet(Sheet.Tools));
+
+            Label(window, "DebugHead", "デバッグ", 14, TextAnchor.MiddleLeft,
+                new Vector2(0.1f, 0.78f), new Vector2(0.9f, 0.85f), Muted);
+            TextLink(window, _debugUnlocked ? "全パーツ解放済み" : "全パーツ解放", new Vector2(0.1f, 0.68f), new Vector2(0.9f, 0.77f), () =>
             {
                 if (_debugUnlocked)
                     return;
                 _debugUnlocked = true;
+                _sheet = Sheet.Tools;
                 Rebuild();
-            });
-            DebugPreset(panel, "戦闘寄り", "combat", 0.29f);
-            DebugPreset(panel, "回復寄り", "rest", 0.46f);
-            DebugPreset(panel, "宝寄り", "treasure", 0.63f);
-            Button(panel, "1000回抽選", new Vector2(0.8f, 0.145f), new Vector2(0.96f, 0.19f), () =>
-                _onDebugRolls?.Invoke(_layout.ToGrid(_catalog)));
+            }, _debugUnlocked, 18);
+            TextLink(window, "戦闘寄り", new Vector2(0.1f, 0.58f), new Vector2(0.4f, 0.67f), () => LoadDebugPreset("combat"));
+            TextLink(window, "回復寄り", new Vector2(0.4f, 0.58f), new Vector2(0.65f, 0.67f), () => LoadDebugPreset("rest"));
+            TextLink(window, "宝寄り", new Vector2(0.65f, 0.58f), new Vector2(0.9f, 0.67f), () => LoadDebugPreset("treasure"));
+            TextLink(window, "1000回抽選", new Vector2(0.1f, 0.48f), new Vector2(0.9f, 0.57f), () =>
+                _onDebugRolls?.Invoke(_layout.ToGrid(_catalog)), false, 18);
 
-            Button(panel, "全部外す", new Vector2(0.04f, 0.03f), new Vector2(0.28f, 0.12f), () =>
+            Label(window, "SetTitle", "マイセット（準備中）", 14, TextAnchor.MiddleLeft,
+                new Vector2(0.1f, 0.36f), new Vector2(0.9f, 0.44f), Muted);
+            for (var i = 0; i < 3; i++)
             {
-                _layout.Clear();
-                Rebuild();
-            });
-            var depart = shortages.Count == 0 ? "出発" : "出発できません：" + shortages[0];
-            Button(panel, depart, new Vector2(0.32f, 0.02f), new Vector2(0.96f, 0.13f), TryDepart,
-                shortages.Count == 0 ? new Color(0.62f, 0.16f, 0.12f, 1f) : new Color(0.22f, 0.12f, 0.1f, 1f));
+                var xMin = 0.1f + i * 0.28f;
+                var slot = Rect(window, "SetSlot" + (i + 1), new Vector2(xMin, 0.16f), new Vector2(xMin + 0.25f, 0.34f));
+                var slotImage = slot.gameObject.AddComponent<Image>();
+                slotImage.raycastTarget = false;
+                slotImage.color = new Color(0f, 0f, 0f, 0.35f);
+                BattleUITheme.EnsureSprite(slotImage);
+                Label(slot, "Name", $"枠{i + 1}", 16, TextAnchor.MiddleCenter, Vector2.zero, Vector2.one, Muted);
+            }
         }
 
-        void DebugPreset(RectTransform panel, string label, string id, float xMin)
+        void LoadDebugPreset(string id)
         {
-            Button(panel, label, new Vector2(xMin, 0.145f), new Vector2(xMin + 0.16f, 0.19f), () =>
+            var preset = _boards != null ? _boards.Find(id) : null;
+            if (preset == null)
+                return;
+            var errors = new List<string>();
+            if (!_layout.TryLoadPreset(preset.ToGrid(), _catalog, _debugUnlocked, errors))
             {
-                var preset = _boards != null ? _boards.Find(id) : null;
-                if (preset == null)
-                    return;
-                _layout.LoadPreset(preset.ToGrid(), _catalog);
-                Rebuild();
-            });
+                ShowModal("読み込めません", errors.Count > 0 ? string.Join("\n", errors) : "この並べ方は読み込めません。");
+                return;
+            }
+
+            _sheet = Sheet.None;
+            CommitLayout();
+        }
+
+        string MinimumLine(BoardGrid grid)
+        {
+            var rules = _config != null ? _config.MinimumsFor(_layer) : new List<LayerTypeMinimum>();
+            if (rules.Count == 0)
+                return "最低マス数の指定はありません";
+            var rule = rules[0];
+            var bits = new List<string>();
+            for (var column = 0; column < BoardGrid.Columns; column++)
+                bits.Add($"{grid.Count(column, rule.type)}/{rule.minimumPerColumn}");
+            return $"{LayerPathUI.SquareName(rule.type)}  {string.Join("   ", bits)}";
         }
 
         void TryDepart()
@@ -354,12 +531,8 @@ namespace TypingRoguelike.Run
 
         void BeginDrag(string partId, int placementIndex, int localX, int localY, Text hold)
         {
-            if (placementIndex < 0)
-            {
-                var left = _catalog.Owned(partId, _debugUnlocked) - _layout.CountOf(partId);
-                if (left <= 0)
-                    return;
-            }
+            if (placementIndex < 0 && _layout.Remaining(_catalog, partId, _debugUnlocked) <= 0)
+                return;
 
             _dragging = true;
             _dragPartId = partId;
@@ -383,7 +556,7 @@ namespace TypingRoguelike.Run
             var part = _catalog.Find(_dragPartId);
             if (part == null)
                 return;
-            var ok = _layout.CanPlace(_catalog, part, originX, originY, _dragIndex);
+            var ok = _layout.CanDrop(_catalog, part, originX, originY, _dragIndex, _debugUnlocked);
             foreach (var cell in part.Cells)
             {
                 if (cell == null)
@@ -416,7 +589,7 @@ namespace TypingRoguelike.Run
             if (index >= 0 && overList)
             {
                 _layout.RemoveAt(index);
-                Rebuild();
+                CommitLayout();
                 return;
             }
 
@@ -424,21 +597,21 @@ namespace TypingRoguelike.Run
             {
                 var originX = column - localX;
                 var originY = row - localY;
-                if (_layout.CanPlace(_catalog, part, originX, originY, index))
+                if (_layout.TryDrop(_catalog, part, originX, originY, index, _debugUnlocked))
                 {
-                    if (index >= 0)
-                        _layout.RemoveAt(index);
-                    _layout.Place(partId, originX, originY);
-                    Rebuild();
+                    CommitLayout();
                     return;
                 }
             }
 
             if (_dragHold != null && index < 0)
-            {
-                var left = _catalog.Owned(partId, _debugUnlocked) - _layout.CountOf(partId);
-                _dragHold.text = $"残り{Mathf.Max(0, left)}";
-            }
+                _dragHold.text = HoldText(partId);
+        }
+
+        string HoldText(string partId)
+        {
+            var left = _layout != null ? _layout.Remaining(_catalog, partId, _debugUnlocked) : 0;
+            return left <= 0 ? "使用中" : "";
         }
 
         void ClearPreview()
@@ -486,9 +659,10 @@ namespace TypingRoguelike.Run
             drag.Hold = hold;
         }
 
-        void DrawMini(RectTransform card, ReelPart part)
+        void DrawMini(RectTransform card, ReelPart part, bool icon = false)
         {
-            var box = Rect(card, "Mini", new Vector2(0.04f, 0.12f), new Vector2(0.36f, 0.88f));
+            var box = Rect(card, "Mini", icon ? new Vector2(0.16f, 0.28f) : new Vector2(0.08f, 0.16f),
+                icon ? new Vector2(0.84f, 0.90f) : new Vector2(0.40f, 0.84f));
             var width = Mathf.Max(1, part.Width);
             var height = Mathf.Max(1, part.Height);
             foreach (var cell in part.Cells)
@@ -499,12 +673,20 @@ namespace TypingRoguelike.Run
                     new Vector2(cell.X / (float)width, 1f - (cell.Y + 1) / (float)height),
                     new Vector2((cell.X + 1) / (float)width, 1f - cell.Y / (float)height));
                 var image = piece.gameObject.AddComponent<Image>();
-                image.color = TypeColor(cell.Type);
                 image.raycastTarget = false;
-                BattleUITheme.EnsureSprite(image);
-                if (cell.Type == DungeonNodeType.Trap)
-                    Frame(piece.gameObject, Penalty, 1.5f);
-                Label(piece, "M", Mark(cell.Type), 11, TextAnchor.MiddleCenter, Vector2.zero, Vector2.one, Color.white);
+                var art = ReelBuildArt.Tile(cell.Type);
+                if (art != null)
+                {
+                    image.sprite = art;
+                    image.preserveAspect = true;
+                    image.color = Color.white;
+                }
+                else
+                {
+                    image.color = TypeColor(cell.Type);
+                    BattleUITheme.EnsureSprite(image);
+                    Label(piece, "M", Mark(cell.Type), 11, TextAnchor.MiddleCenter, Vector2.zero, Vector2.one, Color.white);
+                }
             }
         }
 
@@ -512,10 +694,12 @@ namespace TypingRoguelike.Run
         {
             HideModal();
             _modal = FullScreen("ReelModal", new Color(0f, 0f, 0f, 0.72f));
-            var window = PanelOf(_modal.transform, "Box", new Vector2(0.3f, 0.28f), new Vector2(0.7f, 0.72f));
-            Label(window, "Title", title, 24, TextAnchor.MiddleCenter, new Vector2(0.06f, 0.78f), new Vector2(0.94f, 0.96f), BattleUITheme.Gold);
-            Label(window, "Body", body, 18, TextAnchor.UpperLeft, new Vector2(0.08f, 0.24f), new Vector2(0.92f, 0.76f), Ink);
-            Button(window, "閉じる", new Vector2(0.3f, 0.06f), new Vector2(0.7f, 0.18f), HideModal);
+            var window = PanelOf(_modal.transform, "Box", new Vector2(0.30f, 0.26f), new Vector2(0.70f, 0.74f), "plate_board");
+            var modalTitle = Label(window, "Title", title, 24, TextAnchor.MiddleCenter,
+                new Vector2(0.14f, 0.76f), new Vector2(0.86f, 0.90f), BattleUITheme.Gold, true);
+            Emboss(modalTitle, new Color(0f, 0f, 0f, 0.8f));
+            Label(window, "Body", body, 18, TextAnchor.UpperLeft, new Vector2(0.14f, 0.28f), new Vector2(0.86f, 0.74f), Ink);
+            TextLink(window, "閉じる", new Vector2(0.32f, 0.08f), new Vector2(0.68f, 0.20f), HideModal, false, 18);
         }
 
         void HideModal()
@@ -544,22 +728,47 @@ namespace TypingRoguelike.Run
             _root = go;
         }
 
-        GameObject FullScreen(string name, Color color)
+        GameObject FullScreen(string name, Color color, string art = null)
         {
             var rect = Rect(_root.transform, name, Vector2.zero, Vector2.one);
             var image = rect.gameObject.AddComponent<Image>();
-            image.color = color;
-            BattleUITheme.EnsureSprite(image);
+            if (!string.IsNullOrEmpty(art) && ReelBuildArt.Get(art) != null)
+                Paint(image, art);
+            else
+            {
+                image.color = color;
+                BattleUITheme.EnsureSprite(image);
+            }
+
             return rect.gameObject;
         }
 
-        static RectTransform PanelOf(Transform parent, string name, Vector2 min, Vector2 max)
+        static RectTransform PanelOf(Transform parent, string name, Vector2 min, Vector2 max, string plate = null)
         {
+            var shadow = Rect(parent, name + "Shadow",
+                new Vector2(min.x + 0.004f, min.y - 0.012f),
+                new Vector2(max.x + 0.007f, max.y - 0.002f));
+            var shade = shadow.gameObject.AddComponent<Image>();
+            shade.raycastTarget = false;
+            if (!string.IsNullOrEmpty(plate) && ReelBuildArt.Get(plate) != null)
+                Paint(shade, plate, new Color(0f, 0f, 0f, 0.55f));
+            else
+            {
+                shade.color = new Color(0f, 0f, 0f, 0.45f);
+                BattleUITheme.EnsureSprite(shade);
+            }
+
             var rect = Rect(parent, name, min, max);
             var image = rect.gameObject.AddComponent<Image>();
-            image.color = Panel;
-            BattleUITheme.EnsureSprite(image);
-            Frame(rect.gameObject, new Color(0.62f, 0.46f, 0.22f, 0.9f), 1.4f);
+            if (!string.IsNullOrEmpty(plate) && ReelBuildArt.Get(plate) != null)
+                Paint(image, plate);
+            else
+            {
+                image.color = Panel;
+                BattleUITheme.EnsureSprite(image);
+                Frame(rect.gameObject, new Color(0.62f, 0.46f, 0.22f, 0.9f), 1.4f);
+            }
+
             return rect;
         }
 
@@ -582,41 +791,307 @@ namespace TypingRoguelike.Run
             return rect;
         }
 
-        static Text Label(Transform parent, string name, string text, int size, TextAnchor anchor, Vector2 min, Vector2 max, Color color)
+        static Text Label(Transform parent, string name, string text, int size, TextAnchor anchor, Vector2 min, Vector2 max, Color color, bool bold = false)
         {
             var rect = Rect(parent, name, min, max);
             var label = rect.gameObject.AddComponent<Text>();
-            label.font = BattleUITheme.Font;
+            label.font = bold ? BattleUITheme.FontBold : BattleUITheme.Font;
             label.fontSize = size;
+            label.fontStyle = bold ? FontStyle.Bold : FontStyle.Normal;
             label.alignment = anchor;
             label.color = color;
             label.text = text;
             label.raycastTarget = false;
             label.horizontalOverflow = HorizontalWrapMode.Wrap;
-            label.verticalOverflow = VerticalWrapMode.Overflow;
+            label.verticalOverflow = VerticalWrapMode.Truncate;
             return label;
         }
 
-        static void Button(Transform parent, string text, Vector2 min, Vector2 max, Action onClick, Color? color = null)
+        static void Emboss(Text label, Color color)
         {
-            var rect = Rect(parent, "Button", min, max);
-            var image = rect.gameObject.AddComponent<Image>();
-            image.color = color ?? new Color(0.18f, 0.12f, 0.09f, 1f);
-            BattleUITheme.EnsureSprite(image);
-            Frame(rect.gameObject, new Color(0.72f, 0.54f, 0.24f, 0.8f), 1.2f);
-            var button = rect.gameObject.AddComponent<Button>();
-            button.targetGraphic = image;
-            button.onClick.AddListener(() => onClick?.Invoke());
-            var label = Label(rect, "Text", text, 16, TextAnchor.MiddleCenter, Vector2.zero, Vector2.one, Ink);
-            label.fontStyle = FontStyle.Bold;
+            if (label == null)
+                return;
+            var shadow = label.gameObject.AddComponent<Shadow>();
+            shadow.effectColor = color;
+            shadow.effectDistance = new Vector2(1.4f, -1.4f);
         }
 
-        static string OddsText(int count)
+        static void Paint(Image image, string spriteName, Color? tint = null, bool sliced = false, bool aspect = false)
+        {
+            var sprite = ReelBuildArt.Get(spriteName);
+            if (sprite != null)
+            {
+                image.sprite = sprite;
+                image.type = sliced ? Image.Type.Sliced : Image.Type.Simple;
+                image.preserveAspect = aspect;
+                image.color = tint ?? Color.white;
+                return;
+            }
+
+            image.color = tint ?? Panel;
+            BattleUITheme.EnsureSprite(image);
+        }
+
+        static void Button(Transform parent, string text, Vector2 min, Vector2 max, Action onClick, string skin = "btn_iron", int fontSize = 16, bool pulse = false, bool darkLabel = false)
+        {
+            var shadow = Rect(parent, "ButtonShadow", new Vector2(min.x + 0.004f, min.y - 0.008f), new Vector2(max.x + 0.004f, max.y - 0.004f));
+            var shade = shadow.gameObject.AddComponent<Image>();
+            shade.raycastTarget = false;
+            shade.color = new Color(0f, 0f, 0f, 0.45f);
+            BattleUITheme.EnsureSprite(shade);
+            var rect = Rect(parent, "Button", min, max);
+            var image = rect.gameObject.AddComponent<Image>();
+            var gold = skin == "btn_gold";
+            Paint(image, skin);
+            var button = rect.gameObject.AddComponent<Button>();
+            button.targetGraphic = image;
+            var colors = button.colors;
+            colors.highlightedColor = new Color(1.08f, 1.05f, 0.92f, 1f);
+            colors.pressedColor = new Color(0.75f, 0.68f, 0.5f, 1f);
+            colors.fadeDuration = 0.08f;
+            button.colors = colors;
+            button.onClick.AddListener(() => onClick?.Invoke());
+            var ink = darkLabel || gold ? new Color(0.18f, 0.09f, 0.04f, 1f) : Ink;
+            var label = Label(rect, "Text", text, fontSize, TextAnchor.MiddleCenter,
+                new Vector2(0.12f, 0.12f), new Vector2(0.88f, 0.88f), ink, true);
+            Emboss(label, new Color(0f, 0f, 0f, gold ? 0.28f : 0.7f));
+            if (pulse)
+                rect.gameObject.AddComponent<ReelBuildPulse>().Play = true;
+        }
+
+        void TextLink(Transform parent, string text, Vector2 min, Vector2 max, Action onClick, bool selected = false, int fontSize = 16, Color? color = null)
+        {
+            var rect = Rect(parent, "Link", min, max);
+            var hit = rect.gameObject.AddComponent<Image>();
+            hit.color = new Color(1f, 1f, 1f, 0.001f);
+            BattleUITheme.EnsureSprite(hit);
+            var button = rect.gameObject.AddComponent<Button>();
+            button.targetGraphic = hit;
+            var colors = button.colors;
+            colors.highlightedColor = new Color(1f, 1f, 1f, 0.08f);
+            colors.pressedColor = new Color(1f, 1f, 1f, 0.16f);
+            colors.fadeDuration = 0.05f;
+            button.colors = colors;
+            button.onClick.AddListener(() => onClick?.Invoke());
+            var ink = color ?? (selected ? BattleUITheme.Gold : Ink);
+            Label(rect, "Text", text, fontSize, TextAnchor.MiddleCenter, Vector2.zero, Vector2.one, ink, selected || color != null);
+            if (!selected)
+                return;
+            var bar = Rect(rect, "Mark", new Vector2(0.18f, 0.08f), new Vector2(0.82f, 0.16f));
+            var line = bar.gameObject.AddComponent<Image>();
+            line.raycastTarget = false;
+            line.color = BattleUITheme.Gold;
+            BattleUITheme.EnsureSprite(line);
+        }
+
+        void BuildTabs(RectTransform panel)
+        {
+            string[] names = { "全部", "戦闘", "回復", "店", "宝", "イベント", "強いパーツ" };
+            for (var i = 0; i < names.Length; i++)
+            {
+                var index = i;
+                var row = i < 4 ? 0 : 1;
+                var column = i < 4 ? i : i - 4;
+                var count = row == 0 ? 4 : 3;
+                var xMin = 0.08f + column * (0.84f / count);
+                var yMax = row == 0 ? 0.86f : 0.81f;
+                var yMin = yMax - 0.048f;
+                var selected = _filter == index;
+                TextLink(panel, names[i], new Vector2(xMin, yMin), new Vector2(xMin + 0.84f / count - 0.01f, yMax), () =>
+                {
+                    _filter = index;
+                    Rebuild();
+                }, selected, 13);
+            }
+        }
+
+        List<ReelPart> VisibleParts()
+        {
+            var list = new List<ReelPart>();
+            var parts = _catalog?.Parts ?? Array.Empty<ReelPart>();
+            foreach (var part in parts)
+            {
+                if (part == null || part.Synthetic)
+                    continue;
+                if (part.Locked && !_debugUnlocked)
+                    continue;
+                if (!MatchesFilter(part))
+                    continue;
+                list.Add(part);
+            }
+
+            list.Sort((a, b) =>
+            {
+                var aEmpty = _layout.Remaining(_catalog, a.Id, _debugUnlocked) <= 0;
+                var bEmpty = _layout.Remaining(_catalog, b.Id, _debugUnlocked) <= 0;
+                if (aEmpty != bEmpty)
+                    return aEmpty ? 1 : -1;
+                return string.CompareOrdinal(a.Id, b.Id);
+            });
+            return list;
+        }
+
+        bool MatchesFilter(ReelPart part)
+        {
+            if (_filter <= 0)
+                return true;
+            if (_filter == 6)
+                return part.HasPenalty;
+            var type = _filter switch
+            {
+                1 => DungeonNodeType.Combat,
+                2 => DungeonNodeType.Rest,
+                3 => DungeonNodeType.Merchant,
+                4 => DungeonNodeType.Treasure,
+                _ => DungeonNodeType.Event
+            };
+            foreach (var cell in part.Cells)
+            {
+                if (cell != null && cell.Type == type)
+                    return true;
+            }
+
+            return false;
+        }
+
+        int LockedCount()
+        {
+            var count = 0;
+            var parts = _catalog?.Parts ?? Array.Empty<ReelPart>();
+            foreach (var part in parts)
+            {
+                if (part != null && !part.Synthetic && part.Locked && !_debugUnlocked)
+                    count++;
+            }
+
+            return count;
+        }
+
+        static string CellList(ReelPart part)
+        {
+            var names = new List<string>();
+            foreach (var cell in part.Cells)
+                names.Add(cell == null ? "?" : LayerPathUI.SquareName(cell.Type));
+            return string.Join("・", names);
+        }
+
+        void CommitLayout()
+        {
+            var next = CaptureCounts();
+            RememberFlashes(next);
+            _counts = next;
+            Rebuild();
+        }
+
+        int[,] CaptureCounts()
+        {
+            var types = BoardGrid.RoadTypes();
+            var grid = _layout.ToGrid(_catalog);
+            var counts = new int[BoardGrid.Columns, types.Length];
+            for (var type = 0; type < types.Length; type++)
+            {
+                for (var column = 0; column < BoardGrid.Columns; column++)
+                    counts[column, type] = grid.Count(column, types[type]);
+            }
+
+            return counts;
+        }
+
+        void RememberFlashes(int[,] next)
+        {
+            if (_counts == null || next == null)
+                return;
+            var now = Time.unscaledTime;
+            var types = BoardGrid.RoadTypes().Length;
+            for (var type = 0; type < types; type++)
+            {
+                for (var column = 0; column < BoardGrid.Columns; column++)
+                {
+                    if (Percent(_counts[column, type]) == Percent(next[column, type]))
+                        continue;
+                    _flashes.RemoveAll(flash => flash.Column == column && flash.TypeIndex == type);
+                    _flashes.Add(new OddsFlash
+                    {
+                        Column = column,
+                        TypeIndex = type,
+                        From = _counts[column, type],
+                        To = next[column, type],
+                        Count = next[column, type],
+                        Until = now + 1f
+                    });
+                }
+            }
+        }
+
+        void StyleOdds(Text label, int column, int typeIndex, int count)
+        {
+            var now = Time.unscaledTime;
+            foreach (var flash in _flashes)
+            {
+                if (flash.Column != column || flash.TypeIndex != typeIndex || flash.Until <= now)
+                    continue;
+                flash.Count = count;
+                flash.Lines.Add(new FlashLine { Label = label, Rest = label.text });
+                label.text = $"{Percent(flash.From)}%→{Percent(flash.To)}%";
+                label.color = flash.To > flash.From ? BattleUITheme.Gold : new Color(1f, 0.4f, 0.35f, 1f);
+                return;
+            }
+        }
+
+        void RefreshFlashes()
+        {
+            var now = Time.unscaledTime;
+            for (var i = _flashes.Count - 1; i >= 0; i--)
+            {
+                var flash = _flashes[i];
+                if (flash.Until > now)
+                    continue;
+                foreach (var line in flash.Lines)
+                {
+                    if (line.Label == null)
+                        continue;
+                    line.Label.text = line.Rest;
+                    line.Label.color = Ink;
+                }
+
+                _flashes.RemoveAt(i);
+            }
+        }
+
+        void BindClock()
+        {
+            if (_root == null)
+                return;
+            var clock = _root.GetComponent<ReelBuildClock>();
+            if (clock == null)
+                clock = _root.AddComponent<ReelBuildClock>();
+            clock.Tick = RefreshFlashes;
+        }
+
+        internal void ShowTip(string text)
+        {
+            if (_tip == null)
+                return;
+            _tip.text = text ?? "";
+            _tip.color = Ink;
+        }
+
+        internal void HideTip()
+        {
+            if (_tip == null)
+                return;
+            _tip.text = "カーソルを合わせると、名前と中身が出る";
+            _tip.color = Muted;
+        }
+
+        static int Percent(int count) => Mathf.RoundToInt(count * 100f / Mathf.Max(1, BoardGrid.Rows));
+
+        static string OddsText(int count, bool compact)
         {
             if (count <= 0)
-                return "—";
+                return compact ? "—" : "—";
             var percent = Mathf.RoundToInt(count * 100f / BoardGrid.Rows);
-            return $"{percent}%  {count}/{BoardGrid.Rows}";
+            return compact ? $"{percent}%" : $"{percent}%  {count}/{BoardGrid.Rows}";
         }
 
         static string Mark(DungeonNodeType type) => type switch
@@ -670,5 +1145,85 @@ namespace TypingRoguelike.Run
         public void OnDrag(PointerEventData eventData) => Owner?.NotifyDrag(eventData);
 
         public void OnEndDrag(PointerEventData eventData) => Owner?.NotifyEnd(eventData);
+    }
+
+    sealed class OddsFlash
+    {
+        public int Column;
+        public int TypeIndex;
+        public int From;
+        public int To;
+        public int Count;
+        public float Until;
+        public readonly List<FlashLine> Lines = new();
+    }
+
+    sealed class FlashLine
+    {
+        public Text Label;
+        public string Rest;
+    }
+
+    sealed class ReelPartTip : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+    {
+        public ReelBuildUI Owner;
+        public string Text;
+
+        public void OnPointerEnter(PointerEventData eventData) => Owner?.ShowTip(Text);
+
+        public void OnPointerExit(PointerEventData eventData) => Owner?.HideTip();
+    }
+
+    sealed class ReelBuildClock : MonoBehaviour
+    {
+        public Action Tick;
+
+        void Update() => Tick?.Invoke();
+    }
+
+    sealed class ReelBuildPulse : MonoBehaviour
+    {
+        public bool Play;
+
+        void Update()
+        {
+            var scale = Play ? 1f + Mathf.Sin(Time.unscaledTime * 2.6f) * 0.018f : 1f;
+            transform.localScale = new Vector3(scale, scale, 1f);
+        }
+    }
+
+    static class ReelBuildArt
+    {
+        const string Root = "Run/ReelBuild/";
+        static readonly Dictionary<string, Sprite> Cache = new();
+
+        public static Sprite Get(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+                return null;
+            if (Cache.TryGetValue(name, out var sprite))
+                return sprite;
+            sprite = Resources.Load<Sprite>(Root + name);
+            Cache[name] = sprite;
+            return sprite;
+        }
+
+        public static Sprite Tile(DungeonNodeType type)
+        {
+            var name = type switch
+            {
+                DungeonNodeType.Combat => "tile_combat",
+                DungeonNodeType.Rest => "tile_rest",
+                DungeonNodeType.Merchant => "tile_shop",
+                DungeonNodeType.Treasure => "tile_treasure",
+                DungeonNodeType.Event => "tile_event",
+                DungeonNodeType.Trap => "tile_trap",
+                DungeonNodeType.MidBoss => "tile_midboss",
+                DungeonNodeType.Boss => "tile_boss",
+                DungeonNodeType.Elevator => "tile_elevator",
+                _ => "socket_empty"
+            };
+            return Get(name);
+        }
     }
 }

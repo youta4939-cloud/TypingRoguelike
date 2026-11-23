@@ -6,8 +6,8 @@ namespace TypingRoguelike.Data
     [CreateAssetMenu(fileName = "CharacterConfig", menuName = "TypingRoguelike/Character Config")]
     public sealed class CharacterConfig : ScriptableObject
     {
-        public string characterId = "akane";
-        public string displayName = "アカネ";
+        public string characterId = "chara01";
+        public string displayName = "chara01";
         [Tooltip("顔画像。未設定のあいだは仮の色面になる。")]
         public Sprite portrait;
         public TrustPersonality personality = TrustPersonality.Brave;

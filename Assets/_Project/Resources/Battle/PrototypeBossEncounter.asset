@@ -13,16 +13,18 @@ MonoBehaviour:
   m_Name: PrototypeBossEncounter
   m_EditorClassIdentifier: TypingRoguelike::TypingRoguelike.Data.BattleEncounterDefinition
   enemy: {fileID: 11400000, guid: 5559f03a9d9d38242b05e6a8f41959b7, type: 2}
+  enemyPool:
+  - {fileID: 11400000, guid: 5559f03a9d9d38242b05e6a8f41959b7, type: 2}
   wordList: {fileID: 11400000, guid: 3e6750f7febce7141baeb38b724a7780, type: 2}
   party: {fileID: 11400000, guid: 146103864cb0ec44dad0d77f832abdfc, type: 2}
-  playerMaxHp: 100
+  playerMaxHp: 1000
   wordClearDamage: 15
   rerollsPerBattle: 3
   enemyTickInterval: 0.05
   typingAudio: {fileID: 11400000, guid: 21a083445df21d140bad276c8203d79d, type: 2}
   jackpotMultiplier: 2.5
   baseFreezeChance: 0
-  freezeChancePerCharacter: 0.000025
+  freezeChancePerCharacter: 0.0000075
   baseJackpotChanceCap: 0.1
   maxFreezeChance: 0.99
   startLogMessage: "\U0001F525 \u30DC\u30B9\u6226\u958B\u59CB\uFF01"

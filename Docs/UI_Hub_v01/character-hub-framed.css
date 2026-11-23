@@ -1,0 +1,33 @@
+/* Framed illustration study: quiet typography, charcoal, restrained oxblood. */
+body{background:#101214;color:#dcd9d2}
+.screen{height:100svh;min-height:780px;max-width:1600px;margin:auto;background:#151719;overflow:hidden}
+.veil{display:none}
+.top{position:absolute;top:0;left:5%;width:90%;height:118px;padding:30px 0 23px;background:none;border-bottom:1px solid #353638;align-items:center}
+.brand{font-size:23px;letter-spacing:.22em}.brand small{font-size:9px;color:#837e79;margin-top:7px;letter-spacing:.24em}
+.money{font:17px 'Yu Mincho',serif;gap:30px;color:#c8c3b9}.money span+span{border-left:1px solid #3d3c3d;padding-left:30px}.money small{font:10px sans-serif;color:#8d8985;display:block;margin-bottom:5px;letter-spacing:.12em}
+nav{left:8%;top:210px;width:29%;max-width:360px}
+nav:before{content:'PREPARATION / 探索の準備';display:block;font:10px sans-serif;letter-spacing:.17em;color:#85807d;margin-bottom:24px}
+nav button{font-size:21px;letter-spacing:.13em;padding:17px 0 17px 30px;border-bottom:1px solid #303133;transition:color .2s,background .2s;transform:none!important;color:#b9b5ad}
+nav button:after{content:'↗';position:absolute;right:14px;font:15px sans-serif;color:#706967;top:23px;transition:color .2s}
+nav button:hover,nav button:focus-visible{background:#242123;color:#eee5d9}
+nav button:before{content:'';left:9px;top:29px;width:4px;height:4px;background:#a36768}
+nav .primary{font-size:32px;padding:17px 0 16px 30px;background:#2a2022;border-left:2px solid #a36768;border-bottom:1px solid #674347;margin:0;color:#eee5d9}
+nav .primary:before{display:none}nav .primary:after{top:31px;color:#bb8a86}
+.status{margin:10px 0 25px;padding-left:30px;font:11px sans-serif;color:#9d8d89}
+.caption{font:12px/1.9 'Yu Gothic UI',sans-serif;color:#9d9891;padding-left:30px;margin-top:22px;min-height:48px;max-width:330px}
+.illustration{position:absolute;left:45%;right:8%;top:210px;height:396px;margin:0}
+.illustration:before{content:'01 / BETWEEN EXPEDITIONS';position:absolute;top:-33px;left:0;font:10px sans-serif;letter-spacing:.16em;color:#85807d}
+.image-mat{position:relative;width:100%;height:100%;padding:9px;border:1px solid #55504b;background:#191b1d}
+.image-mat:before{content:'';position:absolute;width:28px;height:2px;background:#a36768;left:-1px;top:-1px;z-index:1}
+.illustration .art{position:static;inset:auto;width:100%;height:100%;display:block;object-fit:cover;object-position:76% center;mask-image:none;opacity:.94;filter:saturate(.7);transition:filter .3s}
+.room-shift .illustration .art{filter:saturate(.78) brightness(1.04)}
+figcaption{display:flex;justify-content:space-between;gap:18px;padding-top:16px;align-items:baseline}
+.scene-name{font-size:17px;letter-spacing:.17em;color:#c4beb5}.scene-sub{font:10px/1.7 sans-serif;color:#7f7b76;letter-spacing:.06em;text-align:right}
+.scene-note{font:12px/1.8 'Yu Gothic UI',sans-serif;color:#86827c;margin-top:13px;border-top:1px solid #303133;padding-top:15px}
+.bottom{left:5%;width:90%;bottom:24px;padding:18px 0 0;background:none;border-top:1px solid #353638;color:#716e6b;align-items:flex-start}
+.bottom button{font:12px sans-serif;color:#a09b95;padding:0}.credit{font:10px/1.7 sans-serif;color:#77736e;max-width:75%}
+dialog{background:#1d1f21;border-color:#504747;color:#dcd9d2;box-shadow:none}dialog::backdrop{background:#090a0bd9;backdrop-filter:blur(4px)}.choice{background:#252426;border-color:#474144}.choice:hover{background:#30282a;border-color:#996968}.tag{border:0;padding:0;color:#a57572;letter-spacing:.12em}.panel{background:#303134;border-color:#646264}.indicator{color:#d6b9a2}.floor.selected{background:#614347;border-color:#bf8e86;color:#f5d8c6;box-shadow:none}
+@media(min-width:1500px){.illustration{height:450px}}
+@media(max-width:1000px) and (min-width:761px){nav{left:7%;width:32%}.illustration{left:46%;right:6%;height:365px}nav .primary{font-size:27px}.money{gap:16px}.money span+span{padding-left:16px}}
+@media(max-width:760px){.screen{height:auto;min-height:1120px;padding-bottom:130px}.top{height:110px;left:6%;width:88%;padding-top:25px}.brand{font-size:20px}.money{font-size:13px;gap:10px;flex-direction:row}.money span+span{padding-left:10px}.money small{font-size:9px}.illustration{top:165px;left:8%;right:8%;height:300px}.illustration:before{font-size:9px;top:-27px}.scene-sub{font-size:9px}.scene-note{display:none}nav{top:560px;left:8%;width:84%;max-width:none}nav:before{margin-bottom:16px}nav button{font-size:19px;padding:13px 0 13px 26px}nav .primary{font-size:28px;padding:12px 0 12px 26px}nav .primary:after{top:24px}nav button:after{top:19px}.status{margin-bottom:17px}.caption{margin-top:18px}.bottom{left:6%;width:88%;bottom:20px}.choices{gap:12px}.choice{font-size:20px;padding:22px 12px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}

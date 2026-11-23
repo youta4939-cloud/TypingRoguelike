@@ -1,0 +1,718 @@
+{
+ "version": "stockpanel v4.4 (approved)",
+ "confidential": "社外秘",
+ "coordinate_system": {
+  "canvas": [
+   1920,
+   1080
+  ],
+  "origin": "top-left, y down, 1x px (CanvasScaler reference 1920x1080, Scale With Screen Size, match 0.5 or 1(height))",
+  "unity": "Panel RectTransform: anchorMin=anchorMax=(0,1), pivot=(0,1), anchoredPosition=(panel.x, -panel.y), sizeDelta=panel.size. Every child: anchorMin=anchorMax=(0,1) of the panel, anchoredPosition = 'unity' value; sprites use pivot (0.5,0.5) unless stated.",
+  "sprites": "2x sprites: set Pixels Per Unit 200 (or keep 100 and scale RectTransform 0.5) so they draw at 1x size; 1x sprites provided too."
+ },
+ "panel": {
+  "rect": {
+   "topleft": [
+    810.4,
+    753.7
+   ],
+   "size": [
+    691.2,
+    248.4
+   ]
+  },
+  "visible_bbox_abs": [
+   816,
+   755,
+   1494,
+   994
+  ],
+  "base": "Sprites/Panel/panel_base_2x.png",
+  "bowl_fronts": "Sprites/Panel/panel_bowl_fronts_2x.png",
+  "note": "base and fronts share the panel canvas: both at panel top-left, full size. Demon ornament and text plates are baked in panel_base (toned down)."
+ },
+ "slots": [
+  {
+   "index": 0,
+   "ball_centre": {
+    "abs": [
+     934.6,
+     793.1
+    ],
+    "rel": [
+     124.2,
+     39.4
+    ],
+    "unity": [
+     124.2,
+     -39.4
+    ]
+   },
+   "bowl_mouth": {
+    "abs": [
+     934.6,
+     814.7
+    ],
+    "rel": [
+     124.2,
+     61.0
+    ],
+    "unity": [
+     124.2,
+     -61.0
+    ]
+   },
+   "bowl_tint_glow_centre": {
+    "abs": [
+     934.6,
+     815.8
+    ],
+    "rel": [
+     124.2,
+     62.1
+    ],
+    "unity": [
+     124.2,
+     -62.1
+    ]
+   },
+   "time_offset_s": 0.0
+  },
+  {
+   "index": 1,
+   "ball_centre": {
+    "abs": [
+     1045.3,
+     793.1
+    ],
+    "rel": [
+     234.9,
+     39.4
+    ],
+    "unity": [
+     234.9,
+     -39.4
+    ]
+   },
+   "bowl_mouth": {
+    "abs": [
+     1045.3,
+     814.7
+    ],
+    "rel": [
+     234.9,
+     61.0
+    ],
+    "unity": [
+     234.9,
+     -61.0
+    ]
+   },
+   "bowl_tint_glow_centre": {
+    "abs": [
+     1045.3,
+     815.8
+    ],
+    "rel": [
+     234.9,
+     62.1
+    ],
+    "unity": [
+     234.9,
+     -62.1
+    ]
+   },
+   "time_offset_s": 1.13
+  },
+  {
+   "index": 2,
+   "ball_centre": {
+    "abs": [
+     1156.0,
+     793.1
+    ],
+    "rel": [
+     345.6,
+     39.4
+    ],
+    "unity": [
+     345.6,
+     -39.4
+    ]
+   },
+   "bowl_mouth": {
+    "abs": [
+     1156.0,
+     814.7
+    ],
+    "rel": [
+     345.6,
+     61.0
+    ],
+    "unity": [
+     345.6,
+     -61.0
+    ]
+   },
+   "bowl_tint_glow_centre": {
+    "abs": [
+     1156.0,
+     815.8
+    ],
+    "rel": [
+     345.6,
+     62.1
+    ],
+    "unity": [
+     345.6,
+     -62.1
+    ]
+   },
+   "time_offset_s": 2.29
+  },
+  {
+   "index": 3,
+   "ball_centre": {
+    "abs": [
+     1266.7,
+     793.1
+    ],
+    "rel": [
+     456.3,
+     39.4
+    ],
+    "unity": [
+     456.3,
+     -39.4
+    ]
+   },
+   "bowl_mouth": {
+    "abs": [
+     1266.7,
+     814.7
+    ],
+    "rel": [
+     456.3,
+     61.0
+    ],
+    "unity": [
+     456.3,
+     -61.0
+    ]
+   },
+   "bowl_tint_glow_centre": {
+    "abs": [
+     1266.7,
+     815.8
+    ],
+    "rel": [
+     456.3,
+     62.1
+    ],
+    "unity": [
+     456.3,
+     -62.1
+    ]
+   },
+   "time_offset_s": 0.61
+  },
+  {
+   "index": 4,
+   "ball_centre": {
+    "abs": [
+     1377.4,
+     793.1
+    ],
+    "rel": [
+     567.0,
+     39.4
+    ],
+    "unity": [
+     567.0,
+     -39.4
+    ]
+   },
+   "bowl_mouth": {
+    "abs": [
+     1377.4,
+     814.7
+    ],
+    "rel": [
+     567.0,
+     61.0
+    ],
+    "unity": [
+     567.0,
+     -61.0
+    ]
+   },
+   "bowl_tint_glow_centre": {
+    "abs": [
+     1377.4,
+     815.8
+    ],
+    "rel": [
+     567.0,
+     62.1
+    ],
+    "unity": [
+     567.0,
+     -62.1
+    ]
+   },
+   "time_offset_s": 1.77
+  }
+ ],
+ "flame_sprite": {
+  "size_1x": 86,
+  "size_2x": 172,
+  "pivot_unity": [
+   0.5,
+   0.42
+  ],
+  "note": "ball centre at 58% from the top of the square sprite -> Unity pivot y = 0.42. Place the pivot on slot.ball_centre."
+ },
+ "medallions": {
+  "hp": {
+   "centre": {
+    "abs": [
+     948.1,
+     925.2
+    ],
+    "rel": [
+     137.7,
+     171.5
+    ],
+    "unity": [
+     137.7,
+     -171.5
+    ]
+   },
+   "source_px": [
+    255.0,
+    437.6
+   ],
+   "ring_radius_1x": 28.08,
+   "ring_width_1x": 3.24,
+   "track_width_1x": 5.24,
+   "ring_color": "#FF5A50",
+   "icon": "Sprites/Medallion/icon_heart_1x.png",
+   "icon_centre_offset_px_1x": [
+    0.0,
+    0.5
+   ],
+   "icon_centre_offset_px_2x": [
+    0.0,
+    1.5
+   ],
+   "icon_note": "place the icon so that (sprite centre + offset) = medallion centre, i.e. sprite centre = centre - offset (offset in sprite px, y down)"
+  },
+  "madness": {
+   "centre": {
+    "abs": [
+     1363.0,
+     925.8
+    ],
+    "rel": [
+     552.6,
+     172.1
+    ],
+    "unity": [
+     552.6,
+     -172.1
+    ]
+   },
+   "source_px": [
+    1023.3,
+    438.7
+   ],
+   "ring_radius_1x": 28.08,
+   "ring_width_1x": 3.24,
+   "track_width_1x": 5.24,
+   "ring_color": "#C878FF",
+   "icon": "Sprites/Medallion/icon_brain_1x.png",
+   "icon_centre_offset_px_1x": [
+    -0.5,
+    1.0
+   ],
+   "icon_centre_offset_px_2x": [
+    0.0,
+    2.5
+   ],
+   "icon_note": "place the icon so that (sprite centre + offset) = medallion centre, i.e. sprite centre = centre - offset (offset in sprite px, y down)"
+  }
+ },
+ "plates": {
+  "hp": {
+   "abs": [
+    981.0,
+    905.4,
+    1120.9,
+    955.1
+   ],
+   "rel": [
+    170.6,
+    151.7,
+    310.5,
+    201.4
+   ],
+   "size": [
+    139.9,
+    49.7
+   ]
+  },
+  "madness": {
+   "abs": [
+    1188.9,
+    905.4,
+    1328.8,
+    955.1
+   ],
+   "rel": [
+    378.5,
+    151.7,
+    518.4,
+    201.4
+   ],
+   "size": [
+    139.9,
+    49.7
+   ]
+  }
+ },
+ "text": {
+  "font_numbers": "Noto Serif JP (Black for numbers, Bold for '/100') — mock used NotoSerifJP[wght].ttf variable font",
+  "font_labels": "Noto Sans JP Black — NotoSansJP[wght].ttf",
+  "sizes_1x": {
+   "label": 14,
+   "number": 34,
+   "max": 16
+  },
+  "margin_1x": 6,
+  "shared_fit": "avail = plate width (139.9). need(plate) = 6 + w(label) + 6 + w(number) + 3 + w('/max') + 6 measured at base sizes. fit = min(1, avail/need_hp, avail/need_mad). Apply the SAME fit to both plates.",
+  "layout": "label: left, x = plate.x0 + 6, vertical middle = plate centre y + 1. '/max': right-aligned at plate.x1 - 6, baseline = plate centre y + 11. number: right-aligned at ('/max' left edge - 3), baseline = plate centre y + 12. (all 1x; multiply by fit only the font sizes)",
+  "outline": "stroke 3px (number) / 2px (label, /max) #0A0508 + soft drop shadow (offset 1,2, blur 2, black 86%)",
+  "colors": {
+   "hp_label": "#ECCE96",
+   "hp_number": "#FFFFFF",
+   "hp_number_low": "#FFC4BA",
+   "hp_max": "#C8C4CC",
+   "mad_label": "#C4A0EC",
+   "mad_number": "#E2CEFF",
+   "mad_max": "#B0A0C4"
+  },
+  "punch": {
+   "hp": {
+    "scale": "1 + 0.18*p",
+    "color_to": "#FF786E"
+   },
+   "madness": {
+    "scale": "1 + 0.15*p",
+    "color_to": "#F0AAFF"
+   }
+  }
+ },
+ "fx_masks": {
+  "fx_hp_flash_mask": {
+   "sprite_1x": "Sprites/FX/fx_hp_flash_mask_1x.png",
+   "sprite_2x": "Sprites/FX/fx_hp_flash_mask_2x.png",
+   "topleft": {
+    "abs": [
+     902.4,
+     879.7
+    ],
+    "rel": [
+     92.0,
+     126.0
+    ],
+    "unity": [
+     92.0,
+     -126.0
+    ]
+   },
+   "size_1x": [
+    231,
+    91
+   ]
+  },
+  "fx_madness_glow_mask": {
+   "sprite_1x": "Sprites/FX/fx_madness_glow_mask_1x.png",
+   "sprite_2x": "Sprites/FX/fx_madness_glow_mask_2x.png",
+   "topleft": {
+    "abs": [
+     1176.4,
+     879.7
+    ],
+    "rel": [
+     366.0,
+     126.0
+    ],
+    "unity": [
+     366.0,
+     -126.0
+    ]
+   },
+   "size_1x": [
+    232,
+    91
+   ]
+  },
+  "fx_lowhp_glow_mask": {
+   "sprite_1x": "Sprites/FX/fx_lowhp_glow_mask_1x.png",
+   "sprite_2x": "Sprites/FX/fx_lowhp_glow_mask_2x.png",
+   "topleft": {
+    "abs": [
+     902.4,
+     879.7
+    ],
+    "rel": [
+     92.0,
+     126.0
+    ],
+    "unity": [
+     92.0,
+     -126.0
+    ]
+   },
+   "size_1x": [
+    231,
+    91
+   ]
+  }
+ },
+ "sorting_order_bottom_to_top": [
+  "panel_base",
+  "bowl ember_cold / ember_next (mouth glow, halo, smoke)",
+  "flame glow halo (route A) ",
+  "flame (route A shader RawImage / route B sheet Image)",
+  "panel_bowl_fronts",
+  "bowl_tint_glow (lit bowls, alpha)",
+  "medallion icons",
+  "ring_track",
+  "ring_glow",
+  "ring chip (white, lost HP)",
+  "ring_fill",
+  "fx_hp_flash_mask / fx_lowhp_glow_mask / fx_madness_glow_mask",
+  "TextMeshPro texts",
+  "-- separate canvas layer BELOW word cards --: rising ember particles, projectile + trail, ignition flash/ring (they can overlap the 火球 card area; word cards must stay on top)"
+ ],
+ "colors": {
+  "gems": {
+   "R": {
+    "dark": "#60000E",
+    "mid": "#CC1222",
+    "light": "#FF7870"
+   },
+   "Y": {
+    "dark": "#965800",
+    "mid": "#FCBC14",
+    "light": "#FFF4A0"
+   },
+   "G": {
+    "dark": "#084E2C",
+    "mid": "#24B056",
+    "light": "#A0F696"
+   },
+   "B": {
+    "dark": "#081A68",
+    "mid": "#1C5CE2",
+    "light": "#80BEFF"
+   },
+   "P": {
+    "dark": "#3A085C",
+    "mid": "#962ECC",
+    "light": "#E4A0FF"
+   }
+  },
+  "approved_mid": {
+   "R": "#CC1222",
+   "Y": "#FCBC14",
+   "G": "#24B056",
+   "B": "#1C5CE2",
+   "P": "#962ECC"
+  },
+  "hp_ring": "#FF5A50",
+  "madness_ring": "#C878FF",
+  "ring_track": "#140A0C (alpha 235)",
+  "chip": "#FFECE2",
+  "hp_flash": "#FF3228",
+  "madness_glow": "#AA50FF",
+  "ember_next": "#FF641E",
+  "ember_halo": "#FF7828",
+  "ember_cold": "#5A4642 (alpha 0.5)",
+  "smoke": "#B0A6AA",
+  "ignition_flash": "#FFECFF"
+ },
+ "timings": {
+  "flame": {
+   "period_s": 3.6,
+   "slot_offsets_s": [
+    0.0,
+    1.13,
+    2.29,
+    0.61,
+    1.77
+   ],
+   "sheet": {
+    "frames": 54,
+    "fps": 15,
+    "layout": "9x6 row-major"
+   }
+  },
+  "ember_particle": {
+   "every_s": 2.1,
+   "life_s": 1.6,
+   "phase": "(t + slot_offset*1.7) mod 2.1",
+   "start": "ball centre - 1.1*ball_r (ball_r = 25.9 px@1x)",
+   "rise_px_1x": 21.6,
+   "x": "ball.x + (8*sin(5q + i) + (i-2)*2)",
+   "radius_px_1x": 2.2,
+   "alpha": "0.9*sin(pi*q)",
+   "color": "flame light"
+  },
+  "next_slot": {
+   "pulse": "0.75 + 0.25*sin(3.3 t)",
+   "mouth_glow_alpha": "0.85*pulse",
+   "halo_alpha": "0.35*pulse",
+   "smoke": "30 puffs, sway 6px*sin(j*0.21 - 1.6t)*j/30 (baked sprite: sway whole sprite x by 3px*sin(-1.6t))"
+  },
+  "ignition": {
+   "card_flash_s": 0.25,
+   "card_flash": "typed word card rect (火球 in mock: 1030,630-1282,752, radius 8, blur 6), colour = flame light, alpha 150/255 -> 0 linear",
+   "travel_s": 0.3,
+   "start_abs": [
+    1156,
+    690
+   ],
+   "projectile": "flame sprite of the new colour, glow boost 1.6",
+   "path": "e = smoothstep(q); pos = start + (ball - start)*e + (34*sin(pi*e), -26*sin(pi*e))",
+   "sprite_scale": "0.55 + 0.45*e",
+   "trail": "5 dots at e - j*0.06 (j=1..5), radius (9-j) px, alpha 0.5*(1-j/6)",
+   "land": {
+    "duration_s": 0.45,
+    "scale": "1 + 0.14*(1-e)*cos(5q), e = 1-(1-q)^3",
+    "glow_boost": "1 + 0.9*(1-e)",
+    "flash_s": 0.35,
+    "flash": "r 30->40 px, alpha 0.7*(1-q)^2",
+    "ring": "radius 22 + 34*e px, width 4*(1-q)+1, alpha 0.78*(1-q)"
+   }
+  },
+  "hit": {
+   "plate_flash_s": 0.5,
+   "plate_flash": "alpha = (1 - t/0.5)^1.5",
+   "punch_s": 0.3,
+   "punch": "p = 1 - t/0.3",
+   "chip_hold_s": 0.4,
+   "chip_drain_s": 0.4,
+   "chip_drain": "smoothstep",
+   "screen_vignette_s": 0.35,
+   "screen_vignette": "optional, red edge vignette alpha 0.45*(1-t/0.35)"
+  },
+  "low_hp": {
+   "threshold": 0.25,
+   "glow": "alpha 0.22 + 0.16*sin(2*pi*t/1.2)  (never blinks)",
+   "number_color": "#FFC4BA"
+  },
+  "madness_up": {
+   "countup_s": 0.4,
+   "countup": "smoothstep",
+   "glow_s": 0.9,
+   "glow": "0.8*sin(pi*t/0.9)",
+   "punch": "triangle peak at 0.25 s, width 0.25 s"
+  }
+ },
+ "flame_animation": {
+  "formula": "p = 2*pi*t/3.6; b = 0.5+0.5 sin p (A<->B dissolve); lean = 2.6deg*sin p (about the ball bottom); tip = 0.085*sin(2p+0.8) applied as u -= tip*h^1.4 (h = height above ball middle); breath = 1+0.022 sin(3p+1.3) (scale about ball bottom); pulse = 1+0.055 sin(4p+2.1) (inner brightness); + 3 looped noise warps (8 waves, see shader)",
+  "values": {
+   "period": 3.6,
+   "lean_deg": 2.6,
+   "tip": 0.085,
+   "breath": 0.022,
+   "pulse": 0.055
+  },
+  "noise_waves": [
+   [
+    -2.54215,
+    6.009635,
+    1.0,
+    1.93432,
+    1.0
+   ],
+   [
+    -1.416775,
+    2.890345,
+    3.0,
+    1.685797,
+    0.8
+   ],
+   [
+    -0.000705,
+    5.556535,
+    1.0,
+    2.467678,
+    0.6
+   ],
+   [
+    1.045983,
+    5.525428,
+    1.0,
+    1.34006,
+    0.5
+   ],
+   [
+    -0.287256,
+    6.690427,
+    2.0,
+    4.71479,
+    0.4
+   ],
+   [
+    -1.470636,
+    6.330826,
+    2.0,
+    3.444517,
+    0.35
+   ],
+   [
+    2.45477,
+    3.099263,
+    1.0,
+    2.244945,
+    0.3
+   ],
+   [
+    -1.839866,
+    2.952133,
+    2.0,
+    3.854058,
+    0.25
+   ]
+  ],
+  "sprite_frame": "u = (x - 0.5)/0.3, v = (y_down - 0.58)/0.3  (ball radius = 1)"
+ },
+ "removed_from_E5b": {
+  "ally_hp_bar": "frame 823-1489 x 849-881 (+ HP label/value)",
+  "madness_gauge": "x 1800-1890, y 550-960 (tube, brain icon, 狂気 label, value)",
+  "old_stock_holders": "v2 candelabra row"
+ },
+ "moved_in_E5b": {
+  "notice_box": {
+   "from_": [
+    1348,
+    766,
+    1648,
+    826
+   ],
+   "to": [
+    1515,
+    786,
+    1815,
+    846
+   ]
+  }
+ },
+ "unchanged": [
+  "skill list (plain gem dots gem_<C>_{on,dim3,dim2}_32, spacing 33)",
+  "word cards / attack ring / enemy HP / bottom-right text"
+ ]
+}

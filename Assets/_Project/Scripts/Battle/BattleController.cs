@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
+using TypingRoguelike.Battle.Visual;
 using TypingRoguelike.Data;
 using TypingRoguelike.Run;
 using UnityEngine;
@@ -10,7 +12,7 @@ using UnityEngine.UI;
 
 namespace TypingRoguelike.Battle
 {
-    public sealed class BattleController : MonoBehaviour
+    public sealed partial class BattleController : MonoBehaviour
     {
         [SerializeField] BattleEncounterDefinition encounter;
         [SerializeField] JackpotPresentationDefinition jackpotPresentation;
@@ -19,6 +21,7 @@ namespace TypingRoguelike.Battle
         RunMadnessState _madness;
         Action _onVictory;
         Action _onDefeat;
+        public Action OnCorrectCharacter;
         Action _onInsanity;
         bool _outcomeHandled;
         EncounterBattleModifiers _encounterMods;
@@ -26,31 +29,53 @@ namespace TypingRoguelike.Battle
 
         float _tickInterval = 0.05f;
         float _wordClearDamage = 15f;
-        float _damageReduction;
-        float _jackpotLuckBonusPerWord;
+        float _totalAttack;
+        float _wordDamageCoefficient = 0.04f;
+        float _baseCritChance;
+        float _critMultiplier = 1.5f;
+        float _globalEnemyHpScale = 1f;
+        readonly SkillDamageModifiers _skillDamage = new SkillDamageModifiers();
+        int _critTestMode;
+        bool _debugForceCrit;
+        Func<BattleSkillData, float> _debugCritChance;
+        Func<BattleSkillData, float?> _debugCritMultiplier;
+        int _partyDefense;
+        float _defenseConstant = 400f;
+        float _jackpotAccumulationScale = 1f;
         int _maxRerolls = 3;
-        float _enemyAttackDamage = 25f;
-        float _enemyTimerMax = 100f;
+        float _enemyDamageMultiplier = 1f;
         float _enrageHpFraction = 0.5f;
+        float _enrageIntervalMultiplier = 1f;
         string _emojiNormal = "🐲";
         string _emojiEnraged = "🔥🐲";
         string _emojiDefeated = "💀";
-        float _enragedSpeed;
+        EnemySwing _activeSwing;
+        int _currentAttackSlot = -1;
+        EnemyDefinition _battleEnemyDef;
+        EnemySpritePairPresenter _spritePresenter;
+        bool _spriteAttackStarted;
+        float _spriteImpactLead;
+        EnemyAttackPattern _spriteAttackPattern;
+        bool _resolvingEnemySwing;
 
         List<BattleSkillData> _activeSkills;
         TypingEngine _typing;
         OrbStock _stock;
+        RectTransform _pendingStockCard;
+        bool _stockVisualReady;
         BattleUIRefs _ui;
 
         float _playerHp = 100f;
         float _maxPlayerHp = 100f;
         float _enemyHp = 1000f;
         float _maxEnemyHp = 1000f;
-        float _enemyTimer = 100f;
-        float _enemySpeed = 0.35f;
         float _enemyAttackSlowRemaining;
         int _enemyAttackSlowPercent;
         float _enemyStopRemaining;
+        EnemyBreakState _enemyBreak;
+        AudioSource _shieldSe;
+        AudioClip _shieldCrackClip;
+        AudioClip _enemyBreakClip;
         bool _negateMissHit;
         bool _missHitArmed;
         bool _negateMissUsed;
@@ -75,13 +100,33 @@ namespace TypingRoguelike.Battle
         float _jackpotMultiplier = 2f;
         float _tickAccumulator;
         float _battleElapsed;
+        int _hpBefore;
+        int _madnessBefore;
         float _damageDealt;
         int _wordsCleared;
         int _skillsTriggered;
+        int _dungeonFloor = 1;
 
         readonly List<GameObject> _stockOrbObjects = new();
         readonly List<GameObject> _candidateRows = new();
         TypingAudioPlayer _typingAudio;
+        ExAreaConfig _exConfig;
+        ExAreaState _ex;
+        bool _focusCarryCommitted;
+        string _focusCarryLog = "";
+        string _pendingWordLog;
+        string _recentSkillLog;
+        ExAreaView _exView;
+        ExAreaDebugPanel _exDebug;
+        SwordsmanSkillRunner _swordsman;
+        SwordsmanDebugPanel _swordsmanDebug;
+        TextMeshProUGUI _kiwamiMark;
+        BattleSkillData[] _debugAlice;
+        float _kobuBonus;
+        float _kiwamiCrit;
+        float _exSpecialTimer;
+        bool _exSpecialEnabled;
+        readonly List<ExTickHit> _exHits = new List<ExTickHit>();
 
         public float ExportJackpotAccumulatedChance() => _jackpot.BaseAccumulatedChance;
 
@@ -93,9 +138,11 @@ namespace TypingRoguelike.Battle
             Action onDefeat = null,
             Action onInsanity = null,
             EncounterBattleModifiers mods = default,
-            PartyCombatStats partyStats = default)
+            PartyCombatStats partyStats = default,
+            int dungeonFloor = 1)
         {
             encounter = enc;
+            _dungeonFloor = Mathf.Max(1, dungeonFloor);
             _partyState = party;
             _madness = madness;
             _onVictory = onVictory;
@@ -106,8 +153,22 @@ namespace TypingRoguelike.Battle
             _showEnemyAttackTime = mods.ShowEnemyAttackTime;
             _missHitArmed = false;
             _negateMissUsed = false;
-            _damageReduction = partyStats.DamageReduction;
-            _jackpotLuckBonusPerWord = partyStats.JackpotLuckBonusPerWord;
+            _totalAttack = partyStats.TotalAttack;
+            _wordDamageCoefficient = partyStats.WordDamageCoefficient > 0f
+                ? partyStats.WordDamageCoefficient
+                : 0.04f;
+            _baseCritChance = Mathf.Clamp01(partyStats.BaseCritChance);
+            _critMultiplier = partyStats.CritMultiplier > 0f ? partyStats.CritMultiplier : 1.5f;
+            _globalEnemyHpScale = partyStats.GlobalEnemyHpScale > 0f ? partyStats.GlobalEnemyHpScale : 1f;
+            _skillDamage.Clear();
+            _critTestMode = 0;
+            _debugForceCrit = false;
+            _debugCritChance = null;
+            _debugCritMultiplier = null;
+            _partyDefense = partyStats.TotalDefense;
+            _defenseConstant = partyStats.DefenseConstant > 0f ? partyStats.DefenseConstant : 400f;
+            var hasPartyStats = partyStats.TotalAttack > 0 || partyStats.TotalDefense > 0 || partyStats.TotalLuck > 0;
+            _jackpotAccumulationScale = hasPartyStats ? partyStats.JackpotAccumulationScale : 1f;
             _outcomeHandled = false;
             _resultContinued = false;
             _countdownActive = true;
@@ -121,13 +182,40 @@ namespace TypingRoguelike.Battle
             _presentationPlaying = false;
             _jackpotPlaying = false;
 
-            ApplyEncounter(enc, party, partyStats);
+            var enemy = ResolveBattleEnemy(enc);
+            var breakColors = enemy != null && enemy.breakEnabled
+                ? enemy.breakRequirements
+                : Array.Empty<ElementColor>();
+            _enemyBreak = new EnemyBreakState(breakColors,
+                enemy != null ? enemy.breakDuration : 4f,
+                enemy != null ? enemy.breakDamageMultiplier : 1.5f);
+            // スキル一覧は Build に渡すので、先にロードアウトを組む
+            ApplyEncounter(enc, party, partyStats, enemy);
             SetupTypingAudio(enc);
             _stock = new OrbStock();
-            var visuals = BattleVisualContext.FromEncounter(enc, party);
+            var visuals = BattleVisualContext.FromEncounter(enc, party, enemy);
             _ui = BattleUIBuilder.Build(transform, _activeSkills, _innateSkillIds, visuals);
+            // プレハブ経路は RespawnEnemy で後から作るため、ここでも取り直す
+            _spritePresenter = _ui != null ? _ui.SpritePairPresenter : null;
+            if (_spritePresenter == null && visuals != null && visuals.UseSpritePair && _ui?.EnemyHitRoot != null)
+            {
+                _spritePresenter = EnemySpritePairPresenter.Create(_ui.EnemyHitRoot, visuals);
+                _ui.SpritePairPresenter = _spritePresenter;
+                if (_spritePresenter != null)
+                    _ui.BossPortrait = _spritePresenter.MainImage;
+            }
+            // ConfigureEnemySwings 時は Presenter 未作成のため、ここで初撃リードを付け直す
+            RefreshSpriteAttackLeadForOpening();
+            _ui.EnemyStatus?.Configure(_enemyBreak);
+            // カウントダウン中はモーション時計を進めない
+            _spritePresenter?.SetPaused(true);
+            _shieldSe = gameObject.AddComponent<AudioSource>();
+            _shieldSe.playOnAwake = false;
+            _shieldCrackClip = Resources.Load<AudioClip>("Battle/Audio/ShieldCrack");
+            _enemyBreakClip = Resources.Load<AudioClip>("Battle/Audio/EnemyBreak");
             RefreshPortraitImages(visuals);
             _typing.GenerateWords();
+            SetupExArea();
             RefreshAllUI();
             var startMsg = _encounterMods.HasLogOverride ? _encounterMods.StartLogMessage : enc?.startLogMessage;
             var resolvedStartMessage = !string.IsNullOrEmpty(startMsg) ? startMsg : "戦闘開始！";
@@ -138,6 +226,10 @@ namespace TypingRoguelike.Battle
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             if (_ui.DebugKillButton != null)
                 _ui.DebugKillButton.onClick.AddListener(DebugInstantKillForTest);
+            if (_ui.DebugCritTestButton != null)
+                _ui.DebugCritTestButton.onClick.AddListener(CycleCritTest);
+            if (_ui.DebugAliceSlashButton != null)
+                _ui.DebugAliceSlashButton.onClick.AddListener(DebugAliceSlash);
 #endif
             SetLog("戦闘準備...");
             StartCoroutine(PlayBattleCountdown(resolvedStartMessage));
@@ -192,6 +284,10 @@ namespace TypingRoguelike.Battle
             _ui.CountdownOverlay.SetActive(false);
             _countdownActive = false;
             _battleElapsed = 0f;
+            if (!_isPaused && _enemyStopRemaining <= 0f)
+                _spritePresenter?.SetPaused(false);
+            // GO 直後に開幕短縮で既にリード内なら、ここでモーション開始
+            TryStartSpriteAttackMotion();
             SetLog(startMessage);
         }
 
@@ -215,12 +311,12 @@ namespace TypingRoguelike.Battle
                 img.color = Color.white;
             }
 
-            if (_ui.BossPortrait == null)
+            if (_ui.BossPortrait == null || _spritePresenter != null)
                 return;
 
-            var boss = BattlePortraitResolver.LoadBossFromResources();
-            if (boss == null && encounter?.enemy != null)
-                boss = encounter.enemy.battleIllustration;
+            var boss = _battleEnemyDef != null
+                ? BattlePortraitResolver.ResolveBossIllustration(_battleEnemyDef)
+                : encounter?.enemy?.battleIllustration;
             if (boss == null)
                 return;
 
@@ -228,7 +324,11 @@ namespace TypingRoguelike.Battle
             _ui.BossPortrait.color = Color.white;
         }
 
-        void ApplyEncounter(BattleEncounterDefinition enc, RunPartyState party, PartyCombatStats partyStats)
+        void ApplyEncounter(
+            BattleEncounterDefinition enc,
+            RunPartyState party,
+            PartyCombatStats partyStats,
+            EnemyDefinition enemy)
         {
             _innateSkillIds.Clear();
             if (party != null)
@@ -244,7 +344,7 @@ namespace TypingRoguelike.Battle
             {
                 _activeSkills = BattleLoadoutBuilder.CreateHardcodedFallbackLoadout();
                 _typing = new TypingEngine(BattleLoadoutBuilder.CreateFallbackWordPool(), 3);
-                _jackpot.Configure(0f, 0.000025f, 0.99f, 0.1f);
+                _jackpot.Configure(0f, 0.0000075f * Mathf.Max(0f, _jackpotAccumulationScale), 0.99f, 0.1f);
                 if (_madness != null)
                     _jackpot.ApplyRunAccumulatedChance(_madness.AccumulatedJackpotChance);
                 _jackpotMultiplier = 2f;
@@ -256,18 +356,20 @@ namespace TypingRoguelike.Battle
                 _activeSkills = BattleLoadoutBuilder.CreateHardcodedFallbackLoadout();
 
             var words = BattleLoadoutBuilder.GetWords(enc.wordList);
-            _maxRerolls = enc.rerollsPerBattle;
-            _typing = new TypingEngine(words, enc.rerollsPerBattle);
+            _maxRerolls = Mathf.Max(0, enc.rerollsPerBattle + _encounterMods.RerollBonus);
+            _typing = new TypingEngine(words, _maxRerolls);
             _tickInterval = enc.enemyTickInterval;
-            _wordClearDamage = partyStats.TotalAttack > 0
-                ? partyStats.WordClearDamage
-                : enc.wordClearDamage;
+            _wordClearDamage = enc.wordClearDamage > 0f ? enc.wordClearDamage : 15f;
             enc.ResolveJackpotRollParameters(
                 out var jackpotBase,
                 out var jackpotPerChar,
                 out var jackpotMax,
                 out var jackpotCap);
-            _jackpot.Configure(jackpotBase, jackpotPerChar, jackpotMax, jackpotCap);
+            _jackpot.Configure(
+                jackpotBase,
+                jackpotPerChar * Mathf.Max(0f, _jackpotAccumulationScale),
+                jackpotMax,
+                jackpotCap);
             if (_madness != null)
                 _jackpot.ApplyRunAccumulatedChance(_madness.AccumulatedJackpotChance);
             _jackpotMultiplier = enc.jackpotMultiplier > 0f ? enc.jackpotMultiplier : 2f;
@@ -283,29 +385,190 @@ namespace TypingRoguelike.Battle
                 party?.InitRunHp(_maxPlayerHp);
             }
 
+            _hpBefore = Mathf.RoundToInt(_playerHp);
+            _madnessBefore = _madness != null ? _madness.CurrentMadness : 0;
+
             var hpMul = _encounterMods.EnemyHpMultiplier <= 0f ? 1f : _encounterMods.EnemyHpMultiplier;
             var dmgMul = _encounterMods.EnemyDamageMultiplier <= 0f ? 1f : _encounterMods.EnemyDamageMultiplier;
-            var speedMul = _encounterMods.EnemySpeedMultiplier <= 0f ? 1f : _encounterMods.EnemySpeedMultiplier;
 
-            if (enc.enemy != null)
+            var e = enemy != null ? enemy : enc.enemy;
+            if (e != null)
             {
-                var e = enc.enemy;
                 _maxEnemyHp = e.maxHp * hpMul;
                 _enemyHp = _maxEnemyHp;
-                _enemyAttackDamage = e.attackDamage * dmgMul;
-                _enemyTimerMax = e.attackTimerMax;
-                _enemyTimer = _enemyTimerMax;
-                _enemySpeed = e.attackSpeed * speedMul;
+                _enemyDamageMultiplier = dmgMul;
                 _enemyAttackSlowRemaining = 0f;
                 _enemyAttackSlowPercent = 0;
                 _enemyStopRemaining = Mathf.Max(0f, _encounterMods.OpeningEnemyStopSeconds);
-                ApplyOpeningAttackDelta(_encounterMods.OpeningAttackTimeDeltaSeconds);
-                _enragedSpeed = e.enragedAttackSpeed * speedMul;
-                _enrageHpFraction = e.enrageHpFraction;
+                _enrageIntervalMultiplier = LegacyEnrageIntervalMultiplier(e);
+                _enrageHpFraction = e.enrageHpFraction > 0f ? e.enrageHpFraction : 0.5f;
                 _emojiNormal = e.emojiNormal;
                 _emojiEnraged = e.emojiEnraged;
                 _emojiDefeated = e.emojiDefeated;
+                _isEnraged = false;
+                ConfigureEnemySwings(e);
+                ApplyOpeningAttackDelta(_encounterMods.OpeningAttackTimeDeltaSeconds);
+                ApplyFirstAttackDelayDelta(_encounterMods.FirstAttackDelayDeltaSeconds);
             }
+        }
+
+        EnemyDefinition ResolveBattleEnemy(BattleEncounterDefinition enc)
+        {
+            if (_encounterMods.EnemyOverride != null)
+                return _encounterMods.EnemyOverride;
+
+            var category = _encounterMods.EnemyTier switch
+            {
+                ExEnemyTier.Elite => EnemySpawnCategory.Elite,
+                ExEnemyTier.Boss => EnemySpawnCategory.Boss,
+                _ => EnemySpawnCategory.Normal
+            };
+            var catalog = EnemyCatalogDefinition.LoadOrFallback();
+            return EnemyEncounterResolver.PickEnemy(enc, catalog, _dungeonFloor, category)
+                   ?? enc?.enemy;
+        }
+
+        void ConfigureEnemySwings(EnemyDefinition enemy)
+        {
+            _activeSwing = default;
+            _currentAttackSlot = -1;
+            _battleEnemyDef = enemy;
+            if (enemy == null)
+                return;
+
+            var first = EnemyDefinitionAttackUtil.FirstRotateSlot(enemy);
+            if (first < 0)
+            {
+                Debug.LogWarning("敵に有効な攻撃パターンがありません。");
+                return;
+            }
+
+            BeginAttackOnSlot(first);
+            // 開幕短縮などで既に着弾リード内に入っている場合、1撃目だけモーション開始が欠けるのを防ぐ
+            TryStartSpriteAttackMotion();
+        }
+
+        void BeginAttackOnSlot(int slotIndex)
+        {
+            if (_battleEnemyDef == null || slotIndex < 0)
+            {
+                _activeSwing = default;
+                _currentAttackSlot = -1;
+                return;
+            }
+
+            var pattern = EnemyDefinitionAttackUtil.GetResolvedSlot(_battleEnemyDef, slotIndex);
+            if (!pattern.IsActive)
+            {
+                _activeSwing = default;
+                _currentAttackSlot = -1;
+                return;
+            }
+
+            _currentAttackSlot = slotIndex;
+            var baseInterval = Mathf.Max(0.05f, pattern.intervalSeconds);
+            var waitSeconds = pattern.firstDelaySeconds > 0f ? pattern.firstDelaySeconds : baseInterval;
+
+            waitSeconds = IntervalLength(Mathf.Max(0.05f, waitSeconds));
+            _spriteAttackStarted = false;
+            _spriteAttackPattern = pattern;
+            if (_spritePresenter != null)
+            {
+                _spriteImpactLead = Mathf.Max(0.05f, _spritePresenter.ResolveImpactLead(pattern));
+                // 待ちが短すぎると同フレームで着弾が連発するので、演出リード＋余裕を下限にする
+                waitSeconds = Mathf.Max(waitSeconds, _spriteImpactLead + 0.2f);
+            }
+            _activeSwing = EnemySwing.Open(
+                pattern.damage,
+                baseInterval,
+                waitSeconds,
+                pattern.TelegraphSeconds);
+        }
+
+        /// <summary>
+        /// ApplyEncounter 時点では Presenter がまだ無いので、UI 生成後に初撃の着弾リードを付け直す。
+        /// </summary>
+        void RefreshSpriteAttackLeadForOpening()
+        {
+            if (_spritePresenter == null || !_activeSwing.Enabled || _spriteAttackStarted)
+                return;
+
+            _spriteImpactLead = Mathf.Max(0.05f, _spritePresenter.ResolveImpactLead(_spriteAttackPattern));
+            var minWait = _spriteImpactLead + 0.2f;
+            if (_activeSwing.Remaining < minWait)
+            {
+                _activeSwing.Remaining = minWait;
+                if (_activeSwing.Cycle < _activeSwing.Remaining)
+                    _activeSwing.Cycle = _activeSwing.Remaining;
+            }
+        }
+
+        /// <summary>
+        /// タイマー0＝着弾。モーションは ImpactLead 秒前から開始。
+        /// 開幕短縮などでリードを大きく下回る場合は Remaining をリードまで戻し、
+        /// ためをスキップせず着弾をわずかに遅らせる。
+        /// </summary>
+        void TryStartSpriteAttackMotion()
+        {
+            if (_spritePresenter == null || _spriteAttackStarted)
+                return;
+            if (_countdownActive)
+                return;
+            ref var swing = ref _activeSwing;
+            if (!swing.Enabled)
+                return;
+
+            // Presenter 後付けや初期化順ずれで lead が 0 のまま残らないようにする
+            if (_spriteImpactLead < 0.05f)
+                _spriteImpactLead = Mathf.Max(0.05f, _spritePresenter.ResolveImpactLead(_spriteAttackPattern));
+
+            if (swing.Remaining > _spriteImpactLead)
+                return;
+
+            // リード未満まで短縮されていたら、ため全量を確保してから開始（初撃の同時発火防止）
+            if (swing.Remaining < _spriteImpactLead - 0.001f)
+            {
+                swing.Remaining = _spriteImpactLead;
+                if (swing.Cycle < swing.Remaining)
+                    swing.Cycle = swing.Remaining;
+            }
+
+            _spriteAttackStarted = true;
+            _spritePresenter.SetAttackSpeedMul(EnemyAttackSpeedMultiplier());
+            _spritePresenter.BeginAttack(_spriteAttackPattern, 0f);
+            SyncSpriteAttackClock();
+        }
+
+        /// <summary>モーション時刻 = ImpactLead - Remaining（タイマー0で着弾）。</summary>
+        void SyncSpriteAttackClock()
+        {
+            if (_spritePresenter == null || !_spriteAttackStarted)
+                return;
+            if (!_activeSwing.Enabled)
+                return;
+            if (_activeSwing.Remaining > _spriteImpactLead)
+                return;
+            _spritePresenter.SetAttackSpeedMul(EnemyAttackSpeedMultiplier());
+            var motionTime = _spriteImpactLead - Mathf.Max(0f, _activeSwing.Remaining);
+            _spritePresenter.SetAttackMotionTime(motionTime);
+        }
+
+        void AdvanceToNextRotatedAttack()
+        {
+            if (_battleEnemyDef == null || _currentAttackSlot < 0)
+                return;
+
+            var next = EnemyDefinitionAttackUtil.AdvanceRotateSlot(_battleEnemyDef, _currentAttackSlot);
+            if (next < 0)
+                return;
+            BeginAttackOnSlot(next);
+        }
+
+        static float LegacyEnrageIntervalMultiplier(EnemyDefinition enemy)
+        {
+            if (enemy.attackSpeed > 0f && enemy.enragedAttackSpeed > 0f)
+                return enemy.attackSpeed / enemy.enragedAttackSpeed;
+            return enemy.enrageIntervalMultiplier > 0f ? enemy.enrageIntervalMultiplier : 1f;
         }
 
         void ApplyOpeningAttackDelta(float deltaSeconds)
@@ -326,11 +589,37 @@ namespace TypingRoguelike.Battle
                 sooner -= used;
             }
 
-            if (sooner <= 0f || _tickInterval <= 0f)
+            if (sooner <= 0f)
                 return;
-            var speed = Mathf.Max(0.01f, _enemySpeed);
-            var units = sooner * speed / _tickInterval;
-            _enemyTimer = Mathf.Max(speed, _enemyTimer - units);
+            ShortenSwing(ref _activeSwing, sooner);
+            // 開幕短縮でも着弾リード分は残し、初撃のためが潰えないようにする
+            if (_activeSwing.Enabled && _spriteImpactLead > 0.05f &&
+                _activeSwing.Remaining < _spriteImpactLead)
+            {
+                _activeSwing.Remaining = _spriteImpactLead;
+                if (_activeSwing.Cycle < _activeSwing.Remaining)
+                    _activeSwing.Cycle = _activeSwing.Remaining;
+            }
+            TryStartSpriteAttackMotion();
+        }
+
+        void ApplyFirstAttackDelayDelta(float deltaSeconds)
+        {
+            if (Mathf.Approximately(deltaSeconds, 0f))
+                return;
+
+            if (_activeSwing.Enabled && _activeSwing.WaitingForOpening)
+            {
+                _activeSwing.Remaining = Mathf.Max(1f, _activeSwing.Remaining + deltaSeconds);
+                _activeSwing.Cycle = _activeSwing.Remaining;
+            }
+        }
+
+        static void ShortenSwing(ref EnemySwing swing, float seconds)
+        {
+            if (!swing.Enabled)
+                return;
+            swing.Remaining = Mathf.Max(0f, swing.Remaining - seconds);
         }
 
         void Update()
@@ -348,13 +637,36 @@ namespace TypingRoguelike.Battle
             if (_isPaused)
                 return;
 
+            var breakHeldThisFrame = _enemyBreak != null && _enemyBreak.IsBroken;
+            if (_enemyBreak != null)
+            {
+                if (_enemyBreak.Tick(Time.deltaTime)) SetLog("敵がブレイクから復帰した。");
+                _ui?.EnemyStatus?.Tick(_enemyBreak, Time.deltaTime);
+            }
+
+            TickExArea(Time.deltaTime);
+            _swordsman?.Tick(Time.deltaTime);
+            TickAxe(Time.deltaTime);
+            RefreshKiwamiMark();
+            RefreshSwordsmanDebug();
+
             _battleElapsed += Time.deltaTime;
             TickEnemyAttackSlow(Time.deltaTime);
+            if (breakHeldThisFrame)
+            {
+                _spritePresenter?.SetPaused(true);
+                HoldStoppedAttackBar();
+                RefreshAttackCountdown(_enemyBreak.Remaining);
+                RefreshHeavyTelegraph();
+                return;
+            }
             if (_enemyStopRemaining > 0f)
             {
+                _spritePresenter?.SetPaused(true);
                 _enemyStopRemaining -= Time.deltaTime;
                 HoldStoppedAttackBar();
                 RefreshAttackCountdown(_enemyStopRemaining);
+                RefreshHeavyTelegraph();
                 if (_enemyStopRemaining <= 0f)
                 {
                     _enemyStopRemaining = 0f;
@@ -364,12 +676,26 @@ namespace TypingRoguelike.Battle
                 return;
             }
 
+            // 停止解除後はポーズを戻す（メニューポーズは別経路）
+            if (!_isPaused)
+                _spritePresenter?.SetPaused(false);
+
             _tickAccumulator += Time.deltaTime;
+            // 1フレームで複数回着弾しない（ラグ後の catch-up で連打になるのを防ぐ）
+            var resolvedSwingThisFrame = false;
             while (_tickAccumulator >= _tickInterval)
             {
                 _tickAccumulator -= _tickInterval;
-                TickEnemyTimer();
+                if (TickEnemyTimer(out var resolved) && resolved)
+                {
+                    resolvedSwingThisFrame = true;
+                    break;
+                }
             }
+            if (resolvedSwingThisFrame)
+                _tickAccumulator = 0f;
+            else
+                SyncSpriteAttackClock();
         }
 
         void HandleKeyboard()
@@ -384,13 +710,29 @@ namespace TypingRoguelike.Battle
                 return;
             }
 
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            if (keyboard.f4Key.wasPressedThisFrame)
+            {
+                _exDebug?.Toggle();
+                _swordsmanDebug?.Toggle();
+                _axeDebug?.Toggle();
+                RefreshExDebug();
+                RefreshSwordsmanDebug();
+                RefreshAxeDebug();
+                return;
+            }
+#endif
+
             if (_isPaused || _isGameOver)
                 return;
 
             if (keyboard.enterKey.wasPressedThisFrame || keyboard.numpadEnterKey.wasPressedThisFrame)
             {
-                if (_typing.TryReroll())
+                var avoid = new HashSet<char>();
+                _ex?.CollectFirstLetters(avoid, null);
+                if (_typing.TryReroll(avoid))
                 {
+                    RepairExWords();
                     SetLog($"🔄 リロール実行！ (残り{_typing.RerollCount}回)");
                     RefreshWordBoxes(false);
                     RefreshRerollBadge();
@@ -406,64 +748,7 @@ namespace TypingRoguelike.Battle
                 if (!keyboard[key].wasPressedThisFrame)
                     continue;
 
-                var keyResult = _typing.ProcessKey(c);
-                if (keyResult.Missed)
-                    _missHitArmed = true;
-                PlayTypingSound(keyResult);
-                if (keyResult.Completed.HasValue)
-                {
-                    var completed = keyResult.Completed.Value;
-                    _wordsCleared++;
-                    var wentInsane = _madness != null && _madness.AddFromWordAttack(completed.InputLength);
-                    RefreshMadnessMeter();
-                    if (wentInsane)
-                    {
-                        SetLog("狂気が限界に達した… 発狂！");
-                        TriggerInsanityGameOver();
-                        break;
-                    }
-
-                    _wordsSinceJackpot.Add(string.IsNullOrEmpty(completed.DisplayText) ? "？" : completed.DisplayText);
-                    var bonusJackpot = CurrentJackpotRollBonus();
-                    var jackpotWon = _jackpot.RegisterWordAndRoll(
-                        bonusJackpot,
-                        completed.InputLength,
-                        RunDebugState.JackpotRollChanceOverride);
-                    PersistJackpotAccumulation();
-                    RefreshJackpotMeter();
-                    if (jackpotWon)
-                    {
-                        var jackpotDamage = _madness?.ComputeJackpotDamage(_jackpotMultiplier) ?? 0;
-                        if (RelicJackpotActive())
-                        {
-                            var mul = _encounterMods.JackpotDamageMultiplier > 0f
-                                ? _encounterMods.JackpotDamageMultiplier
-                                : 1f;
-                            jackpotDamage = Mathf.Max(0, Mathf.RoundToInt(jackpotDamage * mul));
-                        }
-                        _madness?.ResetMadnessAfterJackpot();
-                        _jackpot.Reset();
-                        PersistJackpotAccumulation();
-                        RefreshMadnessMeter();
-                        if (!_isGameOver)
-                        {
-                            var words = _wordsSinceJackpot.ToArray();
-                            _wordsSinceJackpot.Clear();
-                            EnqueueJackpot(jackpotDamage, words);
-                        }
-                    }
-                    else
-                        ApplyDamageToEnemy(_wordClearDamage, $"単語クリア！ {(int)_wordClearDamage} ダメージ！");
-
-                    _stock.Push(completed.Color);
-                    _typing.GenerateWords();
-                    TryTriggerSkill();
-                    RefreshStockUI();
-                    RefreshWordBoxes(false);
-                }
-                else
-                    RefreshWordBoxes(false);
-
+                TypeBattleKey(c);
                 break;
             }
         }
@@ -502,9 +787,22 @@ namespace TypingRoguelike.Battle
             _encounterMods.JackpotMadnessThreshold > 0 &&
             _madness.CurrentMadness >= _encounterMods.JackpotMadnessThreshold;
 
+        float ComputeWordDamage(int inputLength)
+        {
+            _ = inputLength;
+            var multiplier = _encounterMods.WordDamageMultiplier > 0f ? _encounterMods.WordDamageMultiplier : 1f;
+            if (_totalAttack <= 0f || _wordDamageCoefficient <= 0f)
+                return Mathf.Max(1f, Mathf.Round(_wordClearDamage * multiplier));
+            var attack = Mathf.RoundToInt(_totalAttack);
+            if (_axe != null)
+                attack += _axe.WordAttackBonus();
+            var word = CombatMath.WordDamage(attack, _wordDamageCoefficient);
+            return Mathf.Max(1f, Mathf.Round(word * multiplier));
+        }
+
         float CurrentJackpotRollBonus()
         {
-            var bonus = _jackpotLuckBonusPerWord + (_madness?.BonusJackpotChance ?? 0f);
+            var bonus = _madness?.BonusJackpotChance ?? 0f;
             if (RelicJackpotActive())
                 bonus += Mathf.Max(0f, _encounterMods.JackpotChanceBonus);
             return bonus;
@@ -534,45 +832,143 @@ namespace TypingRoguelike.Battle
 
         float EnemyAttackSpeedMultiplier()
         {
-            if (_enemyAttackSlowRemaining <= 0f || _enemyAttackSlowPercent <= 0)
-                return 1f;
-            return Mathf.Clamp01(1f - _enemyAttackSlowPercent / 100f);
+            var legacy = 1f;
+            if (_enemyAttackSlowRemaining > 0f && _enemyAttackSlowPercent > 0)
+                legacy = Mathf.Clamp01(1f - _enemyAttackSlowPercent / 100f);
+            var axe = _axe != null ? _axe.Status.SpeedMultiplier : 1f;
+            var mode = _axe?.Config?.options != null ? _axe.Config.options.aslowStacking : "max";
+            if (mode == "add")
+                return Mathf.Clamp01(1f - ((1f - legacy) + (1f - axe)));
+            return Mathf.Min(legacy, axe);
         }
 
-        void TickEnemyTimer()
+        bool TickEnemyTimer(out bool resolvedSwing)
         {
-            _enemyTimer -= _enemySpeed * EnemyAttackSpeedMultiplier();
-            if (_enemyTimer <= 0f)
+            resolvedSwing = false;
+            var step = Mathf.Max(0.01f, _tickInterval) * EnemyAttackSpeedMultiplier();
+            if (!_isGameOver && !_outcomeHandled)
+                resolvedSwing = AdvanceActiveSwing(step);
+            RefreshAttackPresentation();
+            RefreshHeavyTelegraph();
+            return true;
+        }
+
+        bool AdvanceActiveSwing(float step)
+        {
+            ref var swing = ref _activeSwing;
+            if (!swing.Enabled || _isGameOver || _outcomeHandled || _resolvingEnemySwing)
+                return false;
+
+            swing.Remaining -= step;
+
+            TryStartSpriteAttackMotion();
+            SyncSpriteAttackClock();
+
+            if (swing.Remaining > 0f)
+                return false;
+
+            _resolvingEnemySwing = true;
+            try
             {
-                _enemyTimer = _enemyTimerMax;
-                EnemyAttack();
+                // 再入で同じスイングが連発しないよう先に無効化
+                var damage = swing.Damage;
+                swing.Enabled = false;
+                swing.Remaining = 0f;
+                swing.WaitingForOpening = false;
+                // ダメージ＝着弾。モーション／斬撃を先に着弾時刻へ合わせてから与ダメージ
+                _spritePresenter?.NotifySwingImpact();
+                EnemyAttack(damage);
+                AdvanceToNextRotatedAttack();
+            }
+            finally
+            {
+                _resolvingEnemySwing = false;
             }
 
-            if (_ui?.AttackBar != null)
-            {
-                var fill = Mathf.Clamp01(_enemyTimer / _enemyTimerMax);
-                _ui.AttackBar.fillAmount = fill;
-                var danger = fill < 0.25f;
-                var slowed = _enemyAttackSlowRemaining > 0f;
-                var calm = new Color(0.32f, 0.8f, 1f, 0.95f);
-                var warn = new Color(1f, 0.7f, 0.2f, 0.95f);
-                _ui.AttackBar.color = danger
-                    ? Color.Lerp(new Color(1f, 0.08f, 0.1f), Color.white,
-                        (Mathf.Sin(Time.unscaledTime * 12f) + 1f) * 0.18f)
-                    : slowed
-                        ? Color.Lerp(BattleUITheme.AccentAlly, calm, 0.35f)
-                        : Color.Lerp(warn, calm, Mathf.InverseLerp(0.25f, 0.6f, fill));
-                if (_ui.EnemyAttackRingTrack != null)
-                {
-                    _ui.EnemyAttackRingTrack.color = danger
-                        ? new Color(0.35f, 0.04f, 0.06f, 0.85f)
-                        : new Color(0.06f, 0.14f, 0.32f, 0.75f);
-                }
+            return true;
+        }
 
-                if (_ui.AttackBarLabel != null)
-                    _ui.AttackBarLabel.color = danger ? new Color(1f, 0.32f, 0.28f) : BattleUITheme.TextMuted;
+        float IntervalLength(float baseInterval)
+        {
+            var intervalMul = _encounterMods.EnemyAttackIntervalMultiplier <= 0f
+                ? 1f
+                : _encounterMods.EnemyAttackIntervalMultiplier;
+            var speedMul = _encounterMods.EnemySpeedMultiplier <= 0f
+                ? 1f
+                : _encounterMods.EnemySpeedMultiplier;
+            var enrage = _isEnraged ? _enrageIntervalMultiplier : 1f;
+            return Mathf.Max(0.05f, baseInterval * intervalMul * enrage / speedMul);
+        }
+
+        void RefreshAttackPresentation()
+        {
+            if (_ui?.AttackBar == null)
+                return;
+            if (!TryNextSwing(out var remaining, out var cycle))
+            {
+                _ui.AttackBar.fillAmount = 0f;
                 RefreshAttackCountdown(0f);
+                return;
             }
+
+            var remainingFill = cycle <= 0f ? 0f : Mathf.Clamp01(remaining / cycle);
+            var fill = _ui.AttackRingFillsOnApproach
+                ? (1f - remainingFill) * (330f / 360f)
+                : remainingFill;
+            _ui.AttackBar.fillAmount = fill;
+            if (_ui.AttackRingFillsOnApproach)
+            {
+                RefreshAttackCountdown(0f);
+                return;
+            }
+            var danger = fill < 0.25f;
+            var slowed = _enemyAttackSlowRemaining > 0f;
+            var calm = new Color(0.32f, 0.8f, 1f, 0.95f);
+            var warn = new Color(1f, 0.7f, 0.2f, 0.95f);
+            _ui.AttackBar.color = danger
+                ? Color.Lerp(new Color(1f, 0.08f, 0.1f), Color.white,
+                    (Mathf.Sin(Time.unscaledTime * 12f) + 1f) * 0.18f)
+                : slowed
+                    ? Color.Lerp(BattleUITheme.AccentAlly, calm, 0.35f)
+                    : Color.Lerp(warn, calm, Mathf.InverseLerp(0.25f, 0.6f, fill));
+            if (_ui.EnemyAttackRingTrack != null)
+            {
+                _ui.EnemyAttackRingTrack.color = danger
+                    ? new Color(0.35f, 0.04f, 0.06f, 0.85f)
+                    : new Color(0.06f, 0.14f, 0.32f, 0.75f);
+            }
+
+            if (_ui.AttackBarLabel != null)
+                _ui.AttackBarLabel.color = danger ? new Color(1f, 0.32f, 0.28f) : BattleUITheme.TextMuted;
+            RefreshAttackCountdown(0f);
+        }
+
+        void RefreshHeavyTelegraph()
+        {
+            var callout = _ui?.HeavyAttackCallout;
+            if (callout == null)
+                return;
+
+            var show = _activeSwing.Enabled &&
+                       _activeSwing.Telegraph > 0f &&
+                       _activeSwing.Remaining > 0f &&
+                       _activeSwing.Remaining <= _activeSwing.Telegraph;
+            if (callout.activeSelf != show)
+                callout.SetActive(show);
+            if (!show || _ui.HeavyAttackGauge == null)
+                return;
+            _ui.HeavyAttackGauge.fillAmount = Mathf.Clamp01(_activeSwing.Remaining / _activeSwing.Telegraph);
+        }
+
+        bool TryNextSwing(out float remaining, out float cycle)
+        {
+            remaining = 0f;
+            cycle = 0f;
+            if (!_activeSwing.Enabled)
+                return false;
+            remaining = _activeSwing.Remaining;
+            cycle = _activeSwing.Cycle;
+            return true;
         }
 
         void TogglePause()
@@ -580,15 +976,980 @@ namespace TypingRoguelike.Battle
             _isPaused = !_isPaused;
             if (_ui?.PauseOverlay != null)
                 _ui.PauseOverlay.SetActive(_isPaused);
+            // timeScale は止めないため、SpritePair は明示フラグで止める（unscaled 連打防止）
+            _spritePresenter?.SetPaused(_isPaused);
             SetLog(_isPaused ? "⏸️ 一時停止中" : "再開しました！");
             if (!_isPaused)
                 TryTriggerSkill();
         }
 
+        void SetupExArea()
+        {
+            _exView?.Destroy();
+            _exDebug?.Destroy();
+            _exConfig = ExAreaConfig.Load();
+            var slots = _exConfig.slots > 0 ? _exConfig.slots : 1;
+            _ex = new ExAreaState(slots);
+            _kobuBonus = 0f;
+            _kiwamiCrit = 0f;
+            _skillDamage.Clear();
+            _skillDamage.AddCritChanceSource(FocusCritChance);
+            _skillDamage.AddFinalMultiplierSource(KobuFinal);
+            _skillDamage.AddCritMultiplierOverrideSource(KiwamiCrit);
+            _swordsman = new SwordsmanSkillRunner(new BattleSwordsmanBridge(this), SwordsmanSkillConfig.Load());
+            _swordsman.BeginBattle(_partyState != null ? _partyState.CarriedFocus : 0);
+            SetupAxe();
+            _exSpecialEnabled = _exConfig.enemySpecials != null && _exConfig.enemySpecials.enabled;
+            _exSpecialTimer = NextSpecialDelay(true);
+            if (_ui?.RootCard != null)
+            {
+                _exView = ExAreaView.Create(_ui.RootCard, slots);
+                _exView.Refresh(_ex, _exConfig);
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+                _exDebug = ExAreaDebugPanel.Create(
+                    _ui.RootCard,
+                    AddExColor,
+                    kind =>
+                    {
+                        if (kind == ExKind.Focus)
+                            _swordsman?.AddFocus(1, true, true);
+                        else
+                            AddExStatus(kind, 1);
+                        RefreshExView();
+                    },
+                    () =>
+                    {
+                        _swordsman?.AddFocus(5, true, true);
+                        RefreshExView();
+                    },
+                    () =>
+                    {
+                        _ex.ConsumeAll(ExIds.Focus);
+                        RefreshExView();
+                    },
+                    () =>
+                    {
+                        _ex.Clear();
+                        RefreshExView();
+                    },
+                    () =>
+                    {
+                        _exSpecialEnabled = !_exSpecialEnabled;
+                        SetLog(_exSpecialEnabled ? "敵の特殊攻撃をオンにした" : "敵の特殊攻撃をオフにした");
+                        RefreshExDebug();
+                    },
+                    () => TryEnemySpecial(true),
+                    DebugExCommand);
+                _swordsmanDebug?.Destroy();
+                _swordsmanDebug = SwordsmanDebugPanel.Create(_ui.RootCard, _swordsman.Config, DebugEquipSwordsman, DebugResetSwordsman, DebugSwordsmanCommand);
+                RefreshSwordsmanDebug();
+#endif
+                RaiseBattleOverlays();
+            }
+        }
+
+        void RaiseBattleOverlays()
+        {
+            _ui?.CountdownOverlay?.transform.SetAsLastSibling();
+            _ui?.ResultOverlay?.transform.SetAsLastSibling();
+            _ui?.PauseOverlay?.transform.SetAsLastSibling();
+            _ui?.CutinOverlay?.transform.SetAsLastSibling();
+            _ui?.JackpotOverlay?.transform.SetAsLastSibling();
+        }
+
+        void TickExArea(float dt)
+        {
+            if (_ex == null || _exConfig == null || _isGameOver)
+                return;
+            RefreshSpecialLocks();
+            _exHits.Clear();
+            _ex.Tick(
+                dt,
+                _exConfig.poison.intervalSec,
+                _exConfig.poison.damagePerStack,
+                _exConfig.paralysis.intervalSec,
+                _exConfig.paralysis.damagePerStack,
+                _exConfig.frenzy.intervalSec,
+                _exConfig.frenzy.madnessPerBurst,
+                _exHits);
+            foreach (var hit in _exHits)
+            {
+                if (_isGameOver)
+                    break;
+                if (hit.Kind == ExKind.Frenzy)
+                    ApplyExMadness(hit.Amount);
+                else
+                    ApplyExPlayerDamage(hit.Amount, _exConfig.NameOf(hit.Kind) + "のダメージ " + hit.Amount);
+            }
+
+            if (_exSpecialEnabled && !_isGameOver && !(_enemyBreak?.IsBroken ?? false))
+            {
+                _exSpecialTimer -= dt;
+                if (_exSpecialTimer <= 0f)
+                {
+                    TryEnemySpecial(false);
+                    _exSpecialTimer = NextSpecialDelay(false);
+                }
+            }
+
+            RefreshExView();
+        }
+
+        float NextSpecialDelay(bool opening)
+        {
+            var specials = _exConfig?.enemySpecials;
+            if (specials == null)
+                return 0f;
+            if (opening)
+            {
+                var min = specials.firstDelayMinSec;
+                var max = Mathf.Max(min, specials.firstDelayMaxSec);
+                return UnityEngine.Random.Range(min, max);
+            }
+
+            var interval = specials.normalIntervalSec;
+            if (_encounterMods.EnemyTier == ExEnemyTier.Elite && specials.eliteIntervalSec > 0f)
+                interval = specials.eliteIntervalSec;
+            else if (_encounterMods.EnemyTier == ExEnemyTier.Boss && specials.bossIntervalSec > 0f)
+                interval = specials.bossIntervalSec;
+            var jitter = Mathf.Clamp(specials.jitter, 0f, 0.9f);
+            var scale = 1f + UnityEngine.Random.Range(-jitter, jitter);
+            return Mathf.Max(0.05f, interval * scale);
+        }
+
+        void TryEnemySpecial(bool announceSkip)
+        {
+            if (_ex == null || _exConfig?.enemySpecials?.kinds == null)
+                return;
+            var choices = new List<ExKind>();
+            foreach (var id in _exConfig.enemySpecials.kinds)
+            {
+                var kind = ExIds.Parse(id);
+                if (kind == ExKind.None || kind == ExKind.ColorStock || kind == ExKind.Focus)
+                    continue;
+                if (_ex.CanAccept(kind))
+                    choices.Add(kind);
+            }
+
+            if (choices.Count == 0)
+            {
+                if (announceSkip)
+                    SetLog("特殊攻撃は置き場所がないので通常攻撃のまま");
+                return;
+            }
+
+            var pick = choices[UnityEngine.Random.Range(0, choices.Count)];
+            AddExStatus(pick, 1);
+            SetLog(_exConfig.NameOf(pick) + "が降りてきた");
+        }
+
+        void AddExColor(string colorId)
+        {
+            if (_ex == null)
+                return;
+            var added = _ex.TryAddColor(colorId);
+            if (!added.Accepted)
+            {
+                SetLog("色ストックは入らなかった");
+                RefreshExView();
+                return;
+            }
+
+            if (added.Ejected)
+                SetLog("古い色ストックが押し出された");
+            var slot = _ex.Slots[_ex.Count - 1];
+            AssignExWord(slot);
+            RepairExWords();
+            RefreshExView();
+        }
+
+        void AddExStatus(ExKind kind, int times)
+        {
+            if (_ex == null || _exConfig == null || times <= 0)
+                return;
+            var effect = _exConfig.Effect(kind);
+            var interval = effect != null ? effect.intervalSec : 0f;
+            var maxStacks = kind == ExKind.Focus && effect != null ? effect.maxStacks : 0;
+            var reset = kind == ExKind.Frenzy;
+            for (var i = 0; i < times; i++)
+            {
+                var added = _ex.TryAddStatus(kind, maxStacks, interval, reset);
+                if (!added.Accepted)
+                {
+                    SetLog(_exConfig.NameOf(kind) + "は入らなかった");
+                    break;
+                }
+
+                if (added.Ejected)
+                    SetLog("古い色ストックが押し出された");
+            }
+
+            ExSlot fresh = null;
+            foreach (var slot in _ex.Slots)
+            {
+                if (slot.Kind == kind && kind != ExKind.Focus && !slot.HasWord)
+                    fresh = slot;
+            }
+            if (fresh != null)
+                AssignExWord(fresh);
+            RepairExWords();
+            RefreshExView();
+        }
+
+        bool AssignExWord(ExSlot slot)
+        {
+            if (slot == null || _typing == null)
+                return false;
+            var blocked = new HashSet<char>();
+            _typing.CollectFirstLetters(blocked);
+            _ex.CollectFirstLetters(blocked, slot);
+            if (_typing.TryPickWord(blocked, out var display, out var inputs))
+            {
+                slot.SetWord(display, inputs);
+                return true;
+            }
+
+            blocked.Clear();
+            _ex.CollectFirstLetters(blocked, slot);
+            if (!_typing.TryPickWord(blocked, out display, out inputs))
+                return false;
+            slot.SetWord(display, inputs);
+            var avoid = new HashSet<char>();
+            _ex.CollectFirstLetters(avoid, null);
+            _typing.GenerateWords(avoid);
+            RefreshWordBoxes(false);
+            return true;
+        }
+
+        void RegenerateScreenWords()
+        {
+            var avoid = new HashSet<char>();
+            _ex?.CollectFirstLetters(avoid, null);
+            _typing.GenerateWords(avoid);
+            RepairExWords();
+        }
+
+        void RepairExWords()
+        {
+            if (_ex == null || _typing == null)
+                return;
+            for (var attempt = 0; attempt < 8; attempt++)
+            {
+                var screen = new HashSet<char>();
+                _typing.CollectFirstLetters(screen);
+                if (!_ex.ClashesWith(screen))
+                    return;
+                var slot = _ex.FirstClashingSlot(screen);
+                if (slot == null || slot.Progress > 0 || !AssignExWord(slot))
+                    return;
+            }
+        }
+
+        bool ScreenWordInProgress()
+        {
+            if (_typing == null)
+                return false;
+            foreach (var slot in _typing.Slots)
+            {
+                if (slot.Progress > 0)
+                    return true;
+            }
+            return false;
+        }
+
+        void TypeBattleKey(char key)
+        {
+            if (_typing == null)
+                return;
+
+            RefreshSpecialLocks();
+            var screenLive = ScreenWordInProgress();
+            var exReady = _ex != null && _exConfig != null;
+            var exLive = exReady && _ex.HasProgress;
+            var screenResult = new KeyProcessResult(null, false, false);
+            var exResult = ExKeyResult.None;
+            var ranScreen = false;
+
+            if (!screenLive && !exLive)
+            {
+                ranScreen = true;
+                screenResult = _typing.ProcessKey(key);
+                if (exReady && _ex.MatchesFirst(key))
+                    exResult = _ex.ProcessKey(key, _exConfig.frenzy.intervalSec);
+            }
+            else
+            {
+                if (screenLive)
+                {
+                    ranScreen = true;
+                    screenResult = _typing.ProcessKey(key, false);
+                }
+                if (exLive)
+                    exResult = _ex.ProcessKey(key, _exConfig.frenzy.intervalSec);
+            }
+
+            var screenHit = ranScreen && (screenResult.Advanced || screenResult.Completed.HasValue);
+            var exHit = exResult.Completed || (exResult.Advanced && !exResult.Missed);
+            var hit = screenHit || exHit;
+            if (hit)
+                OnCorrectCharacter?.Invoke();
+            if (!hit)
+            {
+                _missHitArmed = true;
+                _typing.ResetActivity();
+                if (exLive || exResult.Missed)
+                    _ex.ClearTypingProgress();
+            }
+
+            WordCompletion? exCompleted = null;
+            if (exResult.Completed && _exConfig != null)
+            {
+                exCompleted = new WordCompletion(
+                    _exConfig.ToElement(exResult.ColorId),
+                    exResult.InputLength,
+                    exResult.DisplayText);
+            }
+
+            PlayTypingSound(new KeyProcessResult(screenResult.Completed ?? exCompleted, hit, !hit));
+            if (exResult.Completed && !_isGameOver)
+            {
+                var cardFirst = _exConfig.specialRules == null || _exConfig.specialRules.cardDamageFirst;
+                var damageCard = IsSpecialDamage(exResult.Kind);
+                var cardLine = cardFirst && damageCard ? ApplySpecialCardHit(exResult) : null;
+                if (!_isGameOver)
+                {
+                    var countAsWord = _exConfig.exWordCountsAsNormalWord;
+                    var pushOrb = exResult.Kind == ExKind.ColorStock;
+                    if (countAsWord)
+                        ApplyWordRewards(exCompleted.Value, pushOrb, false, cardLine);
+                    else if (pushOrb)
+                    {
+                        _stock.Push(_exConfig.ToElement(exResult.ColorId));
+                        TryTriggerSkill();
+                        RefreshStockUI();
+                    }
+                }
+
+                if (!cardFirst && damageCard && !_isGameOver)
+                    ApplySpecialCardHit(exResult);
+
+                if (exResult.NeedsNewWord && !_isGameOver)
+                {
+                    foreach (var slot in _ex.Slots)
+                    {
+                        if (slot.Kind != exResult.Kind || slot.HasWord)
+                            continue;
+                        if (IsSpecialDamage(slot.Kind))
+                            AssignCardWord(slot, _exConfig.FindCard(CardId(slot.Kind)));
+                        else
+                            AssignExWord(slot);
+                        break;
+                    }
+                    RepairExWords();
+                }
+            }
+
+            if (screenResult.Completed.HasValue && !_isGameOver)
+            {
+                ApplyWordRewards(screenResult.Completed.Value, true, true);
+                if (_ex != null && _ex.HasProgress)
+                {
+                    _typing.ParkAll();
+                    RefreshWordBoxes(false);
+                }
+            }
+            else if (!_isGameOver)
+                RefreshWordBoxes(false);
+
+            if (!_isGameOver && !ScreenWordInProgress() && (_ex == null || !_ex.HasProgress))
+            {
+                _typing.ResetActivity();
+                RefreshWordBoxes(false);
+            }
+
+            RefreshExView();
+        }
+
+        void ApplyWordRewards(WordCompletion completed, bool pushOrb, bool regenerateScreen, string logPrefix = null)
+        {
+            _wordsCleared++;
+            var wentInsane = _madness != null && _madness.AddFromWordAttack(completed.InputLength);
+            RefreshMadnessMeter();
+            if (wentInsane)
+            {
+                SetLog("狂気が限界に達した… 発狂！");
+                TriggerInsanityGameOver();
+                return;
+            }
+
+            // Before word damage and automatic skills: the finishing word benefits too.
+            if (pushOrb && _enemyBreak != null)
+            {
+                var wasBroken = _enemyBreak.IsBroken;
+                var consumed = _enemyBreak.CompleteWord(completed.Color);
+                if (consumed >= 0)
+                {
+                    _ui?.EnemyStatus?.Shatter(consumed);
+                    var clip = _enemyBreak.IsBroken ? _enemyBreakClip : _shieldCrackClip;
+                    if (clip != null) _shieldSe.PlayOneShot(clip, _enemyBreak.IsBroken ? 0.75f : 0.45f);
+                }
+                if (!wasBroken && _enemyBreak.IsBroken)
+                {
+                    _spritePresenter?.SetBroken(true);
+                    SetLog($"BREAK！ {_enemyBreak.Duration:0.#}秒停止・与ダメージ×{_enemyBreak.DamageMultiplier:0.##}");
+                }
+
+                if (wasBroken && !_enemyBreak.IsBroken)
+                    _spritePresenter?.SetBroken(false);
+            }
+
+            _wordsSinceJackpot.Add(string.IsNullOrEmpty(completed.DisplayText) ? "？" : completed.DisplayText);
+            var bonusJackpot = CurrentJackpotRollBonus();
+            var jackpotWon = _jackpot.RegisterWordAndRoll(
+                bonusJackpot,
+                completed.InputLength,
+                RunDebugState.JackpotRollChanceOverride);
+            PersistJackpotAccumulation();
+            RefreshJackpotMeter();
+            if (jackpotWon)
+            {
+                var jackpotDamage = _madness?.ComputeJackpotDamage(_jackpotMultiplier) ?? 0;
+                if (RelicJackpotActive())
+                {
+                    var mul = _encounterMods.JackpotDamageMultiplier > 0f
+                        ? _encounterMods.JackpotDamageMultiplier
+                        : 1f;
+                    jackpotDamage = Mathf.Max(0, Mathf.RoundToInt(jackpotDamage * mul));
+                }
+                _madness?.ResetMadnessAfterJackpot();
+                _jackpot.Reset();
+                PersistJackpotAccumulation();
+                RefreshMadnessMeter();
+                if (!_isGameOver)
+                {
+                    var words = _wordsSinceJackpot.ToArray();
+                    _wordsSinceJackpot.Clear();
+                    EnqueueJackpot(jackpotDamage, words);
+                }
+            }
+            else
+            {
+                var wordDamage = WithIncoming(ComputeWordDamage(completed.InputLength), AxeIncomingEnabled(true, false));
+                var line = $"単語クリア！ {(int)wordDamage} ダメージ！";
+                if (!string.IsNullOrEmpty(logPrefix))
+                    line = logPrefix + "\n" + line;
+                _pendingWordLog = line;
+                ApplyDamageToEnemy(wordDamage, line, true, false, false);
+            }
+
+            if (_isGameOver)
+            {
+                _pendingWordLog = null;
+                return;
+            }
+
+            if (pushOrb)
+            {
+                _pendingStockCard = CompletedCard(completed);
+                _stock.Push(completed.Color);
+                if (regenerateScreen)
+                    RegenerateScreenWords();
+                TryTriggerSkill();
+                RefreshStockUI();
+            }
+            else if (regenerateScreen)
+            {
+                RegenerateScreenWords();
+            }
+
+            RefreshWordBoxes(false);
+            if (_enemyHp <= 0f && !_outcomeHandled)
+                ResolveEnemyDown(null);
+            else if (!_outcomeHandled)
+                _pendingWordLog = null;
+        }
+
+        void ApplyExPlayerDamage(int amount, string log)
+        {
+            if (amount <= 0 || _isGameOver || _outcomeHandled)
+                return;
+            var scaled = (float)amount;
+            ApplyDefensiveMitigation(ref scaled, true);
+            amount = Mathf.Max(0, Mathf.RoundToInt(scaled));
+            if (amount <= 0)
+                return;
+            _playerHp = Mathf.Max(0f, _playerHp - amount);
+            RefreshHpBars();
+            _ui?.Stock?.PlayHit(amount);
+            SetLog(log);
+            if (_playerHp <= 0f)
+            {
+                _isGameOver = true;
+                SetLog("☠️ パーティは力尽きた... GAME OVER");
+                CompleteDefeat();
+            }
+        }
+
+        void ApplyExMadness(int amount)
+        {
+            if (amount == 0 || _madness == null || _isGameOver || _outcomeHandled)
+                return;
+            SetLog("伝播が弾けた");
+            var insane = _madness.ApplyDeltaAndCheckInsanity(amount);
+            RefreshMadnessMeter();
+            if (!insane)
+                return;
+            SetLog("狂気が限界に達した… 発狂！");
+            TriggerInsanityGameOver();
+        }
+
+        void RefreshExView()
+        {
+            _exView?.Refresh(_ex, _exConfig);
+            _exView?.SetBlood(_partyState != null ? _partyState.Blood : 0);
+            RefreshExDebug();
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            RefreshDebugCombatReadout();
+#endif
+        }
+
+        void RefreshExDebug()
+        {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            if (_exDebug == null || !_exDebug.IsOpen || _ex == null || _exConfig == null)
+                return;
+            var crit = _ex.Stack(ExKind.Focus) * _exConfig.focus.critChancePerStack * 100f;
+            _exDebug.SetStatus(
+                StatusLine(_exConfig.NameOf(ExKind.Frenzy), ExKind.Frenzy) + "\n" +
+                StatusLine(_exConfig.NameOf(ExKind.Poison), ExKind.Poison) + "\n" +
+                StatusLine(_exConfig.NameOf(ExKind.Paralysis), ExKind.Paralysis) + "\n" +
+                "会心 " + crit.ToString("0.#") + "%\n" +
+                "特殊攻撃 " + (_exSpecialEnabled ? "オン" : "オフ") + "\n" +
+                SpecialCardStatus());
+#endif
+        }
+
+        string StatusLine(string name, ExKind kind)
+        {
+            if (_ex.Stack(kind) <= 0)
+                return name + " なし";
+            return name + " 次まで " + Mathf.Max(0f, _ex.Timer(kind)).ToString("0.0") + "秒";
+        }
+
+        void ClearExArea()
+        {
+            var kept = CommitCarriedFocus();
+            _ex?.Clear();
+            if (kept > 0 && _ex != null)
+            {
+                var max = _exConfig?.focus != null && _exConfig.focus.maxStacks > 0
+                    ? _exConfig.focus.maxStacks
+                    : 20;
+                _ex.AddStacks(ExKind.Focus, kept, max);
+            }
+
+            RefreshExView();
+        }
+
+        int CommitCarriedFocus()
+        {
+            if (_focusCarryCommitted || _swordsman == null || _partyState == null || _ex == null)
+                return _partyState != null ? _partyState.CarriedFocus : 0;
+            _focusCarryCommitted = true;
+            var held = _ex.Stack(ExKind.Focus);
+            var kept = _swordsman.ComputeCarry(held);
+            _partyState.SetCarriedFocus(kept);
+            _focusCarryLog = held > 0 ? _swordsman.CarryMessage(kept) : "";
+            return kept;
+        }
+
+        public bool AddSpecialCard(SpecialCardKind kind, int count, int casterIndex, int bloodOnKill = 1)
+        {
+            if (_ex == null || _exConfig == null || count <= 0)
+                return false;
+            var card = _exConfig.FindCard(CardId(kind));
+            var name = card != null && !string.IsNullOrEmpty(card.nameJa) ? card.nameJa : kind.ToString();
+            var placed = 0;
+            for (var i = 0; i < count; i++)
+            {
+                if (kind == SpecialCardKind.RedRefill)
+                {
+                    var color = card != null && !string.IsNullOrEmpty(card.color) ? card.color : "red";
+                    var added = _ex.TryAddColor(color);
+                    if (!added.Accepted)
+                    {
+                        SetLog("Exエリアがいっぱいで" + name + "が入らない");
+                        break;
+                    }
+
+                    if (added.Ejected)
+                        SetLog("古い色ストックが押し出された");
+                    AssignCardWord(_ex.Slots[_ex.Count - 1], card);
+                    placed++;
+                    continue;
+                }
+
+                var result = _ex.TryAddSpecial(ToExKind(kind), casterIndex, bloodOnKill);
+                if (!result.Accepted)
+                {
+                    SetLog("Exエリアがいっぱいで" + name + "が入らない");
+                    break;
+                }
+
+                if (result.Ejected)
+                    SetLog("古い色ストックが押し出された");
+                var slot = FindExSlot(ToExKind(kind));
+                if (slot != null)
+                {
+                    slot.ConsumeAllOnType = kind == SpecialCardKind.Battou && ConsumesAll(card);
+                    if (!slot.HasWord)
+                        AssignCardWord(slot, card);
+                }
+
+                placed++;
+            }
+
+            RegenerateScreenWords();
+            RefreshExView();
+            return placed == count;
+        }
+
+        public int GetCount(SpecialCardKind kind)
+        {
+            if (_ex == null)
+                return 0;
+            if (kind != SpecialCardKind.RedRefill)
+                return _ex.Stack(ToExKind(kind));
+            var card = _exConfig?.FindCard("red_refill");
+            var color = card != null && !string.IsNullOrEmpty(card.color) ? card.color : "red";
+            var count = 0;
+            foreach (var slot in _ex.Slots)
+            {
+                if (slot.Kind == ExKind.ColorStock && slot.ColorId == color)
+                    count++;
+            }
+            return count;
+        }
+
+        void DebugExCommand(string command)
+        {
+            var caster = AliceOrFirstIndex();
+            switch (command)
+            {
+                case "red":
+                    AddSpecialCard(SpecialCardKind.RedRefill, 1, caster);
+                    break;
+                case "battou":
+                    AddSpecialCard(SpecialCardKind.Battou, 1, caster);
+                    break;
+                case "battou5":
+                    AddSpecialCard(SpecialCardKind.Battou, 5, caster);
+                    break;
+                case "issen":
+                    AddSpecialCard(SpecialCardKind.IssenKiwami, 1, caster);
+                    break;
+                case "issen5":
+                    AddSpecialCard(SpecialCardKind.IssenKiwami, 5, caster);
+                    break;
+                case "hyakki":
+                    AddSpecialCard(SpecialCardKind.HyakkiYakou, 1, caster);
+                    break;
+                case "blood5":
+                    _partyState?.AddBlood(5, HyakkiBloodCap());
+                    RefreshExView();
+                    break;
+                case "blood0":
+                    _partyState?.ResetBlood();
+                    RefreshExView();
+                    break;
+                case "consume":
+                    ToggleBattouConsume();
+                    break;
+            }
+        }
+
+        void ToggleBattouConsume()
+        {
+            var card = _exConfig?.FindCard("battou");
+            if (card == null)
+                return;
+            card.consume = ConsumesAll(card) ? "one" : "all";
+            var slot = FindExSlot(ExKind.Battou);
+            if (slot != null)
+                slot.ConsumeAllOnType = ConsumesAll(card);
+            SetLog(ConsumesAll(card) ? "抜刀の使い方：全部" : "抜刀の使い方：1つ");
+            RefreshExDebug();
+        }
+
+        void RefreshSpecialLocks()
+        {
+            if (_ex == null || _exConfig == null)
+                return;
+            var block = _exConfig.specialRules != null
+                && _exConfig.specialRules.blockedByParalysis
+                && _ex.Stack(ExKind.Paralysis) > 0;
+            foreach (var slot in _ex.Slots)
+            {
+                var locked = block && IsSpecialDamage(slot.Kind);
+                slot.InputLocked = locked;
+                if (locked)
+                    slot.Progress = 0;
+            }
+        }
+
+        string ApplySpecialCardHit(ExKeyResult result)
+        {
+            var card = _exConfig?.FindCard(CardId(result.Kind));
+            if (card == null || _isGameOver)
+                return null;
+            _swordsman?.NoteExCard(card.id);
+            var stacks = result.StackCount > 0 ? result.StackCount : 1;
+            var percent = card.damagePercent;
+            if (result.Kind == ExKind.Battou)
+                percent = SpecialCardMath.Percent(card.damagePercent, card.percentPerCount, stacks);
+            else if (result.Kind == ExKind.HyakkiYakou)
+                percent = SpecialCardMath.Percent(card.damagePercent, card.percentPerBlood, _partyState != null ? _partyState.Blood : 0);
+
+            var caster = CasterMember(result.CasterIndex);
+            var attack = RunPartyState.GetAttack(caster);
+            var skill = new BattleSkillData(
+                0,
+                caster?.character != null ? caster.character.characterName : "",
+                card.nameJa,
+                Array.Empty<ElementColor>(),
+                0,
+                0,
+                "",
+                casterAttack: attack,
+                casterIndex: result.CasterIndex,
+                damagePercent: percent,
+                forceCrit: card.forceCrit);
+            var asSkill = _exConfig.specialRules == null || _exConfig.specialRules.countsAsSkillDamage;
+            var hit = ComputeSkillHit(skill, asSkill);
+            var shown = Mathf.RoundToInt(hit.Damage);
+            if (shown <= 0)
+                return null;
+            shown = Mathf.RoundToInt(WithIncoming(shown, AxeIncomingEnabled(false, true)));
+            var title = string.IsNullOrEmpty(card.nameJa) ? "カード" : card.nameJa;
+            var line = hit.IsCrit ? $"会心！ {title} {shown}ダメ" : $"{title}×{stacks}！ {shown}ダメ";
+            var multiplier = _encounterMods.PlayerDamageMultiplier > 0f ? _encounterMods.PlayerDamageMultiplier : 1f;
+            if (result.Kind == ExKind.HyakkiYakou && _enemyHp > 0f && shown * multiplier * (_enemyBreak?.DamageMultiplier ?? 1f) >= _enemyHp)
+            {
+                var gain = result.BloodOnKill > 0 ? result.BloodOnKill : 1;
+                var total = _partyState != null ? _partyState.AddBlood(gain, card.bloodCap) : gain;
+                line += $"\n怨血 +{gain}（合計{total}）";
+            }
+
+            ApplyDamageToEnemy(shown, line, true, false);
+            return _isGameOver ? null : line;
+        }
+
+        void AssignCardWord(ExSlot slot, ExCardDefinition card)
+        {
+            if (slot == null)
+                return;
+            var mode = _exConfig != null ? _exConfig.CardWordMode(card) : "fixed";
+            if (mode == "pool" || card == null || string.IsNullOrEmpty(card.word))
+            {
+                AssignExWord(slot);
+                return;
+            }
+
+            var inputs = TypingEngine.ExpandInputVariants(card.word);
+            if (inputs == null || inputs.Length == 0)
+                inputs = new[] { card.word };
+            slot.SetWord("", inputs);
+        }
+
+        string SpecialCardStatus()
+        {
+            if (_ex == null || _exConfig == null)
+                return "";
+            var battou = _exConfig.FindCard("battou");
+            var lines = new List<string>
+            {
+                "抜刀の使い方 " + (ConsumesAll(battou) ? "全部" : "1つ"),
+                "怨血 " + (_partyState != null ? _partyState.Blood : 0) + CapLabel(HyakkiBloodCap())
+            };
+            AppendCardPreview(lines, ExKind.Battou);
+            AppendCardPreview(lines, ExKind.IssenKiwami);
+            AppendCardPreview(lines, ExKind.HyakkiYakou);
+            return string.Join("\n", lines);
+        }
+
+        void AppendCardPreview(List<string> lines, ExKind kind)
+        {
+            var count = _ex.Stack(kind);
+            if (count <= 0)
+                return;
+            var card = _exConfig.FindCard(CardId(kind));
+            var slot = FindExSlot(kind);
+            var caster = CasterMember(slot != null ? slot.CasterIndex : -1);
+            var attack = RunPartyState.GetAttack(caster);
+            var casterName = caster?.character != null
+                ? StarterCharacters.Shown(caster.character.characterName)
+                : "?";
+            var percent = card != null ? card.damagePercent : 0f;
+            if (kind == ExKind.Battou && card != null)
+                percent = SpecialCardMath.Percent(card.damagePercent, card.percentPerCount, count);
+            else if (kind == ExKind.HyakkiYakou && card != null)
+                percent = SpecialCardMath.Percent(card.damagePercent, card.percentPerBlood, _partyState != null ? _partyState.Blood : 0);
+            var normal = Preview(attack, percent, false);
+            var crit = Preview(attack, percent, true);
+            lines.Add($"{_exConfig.NameOf(kind)}×{count} {casterName} ATK{attack} 会心なし{normal}／会心{crit}");
+        }
+
+        int Preview(int attack, float percent, bool forceCrit)
+        {
+            var critMultiplier = _skillDamage.CritMultiplierOverride(null)
+                ?? (_critMultiplier > 0f ? _critMultiplier : 1.5f);
+            var asSkill = _exConfig.specialRules == null || _exConfig.specialRules.countsAsSkillDamage;
+            var hit = CombatMath.ComputeSkillDamage(new SkillDamageRequest
+            {
+                CasterAttack = attack,
+                Percent = percent,
+                SkillOwnMultiplier = 1f,
+                FinalMultiplier = asSkill ? _skillDamage.FinalMultiplier(null) : 1f,
+                CritChance = 0f,
+                ForceCrit = forceCrit,
+                CritMultiplier = critMultiplier,
+                Roll = 1f
+            });
+            return Mathf.RoundToInt(hit.Damage);
+        }
+
+        static string CapLabel(int cap) => cap > 0 ? "／上限" + cap : "／上限なし";
+
+        int HyakkiBloodCap()
+        {
+            var card = _exConfig?.FindCard("hyakki_yakou");
+            return card != null ? card.bloodCap : 0;
+        }
+
+        static bool ConsumesAll(ExCardDefinition card) =>
+            card == null || !string.Equals(card.consume, "one", StringComparison.OrdinalIgnoreCase);
+
+        static bool IsSpecialDamage(ExKind kind) =>
+            kind == ExKind.Battou || kind == ExKind.IssenKiwami || kind == ExKind.HyakkiYakou;
+
+        static ExKind ToExKind(SpecialCardKind kind)
+        {
+            switch (kind)
+            {
+                case SpecialCardKind.Battou: return ExKind.Battou;
+                case SpecialCardKind.IssenKiwami: return ExKind.IssenKiwami;
+                case SpecialCardKind.HyakkiYakou: return ExKind.HyakkiYakou;
+                default: return ExKind.ColorStock;
+            }
+        }
+
+        static string CardId(SpecialCardKind kind)
+        {
+            switch (kind)
+            {
+                case SpecialCardKind.RedRefill: return "red_refill";
+                case SpecialCardKind.Battou: return "battou";
+                case SpecialCardKind.IssenKiwami: return "issen_kiwami";
+                default: return "hyakki_yakou";
+            }
+        }
+
+        static string CardId(ExKind kind)
+        {
+            switch (kind)
+            {
+                case ExKind.Battou: return "battou";
+                case ExKind.IssenKiwami: return "issen_kiwami";
+                case ExKind.HyakkiYakou: return "hyakki_yakou";
+                default: return "red_refill";
+            }
+        }
+
+        ExSlot FindExSlot(ExKind kind)
+        {
+            if (_ex == null)
+                return null;
+            foreach (var slot in _ex.Slots)
+            {
+                if (slot.Kind == kind)
+                    return slot;
+            }
+            return null;
+        }
+
+        MemberRunState CasterMember(int index)
+        {
+            var members = _partyState?.Members;
+            if (members == null || members.Count == 0)
+                return null;
+            if (index >= 0 && index < members.Count)
+                return members[index];
+            return members[0];
+        }
+
+        int AliceOrFirstIndex()
+        {
+            var members = _partyState?.Members;
+            if (members == null || members.Count == 0)
+                return 0;
+            for (var i = 0; i < members.Count; i++)
+            {
+                var name = members[i]?.character != null ? members[i].character.characterName : "";
+                if (StarterCharacters.Same(name, StarterCharacters.Chara01))
+                    return i;
+            }
+
+            return 0;
+        }
+
+        static bool IsAliceSkill(BattleSkillData skill) =>
+            skill != null && StarterCharacters.Same(skill.CharacterName, StarterCharacters.Chara01);
+
+        float FocusCritChance(BattleSkillData skill)
+        {
+            if (!IsAliceSkill(skill) || _ex == null || _exConfig?.focus == null)
+                return 0f;
+            return Mathf.Max(0f, _ex.Stack(ExKind.Focus) * _exConfig.focus.critChancePerStack);
+        }
+
+        SkillDamageResult ComputeSkillHit(
+            BattleSkillData skill,
+            bool asSkillDamage = true,
+            float? percent = null,
+            float skillOwnMultiplier = 1f,
+            bool? forceCrit = null)
+        {
+            var chance = Mathf.Clamp01(_baseCritChance + _skillDamage.SumCritChance(skill));
+            var critMultiplier = _skillDamage.CritMultiplierOverride(skill)
+                ?? (_critMultiplier > 0f ? _critMultiplier : 1.5f);
+            var request = new SkillDamageRequest
+            {
+                CasterAttack = skill.CasterAttack,
+                Percent = percent ?? skill.DamagePercent,
+                FlatDamage = skill.Damage,
+                SkillOwnMultiplier = skillOwnMultiplier,
+                FinalMultiplier = asSkillDamage ? _skillDamage.FinalMultiplier(skill) : 1f,
+                CritChance = chance,
+                ForceCrit = (forceCrit ?? skill.ForceCrit) || _debugForceCrit,
+                CritMultiplier = critMultiplier,
+                Roll = UnityEngine.Random.value
+            };
+            return CombatMath.ComputeSkillDamage(request);
+        }
+
         void TryTriggerSkill()
         {
+            if (_ex != null && _ex.Stack(ExKind.Paralysis) > 0)
+            {
+                var pending = SkillResolver.ResolveTriggeredSkills(
+                    EligibleSkills(), _stock, _cooldownSkillIds, out var waiting);
+                if (pending.Count > 0 || waiting.Count > 0)
+                    SetLog("麻痺でスキルが出ない");
+                return;
+            }
+
             var skills = SkillResolver.ResolveTriggeredSkills(
-                _activeSkills, _stock, _cooldownSkillIds, out var blocked);
+                EligibleSkills(), _stock, _cooldownSkillIds, out var blocked);
             if (skills.Count == 0)
             {
                 if (blocked.Count > 0)
@@ -609,12 +1970,38 @@ namespace TypingRoguelike.Battle
                 _cooldownSkillIds.Add(skill.Id);
 
             var simultaneous = skills.Count > 1;
+            var levelNotes = new List<string>();
+            var focusCrit = false;
             foreach (var skill in skills)
-                ApplySkillEffects(skill, simultaneous);
+            {
+                var note = GrantActivationXp(skill);
+                if (note != null)
+                    levelNotes.Add(note);
+                if (_swordsman != null && _swordsman.Owns(skill))
+                {
+                    if (ApplySwordsmanSkill(skill, simultaneous, simultaneous ? null : note))
+                        focusCrit = true;
+                }
+                else if (_axe != null && _axe.Owns(skill))
+                {
+                    ApplyAxeSkill(skill, simultaneous, simultaneous ? null : note);
+                    _swordsman?.OnAllySkillFired(skill);
+                }
+                else
+                {
+                    if (ApplySkillEffects(skill, simultaneous, simultaneous ? null : note))
+                        focusCrit = true;
+                    _swordsman?.OnAllySkillFired(skill);
+                }
+            }
 
             if (simultaneous)
             {
                 var summary = string.Join(" + ", skills.Select(s => $"{s.CharacterName}/{s.DisplayName}"));
+                if (levelNotes.Count > 0)
+                    summary += "\n" + string.Join(" / ", levelNotes);
+                if (focusCrit)
+                    summary += "\n会心！";
                 SetLog($"✨ 同時発動！ {summary}");
             }
 
@@ -622,7 +2009,8 @@ namespace TypingRoguelike.Battle
             {
                 _skillsTriggered++;
                 PulseCharCard(skill.CharacterName);
-                EnqueueCutin(skill);
+                if (_ui?.E5b != null)
+                    _ui.E5b.Play(skill);
             }
 
             RefreshSkillCooldownUI();
@@ -631,13 +2019,38 @@ namespace TypingRoguelike.Battle
             RefreshCandidatesUI();
         }
 
-        void ApplySkillEffects(BattleSkillData skill, bool suppressLog)
+        string GrantActivationXp(BattleSkillData skill)
         {
-            var msg = BuildSkillTriggerMessage(skill);
+            if (_partyState == null || skill == null)
+                return null;
+            if (!_partyState.TryGrantSkillXp(skill.Id, SkillProgression.XpPerActivation, out var grant) || !grant.Leveled)
+                return null;
+            return $"{grant.SkillName} が Lv.{grant.NewLevel} になった";
+        }
+
+        bool ApplySkillEffects(BattleSkillData skill, bool suppressLog, string levelNote = null)
+        {
+            var crit = false;
+            string msg;
             if (skill.DealsDamage)
-                ApplyDamageToEnemy(skill.Damage, suppressLog ? null : msg);
-            else if (!suppressLog)
-                SetLog(msg);
+            {
+                var result = ComputeSkillHit(skill);
+                var damage = Mathf.Max(1f, Mathf.Round(result.Damage));
+                damage = WithIncoming(damage, true);
+                crit = result.IsCrit;
+                msg = BuildSkillTriggerMessage(skill, Mathf.RoundToInt(damage), crit);
+                if (!string.IsNullOrEmpty(levelNote))
+                    msg += "\n" + levelNote;
+                ApplyDamageToEnemy(damage, suppressLog ? null : msg, true, false);
+            }
+            else
+            {
+                msg = BuildSkillTriggerMessage(skill, 0, false);
+                if (!string.IsNullOrEmpty(levelNote))
+                    msg += "\n" + levelNote;
+                if (!suppressLog)
+                    SetLog(msg);
+            }
 
             if (skill.Heal > 0)
             {
@@ -646,6 +2059,7 @@ namespace TypingRoguelike.Battle
             }
 
             ApplySkillUtilityEffects(skill);
+            return crit;
         }
 
         void EnqueueCutin(BattleSkillData skill)
@@ -682,11 +2096,11 @@ namespace TypingRoguelike.Battle
             _presentationPlaying = false;
         }
 
-        static string BuildSkillTriggerMessage(BattleSkillData skill)
+        static string BuildSkillTriggerMessage(BattleSkillData skill, int damage, bool crit)
         {
             var parts = new List<string>();
             if (skill.DealsDamage)
-                parts.Add($"{skill.Damage}ダメ");
+                parts.Add(crit ? $"会心！ {damage}ダメ" : $"{damage}ダメ");
             if (skill.Heal > 0)
                 parts.Add($"{skill.Heal}回復");
             if (skill.EffectKind == SkillEffectKind.EnemyDelay && skill.EffectValue > 0f)
@@ -699,7 +2113,7 @@ namespace TypingRoguelike.Battle
             if (parts.Count == 0 && !string.IsNullOrEmpty(skill.EffectText))
                 parts.Add(skill.EffectText);
             var detail = parts.Count > 0 ? string.Join(" + ", parts) : "発動";
-            return $"✨ {skill.CharacterName}の{skill.DisplayName}！ {detail}";
+            return $"✨ {StarterCharacters.Shown(skill.CharacterName)}の{skill.DisplayName}！ {detail}";
         }
 
         void ApplySkillUtilityEffects(BattleSkillData skill)
@@ -724,7 +2138,7 @@ namespace TypingRoguelike.Battle
             if (_ui?.CutinOverlay == null)
                 yield break;
 
-            _ui.CutinChar.text = skill.CharacterName;
+            _ui.CutinChar.text = StarterCharacters.Shown(skill.CharacterName);
             _ui.CutinSkill.text = skill.DisplayName;
             if (_ui.CutinPortrait != null)
             {
@@ -799,11 +2213,12 @@ namespace TypingRoguelike.Battle
                     if (landed)
                         return;
                     landed = true;
-                    ApplyDamageToEnemy(show.Damage, null, showFeedback: false);
+                    var jackpotDealt = Mathf.RoundToInt(WithIncoming(show.Damage, true));
+                    ApplyDamageToEnemy(jackpotDealt, null, showFeedback: false, scaleIncoming: false);
                     if (_ui?.EnemyStage != null)
                         StartCoroutine(PunchEnemyStage());
                     if (!_isGameOver)
-                        SetLog($"JACKPOT！ 狂気 × {_jackpotMultiplier:0.##} → {show.Damage} ダメージ！");
+                        SetLog($"JACKPOT！ 狂気 × {_jackpotMultiplier:0.##} → {jackpotDealt} ダメージ！");
                 });
             try
             {
@@ -815,7 +2230,7 @@ namespace TypingRoguelike.Battle
                 if (!landed && isActiveAndEnabled)
                 {
                     landed = true;
-                    ApplyDamageToEnemy(show.Damage, null, showFeedback: false);
+                    ApplyDamageToEnemy(Mathf.RoundToInt(WithIncoming(show.Damage, true)), null, showFeedback: false, scaleIncoming: false);
                 }
 
                 var leftover = transform != null ? transform.Find("JackpotPresentation") : null;
@@ -935,6 +2350,9 @@ namespace TypingRoguelike.Battle
 
             _isGameOver = true;
             _outcomeHandled = true;
+            ClearExArea();
+            if (!string.IsNullOrEmpty(_focusCarryLog))
+                SetLog(_focusCarryLog + "\n狂気が限界に達した… 発狂！");
             _onInsanity?.Invoke();
         }
 
@@ -995,12 +2413,18 @@ namespace TypingRoguelike.Battle
                 return;
             }
 
-            var speed = Mathf.Max(0.01f, _enemySpeed * EnemyAttackSpeedMultiplier());
-            var seconds = Mathf.Max(0f, _enemyTimer / speed * Mathf.Max(0.01f, _tickInterval));
+            if (!TryNextSwing(out var remaining, out _))
+            {
+                _ui.AttackBarLabel.text = string.Empty;
+                return;
+            }
+
+            var rate = Mathf.Max(0.01f, EnemyAttackSpeedMultiplier());
+            var seconds = Mathf.Max(0f, remaining / rate);
             _ui.AttackBarLabel.text = $"{seconds:0.0}秒";
         }
 
-        void EnemyAttack()
+        void EnemyAttack(float rawDamage)
         {
             if (_outcomeHandled)
                 return;
@@ -1011,14 +2435,26 @@ namespace TypingRoguelike.Battle
                 return;
             }
 
-            _ui?.BigMouth?.PlayAttack();
-            _ui?.EnemyBiteFx?.Play();
-            StartCoroutine(BiteImpact());
+            if (_ui?.SkeletonSamurai != null)
+                _ui.SkeletonSamurai.PlayAttack();
+            else if (_ui?.PaperAngel != null)
+                _ui.PaperAngel.PlayAttack();
+            else
+                _ui?.BigMouth?.PlayAttack();
+            StartCoroutine(EnemyHitFeedback());
 
             var takenMul = _encounterMods.DamageTakenMultiplier > 0f ? _encounterMods.DamageTakenMultiplier : 1f;
-            var damageTaken = Mathf.Max(1f, (_enemyAttackDamage - _damageReduction) * takenMul);
+            var scaled = rawDamage * (_enemyDamageMultiplier <= 0f ? 1f : _enemyDamageMultiplier);
+            var constant = _defenseConstant > 0f ? _defenseConstant : 400f;
+            var denom = _partyDefense + constant;
+            var mitigated = denom > 0f ? scaled * constant / denom : scaled;
+            var damageTaken = mitigated * takenMul;
+            ApplyDefensiveMitigation(ref damageTaken, false);
+            damageTaken = Mathf.Max(1f, Mathf.Round(damageTaken));
             _playerHp = Mathf.Max(0f, _playerHp - damageTaken);
             RefreshHpBars();
+            _ui?.Stock?.PlayHit(Mathf.RoundToInt(damageTaken));
+            _ui?.E5b?.NotifyHit();
 
             if (_playerHp <= 0f)
             {
@@ -1034,11 +2470,14 @@ namespace TypingRoguelike.Battle
                 return;
 
             _outcomeHandled = true;
+            ClearExArea();
+            if (!string.IsNullOrEmpty(_focusCarryLog))
+                SetLog(_focusCarryLog + "\n☠️ パーティは力尽きた... GAME OVER");
             _partyState?.SetCurrentHp(0);
             _onDefeat?.Invoke();
         }
 
-        IEnumerator BiteImpact()
+        IEnumerator EnemyHitFeedback()
         {
             yield return new WaitForSecondsRealtime(0.11f);
             var rt = _ui?.EnemyHitRoot != null ? _ui.EnemyHitRoot : _ui?.EnemyStage;
@@ -1062,56 +2501,184 @@ namespace TypingRoguelike.Battle
                 return;
             ApplyDamageToEnemy(_enemyHp, "【テスト】撃破");
         }
+
+        void CycleCritTest()
+        {
+            UnregisterDebugCrit();
+            _critTestMode = (_critTestMode + 1) % 3;
+            if (_critTestMode == 1)
+            {
+                _debugCritChance = _ => 1f;
+                _skillDamage.AddCritChanceSource(_debugCritChance);
+                SetLog("会心テスト：会心率100%");
+            }
+            else if (_critTestMode == 2)
+            {
+                _debugForceCrit = true;
+                _debugCritMultiplier = _ => 2f;
+                _skillDamage.AddCritMultiplierOverrideSource(_debugCritMultiplier);
+                SetLog("会心テスト：確定会心 倍率×2");
+            }
+            else
+            {
+                SetLog("会心テスト：オフ");
+            }
+
+            RefreshDebugCombatReadout();
+        }
+
+        void UnregisterDebugCrit()
+        {
+            if (_debugCritChance != null)
+            {
+                _skillDamage.RemoveCritChanceSource(_debugCritChance);
+                _debugCritChance = null;
+            }
+
+            if (_debugCritMultiplier != null)
+            {
+                _skillDamage.RemoveCritMultiplierOverrideSource(_debugCritMultiplier);
+                _debugCritMultiplier = null;
+            }
+
+            _debugForceCrit = false;
+        }
+
+        void DebugAliceSlash()
+        {
+            if (_isGameOver || _outcomeHandled || _enemyHp <= 0f)
+                return;
+            var attack = _partyState != null ? _partyState.AttackOf(StarterCharacters.Chara01) : 0;
+            if (attack <= 0)
+                attack = 120;
+            var probe = new BattleSkillData(
+                0,
+                StarterCharacters.Chara01,
+                "テスト斬り",
+                Array.Empty<ElementColor>(),
+                0,
+                0,
+                "",
+                damagePercent: 0.3f,
+                casterAttack: attack);
+            var result = ComputeSkillHit(probe);
+            var shown = Mathf.Max(1, Mathf.RoundToInt(result.Damage));
+            var text = result.IsCrit ? $"会心！ テスト斬り {shown}ダメ" : $"テスト斬り {shown}ダメ";
+            ApplyDamageToEnemy(shown, text);
+        }
+
+        void RefreshDebugCombatReadout()
+        {
+            if (_ui?.DebugCombatReadout == null)
+                return;
+            var probe = new BattleSkillData(
+                0, StarterCharacters.Chara01, "", Array.Empty<ElementColor>(), 0, 0, "");
+            var external = _skillDamage.SumCritChance(probe);
+            var chance = Mathf.Clamp01(_baseCritChance + external);
+            var critMultiplier = _skillDamage.CritMultiplierOverride(probe) ?? _critMultiplier;
+            var word = ComputeWordDamage(0);
+            var dealt = WithIncoming(word, AxeIncomingEnabled(true, false));
+            var force = _debugForceCrit ? "／確定会心" : "";
+            _ui.DebugCombatReadout.text =
+                $"敵HP {Mathf.RoundToInt(_enemyHp)} / {Mathf.RoundToInt(_maxEnemyHp)}（敵HP全体倍率 ×{_globalEnemyHpScale:0.##}）\n" +
+                BuildDebugAttackLine() + "\n" +
+                $"単語ダメ {dealt:0}（元 {word:0}）\n" +
+                $"会心率 {chance * 100f:0}%（基礎{_baseCritChance * 100f:0}% + 外から{external * 100f:0}%）／会心倍率 ×{critMultiplier:0.#}{force}";
+        }
+
+        string BuildDebugAttackLine()
+        {
+            if (_partyState?.Members == null)
+                return $"ATK 合計{_totalAttack:0}";
+            var parts = new List<string>();
+            var sum = 0;
+            foreach (var member in _partyState.Members)
+            {
+                var attack = RunPartyState.GetAttack(member);
+                sum += attack;
+                parts.Add($"{StarterCharacters.Shown(member?.character?.characterName)}{attack}");
+            }
+
+            return $"ATK {string.Join(" / ", parts)}（合計{sum}）";
+        }
 #endif
 
-        void ApplyDamageToEnemy(float amount, string skillText, bool showFeedback = true)
+        void ApplyDamageToEnemy(
+            float amount,
+            string skillText,
+            bool showFeedback = true,
+            bool scaleIncoming = true,
+            bool resolveOutcome = true)
         {
+            if (scaleIncoming)
+                amount = WithIncoming(amount, true);
             var dmgMul = _encounterMods.PlayerDamageMultiplier > 0f
                 ? _encounterMods.PlayerDamageMultiplier
                 : 1f;
             amount *= dmgMul;
+            amount *= _enemyBreak?.DamageMultiplier ?? 1f;
             var hpBeforeDamage = _enemyHp;
             _enemyHp = Mathf.Max(0f, _enemyHp - amount);
             _damageDealt += Mathf.Min(hpBeforeDamage, amount);
             RefreshHpBars();
             if (showFeedback)
                 ShowEnemyDamageNumber(amount);
-            if (showFeedback && _ui?.EnemyStage != null)
+            if (showFeedback && _spritePresenter != null)
+                _spritePresenter.PlayHitReaction();
+            else if (showFeedback && _ui?.EnemyStage != null)
                 StartCoroutine(PunchEnemyStage());
 
             if (_enemyHp <= _maxEnemyHp * _enrageHpFraction && !_isEnraged)
             {
                 _isEnraged = true;
-                _enemySpeed = _enragedSpeed;
+                _spritePresenter?.SetEnraged(true);
+                ApplyEnrageToRunningIntervals();
                 if (_ui?.EnemyEmoji != null)
                     _ui.EnemyEmoji.text = _emojiEnraged;
                 if (_ui?.EnemyAura != null)
                     _ui.EnemyAura.color = new Color(1f, 0.025f, 0.05f, 0.48f);
-                SetLog("⚠️ ボスが狂暴化！攻撃速度が増加！");
+                SetLog("⚠️ 狂暴化！攻撃間隔が短くなった！");
             }
             else if (!_isGameOver && !string.IsNullOrEmpty(skillText))
                 SetLog(skillText);
 
-            if (_enemyHp <= 0f)
-            {
-                _isGameOver = true;
-                if (_ui?.EnemyEmoji != null)
-                    _ui.EnemyEmoji.text = _emojiDefeated;
-                if (!_outcomeHandled)
-                {
-                    _partyState?.SetCurrentHp(_playerHp);
-                    if (_playerHp <= 0f)
-                    {
-                        SetLog("☠️ パーティは力尽きた... GAME OVER");
-                        CompleteDefeat();
-                        return;
-                    }
+            if (_enemyHp <= 0f && resolveOutcome)
+                ResolveEnemyDown(skillText);
+        }
 
-                    _outcomeHandled = true;
-                    SetLog("🎉 敵撃破！VICTORY！");
-                    ShowBattleResult();
-                }
+        void ResolveEnemyDown(string skillText)
+        {
+            if (_outcomeHandled)
+                return;
+            _isGameOver = true;
+            _spritePresenter?.PlayDefeat();
+            if (_ui?.EnemyEmoji != null)
+                _ui.EnemyEmoji.text = _emojiDefeated;
+            _partyState?.SetCurrentHp(_playerHp);
+            if (_playerHp <= 0f)
+            {
+                _pendingWordLog = null;
+                _recentSkillLog = null;
+                SetLog("☠️ パーティは力尽きた... GAME OVER");
+                CompleteDefeat();
+                return;
             }
+
+            _outcomeHandled = true;
+            ClearExArea();
+            var line = "🎉 敵撃破！VICTORY！";
+            if (!string.IsNullOrEmpty(_focusCarryLog))
+                line = _focusCarryLog + "\n" + line;
+            if (!string.IsNullOrEmpty(_recentSkillLog) && _recentSkillLog != skillText)
+                line = _recentSkillLog + "\n" + line;
+            if (!string.IsNullOrEmpty(skillText))
+                line = skillText + "\n" + line;
+            if (!string.IsNullOrEmpty(_pendingWordLog) && _pendingWordLog != skillText)
+                line = _pendingWordLog + "\n" + line;
+            _pendingWordLog = null;
+            _recentSkillLog = null;
+            SetLog(line);
+            ShowBattleResult();
         }
 
         void ShowBattleResult()
@@ -1123,29 +2690,18 @@ namespace TypingRoguelike.Battle
                 return;
             }
 
-            var hpRate = _maxPlayerHp > 0f ? _playerHp / _maxPlayerHp : 0f;
-            var rank = hpRate >= 0.8f && _battleElapsed <= 75f
-                ? "S"
-                : hpRate >= 0.58f
-                    ? "A"
-                    : hpRate >= 0.3f ? "B" : "C";
-            var rankColor = rank switch
-            {
-                "S" => BattleUITheme.Gold,
-                "A" => BattleUITheme.Cyan,
-                "B" => BattleUITheme.AccentAlly,
-                _ => BattleUITheme.TextMuted
-            };
-
-            _ui.ResultRank.text = rank;
-            _ui.ResultRank.color = rankColor;
-            _ui.ResultStats.text =
-                $"戦闘時間　{_battleElapsed:0.0} 秒\n" +
-                $"クリア単語　{_wordsCleared}\n" +
-                $"スキル発動　{_skillsTriggered}\n" +
-                $"総ダメージ　{Mathf.RoundToInt(_damageDealt)}\n" +
-                $"残りHP　{Mathf.RoundToInt(_playerHp)} / {Mathf.RoundToInt(_maxPlayerHp)}";
-            _ui.ResultContinueButton.interactable = false;
+            var hpAfter = Mathf.RoundToInt(_playerHp);
+            var madnessAfter = _madness != null ? _madness.CurrentMadness : 0;
+            if (_ui.ResultTitle != null)
+                _ui.ResultTitle.text = "Victory";
+            if (_ui.ResultHp != null)
+                _ui.ResultHp.text = $"HP  {_hpBefore} → {hpAfter}";
+            if (_ui.ResultMadness != null)
+                _ui.ResultMadness.text = $"狂気値  {_madnessBefore} → {madnessAfter}";
+            if (_ui.ResultTime != null)
+                _ui.ResultTime.text = FormatBattleTime(_battleElapsed);
+            if (_ui.ResultContinueButton != null)
+                _ui.ResultContinueButton.interactable = false;
             _ui.ResultOverlay.SetActive(true);
             _ui.ResultOverlay.transform.SetAsLastSibling();
             StartCoroutine(AnimateBattleResult());
@@ -1171,9 +2727,9 @@ namespace TypingRoguelike.Battle
                     group.alpha = eased;
                 if (window != null)
                     window.localScale = Vector3.one * Mathf.Lerp(0.82f, 1f, eased);
-                if (_ui.ResultRank != null)
-                    _ui.ResultRank.rectTransform.localScale =
-                        Vector3.one * (1f + Mathf.Sin(eased * Mathf.PI) * 0.18f);
+                if (_ui.ResultTitle != null)
+                    _ui.ResultTitle.rectTransform.localScale =
+                        Vector3.one * (1f + Mathf.Sin(eased * Mathf.PI) * 0.08f);
                 yield return null;
             }
 
@@ -1197,6 +2753,12 @@ namespace TypingRoguelike.Battle
             }
 
             _onVictory?.Invoke();
+        }
+
+        static string FormatBattleTime(float seconds)
+        {
+            var total = Mathf.Max(0, Mathf.FloorToInt(seconds));
+            return $"TIME  {total / 60:00}：{total % 60:00}";
         }
 
         IEnumerator PunchEnemyStage()
@@ -1235,6 +2797,8 @@ namespace TypingRoguelike.Battle
         {
             if (_ui?.EnemyDamagePopupRoot == null || amount <= 0f)
                 return;
+
+            BattleUIBuilder.RaiseDamagePopups(_ui.EnemyDamagePopupRoot);
 
             var impactPosition = new Vector2(
                 UnityEngine.Random.Range(-70f, 70f),
@@ -1428,14 +2992,23 @@ namespace TypingRoguelike.Battle
 
         void RefreshMadnessMeter()
         {
-            if (_madness == null || _ui?.MadnessFill == null || _ui.MadnessText == null)
+            if (_madness == null)
+                return;
+            if (_ui?.Stock != null)
+                _ui.Stock.SetMadness(_madness.CurrentMadness, _madness.MaxMadness, true);
+            if (_ui?.MadnessFill == null || _ui.MadnessText == null)
                 return;
 
             var max = _madness.MaxMadness;
             var current = _madness.CurrentMadness;
-            _ui.MadnessFill.fillAmount = max > 0 ? current / (float)max : 0f;
-            _ui.MadnessFill.color = RunMadnessState.StageColor(_madness.Stage);
-            _ui.MadnessText.text = $"{current} / {max}";
+            var ratio = max > 0 ? Mathf.Clamp01(current / (float)max) : 0f;
+            var stage = RunMadnessState.StageColor(_madness.Stage);
+            _ui.MadnessFill.fillAmount = ratio;
+            var liquidAlpha = _ui.MadnessEmpty != null ? 0.22f : 1f;
+            _ui.MadnessFill.color = new Color(stage.r, stage.g, stage.b, liquidAlpha);
+            if (_ui.MadnessEmpty != null)
+                _ui.MadnessEmpty.fillAmount = 1f - ratio;
+            _ui.MadnessText.text = $"<size=72%>狂気</size> {current}<size=72%>/{max}</size>";
         }
 
         void RefreshJackpotMeter()
@@ -1443,9 +3016,9 @@ namespace TypingRoguelike.Battle
             if (_ui?.JackpotMeterText == null)
                 return;
 
-            var luck = _jackpotLuckBonusPerWord + (_madness?.BonusJackpotChance ?? 0f);
+            var eventBonus = _madness?.BonusJackpotChance ?? 0f;
             var relicBonus = RelicJackpotActive() ? Mathf.Max(0f, _encounterMods.JackpotChanceBonus) : 0f;
-            var roll = _jackpot.ResolveRollChance(luck + relicBonus);
+            var roll = _jackpot.ResolveRollChance(eventBonus + relicBonus);
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             if (RunDebugState.JackpotRollChanceOverride is float forced)
                 roll = forced;
@@ -1455,8 +3028,8 @@ namespace TypingRoguelike.Battle
             if (RunDebugState.JackpotRollForce10Percent)
                 line += "\n（DEBUG: 当選率 10% 固定）";
 #endif
-            if (luck > 0f)
-                line += $" ＋ 運 {FormatJackpotChancePercent(luck)}";
+            if (eventBonus > 0f)
+                line += $" ＋ 加算 {FormatJackpotChancePercent(eventBonus)}";
             if (_encounterMods.JackpotMadnessThreshold > 0)
             {
                 line += relicBonus > 0f
@@ -1478,16 +3051,23 @@ namespace TypingRoguelike.Battle
         {
             if (_ui == null)
                 return;
+            if (_ui.Stock != null)
+                _ui.Stock.SetHP(Mathf.RoundToInt(_playerHp), Mathf.Max(1, Mathf.RoundToInt(_maxPlayerHp)), true);
             if (_ui.PlayerHpText != null)
-                _ui.PlayerHpText.text = $"{(int)_playerHp} / {(int)_maxPlayerHp}";
-            if (_ui.EnemyHpGauge != null)
+                _ui.PlayerHpText.text = $"{(int)_playerHp}<size=72%> / {(int)_maxPlayerHp}</size>";
+            if (_ui.EnemyStatus != null)
+                _ui.EnemyStatus.SetHP(Mathf.RoundToInt(_enemyHp), Mathf.Max(1, Mathf.RoundToInt(_maxEnemyHp)));
+            else if (_ui.EnemyHpGauge != null)
                 _ui.EnemyHpGauge.SetHP(Mathf.RoundToInt(_enemyHp), Mathf.Max(1, Mathf.RoundToInt(_maxEnemyHp)));
             else if (_ui.EnemyHpText != null)
-                _ui.EnemyHpText.text = $"HP {(int)_enemyHp} / {(int)_maxEnemyHp}";
+                _ui.EnemyHpText.text = $"{(int)_enemyHp}<size=72%><color=#C9B8B8> / {(int)_maxEnemyHp}</color></size>";
             if (_ui.PlayerHpBar != null)
                 _ui.PlayerHpBar.fillAmount = _maxPlayerHp > 0 ? _playerHp / _maxPlayerHp : 0;
             if (_ui.EnemyHpGauge == null && _ui.EnemyHpBar != null)
                 _ui.EnemyHpBar.fillAmount = _maxEnemyHp > 0 ? _enemyHp / _maxEnemyHp : 0;
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            RefreshDebugCombatReadout();
+#endif
         }
 
         void RefreshRerollBadge()
@@ -1505,7 +3085,7 @@ namespace TypingRoguelike.Battle
             if (_ui == null || _typing == null)
                 return;
 
-            var candidates = SkillResolver.GetCandidates(_activeSkills, _stock, _cooldownSkillIds);
+            var candidates = SkillResolver.GetCandidates(EligibleSkills(), _stock, _cooldownSkillIds);
             var chanceColors = new HashSet<ElementColor>();
             foreach (var c in candidates)
                 chanceColors.Add(c.NeededColor);
@@ -1521,44 +3101,33 @@ namespace TypingRoguelike.Battle
                 var highlight = chanceColors.Contains(slot.Color);
                 var focused = slot.Active && slot.Progress > 0;
                 var dimmed = !slot.Active;
+                if (box.E5b)
+                {
+                    var typedCount = Mathf.Clamp(slot.Progress, 0, slot.Text.Length);
+                    var typedRomaji = slot.Text.Substring(0, typedCount);
+                    var untypedRomaji = slot.Text.Substring(typedCount);
+                    BattleLayoutE5b.PaintWord(box, slot.Color, focused, dimmed, slot.DisplayText,
+                        typedRomaji, untypedRomaji, slot.Active);
+                    continue;
+                }
                 box.ElementStripe.color = dimmed ? Color.Lerp(col, Color.black, 0.55f) : col;
-                box.Fill.color = focused
-                    ? Color.Lerp(new Color(0.015f, 0.02f, 0.045f, 0.97f), col, 0.24f)
-                    : Color.Lerp(new Color(0.015f, 0.02f, 0.045f, 0.95f), col, dimmed ? 0.03f : 0.08f);
-                var premiumFrame = BattleUISprites.WordCardPremium != null;
-                if (premiumFrame)
-                {
-                    box.Frame.color = dimmed
-                        ? new Color(0.55f, 0.55f, 0.6f, 0.88f)
-                        : focused || highlight
-                            ? Color.white
-                            : new Color(0.92f, 0.94f, 1f, 1f);
-                }
-                else
-                {
-                    box.Frame.color = dimmed
-                        ? new Color(col.r * 0.4f, col.g * 0.4f, col.b * 0.4f, 0.85f)
-                        : focused || highlight
-                            ? Color.Lerp(col, Color.white, 0.45f)
-                            : new Color(col.r, col.g, col.b, 0.95f);
-                }
+                var ink = new Color(0.01f, 0.01f, 0.015f, 0.97f);
+                box.Fill.color = focused ? Color.Lerp(ink, col, 0.16f) : Color.Lerp(ink, col, dimmed ? 0f : 0.05f);
+                box.Frame.color = dimmed
+                    ? new Color(0.42f, 0.42f, 0.45f, 0.9f)
+                    : focused
+                        ? Color.Lerp(Color.white, col, 0.3f)
+                        : highlight
+                            ? new Color(1f, 0.93f, 0.74f, 1f)
+                            : Color.white;
 
                 if (box.Glow != null)
-                    box.Glow.color = new Color(col.r, col.g, col.b, focused ? 0.6f : highlight ? 0.32f : dimmed ? 0.04f : 0.14f);
+                    box.Glow.color = new Color(col.r, col.g, col.b, focused ? 0.55f : highlight ? 0.3f : dimmed ? 0.02f : 0.1f);
 
                 if (box.FrameRoot != null)
                 {
-                    var s = focused ? 1.06f : dimmed ? 0.9f : 1f;
+                    var s = focused ? 1.06f : dimmed ? 0.92f : 1f;
                     box.FrameRoot.localScale = new Vector3(s, s, 1f);
-                }
-                if (box.Frame != null && box.Frame.TryGetComponent<Outline>(out var outline))
-                {
-                    outline.effectColor = focused
-                        ? new Color(0.75f, 0.97f, 1f, 1f)
-                        : highlight
-                            ? new Color(1f, 0.85f, 0.4f, 0.8f)
-                            : new Color(0.32f, 0.8f, 1f, dimmed ? 0.12f : 0.4f);
-                    outline.effectDistance = focused ? new Vector2(3, -3) : new Vector2(2, -2);
                 }
 
                 box.TagText.text = ElementColorUtility.ToJapanese(slot.Color);
@@ -1577,44 +3146,49 @@ namespace TypingRoguelike.Battle
             RefreshCandidatesUI();
         }
 
+        RectTransform CompletedCard(WordCompletion completed)
+        {
+            if (_typing == null || _ui?.WordBoxes == null)
+                return null;
+            var slots = _typing.Slots;
+            for (var i = 0; i < slots.Count && i < _ui.WordBoxes.Length; i++)
+            {
+                var slot = slots[i];
+                if (!slot.Active || string.IsNullOrEmpty(slot.Text) || slot.Progress < slot.Text.Length)
+                    continue;
+                if (slot.Color == completed.Color && slot.DisplayText == completed.DisplayText)
+                    return _ui.WordBoxes[i]?.FrameRoot;
+            }
+            return null;
+        }
+
         void RefreshStockUI()
         {
+            if (_ui?.Stock != null)
+            {
+                _ui.Stock.Sync(_stock.Orbs, _pendingStockCard, _stockVisualReady);
+                _pendingStockCard = null;
+                _stockVisualReady = true;
+                return;
+            }
             if (_ui?.StockOrbsContainer == null)
                 return;
 
+            var stockHost = _ui.StockOrbsContainer.GetComponent<BattleE5bStock>();
+            if (stockHost != null)
+                stockHost.Next = 0;
             foreach (var go in _stockOrbObjects)
+            {
+                go.SetActive(false);
                 Destroy(go);
+            }
             _stockOrbObjects.Clear();
 
-            const int maxStock = 5;
-            for (var i = 0; i < maxStock; i++)
+            for (var i = 0; i < OrbStock.MaxLength; i++)
             {
-                var go = new GameObject(i < _stock.Orbs.Count ? "Orb" : "OrbEmpty");
-                go.transform.SetParent(_ui.StockOrbsContainer, false);
-                var rt = go.AddComponent<RectTransform>();
-                rt.sizeDelta = new Vector2(28, 28);
-                var img = go.AddComponent<Image>();
-                BattleUITheme.EnsureSprite(img);
-                if (i < _stock.Orbs.Count)
-                {
-                    img.color = ElementColorUtility.ToUnityColor(_stock.Orbs[i]);
-                    AddOrbOutline(go, new Color(1, 1, 1, 0.35f));
-                }
-                else
-                {
-                    img.color = new Color(0.12f, 0.08f, 0.1f, 0.85f);
-                    AddOrbOutline(go, new Color(1, 1, 1, 0.12f));
-                }
-
-                _stockOrbObjects.Add(go);
+                ElementColor? color = i < _stock.Orbs.Count ? _stock.Orbs[i] : null;
+                _stockOrbObjects.Add(BattleHudKit.StockOrb(_ui.StockOrbsContainer, color, 46f));
             }
-        }
-
-        static void AddOrbOutline(GameObject go, Color color)
-        {
-            var outline = go.AddComponent<Outline>();
-            outline.effectColor = color;
-            outline.effectDistance = new Vector2(1, -1);
         }
 
         void RefreshCandidatesUI()
@@ -1626,129 +3200,95 @@ namespace TypingRoguelike.Battle
                 Destroy(row);
             _candidateRows.Clear();
 
-            var candidates = SkillResolver.GetCandidates(_activeSkills, _stock, _cooldownSkillIds);
+            var candidates = SkillResolver.GetCandidates(EligibleSkills(), _stock, _cooldownSkillIds);
             if (candidates.Count == 0)
             {
-                _candidateRows.Add(CreateCandidateHintRow());
+                _candidateRows.Add(BattleHudKit.HintRow(_ui.CandidatesContainer, "色を揃えてスキルを狙え"));
                 return;
             }
 
-            foreach (var c in candidates)
+            // 発動可能 → 次の1色で発動 → クールダウン中 の順に、最大6件。
+            candidates.Sort((a, b) => CandidateRank(a).CompareTo(CandidateRank(b)));
+            var highlighted = false;
+            for (var i = 0; i < candidates.Count && i < 6; i++)
             {
-                if (c.IsPatternComplete && c.IsOnCooldown)
-                    _candidateRows.Add(CreateCandidateCooldownRow(c.Skill));
-                else
-                    _candidateRows.Add(CreateCandidateRow(c.Skill, c.NeededColor));
+                var c = candidates[i];
+                var cooling = c.IsPatternComplete && c.IsOnCooldown;
+                var highlight = !highlighted && !cooling;
+                highlighted |= highlight;
+                var matched = c.IsPatternComplete ? c.Skill.Pattern.Length : c.Skill.Pattern.Length - 1;
+                _candidateRows.Add(BattleHudKit.NextSkillRow(_ui.CandidatesContainer, c.Skill,
+                    CharacterPortraitSprite(c.Skill.CharacterName), matched, highlight, cooling));
             }
         }
 
-        GameObject CreateCandidateHintRow()
-        {
-            var go = new GameObject("CandidateHint");
-            go.transform.SetParent(_ui.CandidatesContainer, false);
-            var le = go.AddComponent<LayoutElement>();
-            le.minHeight = 38;
-            var img = go.AddComponent<Image>();
-            BattleUITheme.StylePanel(img, new Color(0.12f, 0.05f, 0.08f, 0.94f));
-            CreateCandidateLabel(go.transform, "オーブを溜めてスキルを発動", new Vector2(0, 0), new Vector2(1, 1));
-            return go;
-        }
+        static int CandidateRank(SkillCandidate c) =>
+            c.IsPatternComplete ? (c.IsOnCooldown ? 2 : 0) : 1;
 
-        GameObject CreateCandidateCooldownRow(BattleSkillData skill)
-        {
-            var go = new GameObject("CandidateCooldown");
-            go.transform.SetParent(_ui.CandidatesContainer, false);
-            var le = go.AddComponent<LayoutElement>();
-            le.minHeight = 42;
-            var img = go.AddComponent<Image>();
-            BattleUITheme.StylePanel(img, new Color(0.18f, 0.08f, 0.06f, 0.94f));
-
-            var title = $"{skill.CharacterName}  {skill.DisplayName}  ⏳クールダウン";
-            CreateCandidateLabel(go.transform, title, new Vector2(0, 0), new Vector2(0.58f, 1));
-
-            var patternHost = BattleUIOrbPattern.CreateHost(go.transform, new Vector2(0.58f, 0.1f), new Vector2(0.98f, 0.9f));
-            BattleUIOrbPattern.Apply(patternHost, skill.Pattern, 15f, highlightIndex: -1);
-
-            return go;
-        }
-
-        GameObject CreateCandidateRow(BattleSkillData skill, ElementColor neededColor)
-        {
-            var go = new GameObject("Candidate");
-            go.transform.SetParent(_ui.CandidatesContainer, false);
-            var le = go.AddComponent<LayoutElement>();
-            le.minHeight = 42;
-            var img = go.AddComponent<Image>();
-            BattleUITheme.StylePanel(img, new Color(0.12f, 0.05f, 0.08f, 0.94f));
-
-            var title = $"{skill.CharacterName}  {skill.DisplayName}  → 次の1語";
-            CreateCandidateLabel(go.transform, title, new Vector2(0, 0), new Vector2(0.58f, 1));
-
-            var patternHost = BattleUIOrbPattern.CreateHost(go.transform, new Vector2(0.58f, 0.1f), new Vector2(0.98f, 0.9f));
-            var highlight = FindHighlightIndex(skill.Pattern, neededColor);
-            BattleUIOrbPattern.Apply(patternHost, skill.Pattern, 15f, highlight);
-
-            var accentGo = new GameObject("Accent");
-            accentGo.transform.SetParent(go.transform, false);
-            var art = accentGo.AddComponent<RectTransform>();
-            art.anchorMin = new Vector2(0, 0);
-            art.anchorMax = new Vector2(0, 1);
-            art.pivot = new Vector2(0, 0.5f);
-            art.sizeDelta = new Vector2(5, 0);
-            art.anchoredPosition = Vector2.zero;
-            var accentImg = accentGo.AddComponent<Image>();
-            BattleUITheme.StylePanel(accentImg, ElementColorUtility.ToUnityColor(neededColor));
-
-            return go;
-        }
-
-        static int FindHighlightIndex(ElementColor[] pattern, ElementColor neededColor)
-        {
-            if (pattern == null || pattern.Length == 0)
-                return -1;
-            for (var i = pattern.Length - 1; i >= 0; i--)
-            {
-                if (pattern[i] == neededColor)
-                    return i;
-            }
-
-            return pattern.Length - 1;
-        }
-
-        static void CreateCandidateLabel(Transform parent, string text, Vector2 anchorMin, Vector2 anchorMax)
-        {
-            var textGo = new GameObject("Text");
-            textGo.transform.SetParent(parent, false);
-            var rt = textGo.AddComponent<RectTransform>();
-            rt.anchorMin = anchorMin;
-            rt.anchorMax = anchorMax;
-            rt.offsetMin = new Vector2(12, 4);
-            rt.offsetMax = new Vector2(-6, -4);
-            var label = textGo.AddComponent<Text>();
-            label.font = BattleUITheme.Font;
-            label.fontSize = 13;
-            label.text = text;
-            label.color = BattleUITheme.TextPrimary;
-            label.alignment = TextAnchor.MiddleLeft;
-        }
+        Sprite CharacterPortraitSprite(string characterName) =>
+            _ui?.CharPortraits != null && _ui.CharPortraits.TryGetValue(characterName, out var img) && img != null
+                ? img.sprite
+                : null;
 
         void RefreshSkillCooldownUI()
         {
             if (_ui == null)
                 return;
 
-            foreach (var kv in _ui.SkillRowGraphics)
+            var readyIds = new HashSet<int>();
+            if (_activeSkills != null && _stock != null)
             {
-                var onCooldown = _cooldownSkillIds.Contains(kv.Key);
-                if (onCooldown)
-                    kv.Value.color = new Color(0.12f, 0.12f, 0.14f, 0.55f);
+                foreach (var candidate in SkillResolver.GetCandidates(EligibleSkills(), _stock, _cooldownSkillIds))
+                {
+                    if (candidate.IsPatternComplete && !candidate.IsOnCooldown)
+                        readyIds.Add(candidate.Skill.Id);
+                }
             }
+
+            BattlePartyCardUI.Refresh(_ui, _stock, readyIds, _cooldownSkillIds);
         }
 
         void SetLog(string message)
         {
             if (_ui?.LogText != null)
-                _ui.LogText.text = message;
+                _ui.LogText.text = BattleHudKit.StripUnsupportedGlyphs(message);
+        }
+
+        void ApplyEnrageToRunningIntervals()
+        {
+            var mul = _enrageIntervalMultiplier > 0f ? _enrageIntervalMultiplier : 1f;
+            ScaleRunningInterval(ref _activeSwing, mul);
+        }
+
+        static void ScaleRunningInterval(ref EnemySwing swing, float multiplier)
+        {
+            if (!swing.Enabled || swing.WaitingForOpening || multiplier <= 0f)
+                return;
+            swing.Remaining *= multiplier;
+            swing.Cycle = Mathf.Max(0.05f, swing.Cycle * multiplier);
+        }
+
+        struct EnemySwing
+        {
+            public bool Enabled;
+            public float Remaining;
+            public float Cycle;
+            public float BaseInterval;
+            public float Damage;
+            public float Telegraph;
+            public bool WaitingForOpening;
+
+            public static EnemySwing Open(float damage, float interval, float opening, float telegraph) =>
+                new()
+                {
+                    Enabled = true,
+                    Remaining = opening,
+                    Cycle = opening,
+                    BaseInterval = interval,
+                    Damage = damage,
+                    Telegraph = telegraph,
+                    WaitingForOpening = true
+                };
         }
     }
 }

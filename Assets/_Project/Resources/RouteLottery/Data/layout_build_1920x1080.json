@@ -1,0 +1,351 @@
+{
+ "_note": "ビルド画面「記憶を編む」1920x1080。local = パネル左上基準。",
+ "background": "Route/bg_hell_town_1920x1080",
+ "title": {
+  "text_key": "build.title",
+  "pos": [
+   56,
+   82
+  ],
+  "font": "serif",
+  "size": 58,
+  "weight": "Bold",
+  "badge_after_title_gap": 24,
+  "subtitle": {
+   "text_key": "build.subtitle",
+   "pos": [
+    58,
+    134
+   ],
+   "size": 24
+  }
+ },
+ "palette": {
+  "rect": [
+   36,
+   160,
+   500,
+   938
+  ],
+  "title_local": [
+   232,
+   54
+  ],
+  "sub_local": [
+   232,
+   92
+  ],
+  "cards": {
+   "size": [
+    192,
+    146
+   ],
+   "gap": [
+    16,
+    12
+   ],
+   "origin_local": [
+    32,
+    120
+   ],
+   "cols": 2,
+   "preview_center_y_local": 53,
+   "preview_cell": 26,
+   "preview_gap": 3,
+   "name": {
+    "local": [
+     14,
+     104
+    ],
+    "font": "serif",
+    "size": 19,
+    "weight": "Bold"
+   },
+   "remaining": {
+    "local_right": [
+     178,
+     130
+    ],
+    "size": 16
+   },
+   "tag": {
+    "sprite": "Build/tag_plate_9s",
+    "local": [
+     100,
+     8,
+     84,
+     26
+    ],
+    "text_key": "build.palette.grabbing",
+    "size": 15
+   },
+   "used": {
+    "saturation": 0.2,
+    "brightness": 0.45
+   }
+  }
+ },
+ "board": {
+  "rect": [
+   524,
+   160,
+   960,
+   938
+  ],
+  "cell": 96,
+  "gap": 6,
+  "origin": [
+   608,
+   278
+  ],
+  "slot_sprite": "Build/board_slot_9s (cell+4 each side)",
+  "row_numbers_x": 578,
+  "lane_header": {
+   "y": 210,
+   "size": 26,
+   "check_y": 244,
+   "check_size": 17,
+   "ok_color": [
+    214,
+    170,
+    96
+   ],
+   "err_color": [
+    232,
+    72,
+    60
+   ]
+  },
+  "error_glow": {
+   "sprite": "Common/glow_rect_9s",
+   "tint": [
+    232,
+    72,
+    60
+   ],
+   "alpha": 1.0,
+   "around": "whole lane column (rows 1-6)"
+  },
+  "validation_text": {
+   "text_key": "build.board.validation",
+   "center": [
+    752,
+    908
+   ],
+   "size": 17
+  },
+  "ghost": {
+   "tile_alpha": 0.38,
+   "glow": "Common/glow_rect_9s",
+   "glow_tint": [
+    255,
+    170,
+    70
+   ],
+   "glow_alpha": 0.9
+  },
+  "held_piece": {
+   "scale": 0.92,
+   "offset_from_ghost": [
+    70,
+    -120
+   ],
+   "shadow": {
+    "offset": [
+     14,
+     22
+    ],
+    "blur": 10,
+    "alpha": 0.6
+   }
+  }
+ },
+ "rates_panel": {
+  "rect": [
+   984,
+   160,
+   1884,
+   938
+  ],
+  "title_local": [
+   40,
+   50
+  ],
+  "formula_local_right": [
+   860,
+   52
+  ],
+  "type_columns": {
+   "x0_local": 170,
+   "width_each": 115.0,
+   "icon_y_local": 76,
+   "icon_size": 30,
+   "name_y_local": 121
+  },
+  "lane_rows": {
+   "y_local": [
+    160,
+    208,
+    256
+   ],
+   "h": 44,
+   "label_x_local": 54,
+   "value_dy": -6,
+   "value_size": 20,
+   "bar_dy": [
+    11,
+    16
+   ]
+  },
+  "danger_note_local": [
+   40,
+   296
+  ],
+  "combos": {
+   "title_local": [
+    40,
+    330
+   ],
+   "formula_local_right": [
+    860,
+    332
+   ],
+   "header_y_local": 366,
+   "first_row_center_local": 402.5,
+   "row_h": 29,
+   "cols_local": {
+    "priority_center": 60,
+    "symbols_x": 102,
+    "symbol_size": 25,
+    "symbol_step": 28,
+    "name_x": 214,
+    "effect_x": 420,
+    "rate_right": 854
+   },
+   "fonts": {
+    "name": [
+     "serif",
+     18,
+     "Bold"
+    ],
+    "effect": [
+     "sans",
+     15,
+     "Medium"
+    ],
+    "rate": [
+     "sans",
+     18,
+     "Bold"
+    ],
+    "diff": [
+     "sans",
+     17,
+     "Bold"
+    ]
+   },
+   "footer_y_local": 721,
+   "zero_color": [
+    110,
+    102,
+    98
+   ]
+  },
+  "diff": {
+   "format_lane": "{before:0.0} → {after:0.0}%",
+   "format_combo": "{before:0.00}% → {after:0.00}% ▲/▼",
+   "up_color": [
+    255,
+    168,
+    72
+   ],
+   "down_color": [
+    122,
+    150,
+    196
+   ],
+   "arrow_icons": [
+    "Common/icon_arrow_up",
+    "Common/icon_arrow_down"
+   ]
+  }
+ },
+ "bottom_strip": {
+  "rect": [
+   36,
+   952,
+   960,
+   1052
+  ],
+  "sprite": "Common/iron_panel_9s (PPU multiplier 1.67 -> 0.3 frame scale)",
+  "powers": [
+   {
+    "id": "respin",
+    "icon": "Build/icon_power_respin",
+    "center_local": [
+     270,
+     50
+    ]
+   },
+   {
+    "id": "nudge",
+    "icon": "Build/icon_power_nudge",
+    "center_local": [
+     420,
+     50
+    ]
+   }
+  ],
+  "divider_x_local": 560,
+  "save_slots": {
+   "x_local": [
+    676,
+    748,
+    820
+   ],
+   "rect_h_local": [
+    18,
+    82
+   ],
+   "w": 62
+  }
+ },
+ "monologue": {
+  "rect": [
+   984,
+   952,
+   1460,
+   1052
+  ],
+  "text_x_local": 34,
+  "size": 30,
+  "font": "serif",
+  "weight": "Medium"
+ },
+ "go_button": {
+  "rect": [
+   1490,
+   950,
+   1884,
+   1020
+  ],
+  "label_size": 36,
+  "sub_center": [
+   1687,
+   1038
+  ],
+  "sub_size": 16,
+  "blocked_color": [
+   232,
+   72,
+   60
+  ],
+  "lock_icon_local": [
+   56,
+   35
+  ]
+ },
+ "recall_button": {
+  "note": "「道を思い出す」(任意) — not in the sample layout; if used, put it as a secondary text button above the go button"
+ }
+}

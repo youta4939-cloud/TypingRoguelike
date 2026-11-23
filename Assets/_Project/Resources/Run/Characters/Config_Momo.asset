@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11aa22bb33cc44dd55ee66ff77889901, type: 3}
   m_Name: Config_Momo
   m_EditorClassIdentifier: TypingRoguelike::TypingRoguelike.Data.CharacterConfig
-  characterId: momo
-  displayName: モモ
+  characterId: chara02
+  displayName: chara02
   personality: 1
   tiers:
   - requiredTrust: 25

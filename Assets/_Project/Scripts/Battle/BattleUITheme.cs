@@ -47,7 +47,8 @@ namespace TypingRoguelike.Battle
             {
                 if (_font)
                     return _font;
-                _font = LoadFont("Battle/Fonts/NotoSansJP-Regular", "Battle/Fonts/NotoSansJP-Medium")
+                _font = LoadFont("Battle/Fonts/NotoSansJP-Regular", "Battle/Fonts/NotoSansJP-Medium",
+                            "Battle/Fonts/ZenKakuGothicNew-Medium")
                         ?? Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf")
                         ?? Resources.GetBuiltinResource<Font>("Arial.ttf");
                 return _font;
@@ -60,7 +61,8 @@ namespace TypingRoguelike.Battle
             {
                 if (_fontBold)
                     return _fontBold;
-                _fontBold = LoadFont("Battle/Fonts/NotoSansJP-Bold", "Battle/Fonts/NotoSansJP-Black") ?? Font;
+                _fontBold = LoadFont("Battle/Fonts/NotoSansJP-Bold", "Battle/Fonts/NotoSansJP-Black",
+                                "Battle/Fonts/ZenKakuGothicNew-Bold") ?? Font;
                 return _fontBold;
             }
         }
@@ -72,7 +74,8 @@ namespace TypingRoguelike.Battle
             {
                 if (_fontDisplay)
                     return _fontDisplay;
-                _fontDisplay = LoadFont("Battle/Fonts/Cinzel-Bold", "Battle/Fonts/DINAlternate-Bold") ?? FontBold;
+                _fontDisplay = LoadFont("Battle/Fonts/Cinzel-Bold", "Battle/Fonts/DINAlternate-Bold",
+                                   "Battle/Fonts/ShipporiMinchoB1-ExtraBold") ?? FontBold;
                 return _fontDisplay;
             }
         }

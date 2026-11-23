@@ -37,6 +37,15 @@ namespace TypingRoguelike.Run
         public int towerRunSeed;
         public int towerRunFloor = 1;
         public int towerRunNodeId;
+        /// <summary>エレベーターで拠点へ帰還した。次の再入場で HP 満タン・狂気 0。</summary>
+        public bool towerRunVitalsRested;
+        /// <summary>エレベーターマスにいるだけでは再入場回復しない。帰還のあと一度回復したら true。</summary>
+        public bool towerRunElevatorRestConsumed;
+        /// <summary>この層の抽選結果。battle,rest,danger のように3つ。</summary>
+        public string towerRunRoad = "";
+        public int towerRunRoadFloor;
+        /// <summary>記憶ルーレットの欠片配置。ランが終わっても残す。</summary>
+        public string memoryBoard = "";
         public string towerRunBoardId;
         public string reelLayout;
         public bool reelDebugUnlocked;
@@ -48,6 +57,8 @@ namespace TypingRoguelike.Run
         public int towerRunMadnessMax = RunMadnessState.DefaultMaxMadness;
         public float towerRunBonusJackpotChance;
         public float towerRunJackpotAccumulatedChance;
+        public int towerRunBlood;
+        public int towerRunFocus;
         public int towerRunClearedNodes;
         public List<TowerRunMemberSave> towerRunMembers = new();
 
@@ -67,6 +78,8 @@ namespace TypingRoguelike.Run
         public List<int> towerRunSkipFromNodeIds = new();
         public bool towerRunEventBattlePending;
         public List<CharacterTrustSave> characterTrust = new();
+        public bool personalityMoodActive;
+        public List<PersonalityWeightSave> personalityWeights = new();
         public string opinionLastAbsentId;
         public int opinionDrawSerial;
         public int opinionPendingCardChoices;
@@ -75,6 +88,31 @@ namespace TypingRoguelike.Run
         public float opinionCombatEnemyHpScale = 1f;
         public float opinionCombatOpeningSeconds;
         public float opinionCombatCoinScale = 1f;
+        public string towerRunOpenEventId = "";
+        public int towerRunOpenEventFloor = -1;
+        public int towerRunOpenEventIndex = -1;
+        public string towerRunOpenEventTargetId = "";
+        public int towerRunEventWarpFloor;
+        public EventBattlePendingSave eventBattle = new();
+        public int layerBuffFloor;
+        public int layerWordDamagePercent;
+        public int layerDamageTakenPercent;
+        public int layerEnemyHpPercent;
+        public int layerOpeningSeconds;
+        public int layerBattleCoinPercent;
+        public int layerRerollDelta;
+        public int layerHealAfterBattlePercent;
+
+        /// <summary>主人公の経験値。RunScore.XpCap を超えても貯める。効果の中身は空。</summary>
+        public int playerXp;
+        public int runTypedChars;
+        public int runTypedRaw;
+        public int runTrashKills;
+        public int runTrashPoints;
+        public int runSquares;
+        public int runSquareRaw;
+        public int runBossKills;
+        public int runBossPoints;
 
         public bool IsUnlocked(int skillId) => unlockedSkillIds.Contains(skillId);
     }
@@ -292,6 +330,9 @@ namespace TypingRoguelike.Run
                 data.towerRunJackpotAccumulatedChance = madness.AccumulatedJackpotChance;
             }
 
+            data.towerRunBlood = party.Blood;
+            data.towerRunFocus = party.CarriedFocus;
+
             Save(data);
         }
 
@@ -328,6 +369,10 @@ namespace TypingRoguelike.Run
             data.towerRunSeed = 0;
             data.towerRunFloor = 1;
             data.towerRunNodeId = 0;
+            data.towerRunVitalsRested = false;
+            data.towerRunElevatorRestConsumed = false;
+            data.towerRunRoad = "";
+            data.towerRunRoadFloor = 0;
             data.towerRunBoardId = "";
             data.reelLayout = "";
             data.reelDebugUnlocked = false;
@@ -339,6 +384,8 @@ namespace TypingRoguelike.Run
             data.towerRunMadnessMax = RunMadnessState.DefaultMaxMadness;
             data.towerRunBonusJackpotChance = 0f;
             data.towerRunJackpotAccumulatedChance = 0f;
+            data.towerRunBlood = 0;
+            data.towerRunFocus = 0;
             data.towerRunClearedNodes = 0;
             data.towerRunMembers ??= new List<TowerRunMemberSave>();
             data.towerRunMembers.Clear();
@@ -354,6 +401,20 @@ namespace TypingRoguelike.Run
             data.towerRunSkipFromNodeIds ??= new List<int>();
             data.towerRunSkipFromNodeIds.Clear();
             data.towerRunEventBattlePending = false;
+            data.towerRunOpenEventId = "";
+            data.towerRunOpenEventFloor = -1;
+            data.towerRunOpenEventIndex = -1;
+            data.towerRunOpenEventTargetId = "";
+            data.towerRunEventWarpFloor = 0;
+            data.eventBattle = new EventBattlePendingSave();
+            data.layerBuffFloor = 0;
+            data.layerWordDamagePercent = 0;
+            data.layerDamageTakenPercent = 0;
+            data.layerEnemyHpPercent = 0;
+            data.layerOpeningSeconds = 0;
+            data.layerBattleCoinPercent = 0;
+            data.layerRerollDelta = 0;
+            data.layerHealAfterBattlePercent = 0;
             data.opinionPendingCardChoices = 0;
             Save(data);
         }
@@ -411,7 +472,13 @@ namespace TypingRoguelike.Run
             data.towerRunBoardId ??= "";
             data.reelLayout ??= "";
             data.characterTrust ??= new List<CharacterTrustSave>();
+            data.personalityWeights ??= new List<PersonalityWeightSave>();
             data.opinionLastAbsentId ??= "";
+            data.towerRunOpenEventId ??= "";
+            data.towerRunOpenEventTargetId ??= "";
+            data.eventBattle ??= new EventBattlePendingSave();
+            data.eventBattle.rewards ??= Array.Empty<EventEffect>();
+            data.eventBattle.resultText ??= "";
             if (data.opinionCombatEnemyHpScale <= 0f)
                 data.opinionCombatEnemyHpScale = 1f;
             if (data.opinionCombatCoinScale <= 0f)

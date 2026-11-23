@@ -1,0 +1,1911 @@
+fileFormatVersion: 2
+guid: 078a51843996b8f409a1a779b68d00f0
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 3492893840314522192
+    second: strike_slash_mask_07_0
+  - first:
+      213: -4434930907221748708
+    second: strike_slash_mask_07_1
+  - first:
+      213: -4355738919102972794
+    second: strike_slash_mask_07_2
+  - first:
+      213: 4629930551085408141
+    second: strike_slash_mask_07_3
+  - first:
+      213: 4916264867860054624
+    second: strike_slash_mask_07_4
+  - first:
+      213: 3511262148966973273
+    second: strike_slash_mask_07_5
+  - first:
+      213: 813684825997202312
+    second: strike_slash_mask_07_6
+  - first:
+      213: 8787893948448934432
+    second: strike_slash_mask_07_7
+  - first:
+      213: 3791957066326569246
+    second: strike_slash_mask_07_8
+  - first:
+      213: 531834731369879788
+    second: strike_slash_mask_07_9
+  - first:
+      213: -5202361508464504672
+    second: strike_slash_mask_07_10
+  - first:
+      213: 4207146556620472963
+    second: strike_slash_mask_07_11
+  - first:
+      213: -3227342376898526705
+    second: strike_slash_mask_07_12
+  - first:
+      213: 5839763061025787629
+    second: strike_slash_mask_07_13
+  - first:
+      213: 2738253566804609099
+    second: strike_slash_mask_07_14
+  - first:
+      213: 3339238151267478955
+    second: strike_slash_mask_07_15
+  - first:
+      213: 8223798537616746813
+    second: strike_slash_mask_07_16
+  - first:
+      213: 22614274584539959
+    second: strike_slash_mask_07_17
+  - first:
+      213: 5356395727777305059
+    second: strike_slash_mask_07_18
+  - first:
+      213: 9109278489426385801
+    second: strike_slash_mask_07_19
+  - first:
+      213: 8108874297694399028
+    second: strike_slash_mask_07_20
+  - first:
+      213: -42739910499704114
+    second: strike_slash_mask_07_21
+  - first:
+      213: -9202606258644230975
+    second: strike_slash_mask_07_22
+  - first:
+      213: -6869793804240160449
+    second: strike_slash_mask_07_23
+  - first:
+      213: 320938826504439141
+    second: strike_slash_mask_07_24
+  - first:
+      213: -2995935087445666427
+    second: strike_slash_mask_07_25
+  - first:
+      213: 3510043991744422996
+    second: strike_slash_mask_07_26
+  - first:
+      213: -8738207980384091616
+    second: strike_slash_mask_07_27
+  - first:
+      213: -6766190427610073887
+    second: strike_slash_mask_07_28
+  - first:
+      213: -4156067115558023289
+    second: strike_slash_mask_07_29
+  - first:
+      213: -6804434909699971928
+    second: strike_slash_mask_07_30
+  - first:
+      213: 5140637630700138009
+    second: strike_slash_mask_07_31
+  - first:
+      213: 6675683793086827922
+    second: strike_slash_mask_07_32
+  - first:
+      213: -4622026929882950251
+    second: strike_slash_mask_07_33
+  - first:
+      213: 4052404887444559743
+    second: strike_slash_mask_07_34
+  - first:
+      213: 8786532697924392734
+    second: strike_slash_mask_07_35
+  - first:
+      213: -4891884460701217653
+    second: strike_slash_mask_07_36
+  - first:
+      213: -6309109754125671466
+    second: strike_slash_mask_07_37
+  - first:
+      213: 8874535106192599155
+    second: strike_slash_mask_07_38
+  - first:
+      213: -7093301347759272808
+    second: strike_slash_mask_07_39
+  - first:
+      213: 5157889410879582185
+    second: strike_slash_mask_07_40
+  - first:
+      213: -430007466323791135
+    second: strike_slash_mask_07_41
+  - first:
+      213: 301242971030083807
+    second: strike_slash_mask_07_42
+  - first:
+      213: 2975833272960310669
+    second: strike_slash_mask_07_43
+  - first:
+      213: -8044748711926711441
+    second: strike_slash_mask_07_44
+  - first:
+      213: -5550894996103619874
+    second: strike_slash_mask_07_45
+  - first:
+      213: 2705632174886092895
+    second: strike_slash_mask_07_46
+  - first:
+      213: -1985709693379214762
+    second: strike_slash_mask_07_47
+  - first:
+      213: -1615534940605914663
+    second: strike_slash_mask_07_48
+  - first:
+      213: 844260659984780370
+    second: strike_slash_mask_07_49
+  - first:
+      213: -9577289112860127
+    second: strike_slash_mask_07_50
+  - first:
+      213: 8185800658025552129
+    second: strike_slash_mask_07_51
+  - first:
+      213: -641214199203755569
+    second: strike_slash_mask_07_52
+  - first:
+      213: -3125884174123923326
+    second: strike_slash_mask_07_53
+  - first:
+      213: 7511466670899896301
+    second: strike_slash_mask_07_54
+  - first:
+      213: 9052953008830967645
+    second: strike_slash_mask_07_55
+  - first:
+      213: -1327447807616558869
+    second: strike_slash_mask_07_56
+  - first:
+      213: -6909267959978291763
+    second: strike_slash_mask_07_57
+  - first:
+      213: -4954287111431455110
+    second: strike_slash_mask_07_58
+  - first:
+      213: 5848224949496145584
+    second: strike_slash_mask_07_59
+  - first:
+      213: -8924286206877039430
+    second: strike_slash_mask_07_60
+  - first:
+      213: 2503575764158189582
+    second: strike_slash_mask_07_61
+  - first:
+      213: 5631059130879467974
+    second: strike_slash_mask_07_62
+  - first:
+      213: -7470646370885669866
+    second: strike_slash_mask_07_63
+  - first:
+      213: 2186946969931710831
+    second: strike_slash_mask_07_64
+  - first:
+      213: -298160864558306364
+    second: strike_slash_mask_07_65
+  - first:
+      213: -6599926294398146131
+    second: strike_slash_mask_07_66
+  - first:
+      213: -2912346485126680382
+    second: strike_slash_mask_07_67
+  - first:
+      213: 2935695989268572311
+    second: strike_slash_mask_07_68
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 0
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 0
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: strike_slash_mask_07_0
+      rect:
+        serializedVersion: 2
+        x: 205
+        y: 457
+        width: 17
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 05ad81e0170497030800000000000000
+      internalID: 3492893840314522192
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_1
+      rect:
+        serializedVersion: 2
+        x: 150
+        y: 416
+        width: 38
+        height: 40
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c1495af46d5f372c0800000000000000
+      internalID: -4434930907221748708
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_2
+      rect:
+        serializedVersion: 2
+        x: 213
+        y: 421
+        width: 13
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 68cf580e78e4d83c0800000000000000
+      internalID: -4355738919102972794
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_3
+      rect:
+        serializedVersion: 2
+        x: 243
+        y: 434
+        width: 13
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d8f9c284e41d04040800000000000000
+      internalID: 4629930551085408141
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_4
+      rect:
+        serializedVersion: 2
+        x: 277
+        y: 413
+        width: 20
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 062088e89d41a3440800000000000000
+      internalID: 4916264867860054624
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_5
+      rect:
+        serializedVersion: 2
+        x: 315
+        y: 430
+        width: 17
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 95f737e22528ab030800000000000000
+      internalID: 3511262148966973273
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_6
+      rect:
+        serializedVersion: 2
+        x: 213
+        y: 394
+        width: 31
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 88350b4c90aca4b00800000000000000
+      internalID: 813684825997202312
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_7
+      rect:
+        serializedVersion: 2
+        x: 287
+        y: 401
+        width: 17
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 02a8a116cfed4f970800000000000000
+      internalID: 8787893948448934432
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_8
+      rect:
+        serializedVersion: 2
+        x: 328
+        y: 395
+        width: 17
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e117de57cdcbf9430800000000000000
+      internalID: 3791957066326569246
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_9
+      rect:
+        serializedVersion: 2
+        x: 193
+        y: 386
+        width: 12
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ce85482ded4716700800000000000000
+      internalID: 531834731369879788
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_10
+      rect:
+        serializedVersion: 2
+        x: 258
+        y: 345
+        width: 40
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0a0dec675cf7dc7b0800000000000000
+      internalID: -5202361508464504672
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_11
+      rect:
+        serializedVersion: 2
+        x: 314
+        y: 371
+        width: 32
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3820f59b089c26a30800000000000000
+      internalID: 4207146556620472963
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_12
+      rect:
+        serializedVersion: 2
+        x: 373
+        y: 370
+        width: 19
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f020668153d2633d0800000000000000
+      internalID: -3227342376898526705
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_13
+      rect:
+        serializedVersion: 2
+        x: 293
+        y: 359
+        width: 13
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: deec3e840910b0150800000000000000
+      internalID: 5839763061025787629
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_14
+      rect:
+        serializedVersion: 2
+        x: 204
+        y: 333
+        width: 9
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b48c5527c1b300620800000000000000
+      internalID: 2738253566804609099
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_15
+      rect:
+        serializedVersion: 2
+        x: 238
+        y: 329
+        width: 23
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: badeab2186b575e20800000000000000
+      internalID: 3339238151267478955
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_16
+      rect:
+        serializedVersion: 2
+        x: 337
+        y: 340
+        width: 32
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d39e50bc23dc02270800000000000000
+      internalID: 8223798537616746813
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_17
+      rect:
+        serializedVersion: 2
+        x: 364
+        y: 336
+        width: 13
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 733f67b1097505000800000000000000
+      internalID: 22614274584539959
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_18
+      rect:
+        serializedVersion: 2
+        x: 398
+        y: 315
+        width: 57
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3e11696f88db55a40800000000000000
+      internalID: 5356395727777305059
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_19
+      rect:
+        serializedVersion: 2
+        x: 211
+        y: 319
+        width: 28
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 98bdd5ae588aa6e70800000000000000
+      internalID: 9109278489426385801
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_20
+      rect:
+        serializedVersion: 2
+        x: 285
+        y: 320
+        width: 21
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 43aae5a0632888070800000000000000
+      internalID: 8108874297694399028
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_21
+      rect:
+        serializedVersion: 2
+        x: 355
+        y: 332
+        width: 17
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ec2eee02748286ff0800000000000000
+      internalID: -42739910499704114
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_22
+      rect:
+        serializedVersion: 2
+        x: 342
+        y: 319
+        width: 9
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1cc59b18d56c94080800000000000000
+      internalID: -9202606258644230975
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_23
+      rect:
+        serializedVersion: 2
+        x: 286
+        y: 287
+        width: 22
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f39f51acee699a0a0800000000000000
+      internalID: -6869793804240160449
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_24
+      rect:
+        serializedVersion: 2
+        x: 328
+        y: 304
+        width: 11
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5658d6c8924347400800000000000000
+      internalID: 320938826504439141
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_25
+      rect:
+        serializedVersion: 2
+        x: 346
+        y: 305
+        width: 9
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5851cae39ec4c66d0800000000000000
+      internalID: -2995935087445666427
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_26
+      rect:
+        serializedVersion: 2
+        x: 367
+        y: 267
+        width: 33
+        height: 43
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 454abe9d96e26b030800000000000000
+      internalID: 3510043991744422996
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_27
+      rect:
+        serializedVersion: 2
+        x: 416
+        y: 288
+        width: 23
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 02209bb8326abb680800000000000000
+      internalID: -8738207980384091616
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_28
+      rect:
+        serializedVersion: 2
+        x: 198
+        y: 264
+        width: 21
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1e437a7a7a9a912a0800000000000000
+      internalID: -6766190427610073887
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_29
+      rect:
+        serializedVersion: 2
+        x: 290
+        y: 279
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 78f4b7a6afea256c0800000000000000
+      internalID: -4156067115558023289
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_30
+      rect:
+        serializedVersion: 2
+        x: 346
+        y: 205
+        width: 46
+        height: 81
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8a4e016408ac191a0800000000000000
+      internalID: -6804434909699971928
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_31
+      rect:
+        serializedVersion: 2
+        x: 419
+        y: 272
+        width: 35
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 91e23e850b6375740800000000000000
+      internalID: 5140637630700138009
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_32
+      rect:
+        serializedVersion: 2
+        x: 412
+        y: 271
+        width: 16
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 29dc5cf5a0bc4ac50800000000000000
+      internalID: 6675683793086827922
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_33
+      rect:
+        serializedVersion: 2
+        x: 274
+        y: 253
+        width: 8
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 595990eeef24bdfb0800000000000000
+      internalID: -4622026929882950251
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_34
+      rect:
+        serializedVersion: 2
+        x: 318
+        y: 249
+        width: 9
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f77903a46c80d3830800000000000000
+      internalID: 4052404887444559743
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_35
+      rect:
+        serializedVersion: 2
+        x: 411
+        y: 253
+        width: 12
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e17532b8fe800f970800000000000000
+      internalID: 8786532697924392734
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_36
+      rect:
+        serializedVersion: 2
+        x: 458
+        y: 242
+        width: 35
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b8c86a550098c1cb0800000000000000
+      internalID: -4891884460701217653
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_37
+      rect:
+        serializedVersion: 2
+        x: 306
+        y: 231
+        width: 16
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6d323601b1a8178a0800000000000000
+      internalID: -6309109754125671466
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_38
+      rect:
+        serializedVersion: 2
+        x: 419
+        y: 245
+        width: 14
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 378e757e8aea82b70800000000000000
+      internalID: 8874535106192599155
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_39
+      rect:
+        serializedVersion: 2
+        x: 394
+        y: 224
+        width: 10
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 89c420291088f8d90800000000000000
+      internalID: -7093301347759272808
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_40
+      rect:
+        serializedVersion: 2
+        x: 419
+        y: 231
+        width: 11
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9efe93e6711849740800000000000000
+      internalID: 5157889410879582185
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_41
+      rect:
+        serializedVersion: 2
+        x: 457
+        y: 227
+        width: 22
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1e23107dc7e480af0800000000000000
+      internalID: -430007466323791135
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_42
+      rect:
+        serializedVersion: 2
+        x: 465
+        y: 235
+        width: 30
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fd8d457d2ea3e2400800000000000000
+      internalID: 301242971030083807
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_43
+      rect:
+        serializedVersion: 2
+        x: 406
+        y: 215
+        width: 16
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d8d569958984c4920800000000000000
+      internalID: 2975833272960310669
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_44
+      rect:
+        serializedVersion: 2
+        x: 434
+        y: 212
+        width: 14
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f6bb35e5baf4b5090800000000000000
+      internalID: -8044748711926711441
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_45
+      rect:
+        serializedVersion: 2
+        x: 437
+        y: 184
+        width: 38
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eda10c3396247f2b0800000000000000
+      internalID: -5550894996103619874
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_46
+      rect:
+        serializedVersion: 2
+        x: 495
+        y: 210
+        width: 17
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f5004f4c0265c8520800000000000000
+      internalID: 2705632174886092895
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_47
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 197
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 652051bfd875174e0800000000000000
+      internalID: -1985709693379214762
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_48
+      rect:
+        serializedVersion: 2
+        x: 354
+        y: 185
+        width: 16
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9d1e3fee7877499e0800000000000000
+      internalID: -1615534940605914663
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_49
+      rect:
+        serializedVersion: 2
+        x: 427
+        y: 194
+        width: 10
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 25cca30e89a67bb00800000000000000
+      internalID: 844260659984780370
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_50
+      rect:
+        serializedVersion: 2
+        x: 345
+        y: 171
+        width: 15
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 12a448c9189fddff0800000000000000
+      internalID: -9577289112860127
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_51
+      rect:
+        serializedVersion: 2
+        x: 423
+        y: 178
+        width: 13
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 10995c7045ec99170800000000000000
+      internalID: 8185800658025552129
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_52
+      rect:
+        serializedVersion: 2
+        x: 489
+        y: 183
+        width: 23
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fc906874513f917f0800000000000000
+      internalID: -641214199203755569
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_53
+      rect:
+        serializedVersion: 2
+        x: 478
+        y: 168
+        width: 11
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2880450c7e0ae94d0800000000000000
+      internalID: -3125884174123923326
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_54
+      rect:
+        serializedVersion: 2
+        x: 494
+        y: 173
+        width: 15
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: def9c25c3271e3860800000000000000
+      internalID: 7511466670899896301
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_55
+      rect:
+        serializedVersion: 2
+        x: 425
+        y: 154
+        width: 10
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d5f6ca30ccc82ad70800000000000000
+      internalID: 9052953008830967645
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_56
+      rect:
+        serializedVersion: 2
+        x: 457
+        y: 150
+        width: 17
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: be8d4298045f39de0800000000000000
+      internalID: -1327447807616558869
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_57
+      rect:
+        serializedVersion: 2
+        x: 491
+        y: 160
+        width: 11
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dcd8183b5695d10a0800000000000000
+      internalID: -6909267959978291763
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_58
+      rect:
+        serializedVersion: 2
+        x: 497
+        y: 160
+        width: 14
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a7ef4dffe16de3bb0800000000000000
+      internalID: -4954287111431455110
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_59
+      rect:
+        serializedVersion: 2
+        x: 416
+        y: 126
+        width: 26
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0b66b493b91192150800000000000000
+      internalID: 5848224949496145584
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_60
+      rect:
+        serializedVersion: 2
+        x: 498
+        y: 144
+        width: 14
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ab40d2d4af0962480800000000000000
+      internalID: -8924286206877039430
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_61
+      rect:
+        serializedVersion: 2
+        x: 430
+        y: 106
+        width: 18
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e001dea94ec7eb220800000000000000
+      internalID: 2503575764158189582
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_62
+      rect:
+        serializedVersion: 2
+        x: 439
+        y: 126
+        width: 13
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6c16a45e17a852e40800000000000000
+      internalID: 5631059130879467974
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_63
+      rect:
+        serializedVersion: 2
+        x: 445
+        y: 106
+        width: 11
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 61c6cc4f4bee25890800000000000000
+      internalID: -7470646370885669866
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_64
+      rect:
+        serializedVersion: 2
+        x: 464
+        y: 114
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f618565aea8995e10800000000000000
+      internalID: 2186946969931710831
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_65
+      rect:
+        serializedVersion: 2
+        x: 506
+        y: 117
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4cb241ef548bcdbf0800000000000000
+      internalID: -298160864558306364
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_66
+      rect:
+        serializedVersion: 2
+        x: 478
+        y: 92
+        width: 10
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: da963aec00a5864a0800000000000000
+      internalID: -6599926294398146131
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_67
+      rect:
+        serializedVersion: 2
+        x: 492
+        y: 94
+        width: 14
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2c0ba235d444597d0800000000000000
+      internalID: -2912346485126680382
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_slash_mask_07_68
+      rect:
+        serializedVersion: 2
+        x: 494
+        y: 63
+        width: 14
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 79864e0c2ffadb820800000000000000
+      internalID: 2935695989268572311
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      strike_slash_mask_07_0: 3492893840314522192
+      strike_slash_mask_07_1: -4434930907221748708
+      strike_slash_mask_07_10: -5202361508464504672
+      strike_slash_mask_07_11: 4207146556620472963
+      strike_slash_mask_07_12: -3227342376898526705
+      strike_slash_mask_07_13: 5839763061025787629
+      strike_slash_mask_07_14: 2738253566804609099
+      strike_slash_mask_07_15: 3339238151267478955
+      strike_slash_mask_07_16: 8223798537616746813
+      strike_slash_mask_07_17: 22614274584539959
+      strike_slash_mask_07_18: 5356395727777305059
+      strike_slash_mask_07_19: 9109278489426385801
+      strike_slash_mask_07_2: -4355738919102972794
+      strike_slash_mask_07_20: 8108874297694399028
+      strike_slash_mask_07_21: -42739910499704114
+      strike_slash_mask_07_22: -9202606258644230975
+      strike_slash_mask_07_23: -6869793804240160449
+      strike_slash_mask_07_24: 320938826504439141
+      strike_slash_mask_07_25: -2995935087445666427
+      strike_slash_mask_07_26: 3510043991744422996
+      strike_slash_mask_07_27: -8738207980384091616
+      strike_slash_mask_07_28: -6766190427610073887
+      strike_slash_mask_07_29: -4156067115558023289
+      strike_slash_mask_07_3: 4629930551085408141
+      strike_slash_mask_07_30: -6804434909699971928
+      strike_slash_mask_07_31: 5140637630700138009
+      strike_slash_mask_07_32: 6675683793086827922
+      strike_slash_mask_07_33: -4622026929882950251
+      strike_slash_mask_07_34: 4052404887444559743
+      strike_slash_mask_07_35: 8786532697924392734
+      strike_slash_mask_07_36: -4891884460701217653
+      strike_slash_mask_07_37: -6309109754125671466
+      strike_slash_mask_07_38: 8874535106192599155
+      strike_slash_mask_07_39: -7093301347759272808
+      strike_slash_mask_07_4: 4916264867860054624
+      strike_slash_mask_07_40: 5157889410879582185
+      strike_slash_mask_07_41: -430007466323791135
+      strike_slash_mask_07_42: 301242971030083807
+      strike_slash_mask_07_43: 2975833272960310669
+      strike_slash_mask_07_44: -8044748711926711441
+      strike_slash_mask_07_45: -5550894996103619874
+      strike_slash_mask_07_46: 2705632174886092895
+      strike_slash_mask_07_47: -1985709693379214762
+      strike_slash_mask_07_48: -1615534940605914663
+      strike_slash_mask_07_49: 844260659984780370
+      strike_slash_mask_07_5: 3511262148966973273
+      strike_slash_mask_07_50: -9577289112860127
+      strike_slash_mask_07_51: 8185800658025552129
+      strike_slash_mask_07_52: -641214199203755569
+      strike_slash_mask_07_53: -3125884174123923326
+      strike_slash_mask_07_54: 7511466670899896301
+      strike_slash_mask_07_55: 9052953008830967645
+      strike_slash_mask_07_56: -1327447807616558869
+      strike_slash_mask_07_57: -6909267959978291763
+      strike_slash_mask_07_58: -4954287111431455110
+      strike_slash_mask_07_59: 5848224949496145584
+      strike_slash_mask_07_6: 813684825997202312
+      strike_slash_mask_07_60: -8924286206877039430
+      strike_slash_mask_07_61: 2503575764158189582
+      strike_slash_mask_07_62: 5631059130879467974
+      strike_slash_mask_07_63: -7470646370885669866
+      strike_slash_mask_07_64: 2186946969931710831
+      strike_slash_mask_07_65: -298160864558306364
+      strike_slash_mask_07_66: -6599926294398146131
+      strike_slash_mask_07_67: -2912346485126680382
+      strike_slash_mask_07_68: 2935695989268572311
+      strike_slash_mask_07_7: 8787893948448934432
+      strike_slash_mask_07_8: 3791957066326569246
+      strike_slash_mask_07_9: 531834731369879788
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

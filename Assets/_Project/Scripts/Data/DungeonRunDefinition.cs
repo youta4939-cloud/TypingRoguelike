@@ -11,17 +11,26 @@ namespace TypingRoguelike.Data
         public BattleEncounterDefinition bossEncounter;
 
         [Header("Rest / ラン内通貨（塔片）")]
-        [Range(0.05f, 0.35f)] public float restHealFraction = 0.15f;
+        [Range(0.05f, 0.35f)] public float restHealFraction = 0.2f;
         [Tooltip("道中戦闘（通常・強敵）の敵 HP 倍率。ボスは別")]
         [Range(0.35f, 1.25f)] public float combatEnemyHpMultiplier = 0.72f;
+        [Tooltip("全戦闘の敵HPに最後に掛ける。1にすると元に戻る（仮）。")]
+        [Range(0.1f, 10f)] public float globalEnemyHpScale = 2f;
 
         [Header("パーティステ係数")]
-        [Tooltip("単語与ダメ = Σ攻撃 × この値")]
-        public float partyAttackCoefficient = 1f;
-        [Tooltip("被ダメ軽減 = Σ防御 × この値（敵攻撃から減算）")]
+        [Tooltip("単語与ダメ = 全員のATK合計 × この値。文字数では増えない。0.04 なら合計300で12。")]
+        public float partyAttackCoefficient = 0.04f;
+        [Tooltip("旧・減算用。被ダメは partyDefenseConstant を使う。")]
         public float partyDefenseCoefficient = 0.5f;
-        [Tooltip("JACKPOT 1語ごとの加算 = Σ運 × この値（0.0005 → 運10で+0.5%）")]
-        public float partyLuckJackpotBonusPerPoint = 0.0005f;
+        [Tooltip("被ダメ = 攻撃 × この値 / (Σ防御 + この値)。初期防御400なら半分。")]
+        public float partyDefenseConstant = 400f;
+        [Header("スキルダメージ（会心）")]
+        [Tooltip("仮。基礎会心率。0なら、外から足さない限り会心しない。")]
+        public float baseCritChance = 0f;
+        [Tooltip("仮。会心したときのダメージ倍率。")]
+        public float critMultiplier = 1.5f;
+        [Tooltip("未使用。ジャックポットの伸びは運合計 / 120。")]
+        public float partyLuckJackpotBonusPerPoint = 0f;
         public int combatCoinReward = 8;
         public int eliteCoinReward = 15;
         public int treasureCoinReward = 10;

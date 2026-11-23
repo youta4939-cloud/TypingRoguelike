@@ -2,7 +2,8 @@
   "name": "TypingRoguelike.Editor",
   "rootNamespace": "TypingRoguelike.EditorTools",
   "references": [
-    "TypingRoguelike"
+    "TypingRoguelike",
+    "Unity.TextMeshPro"
   ],
   "includePlatforms": [
     "Editor"

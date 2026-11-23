@@ -16,6 +16,7 @@ MonoBehaviour:
   characterName: エレン
   displayName: 守護
   pattern: 000000000200000003000000
+  damagePercent: 0
   damage: 0
   heal: 0
   effectText: 敵攻撃40%減・8秒

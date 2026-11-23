@@ -81,7 +81,7 @@ namespace TypingRoguelike.Battle
             root.pivot = feet;
             root.sizeDelta = new Vector2(BigMouthParts.CanvasWidth, BigMouthParts.CanvasHeight);
             root.anchoredPosition = Vector2.zero;
-            root.localScale = Vector3.one * 0.62f;
+            root.localScale = Vector3.one * BigMouthParts.UiRootScale;
 
             var idle = rootGo.AddComponent<BigMouthIdle>();
             idle.positionsArePixels = true;

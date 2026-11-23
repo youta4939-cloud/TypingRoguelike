@@ -65,14 +65,41 @@ namespace TypingRoguelike.Battle
             _random = seed.HasValue ? new System.Random(seed.Value) : new System.Random();
         }
 
-        public void GenerateWords()
-        {
-            var words = _wordPool.OrderBy(_ => _random.Next()).Take(3).ToArray();
-            var colors = AllColors.OrderBy(_ => _random.Next()).Take(3).ToArray();
+        public void GenerateWords() => GenerateWords(null);
 
+        public void GenerateWords(IReadOnlyCollection<char> avoidFirst)
+        {
+            var preferred = new List<TypingWordEntry>();
+            var rest = new List<TypingWordEntry>();
+            foreach (var word in _wordPool)
+            {
+                if (avoidFirst != null && avoidFirst.Count > 0 && FirstLettersOverlap(word.InputOptions, avoidFirst))
+                    rest.Add(word);
+                else
+                    preferred.Add(word);
+            }
+            Shuffle(preferred);
+            Shuffle(rest);
+            var picked = new List<TypingWordEntry>(3);
+            foreach (var word in preferred)
+            {
+                if (picked.Count >= 3)
+                    break;
+                picked.Add(word);
+            }
+            foreach (var word in rest)
+            {
+                if (picked.Count >= 3)
+                    break;
+                picked.Add(word);
+            }
+            if (picked.Count == 0)
+                picked.Add(new TypingWordEntry("？", new[] { "?" }));
+
+            var colors = AllColors.OrderBy(_ => _random.Next()).Take(3).ToArray();
             for (var i = 0; i < 3; i++)
             {
-                var word = words[i % words.Length];
+                var word = picked[i % picked.Count];
                 _slots[i].Color = colors[i];
                 _slots[i].DisplayText = word.DisplayText;
                 _slots[i].InputOptions = word.InputOptions;
@@ -82,20 +109,83 @@ namespace TypingRoguelike.Battle
             }
         }
 
-        public bool TryReroll()
+        public bool TryPickWord(IReadOnlyCollection<char> blockedFirst, out string display, out string[] inputs)
+        {
+            display = null;
+            inputs = null;
+            var choices = new List<TypingWordEntry>();
+            foreach (var word in _wordPool)
+            {
+                if (FirstLettersOverlap(word.InputOptions, blockedFirst))
+                    continue;
+                choices.Add(word);
+            }
+            if (choices.Count == 0)
+                return false;
+            var pick = choices[_random.Next(choices.Count)];
+            display = pick.DisplayText;
+            inputs = pick.InputOptions;
+            return true;
+        }
+
+        public void CollectFirstLetters(ISet<char> into)
+        {
+            if (into == null)
+                return;
+            foreach (var slot in _slots)
+                AddFirstLetters(slot.InputOptions, into);
+        }
+
+        public static bool FirstLettersOverlap(string[] inputs, IReadOnlyCollection<char> blocked)
+        {
+            if (inputs == null || blocked == null || blocked.Count == 0)
+                return false;
+            foreach (var input in inputs)
+            {
+                if (!string.IsNullOrEmpty(input) && blocked.Contains(input[0]))
+                    return true;
+            }
+            return false;
+        }
+
+        static void AddFirstLetters(string[] inputs, ISet<char> into)
+        {
+            if (inputs == null)
+                return;
+            foreach (var input in inputs)
+            {
+                if (!string.IsNullOrEmpty(input))
+                    into.Add(input[0]);
+            }
+        }
+
+        void Shuffle(List<TypingWordEntry> list)
+        {
+            for (var i = list.Count - 1; i > 0; i--)
+            {
+                var j = _random.Next(i + 1);
+                var swap = list[i];
+                list[i] = list[j];
+                list[j] = swap;
+            }
+        }
+
+        public bool TryReroll(IReadOnlyCollection<char> avoidFirst = null)
         {
             if (RerollCount <= 0)
                 return false;
             RerollCount--;
-            GenerateWords();
+            GenerateWords(avoidFirst);
             return true;
         }
 
-        public void AddReroll(int amount, int maxRerolls)
+        public void AddReroll(int amount, int maxRerolls, bool ignoreCap = false)
         {
             if (amount <= 0)
                 return;
-            RerollCount = Mathf.Min(RerollCount + amount, Mathf.Max(0, maxRerolls));
+            RerollCount += amount;
+            if (!ignoreCap)
+                RerollCount = Mathf.Min(RerollCount, Mathf.Max(0, maxRerolls));
         }
 
         public void ClearTypingProgress()
@@ -104,7 +194,13 @@ namespace TypingRoguelike.Battle
                 slot.Progress = 0;
         }
 
-        public KeyProcessResult ProcessKey(char key)
+        public KeyProcessResult ProcessKey(char key) => ProcessKey(key, true);
+
+        /// <param name="resetIfNone">
+        /// どの単語も続かなかったとき、全部を入力前へ戻す。
+        /// Ex側がまだ続いているときは false にして、外れた単語を入力中のまま戻さない。
+        /// </param>
+        public KeyProcessResult ProcessKey(char key, bool resetIfNone)
         {
             WordCompletion? completed = null;
             var advanced = false;
@@ -139,17 +235,29 @@ namespace TypingRoguelike.Battle
             }
 
             var anyActive = _slots.Any(s => s.Active && s.Progress > 0);
-            if (!anyActive && !completed.HasValue)
-            {
-                foreach (var slot in _slots)
-                {
-                    slot.Progress = 0;
-                    slot.Active = true;
-                }
-            }
+            if (!anyActive && !completed.HasValue && resetIfNone)
+                ResetActivity();
 
             var missed = !advanced && !completed.HasValue;
             return new KeyProcessResult(completed, advanced, missed);
+        }
+
+        public void ResetActivity()
+        {
+            foreach (var slot in _slots)
+            {
+                slot.Progress = 0;
+                slot.Active = true;
+            }
+        }
+
+        public void ParkAll()
+        {
+            foreach (var slot in _slots)
+            {
+                slot.Progress = 0;
+                slot.Active = false;
+            }
         }
 
         static TypingWordEntry ParseWord(string encoded)
@@ -294,7 +402,7 @@ namespace TypingRoguelike.Battle
             Reset();
         }
 
-        /// <summary>単語1完了ごとに1回抽選。外れ時は完了文字数 × 1文字あたり加算。</summary>
+        /// <summary>単語1完了ごとに1回抽選。外れ時は文字数 × 固定値を足す。今の蓄積量では変えない。</summary>
         public bool RegisterWordAndRoll(
             float bonusJackpotChance,
             int completedCharacterCount,

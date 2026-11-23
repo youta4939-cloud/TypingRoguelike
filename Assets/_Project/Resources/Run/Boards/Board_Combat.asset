@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: TypingRoguelike::TypingRoguelike.Data.BoardPreset
   presetId: combat
   displayName: 戦闘寄り
-  column1: BBBBBRTEE
-  column2: BBBBBRTEE
-  column3: BBBBBRTEE
+  column1: BBBBBX
+  column2: BBBBBX
+  column3: BBBBBX

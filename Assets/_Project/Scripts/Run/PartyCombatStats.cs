@@ -1,4 +1,5 @@
 using System.Text;
+using TypingRoguelike.Battle;
 using TypingRoguelike.Data;
 using UnityEngine;
 
@@ -11,29 +12,48 @@ namespace TypingRoguelike.Run
         public int TotalDefense { get; }
         public int TotalLuck { get; }
 
-        public float WordClearDamage { get; }
-        public float DamageReduction { get; }
-        /// <summary>1語完了ごとに JACKPOT 抽選へ加算（0〜1）。</summary>
-        public float JackpotLuckBonusPerWord { get; }
+        public int TotalHp { get; }
+        public float WordDamageCoefficient { get; }
+        public int WordDamage { get; }
+        public float DefenseConstant { get; }
+        /// <summary>蓄積の伸び。運120で1、上限220で 220/120。</summary>
+        public float JackpotAccumulationScale { get; }
+        public float BaseCritChance { get; }
+        public float CritMultiplier { get; }
+        public float GlobalEnemyHpScale { get; }
+
+        public const int LuckReference = 120;
+        public const int LuckCap = 220;
 
         PartyCombatStats(
+            int hp,
             int atk,
             int def,
             int luck,
-            float wordDamage,
-            float damageReduction,
-            float jackpotBonus)
+            float wordDamageCoefficient,
+            int wordDamage,
+            float defenseConstant,
+            float jackpotScale,
+            float baseCritChance,
+            float critMultiplier,
+            float globalEnemyHpScale)
         {
+            TotalHp = hp;
             TotalAttack = atk;
             TotalDefense = def;
             TotalLuck = luck;
-            WordClearDamage = wordDamage;
-            DamageReduction = damageReduction;
-            JackpotLuckBonusPerWord = jackpotBonus;
+            WordDamageCoefficient = wordDamageCoefficient;
+            WordDamage = wordDamage;
+            DefenseConstant = defenseConstant;
+            JackpotAccumulationScale = jackpotScale;
+            BaseCritChance = baseCritChance;
+            CritMultiplier = critMultiplier;
+            GlobalEnemyHpScale = globalEnemyHpScale;
         }
 
         public static PartyCombatStats Compute(RunPartyState party, DungeonRunDefinition runConfig)
         {
+            var hp = 0;
             var atk = 0;
             var def = 0;
             var luck = 0;
@@ -44,21 +64,43 @@ namespace TypingRoguelike.Run
                     var c = member?.character;
                     if (c == null)
                         continue;
-                    atk += c.attack;
+                    hp += c.hp;
+                    atk += RunPartyState.GetAttack(member);
                     def += c.defense;
                     luck += c.luck;
                 }
             }
 
-            var atkCoeff = runConfig != null ? runConfig.partyAttackCoefficient : 1f;
-            var defCoeff = runConfig != null ? runConfig.partyDefenseCoefficient : 0.5f;
-            var luckPerPoint = runConfig != null ? runConfig.partyLuckJackpotBonusPerPoint : 0.0005f;
+            var coefficient = runConfig != null && runConfig.partyAttackCoefficient > 0f
+                ? runConfig.partyAttackCoefficient
+                : 0.04f;
+            var wordDamage = (int)CombatMath.WordDamage(atk, coefficient);
+            var defenseConstant = runConfig != null && runConfig.partyDefenseConstant > 0f
+                ? runConfig.partyDefenseConstant
+                : 400f;
+            var cappedLuck = Mathf.Clamp(luck, 0, LuckCap);
+            var jackpotScale = LuckReference > 0 ? cappedLuck / (float)LuckReference : 0f;
+            var baseCrit = runConfig != null ? Mathf.Clamp01(runConfig.baseCritChance) : 0f;
+            var critMultiplier = runConfig != null && runConfig.critMultiplier > 0f
+                ? runConfig.critMultiplier
+                : 1.5f;
+            var hpScale = runConfig != null && runConfig.globalEnemyHpScale > 0f
+                ? runConfig.globalEnemyHpScale
+                : 1f;
 
-            var wordDamage = Mathf.Max(1f, atk * atkCoeff);
-            var reduction = Mathf.Max(0f, def * defCoeff);
-            var jackpotBonus = Mathf.Max(0f, luck * luckPerPoint);
+            return new PartyCombatStats(
+                hp, atk, def, luck, coefficient, wordDamage, defenseConstant, jackpotScale,
+                baseCrit, critMultiplier, hpScale);
+        }
 
-            return new PartyCombatStats(atk, def, luck, wordDamage, reduction, jackpotBonus);
+        public float DamageTakenRatio
+        {
+            get
+            {
+                var k = DefenseConstant > 0f ? DefenseConstant : 400f;
+                var denom = TotalDefense + k;
+                return denom > 0f ? k / denom : 1f;
+            }
         }
 
         public string BuildDetailText(RunPartyState party, DungeonRunDefinition runConfig, RelicRunModifiers relicMods)
@@ -73,17 +115,20 @@ namespace TypingRoguelike.Run
                     if (c == null)
                         continue;
                     sb.AppendLine(
-                        $"{c.characterName}（{c.roleLabel}）　攻 {c.attack}　防 {c.defense}　運 {c.luck}");
+                        $"{StarterCharacters.Shown(c.characterName)}（{c.roleLabel}）　HP {c.hp}　攻 {RunPartyState.GetAttack(member)}　防 {c.defense}　運 {c.luck}");
                 }
             }
 
             sb.AppendLine();
             sb.AppendLine("【パーティ合計 → 戦闘】");
-            sb.AppendLine($"攻撃　{TotalAttack} × {Coeff(runConfig?.partyAttackCoefficient, 1f):0.##} → 単語 {(int)WordClearDamage} ダメ");
+            sb.AppendLine($"HP　{TotalHp}");
             sb.AppendLine(
-                $"防御　{TotalDefense} × {Coeff(runConfig?.partyDefenseCoefficient, 0.5f):0.##} → 被ダメ -{(int)DamageReduction}");
+                $"攻撃　{TotalAttack} × {WordDamageCoefficient:0.####} → 単語 {WordDamage} ダメ");
+            var takenPercent = Mathf.RoundToInt(DamageTakenRatio * 100f);
             sb.AppendLine(
-                $"運　　{TotalLuck} × {Coeff(runConfig?.partyLuckJackpotBonusPerPoint, 0.0005f):0.####} → JACKPOT +{JackpotLuckBonusPerWord * 100f:0.1}% / 語");
+                $"防御　{TotalDefense}（定数 {DefenseConstant:0}）→ 攻撃の {takenPercent}% を受ける");
+            sb.AppendLine(
+                $"運　　{Mathf.Min(TotalLuck, LuckCap)}（上限 {LuckCap}）→ 蓄積の伸び ×{JackpotAccumulationScale:0.00}");
 
             if (relicMods.PlayerDamageBonusPercent > 0 ||
                 relicMods.MadnessMaxBonus > 0 ||
@@ -109,7 +154,5 @@ namespace TypingRoguelike.Run
 
             return sb.ToString().TrimEnd();
         }
-
-        static float Coeff(float? value, float fallback) => value ?? fallback;
     }
 }

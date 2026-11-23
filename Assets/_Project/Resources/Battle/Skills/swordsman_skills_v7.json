@@ -1,0 +1,69 @@
+{
+  "version": "swordsman_v7",
+  "character": "アリス",
+  "options": {
+    "chainScope": "self",
+    "chainCountsExCards": false,
+    "onagiFocusConsume": "threshold",
+    "focusGainMode": "battleTotal",
+    "focusGainCountsOverflow": true,
+    "kobuStacking": "refresh",
+    "tateRerollIgnoresCap": true,
+    "tateStacks": false,
+    "tateAppliesToDot": false,
+    "tsuiFiresWithZeroFocus": true,
+    "passiveLabel": "パッシブ",
+    "replaceAliceSkills": true,
+    "aliceInnateSkillId": 100
+  },
+  "skills": [
+    { "skillId": 100, "key": "ichi_no_tachi", "nameJa": "一ノ太刀", "rarity": "N", "type": "active", "pattern": ["red","blue"],
+      "damagePercent": [0.15, 0.20, 0.30],
+      "text": ["攻撃力の15%のダメージ", "攻撃力の20%のダメージ", "攻撃力の30%のダメージ"] },
+
+    { "skillId": 101, "key": "tatenaoshi", "nameJa": "立て直し", "rarity": "N", "type": "active", "pattern": ["red","green"],
+      "nextHitReduction": [0.25, 0.25, 0.25], "reroll": [1, 2, 3],
+      "text": ["次に受けるダメージを25%軽減し、リロール+1", "次に受けるダメージを25%軽減し、リロール+2", "次に受けるダメージを25%軽減し、リロール+3"] },
+
+    { "skillId": 102, "key": "kobu", "nameJa": "鼓舞", "rarity": "N", "type": "active", "pattern": ["red","yellow"],
+      "finalDamageBonus": [0.15, 0.20, 0.30], "durationSec": 30, "target": "swordsmanSkills",
+      "text": ["30秒間、剣士のスキルダメージ+15%", "30秒間、剣士のスキルダメージ+20%", "30秒間、剣士のスキルダメージ+30%"] },
+
+    { "skillId": 103, "key": "meikyo_shisui", "nameJa": "明鏡止水", "rarity": "N", "type": "active", "pattern": ["yellow","red","blue"],
+      "focusAdd": [3, 4, 5],
+      "text": ["集中+3", "集中+4", "集中+5"] },
+
+    { "skillId": 104, "key": "onagi", "nameJa": "大薙ぎ", "rarity": "N", "type": "active", "pattern": ["red","red","purple"],
+      "damagePercent": [0.30, 0.40, 0.50], "focusThreshold": [3, 2, 1], "multiplierWhenConsumed": 2.0,
+      "text": ["攻撃力の30%のダメージ。集中が3以上なら消費してダメージ200%", "攻撃力の40%のダメージ。集中が2以上なら消費してダメージ200%", "攻撃力の50%のダメージ。集中が1以上なら消費してダメージ200%"] },
+
+    { "skillId": 105, "key": "noutou", "nameJa": "納刀", "rarity": "N", "type": "active", "pattern": ["green","yellow"],
+      "addCard": "red_refill", "addCount": [1, 2, 3],
+      "text": ["Exに赤補充を1枚", "Exに赤補充を2枚", "Exに赤補充を3枚"] },
+
+    { "skillId": 106, "key": "iai_no_kamae", "nameJa": "居合ノ構え", "rarity": "R", "type": "passive", "oncePerBattle": true, "pattern": ["blue","blue","red"],
+      "addCard": "battou", "addCount": [1, 1, 1], "allySkillBattou": [1, 2, 3],
+      "text": ["Exに抜刀を追加。この戦闘中、仲間のスキル発動ごとに抜刀+1", "Exに抜刀を追加。この戦闘中、仲間のスキル発動ごとに抜刀+2", "Exに抜刀を追加。この戦闘中、仲間のスキル発動ごとに抜刀+3"] },
+
+    { "skillId": 107, "key": "ni_no_tachi", "nameJa": "二ノ太刀", "rarity": "R", "type": "active", "pattern": ["blue","red","purple"],
+      "damagePercent": [0.20, 0.27, 0.40], "chainPrev": "ichi_no_tachi", "chainFocusAdd": [1, 2, 3],
+      "text": ["攻撃力の20%のダメージ。直前が一ノ太刀なら集中+1", "攻撃力の27%のダメージ。直前が一ノ太刀なら集中+2", "攻撃力の40%のダメージ。直前が一ノ太刀なら集中+3"] },
+
+    { "skillId": 108, "key": "san_no_tachi", "nameJa": "三ノ太刀", "rarity": "R", "type": "active", "pattern": ["purple","red","red"],
+      "damagePercent": [0.20, 0.27, 0.40], "chainPrev": "ni_no_tachi", "focusGainRequired": 10,
+      "addCard": "issen_kiwami", "addCount": [3, 4, 5],
+      "text": ["攻撃力の20%のダメージ。直前が二ノ太刀で集中を10獲得していればExに一閃・極×3", "攻撃力の27%のダメージ。直前が二ノ太刀で集中を10獲得していればExに一閃・極×4", "攻撃力の40%のダメージ。直前が二ノ太刀で集中を10獲得していればExに一閃・極×5"] },
+
+    { "skillId": 109, "key": "youtou_kaihou", "nameJa": "妖刀解放", "rarity": "R", "type": "active", "pattern": ["purple","purple","purple","red"],
+      "addCard": "hyakki_yakou", "addCount": [1, 1, 1], "bloodOnKill": [1, 2, 3],
+      "text": ["Exに百鬼夜行を追加。百鬼夜行でとどめを刺すと怨血+1", "Exに百鬼夜行を追加。百鬼夜行でとどめを刺すと怨血+2", "Exに百鬼夜行を追加。百鬼夜行でとどめを刺すと怨血+3"] },
+
+    { "skillId": 110, "key": "tsui_no_tachi", "nameJa": "終ノ太刀", "rarity": "SR", "type": "active", "pattern": ["red","blue","yellow","purple","red"],
+      "percentPerFocus": [0.20, 0.27, 0.33], "consumeAllFocus": true, "forceCrit": true,
+      "text": ["集中をすべて消費し、1つにつき攻撃力の20%のダメージ。必ず会心", "集中をすべて消費し、1つにつき攻撃力の27%のダメージ。必ず会心", "集中をすべて消費し、1つにつき攻撃力の33%のダメージ。必ず会心"] },
+
+    { "skillId": 111, "key": "kyokuchi_no_kata", "nameJa": "極致ノ型", "rarity": "SR", "type": "passive", "oncePerBattle": true, "pattern": ["red","blue","purple","red","red"],
+      "focusAdd": [5, 10, 15], "kiwamiFocusGainRequired": 20, "kiwamiCritMultiplier": 2.0, "kiwamiAddCard": "issen_kiwami", "kiwamiAddCount": 5,
+      "text": ["集中+5。集中を20獲得すると極状態（会心ダメ200%、Exに一閃・極×5）", "集中+10。集中を20獲得すると極状態（会心ダメ200%、Exに一閃・極×5）", "集中+15。集中を20獲得すると極状態（会心ダメ200%、Exに一閃・極×5）"] }
+  ]
+}

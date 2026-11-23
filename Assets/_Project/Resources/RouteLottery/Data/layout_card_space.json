@@ -1,0 +1,121 @@
+{
+ "_note": "カード（card space）。全 Cards/* スプライトは同じキャンバス 1075x1500（native 720x1280 を 6° シアー + 110px パディング）。表示倍率 route=0.472（現在地は ×1.06）。文字は TMP（シアーしない・位置だけシアー済み座標）。",
+ "canvas": [
+  1075,
+  1500
+ ],
+ "native_card": [
+  720,
+  1280
+ ],
+ "padding": 110,
+ "shear_tan": 0.10510423526567647,
+ "shear_note": "native (x,y) -> space (110 + x + tan6*(1280-y), 110 + y)",
+ "art_rect": [
+  185.5,
+  189,
+  709.8,
+  1111
+ ],
+ "art_rect_note": "upright rect covering the sheared interior; illustration = aspect-fill (Envelope) inside it, clipped by card_art_mask",
+ "illustration_recommended_source": {
+  "size": [
+   1280,
+   2000
+  ],
+  "aspect": "16:25 (0.64)",
+  "format": "PNG or JPG sRGB",
+  "safe_area": "keep faces/subject between 14% and 86% of the height (title band top, label band bottom) and 10% from the sides (shear crops the corners)",
+  "min": [
+   710,
+   1111
+  ]
+ },
+ "layers_bottom_to_top": [
+  "card_backing",
+  "illustration (masked, UI_CardArtTone)",
+  "card_grad_top",
+  "card_grad_bottom | card_grad_bottom_done",
+  "card_inner_shadow",
+  "card_crack_a|b (done only)",
+  "card_status_line (not done)",
+  "card_frame_<state>",
+  "medallion",
+  "TMP ordinal",
+  "TMP title",
+  "TMP status",
+  "card_edge_light (current)"
+ ],
+ "behind": [
+  "card_glow_current | card_glow_boss (same canvas, drawn before the card)"
+ ],
+ "medallion": {
+  "center": [
+   600.3,
+   150
+  ],
+  "size_native": [
+   226,
+   222
+  ],
+  "sprite_hires": "Common/medallion_hires"
+ },
+ "ordinal": {
+  "numeral": {
+   "font": "serif",
+   "weight": "Bold",
+   "size_native": 84,
+   "outline_native": 3
+  },
+  "suffix": {
+   "size_native": 38,
+   "dy_native": -27,
+   "gap_native": 2
+  },
+  "shadow_color": [
+   10,
+   6,
+   6
+  ]
+ },
+ "title": {
+  "center": [
+   583.0,
+   315
+  ],
+  "font": "serif",
+  "weight": "Bold",
+  "size_native": 70,
+  "size_native_4plus_chars": 58,
+  "outline_native": 5,
+  "outline_color": [
+   8,
+   5,
+   6
+  ]
+ },
+ "status": {
+  "center": [
+   485.6,
+   1242
+  ],
+  "font": "sans",
+  "weight": "Bold",
+  "size_native": 50,
+  "outline_native": 4,
+  "outline_color": [
+   8,
+   5,
+   6
+  ]
+ },
+ "back": {
+  "sprite": "Cards/card_back",
+  "ordinal_color": [
+   200,
+   70,
+   62
+  ]
+ },
+ "states_ref": "layer_cards.json -> states"
+}

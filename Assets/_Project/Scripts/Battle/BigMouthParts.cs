@@ -22,6 +22,8 @@ namespace TypingRoguelike.Battle
         public const int CanvasWidth = 345;
         public const int CanvasHeight = 520;
         public const float Ppu = 100f;
+        /// <summary>戦闘画面での表示倍率。元の 0.62 の約 1.5 倍。</summary>
+        public const float UiRootScale = 0.93f;
         public const string ResourceFolder = "Battle/Art/Enemies/BigMouth/";
 
         public readonly struct Spec

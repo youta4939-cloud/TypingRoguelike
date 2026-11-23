@@ -31,7 +31,7 @@ namespace TypingRoguelike.Run
             {
                 foreach (var character in pool)
                 {
-                    if (character.characterId == lastAbsentId)
+                    if (StarterCharacters.Same(character.characterId, lastAbsentId))
                     {
                         forced = character;
                         break;

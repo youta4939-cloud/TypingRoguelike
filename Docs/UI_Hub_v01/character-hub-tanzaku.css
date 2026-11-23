@@ -1,0 +1,31 @@
+/* A different composition: suspended vertical slips, an offset vermilion departure. */
+.screen{min-height:850px}
+.top{top:0;left:4%;width:92%;height:106px;border:0;align-items:flex-start;padding-top:28px}
+.brand{font-size:21px;color:#e4d9c9;border-left:3px solid #ac3946;padding-left:15px}.brand small{font-size:8px;letter-spacing:.23em}
+.money{font-size:15px;padding-top:0}.money small{font-size:9px}
+.veil{background:linear-gradient(90deg,#111013f2 0%,#111013bd 25%,#11101380 43%,transparent 67%),linear-gradient(0deg,#100e10e6,transparent 29%,transparent 80%,#100e109c)}
+nav{top:205px;left:6%;width:47%;max-width:650px;height:485px;display:grid;grid-template-columns:1.38fr repeat(4,1fr);gap:13px;align-items:start;padding-top:0;border-top:1px solid #a7977d4d}
+nav:before{content:'帰還、そして再び。';position:absolute;top:-45px;left:0;margin:0;font-size:12px;letter-spacing:.3em;color:#b6a38f}
+nav button,nav .primary{display:flex;flex-direction:column;align-items:center;justify-content:space-between;position:relative;width:100%;height:266px;padding:24px 0 20px;margin:0;border:0;border-radius:0;background:#201c1ddb!important;color:#c4b6a3;letter-spacing:.18em;font-size:26px;font-weight:500;line-height:1.5;box-shadow:none;transition:background .2s,color .2s}
+nav button:before,nav .primary:before{display:block!important;content:'';position:absolute;inset:0;top:0;left:0;width:100%;height:100%;opacity:1;background:none;border-top:2px solid #756353;border-left:1px solid #74614a44;clip-path:none;z-index:-1}
+nav button:after,nav .primary:after{display:block;content:'';position:absolute;top:-30px;left:50%;right:auto;width:1px;height:30px;background:#87745c6b;opacity:1}
+nav button .label{writing-mode:vertical-rl;text-orientation:upright;white-space:nowrap;letter-spacing:.2em;font-size:26px}
+nav button .index{font:10px Georgia,serif;color:#806e5d;letter-spacing:.2em}
+nav button:nth-of-type(2){margin-top:56px}nav button:nth-of-type(3){margin-top:20px}nav button:nth-of-type(4){margin-top:79px}nav button:nth-of-type(5){margin-top:40px}
+nav .primary{height:365px;background:#8f2534ed!important;color:#f3ddc0;margin-top:0;clip-path:polygon(0 0,100% 0,100% 95%,97% 97%,99% 98%,83% 97%,86% 99%,62% 98%,51% 100%,37% 98%,21% 99%,7% 97%,0 98%)}
+nav .primary:before{border-top:3px solid #df9a83;border-left:0}
+nav .primary:after{content:'↓';background:none;width:auto;height:auto;top:auto;bottom:23px;left:calc(50% - 9px);color:#e2ae91;font:27px serif}
+nav .primary .label{font-size:40px;letter-spacing:.17em;margin-top:4px}
+nav .primary .index{display:block;color:#d5a18a;margin-bottom:35px}
+nav button:hover,nav button:focus-visible,nav button.active{background:#3a2d2be8!important;color:#fff0d7}
+nav button.active:before,nav button:hover:before{border-top-color:#d5776e;border-top-width:3px}
+nav button.active .index,nav button:hover .index{color:#dba48d}
+nav .primary:hover,nav .primary:focus-visible,nav .primary.active{background:#ac2e3fed!important;color:#fff0d7}
+.status{position:absolute;top:398px;left:0;padding:0;margin:0;font:11px/1.8 'Yu Mincho',serif;letter-spacing:.12em;color:#c29b89}
+.caption{position:absolute;top:439px;left:0;right:0;margin:0;padding:15px 0 0;border-top:1px solid #8a62514d;color:#b3a28d;font-size:12px;max-width:none;min-height:42px}
+.bottom{left:4%;width:92%;bottom:22px;border:0;align-items:end}.bottom button{writing-mode:vertical-rl;letter-spacing:.15em;border-left:1px solid #80655466;padding-left:10px;font-family:'Yu Mincho',serif}
+.credit{max-width:50%;font-size:10px;color:#9a8173}
+.illustration .art{object-position:center;filter:saturate(.55)}
+@media(min-width:1500px){nav{top:225px;width:45%}}
+@media(max-width:1100px) and (min-width:761px){nav{left:5%;width:52%;gap:10px}nav button .label{font-size:23px}nav .primary .label{font-size:35px}}
+@media(max-width:760px){.screen{min-height:850px;height:100svh}nav{top:215px;left:7%;width:86%;max-width:540px;gap:8px;height:480px}nav button,nav .primary{height:230px;padding-top:19px}nav button .label{font-size:20px}nav .primary{height:330px}nav .primary .label{font-size:30px}nav .primary .index{margin-bottom:30px}.status{top:362px;font-size:10px}.caption{top:407px;font-size:11px}.veil{background:linear-gradient(90deg,#111013e8,#1110138c),linear-gradient(0deg,#111013ed,transparent 65%)}.credit{max-width:70%}.money{font-size:12px}.brand{font-size:18px}nav:before{font-size:11px}}

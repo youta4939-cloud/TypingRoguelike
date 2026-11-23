@@ -9,10 +9,15 @@ namespace TypingRoguelike.Battle
     {
         public readonly Dictionary<string, CharacterVisual> Characters = new();
         public Sprite BossIllustration;
+        public EnemyBattleVisualKind BattleVisual = EnemyBattleVisualKind.Auto;
         public string BossDisplayName = "BOSS";
         public string BossEmojiNormal = "🐲";
         public string BossEmojiEnraged = "🔥🐲";
         public string BossEmojiDefeated = "💀";
+        public EnemyDefinition Enemy;
+
+        public bool UseSpritePair =>
+            Enemy != null && Enemy.visual.graphicMode == EnemyGraphicMode.SpritePair;
 
         public sealed class CharacterVisual
         {
@@ -21,16 +26,24 @@ namespace TypingRoguelike.Battle
             public Sprite Portrait;
         }
 
-        public static BattleVisualContext FromEncounter(BattleEncounterDefinition enc, RunPartyState party)
+        public static BattleVisualContext FromEncounter(
+            BattleEncounterDefinition enc,
+            RunPartyState party,
+            EnemyDefinition enemyOverride = null)
         {
             var ctx = new BattleVisualContext();
-            if (enc?.enemy != null)
+            var enemy = enemyOverride != null ? enemyOverride : enc?.enemy;
+            ctx.Enemy = enemy;
+            if (enemy != null)
             {
-                ctx.BossIllustration = BattlePortraitResolver.ResolveBossIllustration(enc.enemy);
-                ctx.BossDisplayName = enc.enemy.displayName;
-                ctx.BossEmojiNormal = enc.enemy.emojiNormal;
-                ctx.BossEmojiEnraged = enc.enemy.emojiEnraged;
-                ctx.BossEmojiDefeated = enc.enemy.emojiDefeated;
+                ctx.BattleVisual = enemy.visual.graphicMode == EnemyGraphicMode.SpritePair
+                    ? EnemyBattleVisualKind.StaticIllustration
+                    : enemy.battleVisual;
+                ctx.BossIllustration = BattlePortraitResolver.ResolveBossIllustration(enemy);
+                ctx.BossDisplayName = enemy.displayName;
+                ctx.BossEmojiNormal = enemy.emojiNormal;
+                ctx.BossEmojiEnraged = enemy.emojiEnraged;
+                ctx.BossEmojiDefeated = enemy.emojiDefeated;
             }
 
             if (party != null)
@@ -69,7 +82,7 @@ namespace TypingRoguelike.Battle
             if (!string.IsNullOrWhiteSpace(character?.englishName))
                 return character.englishName.Trim().ToUpperInvariant();
 
-            return character?.characterName switch
+            return StarterCharacters.ArtKey(character?.characterName) switch
             {
                 "アリス" => "ALICE",
                 "エレン" => "ELLEN",

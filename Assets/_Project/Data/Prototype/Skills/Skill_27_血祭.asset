@@ -16,9 +16,10 @@ MonoBehaviour:
   characterName: アリス
   displayName: 血祭
   pattern: 010000000400000001000000
+  damagePercent: 0.18
   damage: 36
-  heal: 12
-  effectText: 36ダメ+12回復
+  heal: 67
+  effectText: 36ダメ+67回復
   effectKind: 0
   effectValue: 0
   effectValueInt: 0

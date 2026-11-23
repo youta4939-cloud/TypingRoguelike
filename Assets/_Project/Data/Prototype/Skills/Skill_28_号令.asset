@@ -16,6 +16,7 @@ MonoBehaviour:
   characterName: アリス
   displayName: 号令
   pattern: 030000000100000000000000
+  damagePercent: 0.11
   damage: 22
   heal: 0
   effectText: 22ダメ+リロール+1

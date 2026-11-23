@@ -28,17 +28,28 @@ namespace TypingRoguelike.EditorTools
             EnsureFolder(ResourcesBattle);
 
             var skills = CreateSkills();
+            var swordsman = SwordsmanSkillAssetBuilder.Sync();
+            var axe = AxeSkillAssetBuilder.Sync();
+            var withSwordsman = new List<SkillDefinition>(skills);
+            if (swordsman != null)
+                withSwordsman.AddRange(swordsman);
+            if (axe != null)
+                withSwordsman.AddRange(axe);
             var chars = CreateCharacters(skills);
             var party = CreateParty(chars, skills);
             var words = CreateWordList();
             var enemyBoss = CreateEnemyBoss();
             var enemyNormal = CreateEnemyNormal();
+            var enemyRush = CreateEnemyRush();
+            var enemyHeavy = CreateEnemyHeavy();
             var enemyElite = CreateEnemyElite();
-            var cardPool = CreateCardPool(skills);
+            var cardPool = CreateCardPool(withSwordsman.ToArray());
             var typingAudio = CreateDefaultTypingAudio();
-            var encounterBoss = CreateEncounter(enemyBoss, words, party, cardPool, typingAudio, "PrototypeBossEncounter", "🔥 ボス戦開始！");
-            var encounterCombat = CreateEncounter(enemyNormal, words, party, cardPool, typingAudio, "PrototypeCombatEncounter", "⚔ 魔物が現れた！");
-            var encounterElite = CreateEncounter(enemyElite, words, party, cardPool, typingAudio, "PrototypeEliteEncounter", "💀 強敵の気配…");
+            var encounterBoss = CreateEncounter(enemyBoss, words, party, cardPool, typingAudio, "PrototypeBossEncounter", "🔥 ボス戦開始！", null);
+            var encounterCombat = CreateEncounter(
+                enemyNormal, words, party, cardPool, typingAudio, "PrototypeCombatEncounter", "⚔ 魔物が現れた！",
+                new[] { enemyNormal, enemyRush, enemyHeavy });
+            var encounterElite = CreateEncounter(enemyElite, words, party, cardPool, typingAudio, "PrototypeEliteEncounter", "💀 強敵の気配…", null);
             CreateDungeonRun(encounterCombat, encounterElite, encounterBoss, cardPool);
             CreateMaterialCatalog();
             RelicCsvImporter.Import(RelicCsvImporter.DefaultCsvPath);
@@ -68,6 +79,7 @@ namespace TypingRoguelike.EditorTools
                 assets[i].displayName = card.name;
                 assets[i].pattern = card.pat;
                 assets[i].damage = card.dmg;
+                assets[i].damagePercent = DamagePercent(card.ch, card.dmg);
                 assets[i].heal = card.heal;
                 assets[i].effectText = card.fx;
                 assets[i].effectKind = card.kind;
@@ -87,13 +99,13 @@ namespace TypingRoguelike.EditorTools
             Card(2, "アリス", "💥ヴォルテックス",
                 new[] { ElementColor.Red, ElementColor.Yellow, ElementColor.Purple, ElementColor.Green, ElementColor.Red },
                 98, 0, "98大ダメ"),
-            Card(3, "エレン", "🍃プチヒール", new[] { ElementColor.Green, ElementColor.Yellow }, 0, 15, "15回復",
+            Card(3, "エレン", "🍃プチヒール", new[] { ElementColor.Green, ElementColor.Yellow }, 0, 83, "83回復",
                 SkillEffectKind.HealOnly),
-            Card(4, "エレン", "🌿ヒール", new[] { ElementColor.Green, ElementColor.Green, ElementColor.Blue }, 0, 28,
-                "28回復", SkillEffectKind.HealOnly),
+            Card(4, "エレン", "🌿ヒール", new[] { ElementColor.Green, ElementColor.Green, ElementColor.Blue }, 0, 167,
+                "167回復", SkillEffectKind.HealOnly),
             Card(5, "エレン", "✨パーフェクトケア",
-                new[] { ElementColor.Green, ElementColor.Yellow, ElementColor.Green, ElementColor.Purple }, 0, 42,
-                "42回復", SkillEffectKind.HealOnly),
+                new[] { ElementColor.Green, ElementColor.Yellow, ElementColor.Green, ElementColor.Purple }, 0, 250,
+                "250回復", SkillEffectKind.HealOnly),
             Card(6, "ルナ", "💧ウォータ", new[] { ElementColor.Blue, ElementColor.Purple }, 28, 0, "28ダメ"),
             Card(7, "ルナ", "⚡バースト", new[] { ElementColor.Yellow, ElementColor.Yellow, ElementColor.Red }, 58, 0,
                 "58ダメ"),
@@ -109,15 +121,15 @@ namespace TypingRoguelike.EditorTools
                 "72ダメ"),
             Card(13, "アリス", "🌪️ソードストーム",
                 new[] { ElementColor.Red, ElementColor.Yellow, ElementColor.Blue, ElementColor.Red }, 68, 0, "68ダメ"),
-            Card(14, "エレン", "💚ライフ", new[] { ElementColor.Green, ElementColor.Blue }, 0, 14, "14回復",
+            Card(14, "エレン", "💚ライフ", new[] { ElementColor.Green, ElementColor.Blue }, 0, 83, "83回復",
                 SkillEffectKind.HealOnly),
-            Card(15, "エレン", "🌸再生", new[] { ElementColor.Green, ElementColor.Purple, ElementColor.Yellow }, 0, 26,
-                "26回復", SkillEffectKind.HealOnly),
+            Card(15, "エレン", "🌸再生", new[] { ElementColor.Green, ElementColor.Purple, ElementColor.Yellow }, 0, 150,
+                "150回復", SkillEffectKind.HealOnly),
             Card(16, "エレン", "🫧バリア", new[] { ElementColor.Blue, ElementColor.Green, ElementColor.Green }, 0, 0,
                 "敵攻撃50%減・10秒", SkillEffectKind.EnemyDelay, 10f, effectValueInt: 50),
             Card(17, "エレン", "🌈オーバーヒール",
-                new[] { ElementColor.Yellow, ElementColor.Green, ElementColor.Blue, ElementColor.Green }, 0, 40,
-                "40回復", SkillEffectKind.HealOnly),
+                new[] { ElementColor.Yellow, ElementColor.Green, ElementColor.Blue, ElementColor.Green }, 0, 233,
+                "233回復", SkillEffectKind.HealOnly),
             Card(18, "ルナ", "❄️アイス", new[] { ElementColor.Blue, ElementColor.Blue }, 26, 0, "26ダメ"),
             Card(19, "ルナ", "🔮ミラー", new[] { ElementColor.Purple, ElementColor.Blue, ElementColor.Yellow }, 48, 0,
                 "48ダメ"),
@@ -135,12 +147,12 @@ namespace TypingRoguelike.EditorTools
                 new[] { ElementColor.Yellow, ElementColor.Blue, ElementColor.Purple, ElementColor.Yellow, ElementColor.Red },
                 100, 0, "100大ダメ"),
             Card(26, "アリス", "裂空斬", new[] { ElementColor.Red, ElementColor.Green, ElementColor.Red }, 40, 0, "40ダメ"),
-            Card(27, "アリス", "血祭", new[] { ElementColor.Red, ElementColor.Purple, ElementColor.Red }, 36, 12, "36ダメ+12回復"),
+            Card(27, "アリス", "血祭", new[] { ElementColor.Red, ElementColor.Purple, ElementColor.Red }, 36, 67, "36ダメ+67回復"),
             Card(28, "アリス", "号令", new[] { ElementColor.Yellow, ElementColor.Red, ElementColor.Blue }, 22, 0, "22ダメ+リロール+1",
                 SkillEffectKind.RerollRestore, effectValueInt: 1),
-            Card(29, "エレン", "応急", new[] { ElementColor.Green, ElementColor.Blue, ElementColor.Yellow }, 0, 22, "22回復",
+            Card(29, "エレン", "応急", new[] { ElementColor.Green, ElementColor.Blue, ElementColor.Yellow }, 0, 125, "125回復",
                 SkillEffectKind.HealOnly),
-            Card(30, "エレン", "清光", new[] { ElementColor.Green, ElementColor.Purple, ElementColor.Green }, 0, 32, "32回復",
+            Card(30, "エレン", "清光", new[] { ElementColor.Green, ElementColor.Purple, ElementColor.Green }, 0, 183, "183回復",
                 SkillEffectKind.HealOnly),
             Card(31, "エレン", "守護", new[] { ElementColor.Blue, ElementColor.Green, ElementColor.Yellow }, 0, 0, "敵攻撃40%減・8秒",
                 SkillEffectKind.EnemyDelay, 8f, effectValueInt: 40),
@@ -153,28 +165,31 @@ namespace TypingRoguelike.EditorTools
         {
             var alice = LoadOrCreate<CharacterDefinition>($"{Root}/Characters/Char_Alice.asset");
             alice.characterName = "アリス";
-            alice.roleLabel = "アタッカー";
-            alice.attack = 7;
-            alice.defense = 3;
-            alice.luck = 2;
+            alice.roleLabel = "攻撃型";
+            alice.hp = 250;
+            alice.attack = 120;
+            alice.defense = 80;
+            alice.luck = 20;
             alice.innateSkill = skills[0];
             EditorUtility.SetDirty(alice);
 
             var ellen = LoadOrCreate<CharacterDefinition>($"{Root}/Characters/Char_Ellen.asset");
             ellen.characterName = "エレン";
-            ellen.roleLabel = "ヒーラー";
-            ellen.attack = 3;
-            ellen.defense = 6;
-            ellen.luck = 2;
+            ellen.roleLabel = "支援型";
+            ellen.hp = 400;
+            ellen.attack = 80;
+            ellen.defense = 200;
+            ellen.luck = 20;
             ellen.innateSkill = skills[3];
             EditorUtility.SetDirty(ellen);
 
             var luna = LoadOrCreate<CharacterDefinition>($"{Root}/Characters/Char_Luna.asset");
             luna.characterName = "ルナ";
-            luna.roleLabel = "メイジ";
-            luna.attack = 5;
-            luna.defense = 3;
-            luna.luck = 8;
+            luna.roleLabel = "バランス型";
+            luna.hp = 350;
+            luna.attack = 100;
+            luna.defense = 120;
+            luna.luck = 80;
             luna.innateSkill = skills[6];
             EditorUtility.SetDirty(luna);
 
@@ -260,6 +275,9 @@ namespace TypingRoguelike.EditorTools
         static EnemyDefinition CreateEnemyBoss()
         {
             var e = LoadOrCreate<EnemyDefinition>($"{Root}/Enemy_PrototypeBoss.asset");
+            e.spawnCategory = EnemySpawnCategory.Boss;
+            e.floorMin = 1;
+            e.floorMax = 99;
             e.displayName = "BOSS";
             e.emojiNormal = "🐲";
             e.emojiEnraged = "🔥🐲";
@@ -270,6 +288,7 @@ namespace TypingRoguelike.EditorTools
             e.attackSpeed = 0.35f;
             e.enragedAttackSpeed = 0.55f;
             e.enrageHpFraction = 0.5f;
+            SetAttackPattern(e, 2f, 5f, 160f, 16f, 450f, 3f, 12f, 0.9f);
             EditorUtility.SetDirty(e);
             return e;
         }
@@ -277,6 +296,9 @@ namespace TypingRoguelike.EditorTools
         static EnemyDefinition CreateEnemyNormal()
         {
             var e = LoadOrCreate<EnemyDefinition>($"{Root}/Enemy_PrototypeNormal.asset");
+            e.spawnCategory = EnemySpawnCategory.Normal;
+            e.floorMin = 1;
+            e.floorMax = 15;
             e.displayName = "魔物";
             e.emojiNormal = "👾";
             e.emojiEnraged = "😈";
@@ -287,13 +309,84 @@ namespace TypingRoguelike.EditorTools
             e.attackSpeed = 0.32f;
             e.enragedAttackSpeed = 0.48f;
             e.enrageHpFraction = 0.45f;
+            SetAttackPattern(e, 2.5f, 4f, 120f, 12f, 240f, 2.5f, 12f, 0.75f);
             EditorUtility.SetDirty(e);
             return e;
+        }
+
+        static EnemyDefinition CreateEnemyRush()
+        {
+            var e = LoadOrCreate<EnemyDefinition>($"{Root}/Enemy_PrototypeRush.asset");
+            e.spawnCategory = EnemySpawnCategory.Normal;
+            e.floorMin = 1;
+            e.floorMax = 15;
+            e.displayName = "速攻型";
+            e.emojiNormal = "👾";
+            e.emojiEnraged = "😈";
+            e.emojiDefeated = "💨";
+            e.maxHp = 260f;
+            e.attackDamage = 12f;
+            e.attackTimerMax = 100f;
+            e.attackSpeed = 0.32f;
+            e.enragedAttackSpeed = 0.48f;
+            e.enrageHpFraction = 0.45f;
+            SetAttackPattern(e, 1.5f, 2.5f, 140f, 0f, 0f, 0f, 0f, 0.75f);
+            EditorUtility.SetDirty(e);
+            return e;
+        }
+
+        static EnemyDefinition CreateEnemyHeavy()
+        {
+            var e = LoadOrCreate<EnemyDefinition>($"{Root}/Enemy_PrototypeHeavy.asset");
+            e.spawnCategory = EnemySpawnCategory.Normal;
+            e.floorMin = 1;
+            e.floorMax = 15;
+            e.displayName = "重撃型";
+            e.emojiNormal = "👾";
+            e.emojiEnraged = "😈";
+            e.emojiDefeated = "💨";
+            e.maxHp = 260f;
+            e.attackDamage = 24f;
+            e.attackTimerMax = 100f;
+            e.attackSpeed = 0.32f;
+            e.enragedAttackSpeed = 0.48f;
+            e.enrageHpFraction = 0.45f;
+            SetAttackPattern(e, 0f, 0f, 0f, 8f, 300f, 2.5f, 6f, 0.75f);
+            EditorUtility.SetDirty(e);
+            return e;
+        }
+
+        static void SetAttackPattern(
+            EnemyDefinition enemy,
+            float opening,
+            float lightInterval,
+            float lightDamage,
+            float heavyInterval,
+            float heavyDamage,
+            float telegraph,
+            float heavyFirst,
+            float enrageInterval)
+        {
+            enemy.lightAttackInterval = lightInterval;
+            enemy.lightAttackDamage = lightDamage;
+            enemy.heavyAttackInterval = heavyInterval;
+            enemy.heavyAttackDamage = heavyDamage;
+            enemy.heavyAttackTelegraphSeconds = telegraph;
+            enemy.heavyAttackFirstSeconds = heavyFirst;
+            enemy.enrageIntervalMultiplier = enrageInterval;
+            if (!EnemyDefinitionAttackUtil.HasConfiguredAttackSlots(enemy))
+                EnemyDefinitionAttackUtil.MigrateLegacyToAttackSlots(enemy);
+            if (opening > 0f && enemy.attacks != null && enemy.attacks.Length > 0 &&
+                enemy.attacks[0].firstDelaySeconds <= 0f)
+                enemy.attacks[0].firstDelaySeconds = opening;
         }
 
         static EnemyDefinition CreateEnemyElite()
         {
             var e = LoadOrCreate<EnemyDefinition>($"{Root}/Enemy_PrototypeElite.asset");
+            e.spawnCategory = EnemySpawnCategory.Elite;
+            e.floorMin = 1;
+            e.floorMax = 99;
             e.displayName = "強敵";
             e.emojiNormal = "🦂";
             e.emojiEnraged = "☠️";
@@ -304,6 +397,7 @@ namespace TypingRoguelike.EditorTools
             e.attackSpeed = 0.38f;
             e.enragedAttackSpeed = 0.58f;
             e.enrageHpFraction = 0.5f;
+            SetAttackPattern(e, 2f, 4f, 160f, 11f, 400f, 2f, 8f, 0.75f);
             EditorUtility.SetDirty(e);
             return e;
         }
@@ -345,22 +439,24 @@ namespace TypingRoguelike.EditorTools
             SkillCardPoolDefinition cardPool,
             TypingAudioDefinition typingAudio,
             string resourceFileName,
-            string startLog)
+            string startLog,
+            EnemyDefinition[] enemyPool)
         {
             var enc = LoadOrCreate<BattleEncounterDefinition>($"{ResourcesBattle}/{resourceFileName}.asset");
             enc.enemy = enemy;
+            enc.enemyPool = enemyPool;
             enc.wordList = words;
             enc.party = party;
             enc.rewardCardPool = cardPool;
             enc.typingAudio = typingAudio;
             enc.rewardChoiceCount = 3;
-            enc.playerMaxHp = 100f;
+            enc.playerMaxHp = 1000f;
             enc.wordClearDamage = 15f;
             enc.rerollsPerBattle = 3;
             enc.enemyTickInterval = 0.05f;
             enc.jackpotMultiplier = resourceFileName.Contains("Boss") ? 2.5f : 2f;
             enc.baseFreezeChance = 0f;
-            enc.freezeChancePerCharacter = 0.000025f;
+            enc.freezeChancePerCharacter = 0.0000075f;
             enc.baseJackpotChanceCap = 0.1f;
             enc.maxFreezeChance = 0.99f;
             enc.startLogMessage = startLog;
@@ -385,11 +481,15 @@ namespace TypingRoguelike.EditorTools
             run.eliteEncounter = elite;
             run.bossEncounter = boss;
             run.sharedRewardPool = pool;
-            run.restHealFraction = 0.15f;
+            run.restHealFraction = 0.2f;
             run.combatEnemyHpMultiplier = 0.72f;
-            run.partyAttackCoefficient = 1f;
+            run.globalEnemyHpScale = 2f;
+            run.partyAttackCoefficient = 0.04f;
             run.partyDefenseCoefficient = 0.5f;
-            run.partyLuckJackpotBonusPerPoint = 0.0005f;
+            run.partyDefenseConstant = 400f;
+            run.baseCritChance = 0f;
+            run.critMultiplier = 1.5f;
+            run.partyLuckJackpotBonusPerPoint = 0f;
             run.combatCoinReward = 8;
             run.eliteCoinReward = 15;
             run.treasureCoinReward = 10;
@@ -459,6 +559,19 @@ namespace TypingRoguelike.EditorTools
                 this.effectValue = effectValue;
                 this.effectValueInt = effectValueInt;
             }
+        }
+
+        static float DamagePercent(string character, int damage)
+        {
+            if (damage <= 0)
+                return 0f;
+            var atk = character switch
+            {
+                "アリス" => 120,
+                "エレン" => 80,
+                _ => 100
+            };
+            return damage / (float)atk;
         }
 
         static SkillCardTemplate Card(

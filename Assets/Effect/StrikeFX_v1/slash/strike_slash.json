@@ -1,0 +1,45 @@
+{
+  "kind": "slash",
+  "enum": "EnemyStrikeEffectKind.Slash",
+  "label_ja": "斬る",
+  "frame_count": 13,
+  "fps": 30,
+  "duration_sec": 0.433,
+  "frame_size_px": [
+    512,
+    512
+  ],
+  "sheet": {
+    "columns": 5,
+    "rows": 3,
+    "order": "left-to-right, top-to-bottom",
+    "cell_px": 512
+  },
+  "pivot": [
+    0.5,
+    0.5
+  ],
+  "pivot_note": "フレーム中心 = 着弾点に置く",
+  "impact_frame": 1,
+  "start_offset_sec": -0.0333,
+  "start_note": "着弾時刻 T_hit の (impact_frame/fps) 秒前から再生開始。impact_frame が T_hit に一致する。",
+  "recommended_display_size_eh": 1.452,
+  "recommended_display_size_px_on_1664x929": 720,
+  "reference_center_px_on_1664x929": [
+    1000,
+    430
+  ],
+  "reference_center_offset_from_HOME_eh": [
+    0.01,
+    -0.444
+  ],
+  "intensity_scale": {
+    "Small": 0.67,
+    "Medium": 1.0,
+    "Large": 1.44
+  },
+  "alpha_over_ui": 0.35,
+  "blend": "alpha (straight). Additive not required.",
+  "color": "mask: RGB=heat(0..1 gray), A=coverage. Tint with ramps/StrikeRamp_<Palette>.png (gradient map) or use sheets/<Palette> pre-coloured.",
+  "loop": false
+}

@@ -1,0 +1,2377 @@
+{
+ "title": "Demon girl standing portrait rig v10 (社外秘)",
+ "version": "v10",
+ "canvas_px": [
+  1200,
+  1600
+ ],
+ "pixels_per_unit": 100,
+ "coordinates": {
+  "canvas": "source pixels 1200x1600, origin top-left, y DOWN; angles + = clockwise on screen (all *_canvas_px values and all formulas/anim data)",
+  "rig_local": "Unity: x = px/PPU, y = -py/PPU (origin = canvas top-left, y UP). Unity angle = -canvas angle; Unity y offset = -canvas dy.",
+  "sprite_pivot": "sprite_pivot_normalized is Unity Sprite pivot (0..1 from rect bottom-left).",
+  "mesh": "vertices_sprite_px: origin = sprite rect bottom-left, y up, in px. Unity Sprite local position = (v - pivot_px_in_rect)/PPU."
+ },
+ "render_order": "sorting_order ascending = back to front (0 = wing_L back-most, 32 = hand_L front-most). head_hurt replaces head at the same order.",
+ "parts": [
+  {
+   "name": "wing_L",
+   "sprite": "Sprites/wing_L.png",
+   "sorting_order": 0,
+   "deformer": "WL",
+   "rect_px": {
+    "x": 207,
+    "y": 453,
+    "w": 69,
+    "h": 74
+   },
+   "pivot_canvas_px": [
+    252.0,
+    500.0
+   ],
+   "sprite_pivot_normalized": [
+    0.65217,
+    0.36486
+   ],
+   "pivot_rig_local": [
+    2.52,
+    -5.0
+   ],
+   "mode": "skinned",
+   "attach_bone": null,
+   "mesh": "Data/portrait_meshes_v10.json#wing_L",
+   "routeB_bone": "WL_0"
+  },
+  {
+   "name": "wing_R",
+   "sprite": "Sprites/wing_R.png",
+   "sorting_order": 1,
+   "deformer": "WR",
+   "rect_px": {
+    "x": 785,
+    "y": 434,
+    "w": 222,
+    "h": 160
+   },
+   "pivot_canvas_px": [
+    815.0,
+    560.0
+   ],
+   "sprite_pivot_normalized": [
+    0.13514,
+    0.2125
+   ],
+   "pivot_rig_local": [
+    8.15,
+    -5.6
+   ],
+   "mode": "skinned",
+   "attach_bone": null,
+   "mesh": "Data/portrait_meshes_v10.json#wing_R",
+   "routeB_bone": "WR_1"
+  },
+  {
+   "name": "tail_1",
+   "sprite": "Sprites/tail_1.png",
+   "sorting_order": 2,
+   "deformer": "TAIL",
+   "rect_px": {
+    "x": 930,
+    "y": 740,
+    "w": 93,
+    "h": 161
+   },
+   "pivot_canvas_px": [
+    1000.0,
+    762.0
+   ],
+   "sprite_pivot_normalized": [
+    0.75269,
+    0.86335
+   ],
+   "pivot_rig_local": [
+    10.0,
+    -7.62
+   ],
+   "mode": "skinned",
+   "attach_bone": null,
+   "mesh": "Data/portrait_meshes_v10.json#tail_1",
+   "routeB_bone": "TAIL_0"
+  },
+  {
+   "name": "tail_2",
+   "sprite": "Sprites/tail_2.png",
+   "sorting_order": 3,
+   "deformer": "TAIL",
+   "rect_px": {
+    "x": 959,
+    "y": 882,
+    "w": 63,
+    "h": 124
+   },
+   "pivot_canvas_px": [
+    1013.0,
+    882.0
+   ],
+   "sprite_pivot_normalized": [
+    0.85714,
+    1.0
+   ],
+   "pivot_rig_local": [
+    10.13,
+    -8.82
+   ],
+   "mode": "skinned",
+   "attach_bone": null,
+   "mesh": "Data/portrait_meshes_v10.json#tail_2",
+   "routeB_bone": "TAIL_3"
+  },
+  {
+   "name": "tail_3",
+   "sprite": "Sprites/tail_3.png",
+   "sorting_order": 4,
+   "deformer": "TAIL",
+   "rect_px": {
+    "x": 648,
+    "y": 991,
+    "w": 323,
+    "h": 89
+   },
+   "pivot_canvas_px": [
+    976.0,
+    990.0
+   ],
+   "sprite_pivot_normalized": [
+    1.01548,
+    1.01124
+   ],
+   "pivot_rig_local": [
+    9.76,
+    -9.9
+   ],
+   "mode": "skinned",
+   "attach_bone": null,
+   "mesh": "Data/portrait_meshes_v10.json#tail_3",
+   "routeB_bone": "TAIL_5"
+  },
+  {
+   "name": "tail_4",
+   "sprite": "Sprites/tail_4.png",
+   "sorting_order": 5,
+   "deformer": "TAIL",
+   "rect_px": {
+    "x": 531,
+    "y": 1058,
+    "w": 121,
+    "h": 145
+   },
+   "pivot_canvas_px": [
+    690.0,
+    1053.0
+   ],
+   "sprite_pivot_normalized": [
+    1.31405,
+    1.03448
+   ],
+   "pivot_rig_local": [
+    6.9,
+    -10.53
+   ],
+   "mode": "skinned",
+   "attach_bone": null,
+   "mesh": "Data/portrait_meshes_v10.json#tail_4",
+   "routeB_bone": "TAIL_8"
+  },
+  {
+   "name": "tail_spade",
+   "sprite": "Sprites/tail_spade.png",
+   "sorting_order": 6,
+   "deformer": "TAIL",
+   "rect_px": {
+    "x": 542,
+    "y": 1175,
+    "w": 85,
+    "h": 75
+   },
+   "pivot_canvas_px": [
+    545.0,
+    1165.0
+   ],
+   "sprite_pivot_normalized": [
+    0.03529,
+    1.13333
+   ],
+   "pivot_rig_local": [
+    5.45,
+    -11.65
+   ],
+   "mode": "skinned",
+   "attach_bone": null,
+   "mesh": "Data/portrait_meshes_v10.json#tail_spade",
+   "routeB_bone": "TAIL_8"
+  },
+  {
+   "name": "drillL_3",
+   "sprite": "Sprites/drillL_3.png",
+   "sorting_order": 7,
+   "deformer": "DL",
+   "rect_px": {
+    "x": 198,
+    "y": 555,
+    "w": 195,
+    "h": 411
+   },
+   "pivot_canvas_px": [
+    262.0,
+    712.0
+   ],
+   "sprite_pivot_normalized": [
+    0.32821,
+    0.618
+   ],
+   "pivot_rig_local": [
+    2.62,
+    -7.12
+   ],
+   "mode": "skinned",
+   "attach_bone": null,
+   "mesh": "Data/portrait_meshes_v10.json#drillL_3",
+   "routeB_bone": "DL_6"
+  },
+  {
+   "name": "drillL_2",
+   "sprite": "Sprites/drillL_2.png",
+   "sorting_order": 8,
+   "deformer": "DL",
+   "rect_px": {
+    "x": 218,
+    "y": 437,
+    "w": 153,
+    "h": 279
+   },
+   "pivot_canvas_px": [
+    300.0,
+    455.0
+   ],
+   "sprite_pivot_normalized": [
+    0.53595,
+    0.93548
+   ],
+   "pivot_rig_local": [
+    3.0,
+    -4.55
+   ],
+   "mode": "skinned",
+   "attach_bone": null,
+   "mesh": "Data/portrait_meshes_v10.json#drillL_2",
+   "routeB_bone": "DL_4"
+  },
+  {
+   "name": "drillR_3",
+   "sprite": "Sprites/drillR_3.png",
+   "sorting_order": 9,
+   "deformer": "DR",
+   "rect_px": {
+    "x": 818,
+    "y": 798,
+    "w": 67,
+    "h": 127
+   },
+   "pivot_canvas_px": [
+    848.0,
+    850.0
+   ],
+   "sprite_pivot_normalized": [
+    0.44776,
+    0.59055
+   ],
+   "pivot_rig_local": [
+    8.48,
+    -8.5
+   ],
+   "mode": "skinned",
+   "attach_bone": null,
+   "mesh": "Data/portrait_meshes_v10.json#drillR_3",
+   "routeB_bone": "DR_6"
+  },
+  {
+   "name": "drillR_2",
+   "sprite": "Sprites/drillR_2.png",
+   "sorting_order": 10,
+   "deformer": "DR",
+   "rect_px": {
+    "x": 761,
+    "y": 747,
+    "w": 140,
+    "h": 115
+   },
+   "pivot_canvas_px": [
+    828.0,
+    772.0
+   ],
+   "sprite_pivot_normalized": [
+    0.47857,
+    0.78261
+   ],
+   "pivot_rig_local": [
+    8.28,
+    -7.72
+   ],
+   "mode": "skinned",
+   "attach_bone": null,
+   "mesh": "Data/portrait_meshes_v10.json#drillR_2",
+   "routeB_bone": "DR_5"
+  },
+  {
+   "name": "leg_L",
+   "sprite": "Sprites/leg_L.png",
+   "sorting_order": 11,
+   "deformer": "STATIC",
+   "rect_px": {
+    "x": 199,
+    "y": 715,
+    "w": 402,
+    "h": 844
+   },
+   "pivot_canvas_px": [
+    485.0,
+    790.0
+   ],
+   "sprite_pivot_normalized": [
+    0.71144,
+    0.91114
+   ],
+   "pivot_rig_local": [
+    4.85,
+    -7.9
+   ],
+   "mode": "skinned",
+   "attach_bone": null,
+   "mesh": "Data/portrait_meshes_v10.json#leg_L",
+   "routeB_bone": "Anchor"
+  },
+  {
+   "name": "leg_R",
+   "sprite": "Sprites/leg_R.png",
+   "sorting_order": 12,
+   "deformer": "STATIC",
+   "rect_px": {
+    "x": 617,
+    "y": 701,
+    "w": 426,
+    "h": 856
+   },
+   "pivot_canvas_px": [
+    715.0,
+    790.0
+   ],
+   "sprite_pivot_normalized": [
+    0.23005,
+    0.89603
+   ],
+   "pivot_rig_local": [
+    7.15,
+    -7.9
+   ],
+   "mode": "skinned",
+   "attach_bone": null,
+   "mesh": "Data/portrait_meshes_v10.json#leg_R",
+   "routeB_bone": "Anchor"
+  },
+  {
+   "name": "garter_L",
+   "sprite": "Sprites/garter_L.png",
+   "sorting_order": 13,
+   "deformer": "STATIC",
+   "rect_px": {
+    "x": 461,
+    "y": 853,
+    "w": 27,
+    "h": 57
+   },
+   "pivot_canvas_px": [
+    477.0,
+    830.0
+   ],
+   "sprite_pivot_normalized": [
+    0.59259,
+    1.40351
+   ],
+   "pivot_rig_local": [
+    4.77,
+    -8.3
+   ],
+   "mode": "skinned",
+   "attach_bone": null,
+   "mesh": "Data/portrait_meshes_v10.json#garter_L",
+   "routeB_bone": "Anchor"
+  },
+  {
+   "name": "garter_R",
+   "sprite": "Sprites/garter_R.png",
+   "sorting_order": 14,
+   "deformer": "STATIC",
+   "rect_px": {
+    "x": 692,
+    "y": 819,
+    "w": 44,
+    "h": 75
+   },
+   "pivot_canvas_px": [
+    707.0,
+    830.0
+   ],
+   "sprite_pivot_normalized": [
+    0.34091,
+    0.85333
+   ],
+   "pivot_rig_local": [
+    7.07,
+    -8.3
+   ],
+   "mode": "skinned",
+   "attach_bone": null,
+   "mesh": "Data/portrait_meshes_v10.json#garter_R",
+   "routeB_bone": "Anchor"
+  },
+  {
+   "name": "hair_back",
+   "sprite": "Sprites/hair_back.png",
+   "sorting_order": 15,
+   "deformer": "HEAD",
+   "rect_px": {
+    "x": 381,
+    "y": 58,
+    "w": 374,
+    "h": 396
+   },
+   "pivot_canvas_px": [
+    560.0,
+    372.0
+   ],
+   "sprite_pivot_normalized": [
+    0.47861,
+    0.20707
+   ],
+   "pivot_rig_local": [
+    5.6,
+    -3.72
+   ],
+   "mode": "rigid",
+   "attach_bone": "Head",
+   "routeB_bone": "Head"
+  },
+  {
+   "name": "halberd_upper",
+   "sprite": "Sprites/halberd_upper.png",
+   "sorting_order": 16,
+   "deformer": "HALB",
+   "rect_px": {
+    "x": 54,
+    "y": 15,
+    "w": 445,
+    "h": 355
+   },
+   "pivot_canvas_px": [
+    410.0,
+    300.0
+   ],
+   "sprite_pivot_normalized": [
+    0.8,
+    0.19718
+   ],
+   "pivot_rig_local": [
+    4.1,
+    -3.0
+   ],
+   "mode": "rigid",
+   "attach_bone": "Halberd",
+   "routeB_bone": "Halberd"
+  },
+  {
+   "name": "drillL_1",
+   "sprite": "Sprites/drillL_1.png",
+   "sorting_order": 17,
+   "deformer": "DL",
+   "rect_px": {
+    "x": 336,
+    "y": 95,
+    "w": 185,
+    "h": 337
+   },
+   "pivot_canvas_px": [
+    468.0,
+    128.0
+   ],
+   "sprite_pivot_normalized": [
+    0.71351,
+    0.90208
+   ],
+   "pivot_rig_local": [
+    4.68,
+    -1.28
+   ],
+   "mode": "skinned",
+   "attach_bone": null,
+   "mesh": "Data/portrait_meshes_v10.json#drillL_1",
+   "routeB_bone": "DL_1"
+  },
+  {
+   "name": "torso",
+   "sprite": "Sprites/torso.png",
+   "sorting_order": 18,
+   "deformer": "TORSO",
+   "rect_px": {
+    "x": 355,
+    "y": 292,
+    "w": 417,
+    "h": 397
+   },
+   "pivot_canvas_px": [
+    560.0,
+    640.0
+   ],
+   "sprite_pivot_normalized": [
+    0.49161,
+    0.12343
+   ],
+   "pivot_rig_local": [
+    5.6,
+    -6.4
+   ],
+   "mode": "skinned",
+   "attach_bone": null,
+   "mesh": "Data/portrait_meshes_v10.json#torso",
+   "routeB_bone": "Body"
+  },
+  {
+   "name": "drillR_1",
+   "sprite": "Sprites/drillR_1.png",
+   "sorting_order": 19,
+   "deformer": "DR",
+   "rect_px": {
+    "x": 640,
+    "y": 100,
+    "w": 119,
+    "h": 353
+   },
+   "pivot_canvas_px": [
+    706.0,
+    150.0
+   ],
+   "sprite_pivot_normalized": [
+    0.55462,
+    0.85836
+   ],
+   "pivot_rig_local": [
+    7.06,
+    -1.5
+   ],
+   "mode": "skinned",
+   "attach_bone": null,
+   "mesh": "Data/portrait_meshes_v10.json#drillR_1",
+   "routeB_bone": "DR_0"
+  },
+  {
+   "name": "skirt",
+   "sprite": "Sprites/skirt.png",
+   "sorting_order": 20,
+   "deformer": "SKIRT",
+   "rect_px": {
+    "x": 455,
+    "y": 616,
+    "w": 280,
+    "h": 303
+   },
+   "pivot_canvas_px": [
+    565.0,
+    650.0
+   ],
+   "sprite_pivot_normalized": [
+    0.39286,
+    0.88779
+   ],
+   "pivot_rig_local": [
+    5.65,
+    -6.5
+   ],
+   "mode": "skinned",
+   "attach_bone": null,
+   "mesh": "Data/portrait_meshes_v10.json#skirt",
+   "routeB_bone": "SKIRT_1"
+  },
+  {
+   "name": "skirt_frill",
+   "sprite": "Sprites/skirt_frill.png",
+   "sorting_order": 21,
+   "deformer": "SKIRT",
+   "rect_px": {
+    "x": 404,
+    "y": 555,
+    "w": 453,
+    "h": 271
+   },
+   "pivot_canvas_px": [
+    565.0,
+    650.0
+   ],
+   "sprite_pivot_normalized": [
+    0.35541,
+    0.64945
+   ],
+   "pivot_rig_local": [
+    5.65,
+    -6.5
+   ],
+   "mode": "skinned",
+   "attach_bone": null,
+   "mesh": "Data/portrait_meshes_v10.json#skirt_frill",
+   "routeB_bone": "SKIRT_3"
+  },
+  {
+   "name": "ribbon",
+   "sprite": "Sprites/ribbon.png",
+   "sorting_order": 22,
+   "deformer": "TORSO",
+   "rect_px": {
+    "x": 467,
+    "y": 383,
+    "w": 124,
+    "h": 156
+   },
+   "pivot_canvas_px": [
+    522.0,
+    402.0
+   ],
+   "sprite_pivot_normalized": [
+    0.44355,
+    0.87821
+   ],
+   "pivot_rig_local": [
+    5.22,
+    -4.02
+   ],
+   "mode": "skinned",
+   "attach_bone": null,
+   "mesh": "Data/portrait_meshes_v10.json#ribbon",
+   "routeB_bone": "Body"
+  },
+  {
+   "name": "sleeveR_upper",
+   "sprite": "Sprites/sleeveR_upper.png",
+   "sorting_order": 23,
+   "deformer": "SLVR",
+   "rect_px": {
+    "x": 666,
+    "y": 448,
+    "w": 296,
+    "h": 322
+   },
+   "pivot_canvas_px": [
+    722.0,
+    482.0
+   ],
+   "sprite_pivot_normalized": [
+    0.18919,
+    0.89441
+   ],
+   "pivot_rig_local": [
+    7.22,
+    -4.82
+   ],
+   "mode": "skinned",
+   "attach_bone": null,
+   "mesh": "Data/portrait_meshes_v10.json#sleeveR_upper",
+   "routeB_bone": "SLVR_0"
+  },
+  {
+   "name": "sleeveR_lower",
+   "sprite": "Sprites/sleeveR_lower.png",
+   "sorting_order": 24,
+   "deformer": "SLVR",
+   "rect_px": {
+    "x": 788,
+    "y": 702,
+    "w": 191,
+    "h": 110
+   },
+   "pivot_canvas_px": [
+    860.0,
+    758.0
+   ],
+   "sprite_pivot_normalized": [
+    0.37696,
+    0.49091
+   ],
+   "pivot_rig_local": [
+    8.6,
+    -7.58
+   ],
+   "mode": "skinned",
+   "attach_bone": null,
+   "mesh": "Data/portrait_meshes_v10.json#sleeveR_lower",
+   "routeB_bone": "SLVR_2"
+  },
+  {
+   "name": "halberd_lower",
+   "sprite": "Sprites/halberd_lower.png",
+   "sorting_order": 25,
+   "deformer": "HALB",
+   "rect_px": {
+    "x": 776,
+    "y": 508,
+    "w": 410,
+    "h": 300
+   },
+   "pivot_canvas_px": [
+    410.0,
+    300.0
+   ],
+   "sprite_pivot_normalized": [
+    -0.89268,
+    1.69333
+   ],
+   "pivot_rig_local": [
+    4.1,
+    -3.0
+   ],
+   "mode": "rigid",
+   "attach_bone": "Halberd",
+   "routeB_bone": "Halberd"
+  },
+  {
+   "name": "hand_R",
+   "sprite": "Sprites/hand_R.png",
+   "sorting_order": 26,
+   "deformer": "HALB",
+   "rect_px": {
+    "x": 928,
+    "y": 634,
+    "w": 98,
+    "h": 97
+   },
+   "pivot_canvas_px": [
+    950.0,
+    675.0
+   ],
+   "sprite_pivot_normalized": [
+    0.22449,
+    0.57732
+   ],
+   "pivot_rig_local": [
+    9.5,
+    -6.75
+   ],
+   "mode": "rigid",
+   "attach_bone": "Halberd",
+   "routeB_bone": "Halberd"
+  },
+  {
+   "name": "sleeveL_upper",
+   "sprite": "Sprites/sleeveL_upper.png",
+   "sorting_order": 27,
+   "deformer": "SLVL",
+   "rect_px": {
+    "x": 236,
+    "y": 300,
+    "w": 202,
+    "h": 297
+   },
+   "pivot_canvas_px": [
+    395.0,
+    352.0
+   ],
+   "sprite_pivot_normalized": [
+    0.78713,
+    0.82492
+   ],
+   "pivot_rig_local": [
+    3.95,
+    -3.52
+   ],
+   "mode": "skinned",
+   "attach_bone": null,
+   "mesh": "Data/portrait_meshes_v10.json#sleeveL_upper",
+   "routeB_bone": "SLVL_1"
+  },
+  {
+   "name": "sleeveL_lower",
+   "sprite": "Sprites/sleeveL_lower.png",
+   "sorting_order": 28,
+   "deformer": "SLVL",
+   "rect_px": {
+    "x": 236,
+    "y": 478,
+    "w": 151,
+    "h": 219
+   },
+   "pivot_canvas_px": [
+    305.0,
+    545.0
+   ],
+   "sprite_pivot_normalized": [
+    0.45695,
+    0.69406
+   ],
+   "pivot_rig_local": [
+    3.05,
+    -5.45
+   ],
+   "mode": "skinned",
+   "attach_bone": null,
+   "mesh": "Data/portrait_meshes_v10.json#sleeveL_lower",
+   "routeB_bone": "SLVL_2"
+  },
+  {
+   "name": "sidelock_L",
+   "sprite": "Sprites/sidelock_L.png",
+   "sorting_order": 29,
+   "deformer": "SLL",
+   "rect_px": {
+    "x": 473,
+    "y": 268,
+    "w": 86,
+    "h": 179
+   },
+   "pivot_canvas_px": [
+    492.0,
+    300.0
+   ],
+   "sprite_pivot_normalized": [
+    0.22093,
+    0.82123
+   ],
+   "pivot_rig_local": [
+    4.92,
+    -3.0
+   ],
+   "mode": "skinned",
+   "attach_bone": null,
+   "mesh": "Data/portrait_meshes_v10.json#sidelock_L",
+   "routeB_bone": "SLL_0"
+  },
+  {
+   "name": "sidelock_R",
+   "sprite": "Sprites/sidelock_R.png",
+   "sorting_order": 30,
+   "deformer": "SLR",
+   "rect_px": {
+    "x": 592,
+    "y": 101,
+    "w": 121,
+    "h": 353
+   },
+   "pivot_canvas_px": [
+    655.0,
+    245.0
+   ],
+   "sprite_pivot_normalized": [
+    0.52066,
+    0.59207
+   ],
+   "pivot_rig_local": [
+    6.55,
+    -2.45
+   ],
+   "mode": "skinned",
+   "attach_bone": null,
+   "mesh": "Data/portrait_meshes_v10.json#sidelock_R",
+   "routeB_bone": "SLR_0"
+  },
+  {
+   "name": "head",
+   "sprite": "Sprites/head.png",
+   "sorting_order": 31,
+   "deformer": "HEAD",
+   "rect_px": {
+    "x": 423,
+    "y": 51,
+    "w": 296,
+    "h": 335
+   },
+   "pivot_canvas_px": [
+    560.0,
+    372.0
+   ],
+   "sprite_pivot_normalized": [
+    0.46284,
+    0.04179
+   ],
+   "pivot_rig_local": [
+    5.6,
+    -3.72
+   ],
+   "mode": "rigid",
+   "attach_bone": "Head",
+   "routeB_bone": "Head",
+   "variants": {
+    "Default": "Sprites/head.png",
+    "Hurt": "Sprites/head_hurt.png"
+   }
+  },
+  {
+   "name": "hand_L",
+   "sprite": "Sprites/hand_L.png",
+   "sorting_order": 32,
+   "deformer": "HALB",
+   "rect_px": {
+    "x": 331,
+    "y": 255,
+    "w": 118,
+    "h": 102
+   },
+   "pivot_canvas_px": [
+    410.0,
+    300.0
+   ],
+   "sprite_pivot_normalized": [
+    0.66949,
+    0.55882
+   ],
+   "pivot_rig_local": [
+    4.1,
+    -3.0
+   ],
+   "mode": "rigid",
+   "attach_bone": "Halberd",
+   "routeB_bone": "Halberd"
+  }
+ ],
+ "bones": [
+  {
+   "name": "Anchor",
+   "parent": null,
+   "head_canvas_px": [
+    0.0,
+    0.0
+   ],
+   "head_rig_local": [
+    0.0,
+    -0.0
+   ],
+   "kind": "static",
+   "note": "rig root = canvas top-left. never moves (legs blend to it)"
+  },
+  {
+   "name": "Groove",
+   "parent": "Anchor",
+   "head_canvas_px": [
+    0.0,
+    0.0
+   ],
+   "head_rig_local": [
+    0.0,
+    -0.0
+   ],
+   "kind": "driver",
+   "note": "translation (hipx, bob) px every frame (canvas y-down: +bob = down)"
+  },
+  {
+   "name": "Body",
+   "parent": "Groove",
+   "head_canvas_px": [
+    565.0,
+    800.0
+   ],
+   "head_rig_local": [
+    5.65,
+    -8.0
+   ],
+   "kind": "driver",
+   "note": "rotation = lean about pelvis",
+   "tail_canvas_px": [
+    565.0,
+    560.0
+   ],
+   "length_px": 240.0,
+   "rest_dir_unity_deg": 90.0
+  },
+  {
+   "name": "BreathY",
+   "parent": "Body",
+   "head_canvas_px": [
+    560.0,
+    720.0
+   ],
+   "head_rig_local": [
+    5.6,
+    -7.2
+   ],
+   "kind": "helper",
+   "note": "localPosition offset = 3*(0, -BREATH_DY*breath) px (weights are /3)"
+  },
+  {
+   "name": "BreathX",
+   "parent": "Body",
+   "head_canvas_px": [
+    560.0,
+    520.0
+   ],
+   "head_rig_local": [
+    5.6,
+    -5.2
+   ],
+   "kind": "helper",
+   "note": "localScale.x = 1 + 3*BREATH_DX*breath about x=560 (weights are /3)"
+  },
+  {
+   "name": "ChestSoft",
+   "parent": "Body",
+   "head_canvas_px": [
+    540.0,
+    560.0
+   ],
+   "head_rig_local": [
+    5.4,
+    -5.6
+   ],
+   "kind": "helper",
+   "note": "localPosition offset = 3*(chest_x, chest_y) px from the chest spring (weights are /3)"
+  },
+  {
+   "name": "Head",
+   "parent": "Body",
+   "head_canvas_px": [
+    560.0,
+    372.0
+   ],
+   "head_rig_local": [
+    5.6,
+    -3.72
+   ],
+   "kind": "driver",
+   "note": "localPosition offset = breath_disp(neck); rotation = tilt. rigid: head/hair_back sprites + DL/DR/SLL/SLR chains",
+   "tail_canvas_px": [
+    575.0,
+    120.0
+   ],
+   "length_px": 252.45,
+   "rest_dir_unity_deg": 86.594
+  },
+  {
+   "name": "Halberd",
+   "parent": "Body",
+   "head_canvas_px": [
+    400.0,
+    320.0
+   ],
+   "head_rig_local": [
+    4.0,
+    -3.2
+   ],
+   "kind": "driver",
+   "note": "localPosition offset = breath_disp(400,320); rotation = halb. rigid group hand_L, halberd_upper, halberd_lower, hand_R + SLVL chain",
+   "tail_canvas_px": [
+    1150.0,
+    780.0
+   ],
+   "length_px": 879.83,
+   "rest_dir_unity_deg": -31.522
+  },
+  {
+   "name": "DL_0",
+   "parent": "Head",
+   "head_canvas_px": [
+    468.0,
+    128.0
+   ],
+   "head_rig_local": [
+    4.68,
+    -1.28
+   ],
+   "kind": "fixed",
+   "note": "",
+   "tail_canvas_px": [
+    430.0,
+    230.0
+   ],
+   "length_px": 108.85,
+   "rest_dir_unity_deg": -110.433
+  },
+  {
+   "name": "DL_1",
+   "parent": "DL_0",
+   "head_canvas_px": [
+    430.0,
+    230.0
+   ],
+   "head_rig_local": [
+    4.3,
+    -2.3
+   ],
+   "kind": "spring",
+   "note": "",
+   "tail_canvas_px": [
+    395.0,
+    340.0
+   ],
+   "length_px": 115.43,
+   "rest_dir_unity_deg": -107.65,
+   "spring": {
+    "f_hz": 1.7,
+    "damping": 0.55,
+    "idle_amp_deg": 0.24,
+    "idle_phase_rad": 0.0,
+    "inertia_gain": 0.117,
+    "soft_limit_deg": 10
+   }
+  },
+  {
+   "name": "DL_2",
+   "parent": "DL_1",
+   "head_canvas_px": [
+    395.0,
+    340.0
+   ],
+   "head_rig_local": [
+    3.95,
+    -3.4
+   ],
+   "kind": "spring",
+   "note": "",
+   "tail_canvas_px": [
+    330.0,
+    450.0
+   ],
+   "length_px": 127.77,
+   "rest_dir_unity_deg": -120.579,
+   "spring": {
+    "f_hz": 1.6,
+    "damping": 0.55,
+    "idle_amp_deg": 0.3,
+    "idle_phase_rad": 0.35,
+    "inertia_gain": 0.117,
+    "soft_limit_deg": 10
+   }
+  },
+  {
+   "name": "DL_3",
+   "parent": "DL_2",
+   "head_canvas_px": [
+    330.0,
+    450.0
+   ],
+   "head_rig_local": [
+    3.3,
+    -4.5
+   ],
+   "kind": "spring",
+   "note": "",
+   "tail_canvas_px": [
+    285.0,
+    560.0
+   ],
+   "length_px": 118.85,
+   "rest_dir_unity_deg": -112.249,
+   "spring": {
+    "f_hz": 1.5,
+    "damping": 0.55,
+    "idle_amp_deg": 0.36,
+    "idle_phase_rad": 0.7,
+    "inertia_gain": 0.117,
+    "soft_limit_deg": 10
+   }
+  },
+  {
+   "name": "DL_4",
+   "parent": "DL_3",
+   "head_canvas_px": [
+    285.0,
+    560.0
+   ],
+   "head_rig_local": [
+    2.85,
+    -5.6
+   ],
+   "kind": "spring",
+   "note": "",
+   "tail_canvas_px": [
+    270.0,
+    680.0
+   ],
+   "length_px": 120.93,
+   "rest_dir_unity_deg": -97.125,
+   "spring": {
+    "f_hz": 1.4,
+    "damping": 0.55,
+    "idle_amp_deg": 0.42,
+    "idle_phase_rad": 1.05,
+    "inertia_gain": 0.1365,
+    "soft_limit_deg": 10
+   }
+  },
+  {
+   "name": "DL_5",
+   "parent": "DL_4",
+   "head_canvas_px": [
+    270.0,
+    680.0
+   ],
+   "head_rig_local": [
+    2.7,
+    -6.8
+   ],
+   "kind": "spring",
+   "note": "",
+   "tail_canvas_px": [
+    285.0,
+    800.0
+   ],
+   "length_px": 120.93,
+   "rest_dir_unity_deg": -82.875,
+   "spring": {
+    "f_hz": 1.3,
+    "damping": 0.55,
+    "idle_amp_deg": 0.66,
+    "idle_phase_rad": 1.4,
+    "inertia_gain": 0.468,
+    "soft_limit_deg": 10
+   }
+  },
+  {
+   "name": "DL_6",
+   "parent": "DL_5",
+   "head_canvas_px": [
+    285.0,
+    800.0
+   ],
+   "head_rig_local": [
+    2.85,
+    -8.0
+   ],
+   "kind": "spring",
+   "note": "",
+   "tail_canvas_px": [
+    300.0,
+    940.0
+   ],
+   "length_px": 140.8,
+   "rest_dir_unity_deg": -83.884,
+   "spring": {
+    "f_hz": 1.2,
+    "damping": 0.55,
+    "idle_amp_deg": 0.78,
+    "idle_phase_rad": 1.75,
+    "inertia_gain": 0.546,
+    "soft_limit_deg": 10
+   }
+  },
+  {
+   "name": "DR_0",
+   "parent": "Head",
+   "head_canvas_px": [
+    706.0,
+    150.0
+   ],
+   "head_rig_local": [
+    7.06,
+    -1.5
+   ],
+   "kind": "fixed",
+   "note": "",
+   "tail_canvas_px": [
+    735.0,
+    250.0
+   ],
+   "length_px": 104.12,
+   "rest_dir_unity_deg": -73.828
+  },
+  {
+   "name": "DR_1",
+   "parent": "DR_0",
+   "head_canvas_px": [
+    735.0,
+    250.0
+   ],
+   "head_rig_local": [
+    7.35,
+    -2.5
+   ],
+   "kind": "spring",
+   "note": "",
+   "tail_canvas_px": [
+    748.0,
+    350.0
+   ],
+   "length_px": 100.84,
+   "rest_dir_unity_deg": -82.593,
+   "spring": {
+    "f_hz": 1.8,
+    "damping": 0.55,
+    "idle_amp_deg": 0.3,
+    "idle_phase_rad": 0.2,
+    "inertia_gain": 0.39,
+    "soft_limit_deg": 10
+   }
+  },
+  {
+   "name": "DR_2",
+   "parent": "DR_1",
+   "head_canvas_px": [
+    748.0,
+    350.0
+   ],
+   "head_rig_local": [
+    7.48,
+    -3.5
+   ],
+   "kind": "spring",
+   "note": "",
+   "tail_canvas_px": [
+    752.0,
+    450.0
+   ],
+   "length_px": 100.08,
+   "rest_dir_unity_deg": -87.709,
+   "spring": {
+    "f_hz": 1.7,
+    "damping": 0.55,
+    "idle_amp_deg": 0.36,
+    "idle_phase_rad": 0.55,
+    "inertia_gain": 0.39,
+    "soft_limit_deg": 10
+   }
+  },
+  {
+   "name": "DR_3",
+   "parent": "DR_2",
+   "head_canvas_px": [
+    752.0,
+    450.0
+   ],
+   "head_rig_local": [
+    7.52,
+    -4.5
+   ],
+   "kind": "spring",
+   "note": "",
+   "tail_canvas_px": [
+    790.0,
+    620.0
+   ],
+   "length_px": 174.2,
+   "rest_dir_unity_deg": -77.4,
+   "spring": {
+    "f_hz": 1.6,
+    "damping": 0.55,
+    "idle_amp_deg": 0.42,
+    "idle_phase_rad": 0.9,
+    "inertia_gain": 0.39,
+    "soft_limit_deg": 10
+   }
+  },
+  {
+   "name": "DR_4",
+   "parent": "DR_3",
+   "head_canvas_px": [
+    790.0,
+    620.0
+   ],
+   "head_rig_local": [
+    7.9,
+    -6.2
+   ],
+   "kind": "spring",
+   "note": "",
+   "tail_canvas_px": [
+    825.0,
+    760.0
+   ],
+   "length_px": 144.31,
+   "rest_dir_unity_deg": -75.964,
+   "spring": {
+    "f_hz": 1.5,
+    "damping": 0.55,
+    "idle_amp_deg": 0.48,
+    "idle_phase_rad": 1.25,
+    "inertia_gain": 0.39,
+    "soft_limit_deg": 10
+   }
+  },
+  {
+   "name": "DR_5",
+   "parent": "DR_4",
+   "head_canvas_px": [
+    825.0,
+    760.0
+   ],
+   "head_rig_local": [
+    8.25,
+    -7.6
+   ],
+   "kind": "spring",
+   "note": "",
+   "tail_canvas_px": [
+    850.0,
+    850.0
+   ],
+   "length_px": 93.41,
+   "rest_dir_unity_deg": -74.476,
+   "spring": {
+    "f_hz": 1.4,
+    "damping": 0.55,
+    "idle_amp_deg": 0.54,
+    "idle_phase_rad": 1.6,
+    "inertia_gain": 0.39,
+    "soft_limit_deg": 10
+   }
+  },
+  {
+   "name": "DR_6",
+   "parent": "DR_5",
+   "head_canvas_px": [
+    850.0,
+    850.0
+   ],
+   "head_rig_local": [
+    8.5,
+    -8.5
+   ],
+   "kind": "spring",
+   "note": "",
+   "tail_canvas_px": [
+    860.0,
+    925.0
+   ],
+   "length_px": 75.66,
+   "rest_dir_unity_deg": -82.405,
+   "spring": {
+    "f_hz": 1.3,
+    "damping": 0.55,
+    "idle_amp_deg": 0.6,
+    "idle_phase_rad": 1.95,
+    "inertia_gain": 0.39,
+    "soft_limit_deg": 10
+   }
+  },
+  {
+   "name": "SLL_0",
+   "parent": "Head",
+   "head_canvas_px": [
+    500.0,
+    300.0
+   ],
+   "head_rig_local": [
+    5.0,
+    -3.0
+   ],
+   "kind": "fixed",
+   "note": "",
+   "tail_canvas_px": [
+    502.0,
+    350.0
+   ],
+   "length_px": 50.04,
+   "rest_dir_unity_deg": -87.709
+  },
+  {
+   "name": "SLL_1",
+   "parent": "SLL_0",
+   "head_canvas_px": [
+    502.0,
+    350.0
+   ],
+   "head_rig_local": [
+    5.02,
+    -3.5
+   ],
+   "kind": "spring",
+   "note": "",
+   "tail_canvas_px": [
+    500.0,
+    400.0
+   ],
+   "length_px": 50.04,
+   "rest_dir_unity_deg": -92.291,
+   "spring": {
+    "f_hz": 2.4,
+    "damping": 0.4,
+    "idle_amp_deg": 0.84,
+    "idle_phase_rad": 0.4,
+    "inertia_gain": 0.33,
+    "soft_limit_deg": 6
+   }
+  },
+  {
+   "name": "SLL_2",
+   "parent": "SLL_1",
+   "head_canvas_px": [
+    500.0,
+    400.0
+   ],
+   "head_rig_local": [
+    5.0,
+    -4.0
+   ],
+   "kind": "spring",
+   "note": "",
+   "tail_canvas_px": [
+    494.0,
+    455.0
+   ],
+   "length_px": 55.33,
+   "rest_dir_unity_deg": -96.226,
+   "spring": {
+    "f_hz": 2.2,
+    "damping": 0.4,
+    "idle_amp_deg": 1.08,
+    "idle_phase_rad": 0.8,
+    "inertia_gain": 0.33,
+    "soft_limit_deg": 6
+   }
+  },
+  {
+   "name": "SLR_0",
+   "parent": "Head",
+   "head_canvas_px": [
+    650.0,
+    200.0
+   ],
+   "head_rig_local": [
+    6.5,
+    -2.0
+   ],
+   "kind": "fixed",
+   "note": "",
+   "tail_canvas_px": [
+    652.0,
+    270.0
+   ],
+   "length_px": 70.03,
+   "rest_dir_unity_deg": -88.363
+  },
+  {
+   "name": "SLR_1",
+   "parent": "SLR_0",
+   "head_canvas_px": [
+    652.0,
+    270.0
+   ],
+   "head_rig_local": [
+    6.52,
+    -2.7
+   ],
+   "kind": "spring",
+   "note": "",
+   "tail_canvas_px": [
+    660.0,
+    350.0
+   ],
+   "length_px": 80.4,
+   "rest_dir_unity_deg": -84.289,
+   "spring": {
+    "f_hz": 2.2,
+    "damping": 0.4,
+    "idle_amp_deg": 0.84,
+    "idle_phase_rad": 0.5,
+    "inertia_gain": 0.33,
+    "soft_limit_deg": 6
+   }
+  },
+  {
+   "name": "SLR_2",
+   "parent": "SLR_1",
+   "head_canvas_px": [
+    660.0,
+    350.0
+   ],
+   "head_rig_local": [
+    6.6,
+    -3.5
+   ],
+   "kind": "spring",
+   "note": "",
+   "tail_canvas_px": [
+    652.0,
+    455.0
+   ],
+   "length_px": 105.3,
+   "rest_dir_unity_deg": -94.357,
+   "spring": {
+    "f_hz": 2.0,
+    "damping": 0.4,
+    "idle_amp_deg": 1.08,
+    "idle_phase_rad": 0.9,
+    "inertia_gain": 0.33,
+    "soft_limit_deg": 6
+   }
+  },
+  {
+   "name": "SLVL_0",
+   "parent": "Halberd",
+   "head_canvas_px": [
+    410.0,
+    290.0
+   ],
+   "head_rig_local": [
+    4.1,
+    -2.9
+   ],
+   "kind": "fixed",
+   "note": "",
+   "tail_canvas_px": [
+    340.0,
+    410.0
+   ],
+   "length_px": 138.92,
+   "rest_dir_unity_deg": -120.256
+  },
+  {
+   "name": "SLVL_1",
+   "parent": "SLVL_0",
+   "head_canvas_px": [
+    340.0,
+    410.0
+   ],
+   "head_rig_local": [
+    3.4,
+    -4.1
+   ],
+   "kind": "spring",
+   "note": "",
+   "tail_canvas_px": [
+    305.0,
+    530.0
+   ],
+   "length_px": 125.0,
+   "rest_dir_unity_deg": -106.26,
+   "spring": {
+    "f_hz": 2.3,
+    "damping": 0.4,
+    "idle_amp_deg": 0.3,
+    "idle_phase_rad": 0.9,
+    "inertia_gain": 0.27,
+    "soft_limit_deg": 2.5
+   }
+  },
+  {
+   "name": "SLVL_2",
+   "parent": "SLVL_1",
+   "head_canvas_px": [
+    305.0,
+    530.0
+   ],
+   "head_rig_local": [
+    3.05,
+    -5.3
+   ],
+   "kind": "spring",
+   "note": "",
+   "tail_canvas_px": [
+    292.0,
+    650.0
+   ],
+   "length_px": 120.7,
+   "rest_dir_unity_deg": -96.183,
+   "spring": {
+    "f_hz": 2.6,
+    "damping": 0.4,
+    "idle_amp_deg": 0.42,
+    "idle_phase_rad": 1.3,
+    "inertia_gain": 0.27,
+    "soft_limit_deg": 2.5
+   }
+  },
+  {
+   "name": "SLVR_0",
+   "parent": "Body",
+   "head_canvas_px": [
+    722.0,
+    482.0
+   ],
+   "head_rig_local": [
+    7.22,
+    -4.82
+   ],
+   "kind": "ik",
+   "note": "chain root: localPosition offset = breath_disp(head) each frame",
+   "tail_canvas_px": [
+    840.0,
+    590.0
+   ],
+   "length_px": 159.96,
+   "rest_dir_unity_deg": -42.466
+  },
+  {
+   "name": "SLVR_1",
+   "parent": "SLVR_0",
+   "head_canvas_px": [
+    840.0,
+    590.0
+   ],
+   "head_rig_local": [
+    8.4,
+    -5.9
+   ],
+   "kind": "ik",
+   "note": "",
+   "tail_canvas_px": [
+    945.0,
+    690.0
+   ],
+   "length_px": 145.0,
+   "rest_dir_unity_deg": -43.603
+  },
+  {
+   "name": "SLVR_2",
+   "parent": "SLVR_1",
+   "head_canvas_px": [
+    850.0,
+    690.0
+   ],
+   "head_rig_local": [
+    8.5,
+    -6.9
+   ],
+   "kind": "spring",
+   "note": "",
+   "tail_canvas_px": [
+    865.0,
+    800.0
+   ],
+   "length_px": 111.02,
+   "rest_dir_unity_deg": -82.235,
+   "spring": {
+    "f_hz": 2.6,
+    "damping": 0.4,
+    "idle_amp_deg": 1.5,
+    "idle_phase_rad": 1.2,
+    "inertia_gain": 0.75,
+    "soft_limit_deg": 6
+   }
+  },
+  {
+   "name": "WR_0",
+   "parent": "Body",
+   "head_canvas_px": [
+    800.0,
+    515.0
+   ],
+   "head_rig_local": [
+    8.0,
+    -5.15
+   ],
+   "kind": "spring",
+   "note": "chain root: localPosition offset = breath_disp(head) each frame",
+   "tail_canvas_px": [
+    850.0,
+    445.0
+   ],
+   "length_px": 86.02,
+   "rest_dir_unity_deg": 54.462,
+   "spring": {
+    "f_hz": 3.0,
+    "damping": 0.35,
+    "idle_amp_deg": 0,
+    "idle_phase_rad": 0,
+    "inertia_gain": 0.6,
+    "soft_limit_deg": 25
+   }
+  },
+  {
+   "name": "WR_1",
+   "parent": "WR_0",
+   "head_canvas_px": [
+    850.0,
+    445.0
+   ],
+   "head_rig_local": [
+    8.5,
+    -4.45
+   ],
+   "kind": "spring",
+   "note": "",
+   "tail_canvas_px": [
+    1005.0,
+    600.0
+   ],
+   "length_px": 219.2,
+   "rest_dir_unity_deg": -45.0,
+   "spring": {
+    "f_hz": 3.4,
+    "damping": 0.35,
+    "idle_amp_deg": 0,
+    "idle_phase_rad": 0,
+    "inertia_gain": 0.6,
+    "soft_limit_deg": 20
+   }
+  },
+  {
+   "name": "WL_0",
+   "parent": "Body",
+   "head_canvas_px": [
+    252.0,
+    500.0
+   ],
+   "head_rig_local": [
+    2.52,
+    -5.0
+   ],
+   "kind": "spring",
+   "note": "chain root: localPosition offset = breath_disp(head) each frame",
+   "tail_canvas_px": [
+    205.0,
+    470.0
+   ],
+   "length_px": 55.76,
+   "rest_dir_unity_deg": 147.45,
+   "spring": {
+    "f_hz": 3.2,
+    "damping": 0.35,
+    "idle_amp_deg": 0,
+    "idle_phase_rad": 0,
+    "inertia_gain": 0.6,
+    "soft_limit_deg": 25
+   }
+  },
+  {
+   "name": "TAIL_0",
+   "parent": "Body",
+   "head_canvas_px": [
+    950.0,
+    745.0
+   ],
+   "head_rig_local": [
+    9.5,
+    -7.45
+   ],
+   "kind": "fixed",
+   "note": "chain root: localPosition offset = breath_disp(head) each frame",
+   "tail_canvas_px": [
+    1000.0,
+    790.0
+   ],
+   "length_px": 67.27,
+   "rest_dir_unity_deg": -41.987
+  },
+  {
+   "name": "TAIL_1",
+   "parent": "TAIL_0",
+   "head_canvas_px": [
+    1000.0,
+    790.0
+   ],
+   "head_rig_local": [
+    10.0,
+    -7.9
+   ],
+   "kind": "spring",
+   "note": "",
+   "tail_canvas_px": [
+    1012.0,
+    860.0
+   ],
+   "length_px": 71.02,
+   "rest_dir_unity_deg": -80.272,
+   "spring": {
+    "f_hz": 1.2,
+    "damping": 0.55,
+    "idle_amp_deg": 0.33,
+    "idle_phase_rad": 0.0,
+    "inertia_gain": 0.45,
+    "soft_limit_deg": 12
+   }
+  },
+  {
+   "name": "TAIL_2",
+   "parent": "TAIL_1",
+   "head_canvas_px": [
+    1012.0,
+    860.0
+   ],
+   "head_rig_local": [
+    10.12,
+    -8.6
+   ],
+   "kind": "spring",
+   "note": "",
+   "tail_canvas_px": [
+    1000.0,
+    940.0
+   ],
+   "length_px": 80.89,
+   "rest_dir_unity_deg": -98.531,
+   "spring": {
+    "f_hz": 1.2,
+    "damping": 0.55,
+    "idle_amp_deg": 0.36,
+    "idle_phase_rad": 0.5,
+    "inertia_gain": 0.45,
+    "soft_limit_deg": 12
+   }
+  },
+  {
+   "name": "TAIL_3",
+   "parent": "TAIL_2",
+   "head_canvas_px": [
+    1000.0,
+    940.0
+   ],
+   "head_rig_local": [
+    10.0,
+    -9.4
+   ],
+   "kind": "spring",
+   "note": "",
+   "tail_canvas_px": [
+    960.0,
+    1010.0
+   ],
+   "length_px": 80.62,
+   "rest_dir_unity_deg": -119.745,
+   "spring": {
+    "f_hz": 1.15,
+    "damping": 0.55,
+    "idle_amp_deg": 0.39,
+    "idle_phase_rad": 1.0,
+    "inertia_gain": 0.45,
+    "soft_limit_deg": 12
+   }
+  },
+  {
+   "name": "TAIL_4",
+   "parent": "TAIL_3",
+   "head_canvas_px": [
+    960.0,
+    1010.0
+   ],
+   "head_rig_local": [
+    9.6,
+    -10.1
+   ],
+   "kind": "spring",
+   "note": "",
+   "tail_canvas_px": [
+    870.0,
+    1045.0
+   ],
+   "length_px": 96.57,
+   "rest_dir_unity_deg": -158.749,
+   "spring": {
+    "f_hz": 1.1,
+    "damping": 0.55,
+    "idle_amp_deg": 0.42,
+    "idle_phase_rad": 1.5,
+    "inertia_gain": 0.45,
+    "soft_limit_deg": 12
+   }
+  },
+  {
+   "name": "TAIL_5",
+   "parent": "TAIL_4",
+   "head_canvas_px": [
+    870.0,
+    1045.0
+   ],
+   "head_rig_local": [
+    8.7,
+    -10.45
+   ],
+   "kind": "spring",
+   "note": "",
+   "tail_canvas_px": [
+    700.0,
+    1052.0
+   ],
+   "length_px": 170.14,
+   "rest_dir_unity_deg": -177.642,
+   "spring": {
+    "f_hz": 1.05,
+    "damping": 0.55,
+    "idle_amp_deg": 0.45,
+    "idle_phase_rad": 2.0,
+    "inertia_gain": 0.45,
+    "soft_limit_deg": 12
+   }
+  },
+  {
+   "name": "TAIL_6",
+   "parent": "TAIL_5",
+   "head_canvas_px": [
+    700.0,
+    1052.0
+   ],
+   "head_rig_local": [
+    7.0,
+    -10.52
+   ],
+   "kind": "spring",
+   "note": "",
+   "tail_canvas_px": [
+    590.0,
+    1075.0
+   ],
+   "length_px": 112.38,
+   "rest_dir_unity_deg": -168.19,
+   "spring": {
+    "f_hz": 1.0,
+    "damping": 0.55,
+    "idle_amp_deg": 0.48,
+    "idle_phase_rad": 2.5,
+    "inertia_gain": 0.45,
+    "soft_limit_deg": 12
+   }
+  },
+  {
+   "name": "TAIL_7",
+   "parent": "TAIL_6",
+   "head_canvas_px": [
+    590.0,
+    1075.0
+   ],
+   "head_rig_local": [
+    5.9,
+    -10.75
+   ],
+   "kind": "spring",
+   "note": "",
+   "tail_canvas_px": [
+    535.0,
+    1130.0
+   ],
+   "length_px": 77.78,
+   "rest_dir_unity_deg": -135.0,
+   "spring": {
+    "f_hz": 1.0,
+    "damping": 0.55,
+    "idle_amp_deg": 0.51,
+    "idle_phase_rad": 3.0,
+    "inertia_gain": 0.45,
+    "soft_limit_deg": 12
+   }
+  },
+  {
+   "name": "TAIL_8",
+   "parent": "TAIL_7",
+   "head_canvas_px": [
+    535.0,
+    1130.0
+   ],
+   "head_rig_local": [
+    5.35,
+    -11.3
+   ],
+   "kind": "spring",
+   "note": "",
+   "tail_canvas_px": [
+    560.0,
+    1200.0
+   ],
+   "length_px": 74.33,
+   "rest_dir_unity_deg": -70.346,
+   "spring": {
+    "f_hz": 1.0,
+    "damping": 0.55,
+    "idle_amp_deg": 0.54,
+    "idle_phase_rad": 3.5,
+    "inertia_gain": 0.45,
+    "soft_limit_deg": 12
+   }
+  },
+  {
+   "name": "SKIRT_0",
+   "parent": "Body",
+   "head_canvas_px": [
+    565.0,
+    600.0
+   ],
+   "head_rig_local": [
+    5.65,
+    -6.0
+   ],
+   "kind": "fixed",
+   "note": "chain root: localPosition offset = breath_disp(head) each frame",
+   "tail_canvas_px": [
+    565.0,
+    650.0
+   ],
+   "length_px": 50.0,
+   "rest_dir_unity_deg": -90.0
+  },
+  {
+   "name": "SKIRT_1",
+   "parent": "SKIRT_0",
+   "head_canvas_px": [
+    565.0,
+    650.0
+   ],
+   "head_rig_local": [
+    5.65,
+    -6.5
+   ],
+   "kind": "spring",
+   "note": "",
+   "tail_canvas_px": [
+    580.0,
+    880.0
+   ],
+   "length_px": 230.49,
+   "rest_dir_unity_deg": -86.269,
+   "spring": {
+    "f_hz": 2.2,
+    "damping": 0.3,
+    "idle_amp_deg": 0.72,
+    "idle_phase_rad": 0.6,
+    "inertia_gain": 0.9,
+    "soft_limit_deg": 6
+   }
+  },
+  {
+   "name": "SKIRT_2",
+   "parent": "SKIRT_0",
+   "head_canvas_px": [
+    470.0,
+    600.0
+   ],
+   "head_rig_local": [
+    4.7,
+    -6.0
+   ],
+   "kind": "spring",
+   "note": "",
+   "tail_canvas_px": [
+    415.0,
+    800.0
+   ],
+   "length_px": 207.42,
+   "rest_dir_unity_deg": -105.376,
+   "spring": {
+    "f_hz": 2.4,
+    "damping": 0.3,
+    "idle_amp_deg": 1.08,
+    "idle_phase_rad": 0.9,
+    "inertia_gain": 0.9,
+    "soft_limit_deg": 6
+   }
+  },
+  {
+   "name": "SKIRT_3",
+   "parent": "SKIRT_0",
+   "head_canvas_px": [
+    660.0,
+    620.0
+   ],
+   "head_rig_local": [
+    6.6,
+    -6.2
+   ],
+   "kind": "spring",
+   "note": "",
+   "tail_canvas_px": [
+    720.0,
+    830.0
+   ],
+   "length_px": 218.4,
+   "rest_dir_unity_deg": -74.055,
+   "spring": {
+    "f_hz": 2.4,
+    "damping": 0.3,
+    "idle_amp_deg": 1.08,
+    "idle_phase_rad": 1.1,
+    "inertia_gain": 0.9,
+    "soft_limit_deg": 6
+   }
+  },
+  {
+   "name": "SKIRT_4",
+   "parent": "SKIRT_0",
+   "head_canvas_px": [
+    740.0,
+    570.0
+   ],
+   "head_rig_local": [
+    7.4,
+    -5.7
+   ],
+   "kind": "spring",
+   "note": "",
+   "tail_canvas_px": [
+    855.0,
+    800.0
+   ],
+   "length_px": 257.15,
+   "rest_dir_unity_deg": -63.435,
+   "spring": {
+    "f_hz": 2.3,
+    "damping": 0.3,
+    "idle_amp_deg": 1.32,
+    "idle_phase_rad": 1.3,
+    "inertia_gain": 0.9,
+    "soft_limit_deg": 6
+   }
+  }
+ ],
+ "chains": {
+  "DL": {
+   "root_parent": "Head",
+   "gaussian_sigma_px": 42,
+   "bones": [
+    "DL_0",
+    "DL_1",
+    "DL_2",
+    "DL_3",
+    "DL_4",
+    "DL_5",
+    "DL_6"
+   ],
+   "ik": null
+  },
+  "DR": {
+   "root_parent": "Head",
+   "gaussian_sigma_px": 36,
+   "bones": [
+    "DR_0",
+    "DR_1",
+    "DR_2",
+    "DR_3",
+    "DR_4",
+    "DR_5",
+    "DR_6"
+   ],
+   "ik": null
+  },
+  "SLL": {
+   "root_parent": "Head",
+   "gaussian_sigma_px": 22,
+   "bones": [
+    "SLL_0",
+    "SLL_1",
+    "SLL_2"
+   ],
+   "ik": null
+  },
+  "SLR": {
+   "root_parent": "Head",
+   "gaussian_sigma_px": 30,
+   "bones": [
+    "SLR_0",
+    "SLR_1",
+    "SLR_2"
+   ],
+   "ik": null
+  },
+  "SLVL": {
+   "root_parent": "Halberd",
+   "gaussian_sigma_px": 40,
+   "bones": [
+    "SLVL_0",
+    "SLVL_1",
+    "SLVL_2"
+   ],
+   "ik": null
+  },
+  "SLVR": {
+   "root_parent": "Body",
+   "gaussian_sigma_px": 42,
+   "bones": [
+    "SLVR_0",
+    "SLVR_1",
+    "SLVR_2"
+   ],
+   "ik": {
+    "bones": [
+     "SLVR_0",
+     "SLVR_1"
+    ],
+    "target_canvas_px": [
+     945,
+     690
+    ],
+    "target_follows": "Halberd"
+   }
+  },
+  "WR": {
+   "root_parent": "Body",
+   "gaussian_sigma_px": 50,
+   "bones": [
+    "WR_0",
+    "WR_1"
+   ],
+   "ik": null
+  },
+  "WL": {
+   "root_parent": "Body",
+   "gaussian_sigma_px": 30,
+   "bones": [
+    "WL_0"
+   ],
+   "ik": null
+  },
+  "TAIL": {
+   "root_parent": "Body",
+   "gaussian_sigma_px": 34,
+   "bones": [
+    "TAIL_0",
+    "TAIL_1",
+    "TAIL_2",
+    "TAIL_3",
+    "TAIL_4",
+    "TAIL_5",
+    "TAIL_6",
+    "TAIL_7",
+    "TAIL_8"
+   ],
+   "ik": null
+  },
+  "SKIRT": {
+   "root_parent": "Body",
+   "gaussian_sigma_px": 46,
+   "bones": [
+    "SKIRT_0",
+    "SKIRT_1",
+    "SKIRT_2",
+    "SKIRT_3",
+    "SKIRT_4"
+   ],
+   "ik": null
+  }
+ },
+ "fields": {
+  "breath": {
+   "BREATH_DY": 5.0,
+   "BREATH_DX": 0.009,
+   "formula": "dy=-BREATH_DY*breath*smoothstep((720-y)/300); dx=BREATH_DX*breath*(x-560)*exp(-((y-520)/120)^2)  (rest canvas px)",
+   "implemented_by": [
+    "BreathY",
+    "BreathX bones on torso/ribbon; Head/Halberd/torso-rooted chain roots get breath_disp(their head) as a localPosition offset"
+   ]
+  },
+  "chest_softness": {
+   "center_px": [
+    540.0,
+    560.0
+   ],
+   "sigma_x": 130.0,
+   "sigma_up": 90.0,
+   "sigma_down": 45.0,
+   "layers": [
+    "torso",
+    "ribbon"
+   ],
+   "formula": "disp = (chest_x, chest_y) * exp(-((x-540)/130)^2 - ((y-560)/sy)^2), sy=90 above / 45 below the centre",
+   "implemented_by": "ChestSoft bone"
+  },
+  "groove": {
+   "HIP_Y": 820.0,
+   "FOOT_Y": 1560.0,
+   "formula": "disp=(hipx,bob)*smoothstep((FOOT_Y-y)/(FOOT_Y-HIP_Y)) applied after everything",
+   "implemented_by": "Groove bone; leg_L/leg_R/garter_L/garter_R vertices blend Groove/Anchor by that weight. Other parts ride Groove fully (tail tip differs up to ~8px at the bottom of a beat from the reference renderer, reads natural)"
+  }
+ },
+ "face_variants": {
+  "part": "head",
+  "Default": "Sprites/head.png",
+  "Hurt": "Sprites/head_hurt.png",
+  "note": "identical rect/pivot/alpha; swap SpriteRenderer.sprite. Hurt = トダ hurt expression (eyes/brows/mouth), purple iris"
+ },
+ "panel": {
+  "screen": "E5b battle screen 1920x1080, left ally panel x 0..640",
+  "mask": "Reference/panel_mask_640x1080.png (diagonal cut (620,0)-(470,1080), white = visible)",
+  "camera": "screen_px = (canvas_px - (615,300)) * cam.scale + (440,300) + (cam.dx + shake.x, cam.dy + shake.y)   (screen y down, 1080 high)",
+  "fullbody_camera": "screen_px = canvas_px + (0.6*cam.dx + shake.x, 0.6*cam.dy + shake.y)"
+ },
+ "notes": [
+  "torso sprite = the renderer crop (x<772); 227 px of stray wing fragments beyond it are intentionally not shipped (they never appear in the approved videos)",
+  "hidden-area fills (inpainted from トダ pixels) are baked into the sprites; they only show when parts move"
+ ]
+}

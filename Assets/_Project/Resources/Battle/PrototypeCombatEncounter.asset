@@ -12,17 +12,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c73c0ff84501a21449f4921f763fa243, type: 3}
   m_Name: PrototypeCombatEncounter
   m_EditorClassIdentifier: TypingRoguelike::TypingRoguelike.Data.BattleEncounterDefinition
-  enemy: {fileID: 11400000, guid: ff743e2b7ef74974a84ba2ab84ca02ee, type: 2}
+  enemy: {fileID: 11400000, guid: 2460b1da83f9eb0449d4a908f14c2153, type: 2}
+  enemyPool:
+  - {fileID: 11400000, guid: 2460b1da83f9eb0449d4a908f14c2153, type: 2}
+  - {fileID: 11400000, guid: a51a53a88237afd4e8bad1d56cdb0ebe, type: 2}
+  - {fileID: 11400000, guid: d4b02f8c6e5a4b3f0c7d9e1a2b3c4d5e, type: 2}
+  - {fileID: 11400000, guid: ff743e2b7ef74974a84ba2ab84ca02ee, type: 2}
+  - {fileID: 11400000, guid: b56123db3535c3749b6be76bf95b2a8d, type: 2}
+  - {fileID: 11400000, guid: c3a91e7b5d4f4a2e9b6c8d0f1a2b3c4d, type: 2}
   wordList: {fileID: 11400000, guid: 3e6750f7febce7141baeb38b724a7780, type: 2}
   party: {fileID: 11400000, guid: 146103864cb0ec44dad0d77f832abdfc, type: 2}
-  playerMaxHp: 100
+  playerMaxHp: 1000
   wordClearDamage: 15
   rerollsPerBattle: 3
   enemyTickInterval: 0.05
   typingAudio: {fileID: 11400000, guid: 21a083445df21d140bad276c8203d79d, type: 2}
   jackpotMultiplier: 2
   baseFreezeChance: 0
-  freezeChancePerCharacter: 0.000025
+  freezeChancePerCharacter: 0.0000075
   baseJackpotChanceCap: 0.1
   maxFreezeChance: 0.99
   startLogMessage: "\u2694 \u9B54\u7269\u304C\u73FE\u308C\u305F\uFF01"

@@ -1,0 +1,1079 @@
+fileFormatVersion: 2
+guid: c0b6b089818fb2d4bb7975f5c4340771
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 4987251631757675369
+    second: strike_thrust_BloodRed_09_0
+  - first:
+      213: -4446300952627860180
+    second: strike_thrust_BloodRed_09_1
+  - first:
+      213: 6761472724760082217
+    second: strike_thrust_BloodRed_09_2
+  - first:
+      213: -6814180801059722257
+    second: strike_thrust_BloodRed_09_3
+  - first:
+      213: -1922349348169351063
+    second: strike_thrust_BloodRed_09_4
+  - first:
+      213: 1865710787605716345
+    second: strike_thrust_BloodRed_09_5
+  - first:
+      213: 6638423710928107371
+    second: strike_thrust_BloodRed_09_6
+  - first:
+      213: -2034547694866393954
+    second: strike_thrust_BloodRed_09_7
+  - first:
+      213: 3693834698989519353
+    second: strike_thrust_BloodRed_09_8
+  - first:
+      213: -1725619461400985661
+    second: strike_thrust_BloodRed_09_9
+  - first:
+      213: -1117011187602059595
+    second: strike_thrust_BloodRed_09_10
+  - first:
+      213: 2007871115912013878
+    second: strike_thrust_BloodRed_09_11
+  - first:
+      213: 7425962937633086565
+    second: strike_thrust_BloodRed_09_12
+  - first:
+      213: -558919380742577426
+    second: strike_thrust_BloodRed_09_13
+  - first:
+      213: -3737354656704522900
+    second: strike_thrust_BloodRed_09_14
+  - first:
+      213: -6431995352744517296
+    second: strike_thrust_BloodRed_09_15
+  - first:
+      213: 2303985563562437583
+    second: strike_thrust_BloodRed_09_16
+  - first:
+      213: -5977868184361655687
+    second: strike_thrust_BloodRed_09_17
+  - first:
+      213: -4174675279332612646
+    second: strike_thrust_BloodRed_09_18
+  - first:
+      213: -8024590712467434192
+    second: strike_thrust_BloodRed_09_19
+  - first:
+      213: -4334461185253798887
+    second: strike_thrust_BloodRed_09_20
+  - first:
+      213: -4224031755545866206
+    second: strike_thrust_BloodRed_09_21
+  - first:
+      213: 6411732957904545158
+    second: strike_thrust_BloodRed_09_22
+  - first:
+      213: -7348542112406298531
+    second: strike_thrust_BloodRed_09_23
+  - first:
+      213: -1874856211831498572
+    second: strike_thrust_BloodRed_09_24
+  - first:
+      213: -2182240627232768262
+    second: strike_thrust_BloodRed_09_25
+  - first:
+      213: 3335678690420970644
+    second: strike_thrust_BloodRed_09_26
+  - first:
+      213: -1146325325495856536
+    second: strike_thrust_BloodRed_09_27
+  - first:
+      213: 5666335295532320000
+    second: strike_thrust_BloodRed_09_28
+  - first:
+      213: 2430662902746533146
+    second: strike_thrust_BloodRed_09_29
+  - first:
+      213: -6893946138448338275
+    second: strike_thrust_BloodRed_09_30
+  - first:
+      213: 2928842199805483251
+    second: strike_thrust_BloodRed_09_31
+  - first:
+      213: 8031606353512279586
+    second: strike_thrust_BloodRed_09_32
+  - first:
+      213: 5410747060070594552
+    second: strike_thrust_BloodRed_09_33
+  - first:
+      213: -6389952720166659552
+    second: strike_thrust_BloodRed_09_34
+  - first:
+      213: -1197768500035510387
+    second: strike_thrust_BloodRed_09_35
+  - first:
+      213: 8675594137014000182
+    second: strike_thrust_BloodRed_09_36
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 0
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: strike_thrust_BloodRed_09_0
+      rect:
+        serializedVersion: 2
+        x: 198
+        y: 379
+        width: 9
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 96b476c7fe6463540800000000000000
+      internalID: 4987251631757675369
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_BloodRed_09_1
+      rect:
+        serializedVersion: 2
+        x: 199
+        y: 369
+        width: 6
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c2da22257d09b42c0800000000000000
+      internalID: -4446300952627860180
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_BloodRed_09_2
+      rect:
+        serializedVersion: 2
+        x: 205
+        y: 371
+        width: 22
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 92731dd8e9395dd50800000000000000
+      internalID: 6761472724760082217
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_BloodRed_09_3
+      rect:
+        serializedVersion: 2
+        x: 187
+        y: 254
+        width: 23
+        height: 71
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: feb6c8d1aaa2f61a0800000000000000
+      internalID: -6814180801059722257
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_BloodRed_09_4
+      rect:
+        serializedVersion: 2
+        x: 245
+        y: 318
+        width: 22
+        height: 52
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9608920f3717255e0800000000000000
+      internalID: -1922349348169351063
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_BloodRed_09_5
+      rect:
+        serializedVersion: 2
+        x: 126
+        y: 245
+        width: 14
+        height: 66
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 97d5adc831654e910800000000000000
+      internalID: 1865710787605716345
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_BloodRed_09_6
+      rect:
+        serializedVersion: 2
+        x: 278
+        y: 275
+        width: 12
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b677666713b602c50800000000000000
+      internalID: 6638423710928107371
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_BloodRed_09_7
+      rect:
+        serializedVersion: 2
+        x: 178
+        y: 249
+        width: 9
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e9416e8a6a5d3c3e0800000000000000
+      internalID: -2034547694866393954
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_BloodRed_09_8
+      rect:
+        serializedVersion: 2
+        x: 286
+        y: 249
+        width: 10
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9f148448613234330800000000000000
+      internalID: 3693834698989519353
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_BloodRed_09_9
+      rect:
+        serializedVersion: 2
+        x: 143
+        y: 238
+        width: 13
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3cf71b91e3e5d08e0800000000000000
+      internalID: -1725619461400985661
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_BloodRed_09_10
+      rect:
+        serializedVersion: 2
+        x: 120
+        y: 225
+        width: 11
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5be87d83e349f70f0800000000000000
+      internalID: -1117011187602059595
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_BloodRed_09_11
+      rect:
+        serializedVersion: 2
+        x: 107
+        y: 216
+        width: 10
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 638e3ba44246ddb10800000000000000
+      internalID: 2007871115912013878
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_BloodRed_09_12
+      rect:
+        serializedVersion: 2
+        x: 159
+        y: 194
+        width: 19
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 56c16d482f15e0760800000000000000
+      internalID: 7425962937633086565
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_BloodRed_09_13
+      rect:
+        serializedVersion: 2
+        x: 213
+        y: 198
+        width: 14
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ee2e1c4d8c15e38f0800000000000000
+      internalID: -558919380742577426
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_BloodRed_09_14
+      rect:
+        serializedVersion: 2
+        x: 127
+        y: 183
+        width: 13
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c659977bdbf322cc0800000000000000
+      internalID: -3737354656704522900
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_BloodRed_09_15
+      rect:
+        serializedVersion: 2
+        x: 158
+        y: 183
+        width: 18
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 05123ba0e46fcb6a0800000000000000
+      internalID: -6431995352744517296
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_BloodRed_09_16
+      rect:
+        serializedVersion: 2
+        x: 184
+        y: 185
+        width: 9
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fcb64cbb9a669ff10800000000000000
+      internalID: 2303985563562437583
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_BloodRed_09_17
+      rect:
+        serializedVersion: 2
+        x: 297
+        y: 194
+        width: 13
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 972a305fe885a0da0800000000000000
+      internalID: -5977868184361655687
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_BloodRed_09_18
+      rect:
+        serializedVersion: 2
+        x: 14
+        y: 154
+        width: 35
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ad566caa3f29016c0800000000000000
+      internalID: -4174675279332612646
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_BloodRed_09_19
+      rect:
+        serializedVersion: 2
+        x: 122
+        y: 162
+        width: 9
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 035da7b534de2a090800000000000000
+      internalID: -8024590712467434192
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_BloodRed_09_20
+      rect:
+        serializedVersion: 2
+        x: 132
+        y: 171
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 91c8a385486e8d3c0800000000000000
+      internalID: -4334461185253798887
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_BloodRed_09_21
+      rect:
+        serializedVersion: 2
+        x: 134
+        y: 161
+        width: 14
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 22018ba8f793165c0800000000000000
+      internalID: -4224031755545866206
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_BloodRed_09_22
+      rect:
+        serializedVersion: 2
+        x: 158
+        y: 158
+        width: 19
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 685a096872d0bf850800000000000000
+      internalID: 6411732957904545158
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_BloodRed_09_23
+      rect:
+        serializedVersion: 2
+        x: 201
+        y: 182
+        width: 6
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d50260d02ebb40a90800000000000000
+      internalID: -7348542112406298531
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_BloodRed_09_24
+      rect:
+        serializedVersion: 2
+        x: 209
+        y: 170
+        width: 23
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4b859d0753c2bf5e0800000000000000
+      internalID: -1874856211831498572
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_BloodRed_09_25
+      rect:
+        serializedVersion: 2
+        x: 300
+        y: 150
+        width: 13
+        height: 43
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: afe7d5726bf17b1e0800000000000000
+      internalID: -2182240627232768262
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_BloodRed_09_26
+      rect:
+        serializedVersion: 2
+        x: 131
+        y: 145
+        width: 9
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 494d1638816ba4e20800000000000000
+      internalID: 3335678690420970644
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_BloodRed_09_27
+      rect:
+        serializedVersion: 2
+        x: 144
+        y: 140
+        width: 14
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 86219c0a03f6710f0800000000000000
+      internalID: -1146325325495856536
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_BloodRed_09_28
+      rect:
+        serializedVersion: 2
+        x: 167
+        y: 153
+        width: 11
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 00546740eedd2ae40800000000000000
+      internalID: 5666335295532320000
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_BloodRed_09_29
+      rect:
+        serializedVersion: 2
+        x: 189
+        y: 155
+        width: 8
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a1d4de628037bb120800000000000000
+      internalID: 2430662902746533146
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_BloodRed_09_30
+      rect:
+        serializedVersion: 2
+        x: 166
+        y: 135
+        width: 10
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d926c154388c350a0800000000000000
+      internalID: -6893946138448338275
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_BloodRed_09_31
+      rect:
+        serializedVersion: 2
+        x: 173
+        y: 132
+        width: 8
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3f8549a867655a820800000000000000
+      internalID: 2928842199805483251
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_BloodRed_09_32
+      rect:
+        serializedVersion: 2
+        x: 283
+        y: 125
+        width: 16
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 22eaedcdc6ff57f60800000000000000
+      internalID: 8031606353512279586
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_BloodRed_09_33
+      rect:
+        serializedVersion: 2
+        x: 154
+        y: 98
+        width: 13
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8f73ff4a8c5d61b40800000000000000
+      internalID: 5410747060070594552
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_BloodRed_09_34
+      rect:
+        serializedVersion: 2
+        x: 159
+        y: 95
+        width: 12
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 02adcee3bd35257a0800000000000000
+      internalID: -6389952720166659552
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_BloodRed_09_35
+      rect:
+        serializedVersion: 2
+        x: 168
+        y: 88
+        width: 11
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d8f1b3035eba06fe0800000000000000
+      internalID: -1197768500035510387
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_BloodRed_09_36
+      rect:
+        serializedVersion: 2
+        x: 181
+        y: 115
+        width: 8
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 63a5e2007e6e56870800000000000000
+      internalID: 8675594137014000182
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      strike_thrust_BloodRed_09_0: 4987251631757675369
+      strike_thrust_BloodRed_09_1: -4446300952627860180
+      strike_thrust_BloodRed_09_10: -1117011187602059595
+      strike_thrust_BloodRed_09_11: 2007871115912013878
+      strike_thrust_BloodRed_09_12: 7425962937633086565
+      strike_thrust_BloodRed_09_13: -558919380742577426
+      strike_thrust_BloodRed_09_14: -3737354656704522900
+      strike_thrust_BloodRed_09_15: -6431995352744517296
+      strike_thrust_BloodRed_09_16: 2303985563562437583
+      strike_thrust_BloodRed_09_17: -5977868184361655687
+      strike_thrust_BloodRed_09_18: -4174675279332612646
+      strike_thrust_BloodRed_09_19: -8024590712467434192
+      strike_thrust_BloodRed_09_2: 6761472724760082217
+      strike_thrust_BloodRed_09_20: -4334461185253798887
+      strike_thrust_BloodRed_09_21: -4224031755545866206
+      strike_thrust_BloodRed_09_22: 6411732957904545158
+      strike_thrust_BloodRed_09_23: -7348542112406298531
+      strike_thrust_BloodRed_09_24: -1874856211831498572
+      strike_thrust_BloodRed_09_25: -2182240627232768262
+      strike_thrust_BloodRed_09_26: 3335678690420970644
+      strike_thrust_BloodRed_09_27: -1146325325495856536
+      strike_thrust_BloodRed_09_28: 5666335295532320000
+      strike_thrust_BloodRed_09_29: 2430662902746533146
+      strike_thrust_BloodRed_09_3: -6814180801059722257
+      strike_thrust_BloodRed_09_30: -6893946138448338275
+      strike_thrust_BloodRed_09_31: 2928842199805483251
+      strike_thrust_BloodRed_09_32: 8031606353512279586
+      strike_thrust_BloodRed_09_33: 5410747060070594552
+      strike_thrust_BloodRed_09_34: -6389952720166659552
+      strike_thrust_BloodRed_09_35: -1197768500035510387
+      strike_thrust_BloodRed_09_36: 8675594137014000182
+      strike_thrust_BloodRed_09_4: -1922349348169351063
+      strike_thrust_BloodRed_09_5: 1865710787605716345
+      strike_thrust_BloodRed_09_6: 6638423710928107371
+      strike_thrust_BloodRed_09_7: -2034547694866393954
+      strike_thrust_BloodRed_09_8: 3693834698989519353
+      strike_thrust_BloodRed_09_9: -1725619461400985661
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

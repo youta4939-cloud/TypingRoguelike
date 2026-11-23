@@ -126,7 +126,7 @@ namespace TypingRoguelike.Data
     [Serializable]
     public sealed class OpinionLine
     {
-        public string characterId = "akane";
+        public string characterId = "chara01";
         public OpinionScene scene = OpinionScene.Aggressive;
         [TextArea] public string line = "";
         [Tooltip("あとで同じ名前の顔画像に差し替える")]

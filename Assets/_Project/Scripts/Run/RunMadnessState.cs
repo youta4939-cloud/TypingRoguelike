@@ -8,6 +8,7 @@ namespace TypingRoguelike.Run
     public sealed class RunMadnessState
     {
         public const int DefaultMaxMadness = 1000;
+        public const int MaxRaisedMadness = 1200;
 
         [SerializeField] int currentMadness;
         [SerializeField] int maxMadness = DefaultMaxMadness;

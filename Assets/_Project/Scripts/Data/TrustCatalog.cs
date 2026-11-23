@@ -52,7 +52,7 @@ namespace TypingRoguelike.Data
                 return null;
             foreach (var character in characters)
             {
-                if (character != null && character.characterId == characterId)
+                if (character != null && StarterCharacters.Same(character.characterId, characterId))
                     return character;
             }
 
@@ -72,13 +72,13 @@ namespace TypingRoguelike.Data
             catalog.lines = CreateInstance<OpinionLineTable>();
             catalog.characters = new[]
             {
-                MakeCharacter("akane", "アカネ", TrustPersonality.Brave,
+                MakeCharacter(StarterCharacters.Chara01, StarterCharacters.Shown(StarterCharacters.Chara01), TrustPersonality.Brave,
                     Tier(25, "攻撃+10%", TrustPassiveKind.AttackPercent, 0.1f),
                     Tier(50, "戦闘開始時に敵が5秒止まる", TrustPassiveKind.OpeningFreezeSeconds, 5f),
                     Tier(75, "攻撃+20%", TrustPassiveKind.AttackPercent, 0.2f),
                     Tier(100, "戦闘開始時に敵が10秒止まる", TrustPassiveKind.OpeningFreezeSeconds, 10f)),
                 MakeMomo(),
-                MakeCharacter("nagi", "ナギ", TrustPersonality.Curious,
+                MakeCharacter(StarterCharacters.Chara03, StarterCharacters.Shown(StarterCharacters.Chara03), TrustPersonality.Curious,
                     Tier(25, "攻撃+5%（コンボの仮）", TrustPassiveKind.AttackPercent, 0.05f),
                     Tier(50, "戦闘の刻印の選択肢+1", TrustPassiveKind.CardRewardChoices, 1f),
                     Tier(75, "攻撃+10%（コンボの仮）", TrustPassiveKind.AttackPercent, 0.1f),
@@ -111,7 +111,7 @@ namespace TypingRoguelike.Data
 
         static CharacterConfig MakeMomo()
         {
-            var config = MakeCharacter("momo", "モモ", TrustPersonality.Timid,
+            var config = MakeCharacter(StarterCharacters.Chara02, StarterCharacters.Shown(StarterCharacters.Chara02), TrustPersonality.Timid,
                 Tier(25, "被ダメージ−10%", TrustPassiveKind.DamageTakenPercent, 0.1f),
                 null,
                 Tier(75, "被ダメージ−20%", TrustPassiveKind.DamageTakenPercent, 0.2f),

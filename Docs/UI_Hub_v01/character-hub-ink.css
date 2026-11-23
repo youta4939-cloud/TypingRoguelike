@@ -1,0 +1,31 @@
+/* Ink menu: type and selection carry the identity, not ornamental boxes. */
+body{background:#0e0d0e}.screen{background:#151214;color:#e8dfd1}
+.top{border-color:#472b2f}.brand{font-weight:700;color:#cb5556;letter-spacing:.16em}.brand small{color:#92817b}
+.money{color:#ddd0bd}.money span+span{border-color:#533238}.money small{color:#a28c83}
+nav{left:8%;top:185px;width:34%;max-width:440px;counter-reset:menu}
+nav:before{content:'支度を整え、再び塔へ。';font:12px 'Yu Mincho',serif;letter-spacing:.18em;color:#9e8b80;margin-bottom:28px}
+nav button{isolation:isolate;counter-increment:menu;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:17px 18px 17px 26px;border:0;color:#bfb1a3;font-weight:600;font-size:24px;letter-spacing:.12em;background:none!important;transition:color .18s}
+nav button .label{position:relative;z-index:1}
+nav button .index{font:10px Georgia,serif;letter-spacing:.12em;color:#77625f;position:relative;z-index:1;transition:color .18s}
+nav button:before{content:'';display:block;opacity:0;position:absolute;left:-18px;top:8px;width:calc(100% + 25px);height:calc(100% - 12px);background:#951e30;z-index:-1;clip-path:polygon(0 24%,4% 17%,4% 9%,15% 12%,19% 4%,31% 9%,42% 5%,47% 11%,67% 9%,70% 17%,87% 16%,84% 24%,98% 26%,91% 34%,100% 39%,91% 46%,97% 51%,89% 56%,95% 64%,82% 65%,90% 73%,73% 73%,79% 82%,59% 86%,43% 84%,35% 92%,20% 86%,13% 90%,12% 81%,3% 82%,4% 68%,0 63%);transition:opacity .18s}
+nav button:after{content:'';position:absolute;left:2px;right:auto;top:calc(50% - 3px);width:6px;height:6px;background:#f1d8b6;opacity:0;z-index:1}
+nav button:hover,nav button:focus-visible,nav button.active{color:#fff0d8}
+nav button:hover:before,nav button:focus-visible:before,nav button.active:before{opacity:1}
+nav button:hover:after,nav button:focus-visible:after,nav button.active:after{opacity:1}
+nav button.active .index,nav button:hover .index{color:#d39c97}
+nav .primary{display:flex;align-items:baseline;position:relative;font-size:48px;line-height:1.4;padding:0 0 17px 0;border-left:0;border-bottom:1px solid #963443;margin:0 0 10px;color:#eee2cf;background:none!important;letter-spacing:.08em}
+nav .primary:before{display:none!important}nav .primary:after{content:'→';display:block;position:static;opacity:1;width:auto;height:auto;background:none;color:#c25760;font:24px serif;transform:none;align-self:center}
+nav .primary .index{display:none}nav .primary:hover,nav .primary:focus-visible{color:#fff2d9}
+.status{padding:0;margin:0 0 32px;color:#a89084;font:12px/1.8 'Yu Mincho',serif;letter-spacing:.08em}
+.status:before{content:'';display:inline-block;width:4px;height:4px;background:#bb545d;margin-right:9px;vertical-align:middle}
+.caption{margin:25px 0 0;padding:17px 0 0;max-width:100%;min-height:54px;border-top:1px solid #493033;color:#b4a093;font:12px/1.8 'Yu Mincho',serif;letter-spacing:.06em}
+.illustration{left:51%;right:7%;top:205px;height:380px}
+.illustration:before{content:'拠点にて　／　帰還中';font:11px 'Yu Mincho',serif;letter-spacing:.18em;color:#8d7770}
+.image-mat{padding:7px;border-color:#5b4140;background:#201a1b}.image-mat:before{background:#a73a49;width:42px}
+.illustration .art{filter:saturate(.55);opacity:.9}.room-shift .illustration .art{filter:saturate(.65) brightness(1.03)}
+.scene-name{font-size:19px;color:#d2bdae}.scene-sub{color:#947c72}.scene-note{border-color:#493033;color:#9e8678}
+.bottom{border-color:#472b2f}.bottom button{color:#b19c8e}.credit{color:#88766e}
+dialog{background:#20191c;border-color:#674046}.choice{background:#2b2024;border-color:#624047}.choice:hover{background:#38232a;border-color:#b24d5a}
+@media(min-width:1500px){.illustration{height:430px}nav{top:200px}}
+@media(max-width:1000px) and (min-width:761px){nav{left:7%;width:36%}nav .primary{font-size:39px}nav button{font-size:22px}.illustration{left:51%;right:6%;height:350px}}
+@media(max-width:760px){.screen{min-height:1170px}.illustration{left:9%;right:9%;top:160px;height:285px}.illustration:before{top:-26px}nav{top:540px;left:10%;width:80%;max-width:none}nav:before{margin-bottom:22px}nav .primary{font-size:37px;padding-bottom:12px}.status{margin-bottom:22px}nav button{font-size:22px;padding:15px 14px 15px 26px}.caption{margin-top:20px}}

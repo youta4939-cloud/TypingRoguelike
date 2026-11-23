@@ -15,11 +15,15 @@ MonoBehaviour:
   combatEncounter: {fileID: 11400000, guid: 86513d8b01ac9e8488711c1934c72313, type: 2}
   eliteEncounter: {fileID: 11400000, guid: bc98ff10283c7a84db9f1f4ee128b816, type: 2}
   bossEncounter: {fileID: 11400000, guid: 4fc1ff427298a1845b5f7ffa70ee459d, type: 2}
-  restHealFraction: 0.15
+  restHealFraction: 0.2
   combatEnemyHpMultiplier: 0.72
-  partyAttackCoefficient: 1
+  globalEnemyHpScale: 2
+  partyAttackCoefficient: 0.04
   partyDefenseCoefficient: 0.5
-  partyLuckJackpotBonusPerPoint: 0.0005
+  partyDefenseConstant: 400
+  baseCritChance: 0
+  critMultiplier: 1.5
+  partyLuckJackpotBonusPerPoint: 0
   combatCoinReward: 8
   eliteCoinReward: 15
   treasureCoinReward: 10

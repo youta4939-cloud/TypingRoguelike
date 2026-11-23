@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11aa22bb33cc44dd55ee66ff77889901, type: 3}
   m_Name: Config_Akane
   m_EditorClassIdentifier: TypingRoguelike::TypingRoguelike.Data.CharacterConfig
-  characterId: akane
-  displayName: アカネ
+  characterId: chara01
+  displayName: chara01
   personality: 0
   tiers:
   - requiredTrust: 25

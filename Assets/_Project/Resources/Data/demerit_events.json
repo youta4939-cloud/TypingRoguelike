@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "events": [
+    {
+      "id": "blank_madness_a",
+      "text": "頭の奥が白く焼ける。",
+      "effects": [{ "type": "madness", "value": 30 }]
+    },
+    {
+      "id": "blank_madness_b",
+      "text": "思い出せない恐怖が押し寄せる。",
+      "effects": [{ "type": "madness", "value": 30 }]
+    },
+    {
+      "id": "blank_affinity_all",
+      "text": "誰もこちらを見ない。",
+      "effects": [{ "type": "affinity_all", "value": -3 }]
+    },
+    {
+      "id": "blank_affinity_one",
+      "text": "誰か一人が距離を置く。",
+      "effects": [{ "type": "affinity_one", "value": -5 }]
+    },
+    {
+      "id": "blank_hp",
+      "text": "見えない刃が掠める。",
+      "effects": [{ "type": "hp_percent", "value": -5 }]
+    },
+    {
+      "id": "blank_coins",
+      "text": "ポケットが軽い。",
+      "effects": [{ "type": "coins", "value": -15 }]
+    }
+  ]
+}

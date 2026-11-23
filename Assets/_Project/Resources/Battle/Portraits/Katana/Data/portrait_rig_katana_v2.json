@@ -1,0 +1,367 @@
+{
+ "title": "Katana girl standing portrait rig v2 (社外秘)",
+ "version": "v2",
+ "canvas_px": [
+  1200,
+  1600
+ ],
+ "pixels_per_unit": 100,
+ "source_art": "/workspace/art/edits/katana_fix/katana_fixed_cutout.png（絵の破綻修正版）。顔は一切加工していない",
+ "coordinates": {
+  "canvas": "source px 1200x1600, origin top-left, y DOWN, angle + = clockwise on screen",
+  "rig_local": "Unity: x = px/PPU, y = -py/PPU (origin canvas top-left, y up). Unity angle = -canvas angle, Unity dy = -canvas dy",
+  "mesh": "vertices_canvas_px = rest position on the canvas. vertices_sprite_px = origin sprite-rect bottom-left, y up. uv = 0..1 in the sprite texture"
+ },
+ "render_order": "sorting_order ascending = back to front: fill_behind_ponytail < ponytail < blade_back < head < body < cord_L < cord_R < FX",
+ "deform_model": {
+  "summary": "Every vertex has a fixed rest position p (canvas px) and per-vertex coefficients (vertex_fields). Each frame: posed = p + d(p). Formulas below are exactly the reference renderer (anim_v2.py).",
+  "U": "Body transform: rotate by theta about PIV, then translate (tx, ty). U(p) = R(theta)*(p-PIV) + PIV + (tx,ty)",
+  "U_head": "same theta/tx, ty_head = ty + (1-HEAD_K)*(BREATH*breath + 1.6*lift)  (head rises 80% of the shoulders)",
+  "body": "d = wU*(U(p)-p) + breath*(expand_x, expand_y)",
+  "ponytail": "d = wU*(U(p)-p) + g * S_pony(t - tau_s)   (S_pony = spring output, sampled with the per-vertex delay)",
+  "head": "d = U_head(p)-p + w_side * S_side(t)   (face area has w_side = 0 -> face is rigid)",
+  "cord": "d = wU*(U(p)-p) + w_cord * (S_cord.x, 0.25*S_cord.y)",
+  "PIV": [
+   620.0,
+   1000.0
+  ],
+  "HEAD_K": 0.8,
+  "BREATH_PX": 5.5,
+  "EXPAND_PX": 1.1,
+  "wU": "1 - smoothstep((y-700)/350)  (1 above y=700: head/arms/katana; 0 at y>=1050: hips/legs never move)",
+  "rigid_guarantee": "katana (blade, tsuba, hilt) and the gripping hand: wU=1 and expand=0 -> pure U (affine residual < 0.001 px). face: pure U_head"
+ },
+ "springs": {
+  "pony": {
+   "f_hz": 0.75,
+   "damping": 0.28,
+   "anchor_canvas_px": [
+    345.0,
+    445.0
+   ],
+   "inertia_gain": 1.0,
+   "anchor_moves_with": "Body",
+   "law": "a = 2nd derivative of the anchor position (px/s^2, canvas); F = -inertia_gain*4.0*a + wn^2*idle(t); v += dt*(F - 2*damping*wn*v - wn^2*x); x += dt*v (240Hz). output = 6*tanh(x/6) px",
+   "idle": "(2.2*sin(2pi*t/4+0.6), 0.5*sin(2pi*t/4+1.5))"
+  },
+  "side": {
+   "f_hz": 1.3,
+   "damping": 0.3,
+   "anchor_canvas_px": [
+    380.0,
+    300.0
+   ],
+   "inertia_gain": 0.8,
+   "anchor_moves_with": "Head",
+   "law": "a = 2nd derivative of the anchor position (px/s^2, canvas); F = -inertia_gain*4.0*a + wn^2*idle(t); v += dt*(F - 2*damping*wn*v - wn^2*x); x += dt*v (240Hz). output = 6*tanh(x/6) px",
+   "idle": "(0.7*sin(2pi*t/4+1.1), 0.25*sin(2pi*t/2+0.4))"
+  },
+  "cordL": {
+   "f_hz": 1.1,
+   "damping": 0.22,
+   "anchor_canvas_px": [
+    241.0,
+    877.0
+   ],
+   "inertia_gain": 1.0,
+   "anchor_moves_with": "Body",
+   "law": "a = 2nd derivative of the anchor position (px/s^2, canvas); F = -inertia_gain*4.0*a + wn^2*idle(t); v += dt*(F - 2*damping*wn*v - wn^2*x); x += dt*v (240Hz). output = 6*tanh(x/6) px",
+   "idle": "(0.5*sin(2pi*t/2+0.3), 0)"
+  },
+  "cordR": {
+   "f_hz": 1.15,
+   "damping": 0.22,
+   "anchor_canvas_px": [
+    519.538,
+    905.0
+   ],
+   "inertia_gain": 1.0,
+   "anchor_moves_with": "Body",
+   "law": "a = 2nd derivative of the anchor position (px/s^2, canvas); F = -inertia_gain*4.0*a + wn^2*idle(t); v += dt*(F - 2*damping*wn*v - wn^2*x); x += dt*v (240Hz). output = 6*tanh(x/6) px",
+   "idle": "(0.5*sin(2pi*t/2+1.2), 0)"
+  }
+ },
+ "pony_delay": {
+  "taus_s": [
+   0.1,
+   0.15,
+   0.2,
+   0.25,
+   0.3,
+   0.35,
+   0.4
+  ],
+  "note": "S_pony(t - tau): keep a ring buffer of the spring output (>=0.5 s) or use the 7 baked delayed samples (linear interpolation by tau)"
+ },
+ "parts": [
+  {
+   "name": "fill_behind_ponytail",
+   "sprite": "Sprites/fill_behind_ponytail.png",
+   "sorting_order": 0,
+   "field": "body",
+   "note_ja": "ponytail の裏の塗り足し（ポニーテールが揺れた時だけ見える）",
+   "rect_px": {
+    "x": 0,
+    "y": 428,
+    "w": 616,
+    "h": 1018
+   },
+   "sprite_pivot_normalized": [
+    0.0,
+    1.0
+   ],
+   "pivot_rig_local": [
+    0.0,
+    -4.28
+   ],
+   "mesh": "Data/portrait_meshes_katana_v2.json#fill_behind_ponytail",
+   "routeB_parent": "Body",
+   "variants": null
+  },
+  {
+   "name": "ponytail",
+   "sprite": "Sprites/ponytail.png",
+   "sorting_order": 1,
+   "field": "ponytail",
+   "note_ja": "ポニーテール",
+   "rect_px": {
+    "x": 0,
+    "y": 430,
+    "w": 614,
+    "h": 1014
+   },
+   "sprite_pivot_normalized": [
+    0.0,
+    1.0
+   ],
+   "pivot_rig_local": [
+    0.0,
+    -4.3
+   ],
+   "mesh": "Data/portrait_meshes_katana_v2.json#ponytail",
+   "routeB_parent": "Body",
+   "variants": null
+  },
+  {
+   "name": "blade_back",
+   "sprite": "Sprites/blade_back.png",
+   "sorting_order": 2,
+   "field": "body",
+   "note_ja": "刀身（顎の後ろ側の部分）。頭より奥に描く",
+   "rect_px": {
+    "x": 587,
+    "y": 333,
+    "w": 219,
+    "h": 99
+   },
+   "sprite_pivot_normalized": [
+    0.0,
+    1.0
+   ],
+   "pivot_rig_local": [
+    5.87,
+    -3.33
+   ],
+   "mesh": "Data/portrait_meshes_katana_v2.json#blade_back",
+   "routeB_parent": "Body",
+   "variants": null
+  },
+  {
+   "name": "head",
+   "sprite": "Sprites/head.png",
+   "sorting_order": 3,
+   "field": "head",
+   "note_ja": "頭（顔・髪・ヘアバンド）。顔は剛体のみ",
+   "rect_px": {
+    "x": 0,
+    "y": 0,
+    "w": 748,
+    "h": 444
+   },
+   "sprite_pivot_normalized": [
+    0.0,
+    1.0
+   ],
+   "pivot_rig_local": [
+    0.0,
+    -0.0
+   ],
+   "mesh": "Data/portrait_meshes_katana_v2.json#head",
+   "routeB_parent": "Head",
+   "variants": {
+    "Default": "Sprites/head.png",
+    "Hurt": null
+   }
+  },
+  {
+   "name": "body",
+   "sprite": "Sprites/body.png",
+   "sorting_order": 4,
+   "field": "body",
+   "note_ja": "体・腕・刀（柄・鍔・手）・フード。紐の下は塗り足し済み",
+   "rect_px": {
+    "x": 0,
+    "y": 232,
+    "w": 1200,
+    "h": 1368
+   },
+   "sprite_pivot_normalized": [
+    0.0,
+    1.0
+   ],
+   "pivot_rig_local": [
+    0.0,
+    -2.32
+   ],
+   "mesh": "Data/portrait_meshes_katana_v2.json#body",
+   "routeB_parent": "Body",
+   "variants": null
+  },
+  {
+   "name": "cord_L",
+   "sprite": "Sprites/cord_L.png",
+   "sorting_order": 5,
+   "field": "cordL",
+   "note_ja": "赤い紐（左）",
+   "rect_px": {
+    "x": 208,
+    "y": 874,
+    "w": 39,
+    "h": 113
+   },
+   "sprite_pivot_normalized": [
+    0.0,
+    1.0
+   ],
+   "pivot_rig_local": [
+    2.08,
+    -8.74
+   ],
+   "mesh": "Data/portrait_meshes_katana_v2.json#cord_L",
+   "routeB_parent": "Body",
+   "variants": null
+  },
+  {
+   "name": "cord_R",
+   "sprite": "Sprites/cord_R.png",
+   "sorting_order": 6,
+   "field": "cordR",
+   "note_ja": "赤い紐（右）",
+   "rect_px": {
+    "x": 510,
+    "y": 902,
+    "w": 21,
+    "h": 97
+   },
+   "sprite_pivot_normalized": [
+    0.0,
+    1.0
+   ],
+   "pivot_rig_local": [
+    5.1,
+    -9.02
+   ],
+   "mesh": "Data/portrait_meshes_katana_v2.json#cord_R",
+   "routeB_parent": "Body",
+   "variants": null
+  }
+ ],
+ "fx": [
+  {
+   "name": "fx_blade_glint_mask",
+   "sprite": "Sprites/fx_blade_glint_mask.png",
+   "rect_px": {
+    "x": 611,
+    "y": 352,
+    "w": 161,
+    "h": 69
+   },
+   "parent": "Body",
+   "use": "SpriteMask（刀身の表側だけ光らせる範囲）"
+  },
+  {
+   "name": "fx_glint_band",
+   "sprite": "Sprites/fx_glint_band.png",
+   "size_px": [
+    65,
+    65
+   ],
+   "parent": "Body",
+   "use": "加算マテリアル。刀身に沿って移動し、上のマスク内だけ表示。帯の中心を刀身方向に動かす。幅のガウス σ=13px(キャンバス)。canvas空間で回転 = 刀身の角度",
+   "color_rgb": [
+    1.0,
+    0.96,
+    0.9
+   ],
+   "intensity": 0.75
+  },
+  {
+   "name": "fx_sparkle",
+   "sprite": "Sprites/fx_sparkle.png",
+   "size_px": [
+    81,
+    81
+   ],
+   "parent": "Body",
+   "use": "加算。帯の中心点に置く小さなきらめき（画面px基準のサイズ。E5b 0.62倍表示で 81px のまま）",
+   "color_rgb": [
+    1.0,
+    0.957,
+    0.894
+   ],
+   "intensity": 0.8
+  }
+ ],
+ "bones_routeB": [
+  {
+   "name": "Anchor",
+   "parent": null,
+   "note": "canvas top-left, never moves"
+  },
+  {
+   "name": "Body",
+   "parent": "Anchor",
+   "pivot_canvas_px": [
+    620.0,
+    1000.0
+   ],
+   "note": "rotation -theta (Unity), localPosition += (tx,-ty)/PPU"
+  },
+  {
+   "name": "Head",
+   "parent": "Anchor",
+   "pivot_canvas_px": [
+    620.0,
+    1000.0
+   ],
+   "note": "same as Body but ty_head"
+  }
+ ],
+ "glint": {
+  "blade_from_canvas_px": [
+   772.0,
+   368.0
+  ],
+  "blade_to_canvas_px": [
+   614.0,
+   416.0
+  ],
+  "blade_angle_canvas_deg": 163.101,
+  "band_sigma_px": 13.0,
+  "sweep": "u = (ts)/(1.20) in 0..1 ; band centre along the blade = -10 + u*(L+20) px from blade_from ; strength k = sin(pi*u) ; sparkle at the same point (clamped to the blade)",
+  "full_body_add": "rgb += band*mask*(1.0,0.96,0.90)*0.75*k",
+  "screen_add": "rgb += band*mask*(255,244,228)*0.8*k ; sparkle = star*k (max with band)"
+ },
+ "face_variants": {
+  "part": "head",
+  "Default": "Sprites/head.png",
+  "Hurt": null,
+  "note": "この子の被ダメ表情はまだ無い。SetFace(Hurt) は何もしない（警告ログのみ）。後で head_hurt.png を同じ矩形で用意すれば差し替えるだけで動く"
+ },
+ "panel": {
+  "screen": "E5b battle screen 1920x1080",
+  "placement": "screen_px = canvas_px*0.62 + (-126, 122)  (face anchor canvas (490,230) -> screen (178,265))",
+  "mask": "Reference/panel_mask_1920x1080.png (white = visible; ally panel cut)",
+  "look": "素の色（グレード・リムなし）。UI（スキル列など）は上に重なる"
+ }
+}

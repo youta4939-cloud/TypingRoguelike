@@ -1,0 +1,102 @@
+{
+ "_note": "主人公のモノローグ（感情語なし・短い冷たい観察）。context ごとに上から評価し、最初に条件を満たした行を表示。stat: <type>_total=盤全体の枚数（空き=danger）、lane_min_<type>=3列の最小枚数、validation_failed。",
+ "lines": [
+  {
+   "id": "m_build_invalid",
+   "context": "build",
+   "when": [
+    {
+     "stat": "validation_failed",
+     "op": "==",
+     "value": true
+    }
+   ],
+   "line": "……血の匂いが、薄い。",
+   "placeholder": true
+  },
+  {
+   "id": "m_build_danger",
+   "context": "build",
+   "when": [
+    {
+     "stat": "danger_total",
+     "op": ">=",
+     "value": 3
+    }
+   ],
+   "line": "……何も、思い出せない。",
+   "source": "語部"
+  },
+  {
+   "id": "m_build_battle",
+   "context": "build",
+   "when": [
+    {
+     "stat": "battle_total",
+     "op": ">=",
+     "value": 8
+    }
+   ],
+   "line": "……血の匂いが濃い。",
+   "source": "語部"
+  },
+  {
+   "id": "m_build_rest",
+   "context": "build",
+   "when": [
+    {
+     "stat": "rest_total",
+     "op": ">=",
+     "value": 3
+    }
+   ],
+   "line": "……灯が見える。",
+   "source": "語部"
+  },
+  {
+   "id": "m_build_default",
+   "context": "build",
+   "when": [],
+   "line": "……静かだ。",
+   "placeholder": true
+  },
+  {
+   "id": "m_reach_battle",
+   "context": "lottery_reach",
+   "when": [
+    {
+     "stat": "reach_type",
+     "op": "==",
+     "value": "battle"
+    }
+   ],
+   "line": "……戦の気が、集まっている。"
+  },
+  {
+   "id": "m_reach_default",
+   "context": "lottery_reach",
+   "when": [],
+   "line": "……何かが、揃いかけている。",
+   "placeholder": true
+  },
+  {
+   "id": "m_hit_battle",
+   "context": "lottery_hit",
+   "when": [
+    {
+     "stat": "hit_combo",
+     "op": "==",
+     "value": "c01"
+    }
+   ],
+   "line": "……避けられない、か。"
+  },
+  {
+   "id": "m_hit_default",
+   "context": "lottery_hit",
+   "when": [],
+   "line": "……決まった。",
+   "placeholder": true
+  }
+ ]
+}

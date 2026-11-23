@@ -1,0 +1,58 @@
+{
+ "_note": "抽選画面サンプルの各リール 12 コマ（参照動画と同じ）。実装ではビルド盤の各列 6 マスから作る（列 l の上から順に 6 マス ×2 周 など）。type id。",
+ "strips": [
+  [
+   "rest",
+   "battle",
+   "treasure",
+   "event",
+   "shop",
+   "battle",
+   "danger",
+   "rest",
+   "treasure",
+   "battle",
+   "event",
+   "shop"
+  ],
+  [
+   "treasure",
+   "rest",
+   "battle",
+   "shop",
+   "event",
+   "battle",
+   "treasure",
+   "danger",
+   "rest",
+   "battle",
+   "shop",
+   "event"
+  ],
+  [
+   "shop",
+   "event",
+   "battle",
+   "rest",
+   "treasure",
+   "danger",
+   "shop",
+   "battle",
+   "event",
+   "rest",
+   "treasure",
+   "battle"
+  ]
+ ],
+ "idle_index": [
+  0,
+  0,
+  0
+ ],
+ "stop_index": [
+  17,
+  26,
+  50
+ ],
+ "note_stop": "stop_index mod 12 = 戦 for all reels in the sample (scripted hit)"
+}

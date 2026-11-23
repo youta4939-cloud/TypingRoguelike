@@ -10,7 +10,7 @@ namespace TypingRoguelike.Run
     {
         public static DungeonNodeType DrawColumn(System.Random rng, BoardGrid grid, int column)
         {
-            var row = rng.Next(BoardGrid.Rows);
+            var row = rng.Next(grid.RowCount);
             return grid.Get(column, row);
         }
 
@@ -133,6 +133,16 @@ namespace TypingRoguelike.Run
                 text.Append("  役 一致なし ");
                 text.Append(unmatched);
                 text.AppendLine();
+            }
+
+            text.AppendLine("  期待（全通り）");
+            foreach (var share in YakuEvaluator.Shares(grid, yaku))
+            {
+                text.Append("  ");
+                text.Append(share.Name);
+                text.Append(' ');
+                text.Append(share.Percent.ToString("0.0"));
+                text.AppendLine("%");
             }
 
             return text.ToString();

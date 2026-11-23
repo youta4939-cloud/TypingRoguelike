@@ -1,0 +1,1443 @@
+fileFormatVersion: 2
+guid: 0a594dda8dafcf94cb23791785c165e9
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 4266907840493635697
+    second: strike_magic_BloodRed_15_0
+  - first:
+      213: 8229930591120511096
+    second: strike_magic_BloodRed_15_1
+  - first:
+      213: -8756650690785444361
+    second: strike_magic_BloodRed_15_2
+  - first:
+      213: -5466297086856366591
+    second: strike_magic_BloodRed_15_3
+  - first:
+      213: 1346205894437394104
+    second: strike_magic_BloodRed_15_4
+  - first:
+      213: 2364109830434006427
+    second: strike_magic_BloodRed_15_5
+  - first:
+      213: 1200748448398066445
+    second: strike_magic_BloodRed_15_6
+  - first:
+      213: -4776694369930690051
+    second: strike_magic_BloodRed_15_7
+  - first:
+      213: -1793322372819258499
+    second: strike_magic_BloodRed_15_8
+  - first:
+      213: 4180359333189569038
+    second: strike_magic_BloodRed_15_9
+  - first:
+      213: 2133709111198961539
+    second: strike_magic_BloodRed_15_10
+  - first:
+      213: -8680611265693987498
+    second: strike_magic_BloodRed_15_11
+  - first:
+      213: -3795526047260571546
+    second: strike_magic_BloodRed_15_12
+  - first:
+      213: 2908933202138707544
+    second: strike_magic_BloodRed_15_13
+  - first:
+      213: -2557450734408608535
+    second: strike_magic_BloodRed_15_14
+  - first:
+      213: 8886489621142243265
+    second: strike_magic_BloodRed_15_15
+  - first:
+      213: 8155613505540957978
+    second: strike_magic_BloodRed_15_16
+  - first:
+      213: -3219065759269622790
+    second: strike_magic_BloodRed_15_17
+  - first:
+      213: -4628631857674727718
+    second: strike_magic_BloodRed_15_18
+  - first:
+      213: -8430461025610564511
+    second: strike_magic_BloodRed_15_19
+  - first:
+      213: -9142573449722218254
+    second: strike_magic_BloodRed_15_20
+  - first:
+      213: -5767763199151925060
+    second: strike_magic_BloodRed_15_21
+  - first:
+      213: -4655655549916432263
+    second: strike_magic_BloodRed_15_22
+  - first:
+      213: 3115070202153565896
+    second: strike_magic_BloodRed_15_23
+  - first:
+      213: -3924474569515712326
+    second: strike_magic_BloodRed_15_24
+  - first:
+      213: 8941821465208000218
+    second: strike_magic_BloodRed_15_25
+  - first:
+      213: -5044293384175776091
+    second: strike_magic_BloodRed_15_26
+  - first:
+      213: 160647239856807708
+    second: strike_magic_BloodRed_15_27
+  - first:
+      213: 6634056666470423389
+    second: strike_magic_BloodRed_15_28
+  - first:
+      213: -2001193474954515974
+    second: strike_magic_BloodRed_15_29
+  - first:
+      213: 4100216216595537669
+    second: strike_magic_BloodRed_15_30
+  - first:
+      213: 4729665057303277912
+    second: strike_magic_BloodRed_15_31
+  - first:
+      213: -6154958121127804218
+    second: strike_magic_BloodRed_15_32
+  - first:
+      213: 6121848628203687937
+    second: strike_magic_BloodRed_15_33
+  - first:
+      213: 1618044986151909506
+    second: strike_magic_BloodRed_15_34
+  - first:
+      213: -206681622342884958
+    second: strike_magic_BloodRed_15_35
+  - first:
+      213: 5575050343412372540
+    second: strike_magic_BloodRed_15_36
+  - first:
+      213: 1332900744630034078
+    second: strike_magic_BloodRed_15_37
+  - first:
+      213: -794456958389389366
+    second: strike_magic_BloodRed_15_38
+  - first:
+      213: 2099520844457335016
+    second: strike_magic_BloodRed_15_39
+  - first:
+      213: 6834332695377241615
+    second: strike_magic_BloodRed_15_40
+  - first:
+      213: -3130726487366047503
+    second: strike_magic_BloodRed_15_41
+  - first:
+      213: 328221963996219105
+    second: strike_magic_BloodRed_15_42
+  - first:
+      213: 4539531087262108463
+    second: strike_magic_BloodRed_15_43
+  - first:
+      213: -799654576877217127
+    second: strike_magic_BloodRed_15_44
+  - first:
+      213: 693819933691358576
+    second: strike_magic_BloodRed_15_45
+  - first:
+      213: 1849344175970357258
+    second: strike_magic_BloodRed_15_46
+  - first:
+      213: -981970381716681933
+    second: strike_magic_BloodRed_15_47
+  - first:
+      213: 7817471586082261279
+    second: strike_magic_BloodRed_15_48
+  - first:
+      213: 9050063426113543566
+    second: strike_magic_BloodRed_15_49
+  - first:
+      213: 2480391866942601402
+    second: strike_magic_BloodRed_15_50
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 0
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_0
+      rect:
+        serializedVersion: 2
+        x: 378
+        y: 595
+        width: 89
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 178c3f9e21a173b30800000000000000
+      internalID: 4266907840493635697
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_1
+      rect:
+        serializedVersion: 2
+        x: 356
+        y: 494
+        width: 14
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 870dbd1c446963270800000000000000
+      internalID: 8229930591120511096
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_2
+      rect:
+        serializedVersion: 2
+        x: 397
+        y: 507
+        width: 18
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7fdfd8967902a7680800000000000000
+      internalID: -8756650690785444361
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_3
+      rect:
+        serializedVersion: 2
+        x: 437
+        y: 511
+        width: 10
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1067c2dd2cfc324b0800000000000000
+      internalID: -5466297086856366591
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_4
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 494
+        width: 9
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8b65a74e02faea210800000000000000
+      internalID: 1346205894437394104
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_5
+      rect:
+        serializedVersion: 2
+        x: 338
+        y: 486
+        width: 12
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b95270d7d510fc020800000000000000
+      internalID: 2364109830434006427
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_6
+      rect:
+        serializedVersion: 2
+        x: 389
+        y: 489
+        width: 10
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d034e5b1a5ae9a010800000000000000
+      internalID: 1200748448398066445
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_7
+      rect:
+        serializedVersion: 2
+        x: 463
+        y: 490
+        width: 13
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: df14caf47c5c5bdb0800000000000000
+      internalID: -4776694369930690051
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_8
+      rect:
+        serializedVersion: 2
+        x: 477
+        y: 484
+        width: 15
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d73f858adc6dc17e0800000000000000
+      internalID: -1793322372819258499
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_9
+      rect:
+        serializedVersion: 2
+        x: 278
+        y: 475
+        width: 17
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e0ac0404aae930a30800000000000000
+      internalID: 4180359333189569038
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_10
+      rect:
+        serializedVersion: 2
+        x: 402
+        y: 480
+        width: 7
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 38f470bb1257c9d10800000000000000
+      internalID: 2133709111198961539
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_11
+      rect:
+        serializedVersion: 2
+        x: 444
+        y: 478
+        width: 11
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 65d4e03bb06488780800000000000000
+      internalID: -8680611265693987498
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_12
+      rect:
+        serializedVersion: 2
+        x: 615
+        y: 472
+        width: 32
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6688a496b25935bc0800000000000000
+      internalID: -3795526047260571546
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_13
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 397
+        width: 96
+        height: 81
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 85631dcc55b9e5820800000000000000
+      internalID: 2908933202138707544
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_14
+      rect:
+        serializedVersion: 2
+        x: 299
+        y: 302
+        width: 164
+        height: 170
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9e453056b1c128cd0800000000000000
+      internalID: -2557450734408608535
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_15
+      rect:
+        serializedVersion: 2
+        x: 516
+        y: 466
+        width: 16
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1c701605a37235b70800000000000000
+      internalID: 8886489621142243265
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_16
+      rect:
+        serializedVersion: 2
+        x: 267
+        y: 449
+        width: 14
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a17a523e54f8e2170800000000000000
+      internalID: 8155613505540957978
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_17
+      rect:
+        serializedVersion: 2
+        x: 453
+        y: 443
+        width: 12
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: afb6c1e4fb49353d0800000000000000
+      internalID: -3219065759269622790
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_18
+      rect:
+        serializedVersion: 2
+        x: 482
+        y: 449
+        width: 15
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: adecd3759dbc3cfb0800000000000000
+      internalID: -4628631857674727718
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_19
+      rect:
+        serializedVersion: 2
+        x: 240
+        y: 431
+        width: 16
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 16cf4bb1d5cf00b80800000000000000
+      internalID: -8430461025610564511
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_20
+      rect:
+        serializedVersion: 2
+        x: 269
+        y: 427
+        width: 26
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2f8b36c03ed0f1180800000000000000
+      internalID: -9142573449722218254
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_21
+      rect:
+        serializedVersion: 2
+        x: 283
+        y: 402
+        width: 14
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cb89af5ede9c4ffa0800000000000000
+      internalID: -5767763199151925060
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_22
+      rect:
+        serializedVersion: 2
+        x: 483
+        y: 421
+        width: 17
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 978b7aea1f9c36fb0800000000000000
+      internalID: -4655655549916432263
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_23
+      rect:
+        serializedVersion: 2
+        x: 541
+        y: 408
+        width: 16
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8ce74c138d3fa3b20800000000000000
+      internalID: 3115070202153565896
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_24
+      rect:
+        serializedVersion: 2
+        x: 631
+        y: 392
+        width: 47
+        height: 53
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ab046f9fb277989c0800000000000000
+      internalID: -3924474569515712326
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_25
+      rect:
+        serializedVersion: 2
+        x: 259
+        y: 358
+        width: 17
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ade8fae2f3bb71c70800000000000000
+      internalID: 8941821465208000218
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_26
+      rect:
+        serializedVersion: 2
+        x: 480
+        y: 344
+        width: 30
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5ae895594e11ff9b0800000000000000
+      internalID: -5044293384175776091
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_27
+      rect:
+        serializedVersion: 2
+        x: 526
+        y: 367
+        width: 14
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c1fdfc140dbba3200800000000000000
+      internalID: 160647239856807708
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_28
+      rect:
+        serializedVersion: 2
+        x: 271
+        y: 354
+        width: 12
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d5b18c0b367e01c50800000000000000
+      internalID: 6634056666470423389
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_29
+      rect:
+        serializedVersion: 2
+        x: 466
+        y: 357
+        width: 14
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: af9a18623255a34e0800000000000000
+      internalID: -2001193474954515974
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_30
+      rect:
+        serializedVersion: 2
+        x: 230
+        y: 341
+        width: 19
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 50f1974dce4e6e830800000000000000
+      internalID: 4100216216595537669
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_31
+      rect:
+        serializedVersion: 2
+        x: 279
+        y: 326
+        width: 13
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 851b32f8f4523a140800000000000000
+      internalID: 4729665057303277912
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_32
+      rect:
+        serializedVersion: 2
+        x: 293
+        y: 331
+        width: 11
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6c285cef232359aa0800000000000000
+      internalID: -6154958121127804218
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_33
+      rect:
+        serializedVersion: 2
+        x: 489
+        y: 327
+        width: 16
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1001bc474ec25f450800000000000000
+      internalID: 6121848628203687937
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_34
+      rect:
+        serializedVersion: 2
+        x: 241
+        y: 309
+        width: 18
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 288bf269753747610800000000000000
+      internalID: 1618044986151909506
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_35
+      rect:
+        serializedVersion: 2
+        x: 478
+        y: 319
+        width: 14
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2a1a6a6d828b12df0800000000000000
+      internalID: -206681622342884958
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_36
+      rect:
+        serializedVersion: 2
+        x: 500
+        y: 318
+        width: 17
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c34930cdfbe8e5d40800000000000000
+      internalID: 5575050343412372540
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_37
+      rect:
+        serializedVersion: 2
+        x: 251
+        y: 301
+        width: 15
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e9ed68c4a2a6f7210800000000000000
+      internalID: 1332900744630034078
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_38
+      rect:
+        serializedVersion: 2
+        x: 267
+        y: 304
+        width: 14
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ac7fcd50b9589f4f0800000000000000
+      internalID: -794456958389389366
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_39
+      rect:
+        serializedVersion: 2
+        x: 297
+        y: 284
+        width: 19
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8e85864951ff22d10800000000000000
+      internalID: 2099520844457335016
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_40
+      rect:
+        serializedVersion: 2
+        x: 373
+        y: 277
+        width: 9
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f066cc8606d68de50800000000000000
+      internalID: 6834332695377241615
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_41
+      rect:
+        serializedVersion: 2
+        x: 403
+        y: 290
+        width: 9
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1f8e3a7d8dc6d84d0800000000000000
+      internalID: -3130726487366047503
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_42
+      rect:
+        serializedVersion: 2
+        x: 411
+        y: 271
+        width: 12
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1e6c97323241e8400800000000000000
+      internalID: 328221963996219105
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_43
+      rect:
+        serializedVersion: 2
+        x: 207
+        y: 187
+        width: 99
+        height: 96
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f2bc91fe877affe30800000000000000
+      internalID: 4539531087262108463
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_44
+      rect:
+        serializedVersion: 2
+        x: 299
+        y: 260
+        width: 13
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 99ad73a266e07e4f0800000000000000
+      internalID: -799654576877217127
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_45
+      rect:
+        serializedVersion: 2
+        x: 318
+        y: 272
+        width: 11
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 07d22cdbd81f0a900800000000000000
+      internalID: 693819933691358576
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_46
+      rect:
+        serializedVersion: 2
+        x: 393
+        y: 272
+        width: 8
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a009624dab03aa910800000000000000
+      internalID: 1849344175970357258
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_47
+      rect:
+        serializedVersion: 2
+        x: 373
+        y: 230
+        width: 7
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 33b82d9f3275f52f0800000000000000
+      internalID: -981970381716681933
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_48
+      rect:
+        serializedVersion: 2
+        x: 383
+        y: 242
+        width: 8
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f1984222dfc3d7c60800000000000000
+      internalID: 7817471586082261279
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_49
+      rect:
+        serializedVersion: 2
+        x: 407
+        y: 80
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e8d904c9cb8489d70800000000000000
+      internalID: 9050063426113543566
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_BloodRed_15_50
+      rect:
+        serializedVersion: 2
+        x: 418
+        y: 79
+        width: 13
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ab8b1e4e24f1c6220800000000000000
+      internalID: 2480391866942601402
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      strike_magic_BloodRed_15_0: 4266907840493635697
+      strike_magic_BloodRed_15_1: 8229930591120511096
+      strike_magic_BloodRed_15_10: 2133709111198961539
+      strike_magic_BloodRed_15_11: -8680611265693987498
+      strike_magic_BloodRed_15_12: -3795526047260571546
+      strike_magic_BloodRed_15_13: 2908933202138707544
+      strike_magic_BloodRed_15_14: -2557450734408608535
+      strike_magic_BloodRed_15_15: 8886489621142243265
+      strike_magic_BloodRed_15_16: 8155613505540957978
+      strike_magic_BloodRed_15_17: -3219065759269622790
+      strike_magic_BloodRed_15_18: -4628631857674727718
+      strike_magic_BloodRed_15_19: -8430461025610564511
+      strike_magic_BloodRed_15_2: -8756650690785444361
+      strike_magic_BloodRed_15_20: -9142573449722218254
+      strike_magic_BloodRed_15_21: -5767763199151925060
+      strike_magic_BloodRed_15_22: -4655655549916432263
+      strike_magic_BloodRed_15_23: 3115070202153565896
+      strike_magic_BloodRed_15_24: -3924474569515712326
+      strike_magic_BloodRed_15_25: 8941821465208000218
+      strike_magic_BloodRed_15_26: -5044293384175776091
+      strike_magic_BloodRed_15_27: 160647239856807708
+      strike_magic_BloodRed_15_28: 6634056666470423389
+      strike_magic_BloodRed_15_29: -2001193474954515974
+      strike_magic_BloodRed_15_3: -5466297086856366591
+      strike_magic_BloodRed_15_30: 4100216216595537669
+      strike_magic_BloodRed_15_31: 4729665057303277912
+      strike_magic_BloodRed_15_32: -6154958121127804218
+      strike_magic_BloodRed_15_33: 6121848628203687937
+      strike_magic_BloodRed_15_34: 1618044986151909506
+      strike_magic_BloodRed_15_35: -206681622342884958
+      strike_magic_BloodRed_15_36: 5575050343412372540
+      strike_magic_BloodRed_15_37: 1332900744630034078
+      strike_magic_BloodRed_15_38: -794456958389389366
+      strike_magic_BloodRed_15_39: 2099520844457335016
+      strike_magic_BloodRed_15_4: 1346205894437394104
+      strike_magic_BloodRed_15_40: 6834332695377241615
+      strike_magic_BloodRed_15_41: -3130726487366047503
+      strike_magic_BloodRed_15_42: 328221963996219105
+      strike_magic_BloodRed_15_43: 4539531087262108463
+      strike_magic_BloodRed_15_44: -799654576877217127
+      strike_magic_BloodRed_15_45: 693819933691358576
+      strike_magic_BloodRed_15_46: 1849344175970357258
+      strike_magic_BloodRed_15_47: -981970381716681933
+      strike_magic_BloodRed_15_48: 7817471586082261279
+      strike_magic_BloodRed_15_49: 9050063426113543566
+      strike_magic_BloodRed_15_5: 2364109830434006427
+      strike_magic_BloodRed_15_50: 2480391866942601402
+      strike_magic_BloodRed_15_6: 1200748448398066445
+      strike_magic_BloodRed_15_7: -4776694369930690051
+      strike_magic_BloodRed_15_8: -1793322372819258499
+      strike_magic_BloodRed_15_9: 4180359333189569038
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

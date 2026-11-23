@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>怪異録 | イベント台帳</title>
+<style>
+:root{color-scheme:dark;--bg:#101113;--panel:#18191d;--line:#343136;--text:#f1e8d9;--muted:#b7ada2;--gold:#efc57c;--teal:#9bd4c8}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.65 system-ui,sans-serif}
+.shell{max-width:1250px;margin:auto;padding:24px clamp(16px,4vw,48px) 56px}
+header,.bar,.actions{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+header{border-bottom:1px solid var(--line);padding-bottom:22px;margin-bottom:24px}
+h1,h2,.preview h3{font-family:"Yu Mincho",serif}h1{font-size:2.2rem;margin:0;letter-spacing:.12em}h2,h3,p{margin:0}
+.sub,small,output{color:var(--muted)}.sub,small{font-size:.875rem}
+main{display:grid;grid-template-columns:minmax(235px,1fr) minmax(0,2.65fr);gap:20px;align-items:start}
+.panel{border:1px solid var(--line);background:var(--panel);border-radius:14px;padding:clamp(14px,2.4vw,24px)}
+button,input,textarea{font:inherit}button{cursor:pointer;border:1px solid #51483d;border-radius:8px;background:#222227;color:var(--text);padding:7px 12px}
+button:hover{border-color:var(--gold)}.primary{background:var(--gold);color:#211809;border-color:var(--gold);font-weight:700}
+:focus-visible{outline:2px solid var(--teal);outline-offset:3px}[hidden]{display:none!important}
+input,textarea{width:100%;border-radius:7px;border:1px solid var(--line);background:#101114;color:var(--text);padding:8px 10px}
+textarea{resize:vertical;min-height:80px}label{display:grid;gap:5px;font-size:.9rem}#search{margin:12px 0}
+.effects{display:grid;gap:8px}.effect-list{display:grid;gap:8px}.effect-row{display:grid;gap:8px;padding:10px;border:1px solid var(--line);border-radius:8px}.effect-row select{width:100%;font:inherit;color:var(--text);background:#101114;border:1px solid var(--line);border-radius:7px;padding:8px}.effect-values{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:end}.effect-add{justify-self:start}.effect-preview{color:var(--gold)}
+#list{display:grid;gap:7px;max-height:65vh;overflow:auto;padding:3px}.entry{text-align:left;overflow-wrap:anywhere}.entry[aria-current=true]{border-color:var(--gold);background:#2a241e}.num{color:var(--gold);font-size:.85rem}
+form{display:grid;gap:16px;margin-top:14px}.identity{display:grid;grid-template-columns:90px 1fr;gap:12px}.branches{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+fieldset{min-width:0;margin:0;border:1px solid var(--line);border-radius:9px;padding:10px;display:grid;gap:10px}legend{color:var(--gold);padding:0 6px}fieldset+fieldset legend{color:var(--teal)}
+.preview{margin-top:24px;padding:18px;border:1px solid var(--line);border-radius:10px;background:#101114}
+.preview h3{margin:8px 0 12px;font-size:1.45rem}.preview p{white-space:pre-wrap;overflow-wrap:anywhere}.preview .branches{margin-top:16px}.preview button{text-align:left;color:var(--gold);white-space:pre-wrap;overflow-wrap:anywhere}.preview button+button{color:var(--teal)}#result{margin-top:12px;color:#d8bae9}output{display:block;min-height:1.65em;margin-top:8px}
+@media(max-width:740px){main{grid-template-columns:1fr}#list{max-height:14rem}}@media(max-width:470px){.branches{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="shell">
+<header><div><p class="sub">イベント台帳</p><h1>怪異録</h1></div>
+<div class="actions"><button id="import">JSONを読み込む</button><button id="export">台帳JSONを書き出す</button><button id="export-unity">Unity用JSONを書き出す</button><input id="file" type="file" accept=".json,application/json" hidden></div></header>
+<main>
+<aside class="panel"><div class="bar"><h2>イベント一覧</h2><small id="count"></small></div>
+<input id="search" type="search" placeholder="No.・イベント名・文章で検索" aria-label="イベントを検索">
+<div id="list"></div></aside>
+<section class="panel"><div class="bar"><h2 id="editor-title">イベント編集</h2><button id="new">＋ 新規登録</button></div>
+<form id="form">
+<div class="identity"><label>No.<input name="number" type="number" min="1" max="999999" required></label><label>イベント名<input name="title" required></label></div>
+<label>本文<textarea name="body" rows="3"></textarea></label>
+<div class="branches">
+<fieldset><legend>選択肢 A</legend><label>選択肢の文章<input name="choiceA"></label><label id="intro-A" hidden>戦闘前の文章<textarea name="battleIntroA" rows="2"></textarea></label><label><span id="result-label-A">結果文</span><textarea name="resultA" rows="3"></textarea></label><div class="effects"><div id="effects-A" class="effect-list"></div><button type="button" class="effect-add" id="add-A">＋ Aの効果を追加</button></div></fieldset>
+<fieldset><legend>選択肢 B</legend><label>選択肢の文章<input name="choiceB"></label><label id="intro-B" hidden>戦闘前の文章<textarea name="battleIntroB" rows="2"></textarea></label><label><span id="result-label-B">結果文</span><textarea name="resultB" rows="3"></textarea></label><div class="effects"><div id="effects-B" class="effect-list"></div><button type="button" class="effect-add" id="add-B">＋ Bの効果を追加</button></div></fieldset>
+</div>
+<div class="bar"><div class="actions"><button class="primary">保存</button><button type="button" id="duplicate">複製</button></div><button type="button" id="delete">削除</button></div>
+</form>
+<output id="status" role="status"></output>
+<div class="preview"><small>プレイヤー画面プレビュー</small><h3 id="preview-title"></h3><p id="preview-body"></p><div class="branches"><button id="preview-a"></button><button id="preview-b"></button></div><div aria-live="polite"><p id="result" hidden></p><ul id="effect-preview" class="effect-preview" hidden></ul></div><button id="preview-win" hidden>勝利後を表示</button></div>
+</section>
+</main>
+</div>
+<script>
+"use strict";
+const key = "typing-roguelike-event-ledger-v1";
+const samples = [
+  [1, "潮騒の螺旋階段", "水たまりの底で、小さな目がいくつも瞬いている。\n一つだけ、あなたがまばたきするたびに閉じる。", "すくう", "手のひらの目が開くと、壁の向こうに次の階段が見えた。閉じたのは、あなたの左目だった。", "とびこす", "着地した音に遅れて、背後で水が跳ねた。振り返ると、水たまりに映ったあなたが、いまも跳ぶ前の姿勢で立っていた。"],
+  [2, "終点の改札", "改札の向こうから、駅員が切符を差し出している。\n行き先には「自宅」、発車時刻には、今朝あなたが家を出た時刻が印字されている。", "受け取る", "台所の時計は今朝のままだった。玄関では、あなたの声が「いってきます」と言った。", "通り過ぎる", "背後で改札が鳴った。「いってらっしゃいませ」。駅員はあなたの名字を知っていた。"]
+];
+const fields = ["number", "title", "body", "choiceA", "resultA", "choiceB", "resultB"];
+const branches = ["A", "B"];
+// EnemyCatalog.asset に登録済みで、内部IDを持つ敵。
+const unityEnemies = new Map([
+  ["enemy_20261116_131852", "小鬼"],
+  ["enemy_20261117_142742", "リトルデビル"],
+  ["enemy_20261117_225747", "ハーピィー"]
+]);
+const effectTypes = new Map([
+  ["battle", {label: "戦闘開始", enemy: true}],
+  ["hpGain", {label: "HP増加", unit: "HP"}],
+  ["hpLoss", {label: "HP減少", unit: "HP"}],
+  ["madnessGain", {label: "狂気値増加", unit: "ポイント"}],
+  ["madnessLoss", {label: "狂気値減少", unit: "ポイント"}],
+  ["moneyGain", {label: "お金獲得", unit: "通貨"}],
+  ["moneyLoss", {label: "お金減少", unit: "通貨"}],
+  ["trustGain", {label: "信頼値獲得", unit: "ポイント"}],
+  ["skillXpGain", {label: "スキル経験値獲得", unit: "XP"}],
+  ["nextBattleDamage", {label: "次回戦闘のみ：敵に与えるダメージ増加", unit: "%"}],
+  ["nextBattleAttackDelay", {label: "次回戦闘のみ：敵の攻撃開始までの時間増加", unit: "秒", fractional: true}],
+  ["moveUp", {label: "上層へ移動", unit: "層"}],
+  ["moveDown", {label: "下層へ移動", unit: "層"}],
+  ["weaponGain", {label: "武器の獲得", text: true}]
+]);
+const $ = id => document.getElementById(id);
+const form = $("form");
+const status = message => { $("status").textContent = message; };
+
+function decode(raw) {
+  const data = JSON.parse(raw);
+  if (!data || ![1, 2].includes(data.version) || !Array.isArray(data.events)) throw Error("台帳のJSON形式が違います。");
+  const numbers = new Set();
+  for (const event of data.events) {
+    if (!event || !Number.isInteger(event.number) || event.number < 1 || event.number > 999999 ||
+        fields.slice(1).some(field => typeof event[field] !== "string") || !event.title.trim()) {
+      throw Error("入力項目が正しくないイベントがあります。");
+    }
+    if (numbers.has(event.number)) throw Error("No. が重複しています。");
+    numbers.add(event.number);
+  }
+  return data.events.map(event => {
+    const record = Object.fromEntries(fields.map(field => [field, event[field]]));
+    for (const branch of branches) {
+      const intro = "battleIntro" + branch;
+      if (event[intro] !== undefined && typeof event[intro] !== "string") throw Error("戦闘前の文章が正しくありません。");
+      record[intro] = event[intro] ?? "";
+      const field = "effects" + branch;
+      const effects = data.version === 1 ? [] : event[field];
+      if (!Array.isArray(effects) || !effects.every(validEffect)) throw Error("No. " + event.number + " の効果に不正な入力があります。");
+      record[field] = effects.map(({type, value}) => ({type, value}));
+    }
+    return record;
+  });
+}
+
+function validEffect(effect) {
+  const type = effectTypes.get(effect?.type);
+  if (!type) return false;
+  if (type.text || type.enemy) return typeof effect.value === "string" && Boolean(effect.value.trim());
+  return Number.isFinite(effect.value) && effect.value > 0 && (type.fractional || Number.isInteger(effect.value));
+}
+
+function addEffect(branch, effect = {type: "hpGain", value: 1}) {
+  const row = document.createElement("div");
+  row.className = "effect-row";
+  row.innerHTML = '<label>効果の種類<select data-type></select></label><div class="effect-values"><label><span data-unit></span><input data-value required><select data-enemy hidden disabled required></select></label><button type="button">削除</button></div>';
+  const select = row.querySelector("select");
+  const input = row.querySelector("input");
+  const enemy = row.querySelector("[data-enemy]");
+  enemy.add(new Option("敵を選択", ""));
+  for (const [id, name] of unityEnemies) enemy.add(new Option(name + " · " + id, id));
+  for (const [id, type] of effectTypes) select.add(new Option(type.label, id));
+  select.value = effect.type;
+  function updateValue(value) {
+    const type = effectTypes.get(select.value);
+    row.querySelector("[data-unit]").textContent = type.enemy ? "対戦する敵" : type.text ? "武器名" : "量（" + type.unit + "）";
+    input.hidden = input.disabled = Boolean(type.enemy);
+    enemy.hidden = enemy.disabled = !type.enemy;
+    if (type.enemy) {
+      if (value && !unityEnemies.has(value) && !Array.from(enemy.options).some(option => option.value === value)) {
+        enemy.add(new Option("未登録 · " + value, value));
+      }
+      enemy.value = value;
+    }
+    input.type = type.text ? "text" : "number";
+    input.min = type.fractional ? "0" : "1";
+    input.step = type.fractional ? "any" : "1";
+    input.value = value;
+  }
+  updateValue(effect.value);
+  select.onchange = () => {
+    const type = effectTypes.get(select.value);
+    updateValue(type.text || type.enemy ? "" : 1);
+    renderPreview();
+  };
+  row.querySelector("button").onclick = () => { row.remove(); renderPreview(); };
+  $("effects-" + branch).append(row);
+  return select;
+}
+
+let events = [];
+let current = null;
+let baseline = "";
+let storageReadable = true;
+try {
+  const raw = localStorage.getItem(key);
+  events = raw === null ? samples.map(row => Object.fromEntries(fields.map((field, index) => [field, row[index]]))) : decode(raw);
+} catch {
+  storageReadable = false;
+}
+
+function formEvent() {
+  const event = Object.fromEntries(new FormData(form));
+  for (const branch of branches) {
+    event["effects" + branch] = Array.from($("effects-" + branch).children, row => {
+      const type = row.querySelector("[data-type]").value;
+      if (effectTypes.get(type).enemy) return {type, value: row.querySelector("[data-enemy]").value};
+      const value = row.querySelector("input").value;
+      return {type, value: effectTypes.get(type).text ? value.trim() : Number(value)};
+    });
+  }
+  return {...event, number: Number(event.number), title: event.title.trim()};
+}
+
+function nextNumber() {
+  const numbers = new Set(events.map(event => event.number));
+  for (let number = 1; number <= 999999; number++) {
+    if (!numbers.has(number)) return number;
+  }
+  return "";
+}
+
+function canLeave() {
+  return baseline === JSON.stringify(formEvent()) || confirm("保存していない変更を破棄しますか？");
+}
+
+function openEvent(event, asCopy = false) {
+  current = asCopy ? null : event?.number ?? null;
+  for (const field of fields) form.elements[field].value = event?.[field] ?? "";
+  for (const branch of branches) {
+    form.elements["battleIntro" + branch].value = event?.["battleIntro" + branch] ?? "";
+    $("effects-" + branch).replaceChildren();
+    for (const effect of event?.["effects" + branch] ?? []) addEffect(branch, effect);
+  }
+  if (current === null) form.elements.number.value = nextNumber();
+  if (asCopy) form.elements.title.value += "（コピー）";
+  $("editor-title").textContent = current === null ? "イベント登録" : "イベント編集";
+  $("delete").hidden = current === null;
+  baseline = asCopy ? "" : JSON.stringify(formEvent());
+  status("");
+  renderList();
+  renderPreview();
+}
+
+function renderList() {
+  const query = $("search").value.trim().normalize("NFKC").toLowerCase();
+  const shown = events.filter(event => {
+    const effects = branches.flatMap(branch => (event["effects" + branch] ?? []).map(formatEffect));
+    const intros = branches.map(branch => event["battleIntro" + branch] ?? "");
+    return [...fields.map(field => event[field]), ...intros, ...effects].some(value => String(value).normalize("NFKC").toLowerCase().includes(query));
+  })
+    .sort((a, b) => a.number - b.number);
+  $("count").textContent = query ? shown.length + " / " + events.length + "件" : events.length + "件";
+  $("list").replaceChildren();
+  for (const event of shown) {
+    const entry = document.createElement("button");
+    const number = document.createElement("span");
+    number.className = "num";
+    number.textContent = "No. " + event.number;
+    entry.className = "entry";
+    entry.setAttribute("aria-current", String(event.number === current));
+    entry.append(number, document.createElement("br"), event.title);
+    entry.onclick = () => { if (event.number !== current && canLeave()) openEvent(event); };
+    $("list").append(entry);
+  }
+  if (!shown.length) $("list").textContent = query ? "該当するイベントがありません。" : "登録されたイベントがありません。";
+}
+
+function renderPreview() {
+  const event = formEvent();
+  $("preview-title").textContent = event.title || "イベント名";
+  $("preview-body").textContent = event.body || "本文を入力するとここに表示されます。";
+  $("preview-a").textContent = event.choiceA || "選択肢 A";
+  $("preview-b").textContent = event.choiceB || "選択肢 B";
+  for (const branch of branches) {
+    const battle = event["effects" + branch].some(effect => effect.type === "battle");
+    $("intro-" + branch).hidden = !battle;
+    $("result-label-" + branch).textContent = battle ? "勝利後の結果文" : "結果文";
+  }
+  $("result").hidden = true;
+  $("effect-preview").hidden = true;
+  $("preview-win").hidden = true;
+}
+
+function formatEffect(effect) {
+  const type = effectTypes.get(effect.type);
+  if (type.enemy) return type.label + " " + (unityEnemies.get(effect.value) ?? effect.value);
+  return type.label + " " + effect.value + (type.unit ?? "");
+}
+
+function persist(updated) {
+  if (!storageReadable) {
+    status("保存領域を読み取れませんでした。別のブラウザ設定で開くか、台帳のJSONを読み込んでください。");
+    return false;
+  }
+  try {
+    localStorage.setItem(key, encode(updated));
+    events = updated;
+    return true;
+  } catch {
+    status("ブラウザに保存できませんでした。");
+    return false;
+  }
+}
+
+function encode(records, indent) {
+  const events = records.map(event => ({effectsA: [], effectsB: [], ...event}));
+  return JSON.stringify({version: 2, events}, null, indent);
+}
+
+form.onsubmit = event => {
+  event.preventDefault();
+  const draft = formEvent();
+  if (!draft.title) return status("イベント名を入力してください。");
+  if (!branches.every(branch => draft["effects" + branch].every(validEffect))) return status("効果の量、武器名、または対戦する敵を確認してください。");
+  if (events.some(item => item.number === draft.number && item.number !== current)) return status("その No. は使用済みです。");
+  if (persist([...events.filter(item => item.number !== current), draft])) {
+    openEvent(draft);
+    status("保存しました。");
+  }
+};
+form.oninput = renderPreview;
+$("search").oninput = renderList;
+$("new").onclick = () => { if (canLeave()) { openEvent(); form.elements.title.focus(); } };
+$("duplicate").onclick = () => { openEvent(formEvent(), true); form.elements.title.focus(); };
+$("delete").onclick = () => {
+  if (current !== null && confirm("No. " + current + " を削除しますか？") && persist(events.filter(item => item.number !== current))) {
+    openEvent(events[0]);
+    status("削除しました。");
+  }
+};
+for (const branch of branches) {
+  $("add-" + branch).onclick = () => { addEffect(branch).focus(); renderPreview(); };
+  $("preview-" + branch.toLowerCase()).onclick = () => {
+    const event = formEvent();
+    const battle = event["effects" + branch].some(effect => effect.type === "battle");
+    const win = $("preview-win");
+    win.hidden = !battle;
+    if (battle) {
+      $("result").textContent = event["battleIntro" + branch] || "戦闘開始";
+      $("result").hidden = false;
+      $("effect-preview").hidden = true;
+      win.onclick = () => {
+        showResult(event, branch);
+        win.hidden = true;
+      };
+    } else {
+      showResult(event, branch);
+    }
+  };
+}
+
+function showResult(event, branch) {
+  $("result").textContent = event["result" + branch] || "結果文は未入力です。";
+  $("result").hidden = false;
+  const list = $("effect-preview");
+  const items = event["effects" + branch].filter(effect => effect.type !== "battle" && validEffect(effect)).map(effect => {
+    const item = document.createElement("li");
+    item.textContent = formatEffect(effect);
+    return item;
+  });
+  list.replaceChildren(...items);
+  list.hidden = items.length === 0;
+}
+function downloadJson(name, contents) {
+  const url = URL.createObjectURL(new Blob([contents], {type: "application/json"}));
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = name;
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+$("export").onclick = () => {
+  const sorted = [...events].sort((a, b) => a.number - b.number);
+  downloadJson("event-ledger.json", encode(sorted, 2));
+  status("保存済みのイベントを書き出しました。");
+};
+
+const unityEffects = new Map([
+  ["madnessGain", ["madness", 1]], ["madnessLoss", ["madness", -1]],
+  ["moneyGain", ["coins", 1]], ["moneyLoss", ["coins", -1]],
+  ["trustGain", ["trust", 1]],
+  ["moveUp", ["warp", 1]], ["moveDown", ["warp", -1]]
+]);
+const unityCategories = {battle: "battle", madness: "madness", coins: "coins", trust: "trust", warp: "warp"};
+
+function convertForUnity(event) {
+  const options = branches.map(branch => {
+    const choice = event["choice" + branch].trim();
+    const effects = event["effects" + branch] ?? [];
+    const error = message => { throw Error("No. " + event.number + " 選択肢 " + branch + "：" + message); };
+    if (!choice) error("選択肢の文章を入力してください。");
+    const battles = effects.filter(effect => effect.type === "battle");
+    if (battles.length > 1) error("戦闘開始は結果ごとに1件までです。");
+    const converted = effects.map(({type, value}) => {
+      if (type === "battle") {
+        if (!unityEnemies.has(value)) error("敵 ID が一覧にありません（" + value + "）。");
+        return {type: "battle", kind: "normal", enemyId: value};
+      }
+      if (type === "nextBattleAttackDelay" && battles.length && Number.isInteger(value) && value <= 2147483647) {
+        return {type: "battle_opening_seconds", value};
+      }
+      const mapping = unityEffects.get(type);
+      if (type === "nextBattleAttackDelay") error("攻撃開始の遅延は戦闘開始と同じ結果に整数秒で指定してください。");
+      if (!mapping) error("「" + effectTypes.get(type).label + "」はUnity用JSONへの変換に未対応です。");
+      if (value > 2147483647) error("効果量が Unity の整数の上限を超えています。");
+      const convertedEffect = {type: mapping[0], value: value * mapping[1]};
+      if (type === "trustGain") convertedEffect.target = "all";
+      return convertedEffect;
+    });
+    const result = event["result" + branch];
+    const outcome = {chance: 100, text: result, effects: converted};
+    if (battles.length) {
+      outcome.text = "";
+      outcome.battleIntro = event["battleIntro" + branch] ?? "";
+      outcome.victoryText = result;
+    }
+    return {label: choice, stance: branch === "A" ? "aggressive" : "defensive", knowledge: "unknown", outcomes: [outcome]};
+  });
+  const kinds = options.flatMap(option => option.outcomes[0].effects.map(effect => effect.type));
+  const category = kinds.includes("battle") ? "battle" : unityCategories[kinds.find(kind => Object.hasOwn(unityCategories, kind))] ?? "madness";
+  return {id: "ledger_" + event.number, category, title: event.title, minLayer: 1, maxLayer: 15,
+    conditions: [], body: event.body, options};
+}
+
+$("export-unity").onclick = () => {
+  try {
+    if (baseline !== JSON.stringify(formEvent())) throw Error("変更を保存してから書き出してください。");
+    if (!events.length) throw Error("書き出すイベントがありません。");
+    const records = [...events].sort((a, b) => a.number - b.number).map(convertForUnity);
+    downloadJson("events-unity.json", JSON.stringify({version: 2, events: records}, null, 2));
+    status("Unity用JSONを書き出しました。");
+  } catch (error) {
+    status(error.message);
+  }
+};
+$("import").onclick = () => $("file").click();
+$("file").onchange = async () => {
+  const file = $("file").files[0];
+  $("file").value = "";
+  if (!file) return;
+  try {
+    const incoming = decode((await file.text()).replace(/^\uFEFF/, ""));
+    if (!confirm("現在の台帳を、読み込んだ " + incoming.length + " 件で置き換えますか？ 未保存の編集も破棄されます。")) return;
+    storageReadable = true;
+    if (persist(incoming)) {
+      openEvent(events[0]);
+      status(incoming.length + " 件を読み込みました。");
+    }
+  } catch (error) {
+    status("読み込みに失敗しました。 " + error.message);
+  }
+};
+window.addEventListener("beforeunload", event => {
+  if (baseline !== JSON.stringify(formEvent())) {
+    event.preventDefault();
+    event.returnValue = true;
+  }
+});
+openEvent(events[0]);
+if (!storageReadable) status("保存領域を読み取れませんでした。");
+</script>
+</body>
+</html>

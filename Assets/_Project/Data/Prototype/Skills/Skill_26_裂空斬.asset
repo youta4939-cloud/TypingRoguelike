@@ -16,6 +16,7 @@ MonoBehaviour:
   characterName: アリス
   displayName: 裂空斬
   pattern: 010000000200000001000000
+  damagePercent: 0.2
   damage: 40
   heal: 0
   effectText: 40ダメ

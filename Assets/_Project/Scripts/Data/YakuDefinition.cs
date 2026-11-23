@@ -29,14 +29,20 @@ namespace TypingRoguelike.Data
         public int matchCount = 3;
         public YakuBonusKind bonus = YakuBonusKind.None;
         public float bonusValue;
+        public string effectText;
 
-        public string DescribeEffect() => bonus switch
+        public string DescribeEffect()
         {
-            YakuBonusKind.CombatCardChoices => $"この層の戦闘は、刻印の選択肢+{Mathf.Max(1, Mathf.RoundToInt(bonusValue))}",
-            YakuBonusKind.HealBeforeFourth => $"4マス目の前にHP {Mathf.RoundToInt((bonusValue <= 0f ? 0.2f : bonusValue) * 100f)}% 回復",
-            YakuBonusKind.CoinGainPercent => $"この層で得る塔片 +{Mathf.RoundToInt((bonusValue <= 0f ? 0.5f : bonusValue) * 100f)}%",
-            YakuBonusKind.FlatCoins => $"塔片 +{Mathf.Max(0, Mathf.RoundToInt(bonusValue))}",
-            _ => "ボーナスなし。罠の効果だけ。"
-        };
+            if (!string.IsNullOrEmpty(effectText))
+                return effectText;
+            return bonus switch
+            {
+                YakuBonusKind.CombatCardChoices => $"この層の戦闘は、刻印の選択肢+{Mathf.Max(1, Mathf.RoundToInt(bonusValue))}",
+                YakuBonusKind.HealBeforeFourth => $"4マス目の前にHP {Mathf.RoundToInt((bonusValue <= 0f ? 0.2f : bonusValue) * 100f)}% 回復",
+                YakuBonusKind.CoinGainPercent => $"この層で得る塔片 +{Mathf.RoundToInt((bonusValue <= 0f ? 0.5f : bonusValue) * 100f)}%",
+                YakuBonusKind.FlatCoins => $"塔片 +{Mathf.Max(0, Mathf.RoundToInt(bonusValue))}",
+                _ => "ボーナスなし。罠の効果だけ。"
+            };
+        }
     }
 }

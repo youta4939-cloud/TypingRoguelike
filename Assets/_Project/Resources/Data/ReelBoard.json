@@ -1,0 +1,11 @@
+{
+  "rows": 6,
+  "minimums": [
+    { "fromLayer": 1, "toLayer": 99, "type": "B", "minimumPerColumn": 2 }
+  ],
+  "advice": [
+    { "square": "MidBoss", "text": "おすすめ：回復を厚く" },
+    { "square": "Boss", "text": "おすすめ：回復を厚く" },
+    { "square": "Elevator", "text": "おすすめ：宝を厚く" }
+  ]
+}

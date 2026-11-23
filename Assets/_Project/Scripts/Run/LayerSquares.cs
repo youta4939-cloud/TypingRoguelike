@@ -10,7 +10,7 @@ namespace TypingRoguelike.Run
         public static DungeonNodeType[] DrawSquares(int layer, int runSeed, LayerConfig config, BoardGrid board)
         {
             config ??= LayerConfig.RuntimeFallback();
-            board ??= BoardGrid.Parse("BBBRRSTEE", "BBBRRSTEE", "BBBRRSTEE");
+            board ??= BoardGrid.Parse("BBRSTE", "BBRSTE", "BBRSTE");
             // ラン・層・盤面でシードが変わる。同じ組み合わせは同じ結果になり、再開してもマスが変わらない。
             var rng = new System.Random(unchecked(runSeed * 397 ^ layer * 7919 ^ board.ContentHash()));
             var squares = new DungeonNodeType[Count];
@@ -74,9 +74,23 @@ namespace TypingRoguelike.Run
             return "最低必要：" + string.Join("、", parts);
         }
 
+        public static DungeonNodeType FromRoadId(string id)
+        {
+            switch (id)
+            {
+                case "battle": return DungeonNodeType.Combat;
+                case "rest": return DungeonNodeType.Rest;
+                case "treasure": return DungeonNodeType.Treasure;
+                case "shop": return DungeonNodeType.Merchant;
+                case "event": return DungeonNodeType.Event;
+                case "danger": return DungeonNodeType.Trap;
+                default: return DungeonNodeType.Combat;
+            }
+        }
+
         public static DungeonNodeType FixedSquare(int layer, LayerConfig config)
         {
-            var bossEvery = config != null && config.bossEvery > 0 ? config.bossEvery : 5;
+            var bossEvery = config != null && config.bossEvery > 0 ? config.bossEvery : 10;
             var elevatorEvery = config != null && config.elevatorEvery > 0 ? config.elevatorEvery : 3;
             if (layer % bossEvery == 0)
                 return DungeonNodeType.Boss;

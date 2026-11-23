@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: TypingRoguelike::TypingRoguelike.Data.BoardPreset
   presetId: treasure
   displayName: 宝寄り
-  column1: BBBTTTTXX
-  column2: BBBTTTTXX
-  column3: BBBTTTTXX
+  column1: TTBBRR
+  column2: TTXBBT
+  column3: TTXBBT

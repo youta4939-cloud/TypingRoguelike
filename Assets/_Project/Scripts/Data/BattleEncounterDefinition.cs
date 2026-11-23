@@ -7,6 +7,8 @@ namespace TypingRoguelike.Data
     public sealed class BattleEncounterDefinition : ScriptableObject
     {
         public EnemyDefinition enemy;
+        [Tooltip("入っていれば通常戦で等確率に1体選ぶ。空なら enemy を使う")]
+        public EnemyDefinition[] enemyPool;
         public WordListDefinition wordList;
         public PartyLoadoutDefinition party;
 
@@ -24,9 +26,9 @@ namespace TypingRoguelike.Data
         public float jackpotMultiplier = 2f;
         [Tooltip("戦闘開始時・JACKPOT後の初期当選率（0 = 蓄積のみ）")]
         [Range(0f, 1f)] public float baseFreezeChance = 0f;
-        [Tooltip("Jackpot外れ時、完了した単語1文字あたり加算（0.000025 = 0.0025%）")]
+        [Tooltip("運120のとき、Jackpot外れ1文字あたりの蓄積（0.0000075 = 0.00075%）。実加算は運合計/120を掛ける。")]
         [FormerlySerializedAs("freezeChancePerWord")]
-        [Range(0f, 1f)] public float freezeChancePerCharacter = 0.000025f;
+        [Range(0f, 1f)] public float freezeChancePerCharacter = 0.0000075f;
         [Tooltip("通常攻撃だけで蓄積できる当選率の上限")]
         [Range(0f, 1f)] public float baseJackpotChanceCap = 0.1f;
         [Tooltip("スキル等込みの最終当選率上限")]
@@ -48,9 +50,11 @@ namespace TypingRoguelike.Data
 
             baseChance = Mathf.Max(0f, baseChance);
 
-            // 旧レート（1語+1% / 0.0125%・字）を現行 0.0025%・字 へ
-            if (chancePerCharacter >= 0.0001f || chancePerCharacter <= 0f)
-                chancePerCharacter = 0.000025f;
+            // 旧レート（0.00025%/字、およびそれ以前の試作値）を運120基準の 0.00075%/字 へ。
+            if (chancePerCharacter <= 0f ||
+                chancePerCharacter >= 0.00001f ||
+                Mathf.Approximately(chancePerCharacter, 0.0000025f))
+                chancePerCharacter = 0.0000075f;
 
             if (maxFinalChance <= 0.05f)
                 maxFinalChance = 0.99f;

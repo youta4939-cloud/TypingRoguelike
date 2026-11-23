@@ -1,3 +1,4 @@
+using System.Collections;
 using TypingRoguelike.Run;
 using UnityEngine;
 
@@ -10,12 +11,32 @@ namespace TypingRoguelike.Battle
     {
         void Awake()
         {
-            ApplyVoidCameraBackground();
+            EnsureRunFlowHost();
+            Debug.Log($"[TypingRoguelike] BattleSceneSetup 起動（シーン: {gameObject.scene.name}）");
+        }
 
+        void Start() => StartCoroutine(BootstrapRunUiNextFrame());
+
+        static IEnumerator BootstrapRunUiNextFrame()
+        {
+            yield return null;
+            ApplyVoidCameraBackground();
+            var flow = Object.FindAnyObjectByType<RunFlowController>(FindObjectsInactive.Include);
+            if (flow == null)
+            {
+                Debug.LogError(
+                    "[TypingRoguelike] RunFlowController がありません。Assets/Scenes/SampleScene を開いて Play してください。");
+                yield break;
+            }
+
+            flow.EnsureHubVisible();
+        }
+
+        void EnsureRunFlowHost()
+        {
+            ApplyVoidCameraBackground();
             if (!TryGetComponent<RunFlowController>(out _))
                 gameObject.AddComponent<RunFlowController>();
-
-            Debug.Log($"[TypingRoguelike] BattleSceneSetup 起動（シーン: {gameObject.scene.name}）");
         }
 
         static void ApplyVoidCameraBackground()

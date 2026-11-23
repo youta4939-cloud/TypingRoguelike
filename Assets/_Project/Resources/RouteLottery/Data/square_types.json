@@ -1,0 +1,152 @@
+{
+ "_note": "マスの種類。Danger = 欠片が置かれていないセル（盤の空き）。名称・効果は仮（provisional）。icon/tile_bg はスプライト名（_2x/_1x を付けて読む）。illustrations は Sprites/Illustrations/<name>.jpg",
+ "types": [
+  {
+   "id": "battle",
+   "name": "戦闘",
+   "short": "戦",
+   "tile_bg": "Icons/tile_bg_battle",
+   "icon": "Icons/icon_battle",
+   "tint": [
+    44,
+    38,
+    50
+   ],
+   "bar_color": [
+    150,
+    140,
+    190
+   ],
+   "illustrations": [
+    "card_battle_01",
+    "card_battle_02",
+    "card_battle_03"
+   ],
+   "effect": "モンスターと戦闘"
+  },
+  {
+   "id": "rest",
+   "name": "休息",
+   "short": "休",
+   "tile_bg": "Icons/tile_bg_rest",
+   "icon": "Icons/icon_rest",
+   "tint": [
+    55,
+    30,
+    36
+   ],
+   "bar_color": [
+    200,
+    90,
+    100
+   ],
+   "illustrations": [
+    "card_rest_01"
+   ],
+   "effect": "HPなどを回復"
+  },
+  {
+   "id": "treasure",
+   "name": "宝箱",
+   "short": "宝",
+   "tile_bg": "Icons/tile_bg_treasure",
+   "icon": "Icons/icon_treasure",
+   "tint": [
+    50,
+    40,
+    23
+   ],
+   "bar_color": [
+    214,
+    170,
+    80
+   ],
+   "illustrations": [
+    "card_treasure_01"
+   ],
+   "effect": "アイテムを獲得"
+  },
+  {
+   "id": "shop",
+   "name": "ショップ",
+   "short": "店",
+   "tile_bg": "Icons/tile_bg_shop",
+   "icon": "Icons/icon_shop",
+   "tint": [
+    51,
+    41,
+    30
+   ],
+   "bar_color": [
+    200,
+    160,
+    110
+   ],
+   "illustrations": [
+    "card_shop_01"
+   ],
+   "effect": "アイテムを購入"
+  },
+  {
+   "id": "event",
+   "name": "イベント",
+   "short": "イ",
+   "tile_bg": "Icons/tile_bg_event",
+   "icon": "Icons/icon_event",
+   "tint": [
+    26,
+    45,
+    47
+   ],
+   "bar_color": [
+    90,
+    190,
+    190
+   ],
+   "illustrations": [
+    "card_event_01"
+   ],
+   "effect": "特別な出来事"
+  },
+  {
+   "id": "danger",
+   "name": "Danger",
+   "short": "危",
+   "tile_bg": "Icons/tile_bg_danger",
+   "icon": "Icons/icon_danger",
+   "tint": [
+    46,
+    22,
+    30
+   ],
+   "bar_color": [
+    170,
+    40,
+    40
+   ],
+   "illustrations": [
+    "card_danger_01"
+   ],
+   "effect": "狂気+30",
+   "effect_values": {
+    "madness": 30
+   },
+   "provisional": true,
+   "is_empty_cell": true,
+   "helper": "思い出せない場所には、危険が待つ。",
+   "label_color": [
+    226,
+    120,
+    110
+   ]
+  }
+ ],
+ "boss_card": {
+  "id": "boss",
+  "name": "強敵",
+  "illustrations": [
+   "card_boss_01"
+  ],
+  "note": "4マス目（固定）。抽選の対象外"
+ }
+}

@@ -1,0 +1,94 @@
+{
+ "canvas": {
+  "w": 1476,
+  "h": 1908,
+  "scale_from_source": 4,
+  "source": "01M5GXVA0NS3EN52KSVKVN309H.png (369x477)",
+  "coords": "pixels, origin top-left of canvas, y down",
+  "upscaler": "Real-ESRGAN x4 (onnx)",
+  "draw_order": "back to front = list order below",
+  "facing": "frontal/symmetric (no flip needed; game enemies face lower-left)"
+ },
+ "parts": {
+  "01_shadow": {
+   "pivot": [
+    700,
+    1880
+   ],
+   "note": "multiply/alpha black; scale x with float height"
+  },
+  "02_wing_L_inner": {
+   "pivot": [
+    610,
+    797
+   ],
+   "parent": "08_body",
+   "note": "shoulder root (hidden behind hood). screen-left wing, lower blades"
+  },
+  "03_wing_L_outer": {
+   "pivot": [
+    610,
+    797
+   ],
+   "parent": "08_body",
+   "note": "same root; upper blades incl. tip. lag inner by ~0.15 cycle"
+  },
+  "04_wing_R_inner": {
+   "pivot": [
+    830,
+    797
+   ],
+   "parent": "08_body",
+   "note": "screen-right wing, lower blades"
+  },
+  "05_wing_R_outer": {
+   "pivot": [
+    830,
+    797
+   ],
+   "parent": "08_body"
+  },
+  "06_feet": {
+   "pivot": [
+    700,
+    1880
+   ],
+   "note": "ground contact"
+  },
+  "07_face_inner": {
+   "pivot": [
+    690,
+    640
+   ],
+   "parent": "08_body",
+   "note": "folded mask + hood interior, seen through the hood opening (drawn behind body). small nod/bob only (<=2deg, <=4px)"
+  },
+  "08_body": {
+   "pivot": [
+    700,
+    1880
+   ],
+   "note": "hood+robe+cape (opening cut out); root of the rig"
+  },
+  "09_seal": {
+   "pivot": [
+    686,
+    1083
+   ],
+   "parent": "08_body",
+   "note": "chest seal; pulse scale 1.00-1.04"
+  },
+  "10_seal_glow_fx": {
+   "pivot": [
+    686,
+    1083
+   ],
+   "parent": "08_body",
+   "blend": "additive",
+   "note": "optional fx; animate opacity 0-0.6"
+  }
+ },
+ "wing_limits_deg": {
+  "recommended": "+-10 (outer), +-7 (inner); hidden fill tested to +-14"
+ }
+}

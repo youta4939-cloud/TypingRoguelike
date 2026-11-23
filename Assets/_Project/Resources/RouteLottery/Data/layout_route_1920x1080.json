@@ -1,0 +1,322 @@
+{
+ "_note": "層ルート画面 1920x1080。カード中心は (x, 592)。",
+ "background": "Route/bg_hell_town_1920x1080",
+ "header": {
+  "title": {
+   "text_key": "route.title",
+   "center": [
+    960,
+    108
+   ],
+   "font": "serif",
+   "size": 72,
+   "weight": "Bold",
+   "color": [
+    236,
+    224,
+    206
+   ],
+   "outline": {
+    "width_px": 3,
+    "color": [
+     10,
+     6,
+     6
+    ]
+   }
+  },
+  "lines": [
+   {
+    "from": [
+     810,
+     108
+    ],
+    "to": [
+     440,
+     108
+    ],
+    "sprite": "Common/fade_line",
+    "tint": [
+     190,
+     90,
+     40,
+     200
+    ]
+   },
+   {
+    "from": [
+     1110,
+     108
+    ],
+    "to": [
+     1480,
+     108
+    ],
+    "sprite": "Common/fade_line",
+    "tint": [
+     190,
+     90,
+     40,
+     200
+    ]
+   }
+  ],
+  "diamonds": [
+   [
+    810,
+    108
+   ],
+   [
+    1110,
+    108
+   ]
+  ],
+  "diamond_size": 16,
+  "diamond_color": [
+   214,
+   120,
+   52
+  ],
+  "subtitle": {
+   "text_key": "route.subtitle",
+   "center": [
+    960,
+    172
+   ],
+   "font": "sans",
+   "size": 26,
+   "weight": "Medium",
+   "color": [
+    170,
+    158,
+    148
+   ]
+  }
+ },
+ "cards": {
+  "centers_x": [
+   300,
+   740,
+   1180,
+   1620
+  ],
+  "center_y": 592,
+  "scale": 0.472,
+  "current_scale_mul": 1.06,
+  "layout_sample": [
+   [
+    "battle",
+    "current",
+    1
+   ],
+   [
+    "battle2",
+    "upcoming",
+    2
+   ],
+   [
+    "battle3",
+    "upcoming",
+    3
+   ],
+   [
+    "boss",
+    "danger",
+    4
+   ]
+  ],
+  "canvas_size_at_scale": [
+   507.4,
+   708.0
+  ]
+ },
+ "route_line": {
+  "y": 292,
+  "segments": [
+   [
+    420,
+    680
+   ],
+   [
+    860,
+    1120
+   ],
+   [
+    1300,
+    1560
+   ]
+  ],
+  "dot": "Common/dot",
+  "dot_size": 4,
+  "spacing": 14,
+  "color_done": [
+   214,
+   120,
+   52,
+   200
+  ],
+  "color_todo": [
+   110,
+   96,
+   92,
+   150
+  ]
+ },
+ "bubble": {
+  "center_x": 340,
+  "top_y": 924,
+  "height": 52,
+  "pad_left": 60,
+  "pad_right": 28,
+  "face": {
+   "ref": "battle_E5b_parts/reference/notice_face_ellen_44.png (existing asset, by name)",
+   "size": 44,
+   "offset": [
+    5,
+    4
+   ]
+  },
+  "fill": [
+   14,
+   10,
+   12,
+   215
+  ],
+  "outline": [
+   214,
+   120,
+   52,
+   170
+  ],
+  "font": "sans",
+  "size": 22,
+  "weight": "Medium",
+  "color": [
+   230,
+   220,
+   206
+  ]
+ },
+ "status_band": {
+  "y": 1006,
+  "height": 74,
+  "plate": "Route/band_plate",
+  "shadow": "Route/band_shadow (14px above)",
+  "iron_strip": "Route/iron_strip_tile (y=BY0-7, h16, Tiled)",
+  "hp": {
+   "medal_center": [
+    76,
+    1043
+   ],
+   "label_x": 128,
+   "label": "band.hp",
+   "label_color": [
+    255,
+    150,
+    140
+   ],
+   "ring_color": [
+    255,
+    90,
+    80
+   ]
+  },
+  "madness": {
+   "medal_center": [
+    356,
+    1043
+   ],
+   "label_x": 408,
+   "label": "band.madness",
+   "label_color": [
+    214,
+    170,
+    255
+   ],
+   "ring_color": [
+    200,
+    120,
+    255
+   ]
+  },
+  "medallion_refs": "reuse unity_package_stockpanel_v4_4: Sprites/Medallion/icon_heart_*, icon_brain_*, Sprites/Gauge/ring_track_*, ring_glow_*, ring_fill_* (by name, not duplicated). Plate = Common/medallion (82x81 at 1x). Ring r=22.5 w=3.2",
+  "label_font": {
+   "font": "sans",
+   "size": 24,
+   "weight": "Medium"
+  },
+  "value_font": {
+   "font": "sans",
+   "size": 27,
+   "weight": "Bold",
+   "color": [
+    242,
+    234,
+    224
+   ]
+  },
+  "max_color": [
+   160,
+   150,
+   142
+  ],
+  "dividers_x": [
+   690,
+   1700
+  ],
+  "trust": {
+   "x": [
+    830,
+    1130,
+    1430
+   ],
+   "face_ref": "battle_E5b_parts/parts/skill_list/face_marker_<alice|ellen|luna>_baked.png (by name)",
+   "face_size": 50,
+   "name_size": 22,
+   "value_size": 24,
+   "gauge": {
+    "dx": 36,
+    "dy": 14,
+    "w": 196,
+    "h": 6,
+    "track": "Route/trust_track_9s",
+    "fill": "Route/trust_fill_9s",
+    "fill_color": [
+     226,
+     168,
+     96
+    ]
+   }
+  }
+ },
+ "wallet": {
+  "rect": [
+   1620,
+   24,
+   276,
+   52
+  ],
+  "plate": "Route/wallet_plate_9s",
+  "coin": {
+   "sprite": "Route/icon_coin",
+   "pos": [
+    1634,
+    34
+   ],
+   "size": 32
+  },
+  "money_x": 1674,
+  "bag": {
+   "sprite": "Icons/icon_shop",
+   "pos": [
+    1790,
+    32
+   ],
+   "size": 34
+  },
+  "items_x": 1832,
+  "font": "sans",
+  "size": 26,
+  "weight": "Bold"
+ }
+}

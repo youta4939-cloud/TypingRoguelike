@@ -16,6 +16,7 @@ MonoBehaviour:
   characterName: ルナ
   displayName: 星屑
   pattern: 030000000400000000000000
+  damagePercent: 0.366667
   damage: 44
   heal: 0
   effectText: 44ダメ

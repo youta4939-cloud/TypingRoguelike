@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: TypingRoguelike::TypingRoguelike.Data.BoardPreset
   presetId: balance
   displayName: バランス
-  column1: BBBRRSTEE
-  column2: BBBRRSTEE
-  column3: BBBRRSTEE
+  column1: BBRSTE
+  column2: BBRSTE
+  column3: BBRSTE

@@ -1,0 +1,1825 @@
+{
+ "sprites": {
+  "Common/iron_panel_9s_2x.png": {
+   "size": [
+    480,
+    480
+   ],
+   "scale": "2x",
+   "note": "nine-slice of the card iron frame (big panels: 役一覧, 抽選の流れ, machine, 記憶の欠片, board, 出現率). Fill baked (12,8,9,228). Use Image Type Sliced; for thinner frames set Pixels Per Unit Multiplier (e.g. 2.5 => 0.2 frame scale).",
+   "border_LBRT": [
+    150,
+    150,
+    150,
+    150
+   ],
+   "image_type": "Sliced"
+  },
+  "Common/iron_panel_9s_1x.png": {
+   "size": [
+    240,
+    240
+   ],
+   "scale": "1x",
+   "note": "nine-slice of the card iron frame (big panels: 役一覧, 抽選の流れ, machine, 記憶の欠片, board, 出現率). Fill baked (12,8,9,228). Use Image Type Sliced; for thinner frames set Pixels Per Unit Multiplier (e.g. 2.5 => 0.2 frame scale).",
+   "border_LBRT": [
+    75,
+    75,
+    75,
+    75
+   ],
+   "image_type": "Sliced"
+  },
+  "Common/iron_panel_dark_9s_2x.png": {
+   "size": [
+    480,
+    480
+   ],
+   "scale": "2x",
+   "note": "machine frame variant (fill 10,7,8,240)",
+   "border_LBRT": [
+    150,
+    150,
+    150,
+    150
+   ],
+   "image_type": "Sliced"
+  },
+  "Common/iron_panel_dark_9s_1x.png": {
+   "size": [
+    240,
+    240
+   ],
+   "scale": "1x",
+   "note": "machine frame variant (fill 10,7,8,240)",
+   "border_LBRT": [
+    75,
+    75,
+    75,
+    75
+   ],
+   "image_type": "Sliced"
+  },
+  "Common/rounded_r10_9s_2x.png": {
+   "size": [
+    128,
+    128
+   ],
+   "scale": "2x",
+   "note": "white rounded rect r=10. Tint in engine: row bg (26,18,18,170)/(18,12,13,170), narration box (12,8,9,225) etc.",
+   "border_LBRT": [
+    32,
+    32,
+    32,
+    32
+   ],
+   "image_type": "Sliced"
+  },
+  "Common/rounded_r10_9s_1x.png": {
+   "size": [
+    64,
+    64
+   ],
+   "scale": "1x",
+   "note": "white rounded rect r=10. Tint in engine: row bg (26,18,18,170)/(18,12,13,170), narration box (12,8,9,225) etc.",
+   "border_LBRT": [
+    16,
+    16,
+    16,
+    16
+   ],
+   "image_type": "Sliced"
+  },
+  "Common/rounded_r10_outline_9s_2x.png": {
+   "size": [
+    128,
+    128
+   ],
+   "scale": "2x",
+   "note": "white 2px outline r=10 (tint (110,90,84) for plate edges)",
+   "border_LBRT": [
+    32,
+    32,
+    32,
+    32
+   ],
+   "image_type": "Sliced"
+  },
+  "Common/rounded_r10_outline_9s_1x.png": {
+   "size": [
+    64,
+    64
+   ],
+   "scale": "1x",
+   "note": "white 2px outline r=10 (tint (110,90,84) for plate edges)",
+   "border_LBRT": [
+    16,
+    16,
+    16,
+    16
+   ],
+   "image_type": "Sliced"
+  },
+  "Common/rounded_r8_inner_line_9s_2x.png": {
+   "size": [
+    128,
+    128
+   ],
+   "scale": "2x",
+   "note": "1px inner line (tint (60,40,36) / (150,70,40,160))",
+   "border_LBRT": [
+    28,
+    28,
+    28,
+    28
+   ],
+   "image_type": "Sliced"
+  },
+  "Common/rounded_r8_inner_line_9s_1x.png": {
+   "size": [
+    64,
+    64
+   ],
+   "scale": "1x",
+   "note": "1px inner line (tint (60,40,36) / (150,70,40,160))",
+   "border_LBRT": [
+    14,
+    14,
+    14,
+    14
+   ],
+   "image_type": "Sliced"
+  },
+  "Common/rounded_r26_9s_2x.png": {
+   "size": [
+    160,
+    160
+   ],
+   "scale": "2x",
+   "note": "bubble plate (14,10,12,215)",
+   "border_LBRT": [
+    56,
+    56,
+    56,
+    56
+   ],
+   "image_type": "Sliced"
+  },
+  "Common/rounded_r26_9s_1x.png": {
+   "size": [
+    80,
+    80
+   ],
+   "scale": "1x",
+   "note": "bubble plate (14,10,12,215)",
+   "border_LBRT": [
+    28,
+    28,
+    28,
+    28
+   ],
+   "image_type": "Sliced"
+  },
+  "Common/glow_rect_9s_2x.png": {
+   "size": [
+    312,
+    312
+   ],
+   "scale": "2x",
+   "note": "white soft-glow outline around a 96x96 r10 box with 30px pad. Tint: flame (255,170,70) row reach / step active / ghost cell; error (232,72,60); boss red. The inner box edge sits 30px (1x) inside the sprite edge -> make the RectTransform 60px larger than the target box.",
+   "border_LBRT": [
+    96,
+    96,
+    96,
+    96
+   ],
+   "image_type": "Sliced"
+  },
+  "Common/glow_rect_9s_1x.png": {
+   "size": [
+    156,
+    156
+   ],
+   "scale": "1x",
+   "note": "white soft-glow outline around a 96x96 r10 box with 30px pad. Tint: flame (255,170,70) row reach / step active / ghost cell; error (232,72,60); boss red. The inner box edge sits 30px (1x) inside the sprite edge -> make the RectTransform 60px larger than the target box.",
+   "border_LBRT": [
+    48,
+    48,
+    48,
+    48
+   ],
+   "image_type": "Sliced"
+  },
+  "Common/glow_button_9s_2x.png": {
+   "size": [
+    312,
+    312
+   ],
+   "scale": "2x",
+   "note": "button glow (tint (230,90,30), alpha .5); same 30px pad rule",
+   "border_LBRT": [
+    96,
+    96,
+    96,
+    96
+   ],
+   "image_type": "Sliced"
+  },
+  "Common/glow_button_9s_1x.png": {
+   "size": [
+    156,
+    156
+   ],
+   "scale": "1x",
+   "note": "button glow (tint (230,90,30), alpha .5); same 30px pad rule",
+   "border_LBRT": [
+    48,
+    48,
+    48,
+    48
+   ],
+   "image_type": "Sliced"
+  },
+  "Common/button_normal_9s_2x.png": {
+   "size": [
+    700,
+    148
+   ],
+   "scale": "2x",
+   "note": "main button plate 350x74 (1x), no text. Label = TMP Noto Serif JP Bold 40 (go button 36). Text colour normal (240,228,210), disabled (130,122,118)",
+   "border_LBRT": [
+    64,
+    60,
+    64,
+    60
+   ],
+   "image_type": "Sliced"
+  },
+  "Common/button_normal_9s_1x.png": {
+   "size": [
+    350,
+    74
+   ],
+   "scale": "1x",
+   "note": "main button plate 350x74 (1x), no text. Label = TMP Noto Serif JP Bold 40 (go button 36). Text colour normal (240,228,210), disabled (130,122,118)",
+   "border_LBRT": [
+    32,
+    30,
+    32,
+    30
+   ],
+   "image_type": "Sliced"
+  },
+  "Common/button_pressed_9s_2x.png": {
+   "size": [
+    700,
+    148
+   ],
+   "scale": "2x",
+   "note": "main button plate 350x74 (1x), no text. Label = TMP Noto Serif JP Bold 40 (go button 36). Text colour normal (240,228,210), disabled (130,122,118)",
+   "border_LBRT": [
+    64,
+    60,
+    64,
+    60
+   ],
+   "image_type": "Sliced"
+  },
+  "Common/button_pressed_9s_1x.png": {
+   "size": [
+    350,
+    74
+   ],
+   "scale": "1x",
+   "note": "main button plate 350x74 (1x), no text. Label = TMP Noto Serif JP Bold 40 (go button 36). Text colour normal (240,228,210), disabled (130,122,118)",
+   "border_LBRT": [
+    32,
+    30,
+    32,
+    30
+   ],
+   "image_type": "Sliced"
+  },
+  "Common/button_disabled_9s_2x.png": {
+   "size": [
+    700,
+    148
+   ],
+   "scale": "2x",
+   "note": "main button plate 350x74 (1x), no text. Label = TMP Noto Serif JP Bold 40 (go button 36). Text colour normal (240,228,210), disabled (130,122,118)",
+   "border_LBRT": [
+    64,
+    60,
+    64,
+    60
+   ],
+   "image_type": "Sliced"
+  },
+  "Common/button_disabled_9s_1x.png": {
+   "size": [
+    350,
+    74
+   ],
+   "scale": "1x",
+   "note": "main button plate 350x74 (1x), no text. Label = TMP Noto Serif JP Bold 40 (go button 36). Text colour normal (240,228,210), disabled (130,122,118)",
+   "border_LBRT": [
+    32,
+    30,
+    32,
+    30
+   ],
+   "image_type": "Sliced"
+  },
+  "Common/medallion_hires.png": {
+   "size": [
+    933,
+    920
+   ],
+   "note": "ordinal / step medallion plate (from card art). Ordinal number is TMP."
+  },
+  "Common/medallion_2x.png": {
+   "size": [
+    226,
+    222
+   ],
+   "scale": "2x",
+   "note": "route card medallion at route scale f=0.472 is 107x105 (1x)"
+  },
+  "Common/medallion_1x.png": {
+   "size": [
+    113,
+    111
+   ],
+   "scale": "1x",
+   "note": "route card medallion at route scale f=0.472 is 107x105 (1x)"
+  },
+  "Common/medallion_done_hires.png": {
+   "size": [
+    933,
+    920
+   ],
+   "note": "completed-card medallion"
+  },
+  "Common/icon_lock_2x.png": {
+   "size": [
+    80,
+    80
+   ],
+   "scale": "2x",
+   "note": "white, tint (96,88,86) locked / (110,100,98) disabled button"
+  },
+  "Common/icon_lock_1x.png": {
+   "size": [
+    40,
+    40
+   ],
+   "scale": "1x",
+   "note": "white, tint (96,88,86) locked / (110,100,98) disabled button"
+  },
+  "Common/icon_check_2x.png": {
+   "size": [
+    64,
+    64
+   ],
+   "scale": "2x",
+   "note": "tint OK (214,170,96)"
+  },
+  "Common/icon_check_1x.png": {
+   "size": [
+    32,
+    32
+   ],
+   "scale": "1x",
+   "note": "tint OK (214,170,96)"
+  },
+  "Common/icon_cross_2x.png": {
+   "size": [
+    64,
+    64
+   ],
+   "scale": "2x",
+   "note": "tint ERR (232,72,60)"
+  },
+  "Common/icon_cross_1x.png": {
+   "size": [
+    32,
+    32
+   ],
+   "scale": "1x",
+   "note": "tint ERR (232,72,60)"
+  },
+  "Common/icon_arrow_up_2x.png": {
+   "size": [
+    48,
+    48
+   ],
+   "scale": "2x",
+   "note": "diff up, tint flame (255,168,72)"
+  },
+  "Common/icon_arrow_up_1x.png": {
+   "size": [
+    24,
+    24
+   ],
+   "scale": "1x",
+   "note": "diff up, tint flame (255,168,72)"
+  },
+  "Common/icon_arrow_down_2x.png": {
+   "size": [
+    48,
+    48
+   ],
+   "scale": "2x",
+   "note": "diff down, tint dim blue (122,150,196)"
+  },
+  "Common/icon_arrow_down_1x.png": {
+   "size": [
+    24,
+    24
+   ],
+   "scale": "1x",
+   "note": "diff down, tint dim blue (122,150,196)"
+  },
+  "Common/ornament_diamond_2x.png": {
+   "size": [
+    32,
+    32
+   ],
+   "scale": "2x",
+   "note": "tint (214,120,52) / (150,82,46)"
+  },
+  "Common/ornament_diamond_1x.png": {
+   "size": [
+    16,
+    16
+   ],
+   "scale": "1x",
+   "note": "tint (214,120,52) / (150,82,46)"
+  },
+  "Common/dot_2x.png": {
+   "size": [
+    16,
+    16
+   ],
+   "scale": "2x",
+   "note": "route dots / small markers"
+  },
+  "Common/dot_1x.png": {
+   "size": [
+    8,
+    8
+   ],
+   "scale": "1x",
+   "note": "route dots / small markers"
+  },
+  "Common/priority_circle_2x.png": {
+   "size": [
+    52,
+    52
+   ],
+   "scale": "2x",
+   "note": "役一覧 priority badge (number = TMP serif bold 15)"
+  },
+  "Common/priority_circle_1x.png": {
+   "size": [
+    26,
+    26
+   ],
+   "scale": "1x",
+   "note": "役一覧 priority badge (number = TMP serif bold 15)"
+  },
+  "Common/fade_line_2x.png": {
+   "size": [
+    740,
+    4
+   ],
+   "scale": "2x",
+   "note": "white line fading to the right; tint (190,90,40) alpha 200/255. Mirror for the left side."
+  },
+  "Common/fade_line_1x.png": {
+   "size": [
+    370,
+    2
+   ],
+   "scale": "1x",
+   "note": "white line fading to the right; tint (190,90,40) alpha 200/255. Mirror for the left side."
+  },
+  "Common/center_fade_line_2x.png": {
+   "size": [
+    400,
+    4
+   ],
+   "scale": "2x",
+   "note": "white line fading at both ends (card status accent line etc.)"
+  },
+  "Common/center_fade_line_1x.png": {
+   "size": [
+    200,
+    2
+   ],
+   "scale": "1x",
+   "note": "white line fading at both ends (card status accent line etc.)"
+  },
+  "Common/soft_radial.png": {
+   "size": [
+    256,
+    256
+   ],
+   "note": "generic soft radial glow, white"
+  },
+  "Icons/icon_battle_512.png": {
+   "size": [
+    512,
+    512
+   ],
+   "note": "master icon (transparent). Tile = tile_bg + icon at 78% size centred."
+  },
+  "Icons/icon_battle_2x.png": {
+   "size": [
+    234,
+    234
+   ],
+   "scale": "2x",
+   "note": "icon for a 150px (1x) tile"
+  },
+  "Icons/icon_battle_1x.png": {
+   "size": [
+    117,
+    117
+   ],
+   "scale": "1x",
+   "note": "icon for a 150px (1x) tile"
+  },
+  "Icons/tile_bg_battle_2x.png": {
+   "size": [
+    300,
+    300
+   ],
+   "scale": "2x",
+   "note": "tile plate tint (44, 38, 50) (gradient x1.25 top -> x0.75 bottom, inner line x1.7)"
+  },
+  "Icons/tile_bg_battle_1x.png": {
+   "size": [
+    150,
+    150
+   ],
+   "scale": "1x",
+   "note": "tile plate tint (44, 38, 50) (gradient x1.25 top -> x0.75 bottom, inner line x1.7)"
+  },
+  "Icons/tile_battle_2x.png": {
+   "size": [
+    300,
+    300
+   ],
+   "scale": "2x",
+   "note": "pre-composited tile (bg+icon) for convenience / reel strips"
+  },
+  "Icons/tile_battle_1x.png": {
+   "size": [
+    150,
+    150
+   ],
+   "scale": "1x",
+   "note": "pre-composited tile (bg+icon) for convenience / reel strips"
+  },
+  "Icons/icon_rest_512.png": {
+   "size": [
+    512,
+    512
+   ],
+   "note": "master icon (transparent). Tile = tile_bg + icon at 78% size centred."
+  },
+  "Icons/icon_rest_2x.png": {
+   "size": [
+    234,
+    234
+   ],
+   "scale": "2x",
+   "note": "icon for a 150px (1x) tile"
+  },
+  "Icons/icon_rest_1x.png": {
+   "size": [
+    117,
+    117
+   ],
+   "scale": "1x",
+   "note": "icon for a 150px (1x) tile"
+  },
+  "Icons/tile_bg_rest_2x.png": {
+   "size": [
+    300,
+    300
+   ],
+   "scale": "2x",
+   "note": "tile plate tint (55, 30, 36) (gradient x1.25 top -> x0.75 bottom, inner line x1.7)"
+  },
+  "Icons/tile_bg_rest_1x.png": {
+   "size": [
+    150,
+    150
+   ],
+   "scale": "1x",
+   "note": "tile plate tint (55, 30, 36) (gradient x1.25 top -> x0.75 bottom, inner line x1.7)"
+  },
+  "Icons/tile_rest_2x.png": {
+   "size": [
+    300,
+    300
+   ],
+   "scale": "2x",
+   "note": "pre-composited tile (bg+icon) for convenience / reel strips"
+  },
+  "Icons/tile_rest_1x.png": {
+   "size": [
+    150,
+    150
+   ],
+   "scale": "1x",
+   "note": "pre-composited tile (bg+icon) for convenience / reel strips"
+  },
+  "Icons/icon_treasure_512.png": {
+   "size": [
+    512,
+    512
+   ],
+   "note": "master icon (transparent). Tile = tile_bg + icon at 78% size centred."
+  },
+  "Icons/icon_treasure_2x.png": {
+   "size": [
+    234,
+    234
+   ],
+   "scale": "2x",
+   "note": "icon for a 150px (1x) tile"
+  },
+  "Icons/icon_treasure_1x.png": {
+   "size": [
+    117,
+    117
+   ],
+   "scale": "1x",
+   "note": "icon for a 150px (1x) tile"
+  },
+  "Icons/tile_bg_treasure_2x.png": {
+   "size": [
+    300,
+    300
+   ],
+   "scale": "2x",
+   "note": "tile plate tint (50, 40, 23) (gradient x1.25 top -> x0.75 bottom, inner line x1.7)"
+  },
+  "Icons/tile_bg_treasure_1x.png": {
+   "size": [
+    150,
+    150
+   ],
+   "scale": "1x",
+   "note": "tile plate tint (50, 40, 23) (gradient x1.25 top -> x0.75 bottom, inner line x1.7)"
+  },
+  "Icons/tile_treasure_2x.png": {
+   "size": [
+    300,
+    300
+   ],
+   "scale": "2x",
+   "note": "pre-composited tile (bg+icon) for convenience / reel strips"
+  },
+  "Icons/tile_treasure_1x.png": {
+   "size": [
+    150,
+    150
+   ],
+   "scale": "1x",
+   "note": "pre-composited tile (bg+icon) for convenience / reel strips"
+  },
+  "Icons/icon_shop_512.png": {
+   "size": [
+    512,
+    512
+   ],
+   "note": "master icon (transparent). Tile = tile_bg + icon at 78% size centred."
+  },
+  "Icons/icon_shop_2x.png": {
+   "size": [
+    234,
+    234
+   ],
+   "scale": "2x",
+   "note": "icon for a 150px (1x) tile"
+  },
+  "Icons/icon_shop_1x.png": {
+   "size": [
+    117,
+    117
+   ],
+   "scale": "1x",
+   "note": "icon for a 150px (1x) tile"
+  },
+  "Icons/tile_bg_shop_2x.png": {
+   "size": [
+    300,
+    300
+   ],
+   "scale": "2x",
+   "note": "tile plate tint (51, 41, 30) (gradient x1.25 top -> x0.75 bottom, inner line x1.7)"
+  },
+  "Icons/tile_bg_shop_1x.png": {
+   "size": [
+    150,
+    150
+   ],
+   "scale": "1x",
+   "note": "tile plate tint (51, 41, 30) (gradient x1.25 top -> x0.75 bottom, inner line x1.7)"
+  },
+  "Icons/tile_shop_2x.png": {
+   "size": [
+    300,
+    300
+   ],
+   "scale": "2x",
+   "note": "pre-composited tile (bg+icon) for convenience / reel strips"
+  },
+  "Icons/tile_shop_1x.png": {
+   "size": [
+    150,
+    150
+   ],
+   "scale": "1x",
+   "note": "pre-composited tile (bg+icon) for convenience / reel strips"
+  },
+  "Icons/icon_event_512.png": {
+   "size": [
+    512,
+    512
+   ],
+   "note": "master icon (transparent). Tile = tile_bg + icon at 78% size centred."
+  },
+  "Icons/icon_event_2x.png": {
+   "size": [
+    234,
+    234
+   ],
+   "scale": "2x",
+   "note": "icon for a 150px (1x) tile"
+  },
+  "Icons/icon_event_1x.png": {
+   "size": [
+    117,
+    117
+   ],
+   "scale": "1x",
+   "note": "icon for a 150px (1x) tile"
+  },
+  "Icons/tile_bg_event_2x.png": {
+   "size": [
+    300,
+    300
+   ],
+   "scale": "2x",
+   "note": "tile plate tint (26, 45, 47) (gradient x1.25 top -> x0.75 bottom, inner line x1.7)"
+  },
+  "Icons/tile_bg_event_1x.png": {
+   "size": [
+    150,
+    150
+   ],
+   "scale": "1x",
+   "note": "tile plate tint (26, 45, 47) (gradient x1.25 top -> x0.75 bottom, inner line x1.7)"
+  },
+  "Icons/tile_event_2x.png": {
+   "size": [
+    300,
+    300
+   ],
+   "scale": "2x",
+   "note": "pre-composited tile (bg+icon) for convenience / reel strips"
+  },
+  "Icons/tile_event_1x.png": {
+   "size": [
+    150,
+    150
+   ],
+   "scale": "1x",
+   "note": "pre-composited tile (bg+icon) for convenience / reel strips"
+  },
+  "Icons/icon_danger_512.png": {
+   "size": [
+    512,
+    512
+   ],
+   "note": "master icon (transparent). Tile = tile_bg + icon at 78% size centred."
+  },
+  "Icons/icon_danger_2x.png": {
+   "size": [
+    234,
+    234
+   ],
+   "scale": "2x",
+   "note": "icon for a 150px (1x) tile"
+  },
+  "Icons/icon_danger_1x.png": {
+   "size": [
+    117,
+    117
+   ],
+   "scale": "1x",
+   "note": "icon for a 150px (1x) tile"
+  },
+  "Icons/tile_bg_danger_2x.png": {
+   "size": [
+    300,
+    300
+   ],
+   "scale": "2x",
+   "note": "tile plate tint (46, 22, 30) (gradient x1.25 top -> x0.75 bottom, inner line x1.7)"
+  },
+  "Icons/tile_bg_danger_1x.png": {
+   "size": [
+    150,
+    150
+   ],
+   "scale": "1x",
+   "note": "tile plate tint (46, 22, 30) (gradient x1.25 top -> x0.75 bottom, inner line x1.7)"
+  },
+  "Icons/tile_danger_2x.png": {
+   "size": [
+    300,
+    300
+   ],
+   "scale": "2x",
+   "note": "pre-composited tile (bg+icon) for convenience / reel strips"
+  },
+  "Icons/tile_danger_1x.png": {
+   "size": [
+    150,
+    150
+   ],
+   "scale": "1x",
+   "note": "pre-composited tile (bg+icon) for convenience / reel strips"
+  },
+  "Icons/tile_bg_unknown_2x.png": {
+   "size": [
+    300,
+    300
+   ],
+   "scale": "2x",
+   "note": "？？？ tile; the '?' is TMP serif bold (size 62% of tile), colour (150,140,136)"
+  },
+  "Icons/tile_bg_unknown_1x.png": {
+   "size": [
+    150,
+    150
+   ],
+   "scale": "1x",
+   "note": "？？？ tile; the '?' is TMP serif bold (size 62% of tile), colour (150,140,136)"
+  },
+  "Lottery/reel_window_slot_9s_2x.png": {
+   "size": [
+    192,
+    192
+   ],
+   "scale": "2x",
+   "note": "reel window recess; RectTransform = reel window + 6px each side (184x492 at 1x)",
+   "border_LBRT": [
+    32,
+    32,
+    32,
+    32
+   ],
+   "image_type": "Sliced"
+  },
+  "Lottery/reel_window_slot_9s_1x.png": {
+   "size": [
+    96,
+    96
+   ],
+   "scale": "1x",
+   "note": "reel window recess; RectTransform = reel window + 6px each side (184x492 at 1x)",
+   "border_LBRT": [
+    16,
+    16,
+    16,
+    16
+   ],
+   "image_type": "Sliced"
+  },
+  "Lottery/reel_cylinder_shade_2x.png": {
+   "size": [
+    344,
+    960
+   ],
+   "scale": "2x",
+   "note": "black overlay with alpha = 1-cylinder profile (== multiply). Put above the scrolling tiles inside each reel window."
+  },
+  "Lottery/reel_cylinder_shade_1x.png": {
+   "size": [
+    172,
+    480
+   ],
+   "scale": "1x",
+   "note": "black overlay with alpha = 1-cylinder profile (== multiply). Put above the scrolling tiles inside each reel window."
+  },
+  "Lottery/payline_marker_2x.png": {
+   "size": [
+    40,
+    56
+   ],
+   "scale": "2x",
+   "note": "points right; mirror for right side. tint lerp (120,80,50)->(255,170,70) at reach"
+  },
+  "Lottery/payline_marker_1x.png": {
+   "size": [
+    20,
+    28
+   ],
+   "scale": "1x",
+   "note": "points right; mirror for right side. tint lerp (120,80,50)->(255,170,70) at reach"
+  },
+  "Lottery/tile_glow_9s_2x.png": {
+   "size": [
+    420,
+    420
+   ],
+   "scale": "2x",
+   "note": "glow around stopped centre tile (tint flame). 30px pad rule.",
+   "border_LBRT": [
+    112,
+    112,
+    112,
+    112
+   ],
+   "image_type": "Sliced"
+  },
+  "Lottery/tile_glow_9s_1x.png": {
+   "size": [
+    210,
+    210
+   ],
+   "scale": "1x",
+   "note": "glow around stopped centre tile (tint flame). 30px pad rule.",
+   "border_LBRT": [
+    56,
+    56,
+    56,
+    56
+   ],
+   "image_type": "Sliced"
+  },
+  "Lottery/icon_reel_rebuild_2x.png": {
+   "size": [
+    72,
+    60
+   ],
+   "scale": "2x",
+   "note": "「リールを組み替える」 button icon; tint (214,140,80) / disabled (96,88,86)"
+  },
+  "Lottery/icon_reel_rebuild_1x.png": {
+   "size": [
+    36,
+    30
+   ],
+   "scale": "1x",
+   "note": "「リールを組み替える」 button icon; tint (214,140,80) / disabled (96,88,86)"
+  },
+  "Lottery/fx_shard_0.png": {
+   "size": [
+    24,
+    24
+   ],
+   "note": "memory shard, tint (214,222,236), alpha .8"
+  },
+  "Lottery/fx_shard_1.png": {
+   "size": [
+    24,
+    24
+   ],
+   "note": "memory shard, tint (214,222,236), alpha .8"
+  },
+  "Lottery/fx_shard_2.png": {
+   "size": [
+    24,
+    24
+   ],
+   "note": "memory shard, tint (214,222,236), alpha .8"
+  },
+  "Lottery/fx_shard_3.png": {
+   "size": [
+    24,
+    24
+   ],
+   "note": "memory shard, tint (214,222,236), alpha .8"
+  },
+  "Lottery/fx_reach_glow.png": {
+   "size": [
+    640,
+    220
+   ],
+   "note": "soft blob behind the リーチ TMP; tint (220,90,30) alpha .55. 1x size 400x140 behind リーチ！"
+  },
+  "Lottery/brush_face_streaks.png": {
+   "size": [
+    512,
+    128
+   ],
+   "note": "TMP Face Texture for the brush lettering (dry-brush streaks). Tile x1, multiply with the vertex gradient."
+  },
+  "Lottery/flow_arrow_down_2x.png": {
+   "size": [
+    28,
+    20
+   ],
+   "scale": "2x",
+   "note": "抽選の流れ step arrow, tint (120,96,88)"
+  },
+  "Lottery/flow_arrow_down_1x.png": {
+   "size": [
+    14,
+    10
+   ],
+   "scale": "1x",
+   "note": "抽選の流れ step arrow, tint (120,96,88)"
+  },
+  "Lottery/machine_gem_2x.png": {
+   "size": [
+    48,
+    48
+   ],
+   "scale": "2x",
+   "note": "red gem in the machine top medallion"
+  },
+  "Lottery/machine_gem_1x.png": {
+   "size": [
+    24,
+    24
+   ],
+   "scale": "1x",
+   "note": "red gem in the machine top medallion"
+  },
+  "Cards/card_frame_normal.png": {
+   "size": [
+    1075,
+    1500
+   ],
+   "note": "card space canvas: native card 720x1280 sheared 6deg (x += tan6*(1280-y)) + 110px padding. All Cards/* sprites share this canvas -> stack them with identical RectTransforms. iron frame (current/danger use normal)."
+  },
+  "Cards/card_frame_done.png": {
+   "size": [
+    1075,
+    1500
+   ],
+   "note": "card space canvas: native card 720x1280 sheared 6deg (x += tan6*(1280-y)) + 110px padding. All Cards/* sprites share this canvas -> stack them with identical RectTransforms. iron frame (current/danger use normal)."
+  },
+  "Cards/card_frame_upcoming.png": {
+   "size": [
+    1075,
+    1500
+   ],
+   "note": "card space canvas: native card 720x1280 sheared 6deg (x += tan6*(1280-y)) + 110px padding. All Cards/* sprites share this canvas -> stack them with identical RectTransforms. iron frame (current/danger use normal)."
+  },
+  "Cards/card_backing.png": {
+   "size": [
+    1075,
+    1500
+   ],
+   "note": "dark backing behind the art (16,11,11)"
+  },
+  "Cards/card_art_mask.png": {
+   "size": [
+    1075,
+    1500
+   ],
+   "note": "sheared interior mask for the illustration (uGUI Mask, Show Mask Graphic off)"
+  },
+  "Cards/card_grad_top.png": {
+   "size": [
+    1075,
+    1500
+   ],
+   "note": "dark gradient behind the title (top 190 native px)"
+  },
+  "Cards/card_grad_bottom.png": {
+   "size": [
+    1075,
+    1500
+   ],
+   "note": "dark gradient behind the status label (current/upcoming/danger)"
+  },
+  "Cards/card_grad_bottom_done.png": {
+   "size": [
+    1075,
+    1500
+   ],
+   "note": "lighter bottom gradient for completed cards (no label)"
+  },
+  "Cards/card_inner_shadow.png": {
+   "size": [
+    1075,
+    1500
+   ],
+   "note": "inner shadow along the interior edge"
+  },
+  "Cards/card_status_line.png": {
+   "size": [
+    1075,
+    1500
+   ],
+   "note": "accent line above the status label, white. tint current (214,120,52) / upcoming (84,98,124) / danger (170,30,34); alpha 150/255. Hidden on completed cards."
+  },
+  "Cards/card_crack_a.png": {
+   "size": [
+    1075,
+    1500
+   ],
+   "note": "completed-card crack overlay (variant a). Draw over art+gradients, under frame."
+  },
+  "Cards/card_crack_b.png": {
+   "size": [
+    1075,
+    1500
+   ],
+   "note": "completed-card crack overlay (variant b). Draw over art+gradients, under frame."
+  },
+  "Cards/card_glow_current.png": {
+   "size": [
+    1075,
+    1500
+   ],
+   "note": "flame glow behind the current card (colour baked). Fade-in 12.0-12.8s in the transition."
+  },
+  "Cards/card_glow_boss.png": {
+   "size": [
+    1075,
+    1500
+   ],
+   "note": "red glow behind the 4th 強敵 card"
+  },
+  "Cards/card_edge_light.png": {
+   "size": [
+    1075,
+    1500
+   ],
+   "note": "flame line hugging the frame edge, current card only, over frame"
+  },
+  "Cards/card_back.png": {
+   "size": [
+    1075,
+    1500
+   ],
+   "note": "4th card face-down (sigil + frame). Medallion + red-dim '4th' TMP on top, same positions as the front."
+  },
+  "Cards/card_reveal_map.png": {
+   "size": [
+    1075,
+    1500
+   ],
+   "note": "grayscale reveal threshold (centre first + noise). alpha = clamp((0.12+rv*1.15 - map)/0.08). Import: Default, sRGB off."
+  },
+  "Illustrations/card_battle_01.jpg": {
+   "size": [
+    864,
+    1152
+   ],
+   "placeholder": true,
+   "note": "sample illustration (AI-generated placeholder). Aspect-fill (Envelope) into the art rect."
+  },
+  "Illustrations/card_battle_02.jpg": {
+   "size": [
+    864,
+    1152
+   ],
+   "placeholder": true,
+   "note": "sample illustration (AI-generated placeholder). Aspect-fill (Envelope) into the art rect."
+  },
+  "Illustrations/card_battle_03.jpg": {
+   "size": [
+    864,
+    1152
+   ],
+   "placeholder": true,
+   "note": "sample illustration (AI-generated placeholder). Aspect-fill (Envelope) into the art rect."
+  },
+  "Illustrations/card_rest_01.jpg": {
+   "size": [
+    864,
+    1152
+   ],
+   "placeholder": true,
+   "note": "sample illustration (AI-generated placeholder). Aspect-fill (Envelope) into the art rect."
+  },
+  "Illustrations/card_treasure_01.jpg": {
+   "size": [
+    864,
+    1152
+   ],
+   "placeholder": true,
+   "note": "sample illustration (AI-generated placeholder). Aspect-fill (Envelope) into the art rect."
+  },
+  "Illustrations/card_event_01.jpg": {
+   "size": [
+    864,
+    1152
+   ],
+   "placeholder": true,
+   "note": "sample illustration (AI-generated placeholder). Aspect-fill (Envelope) into the art rect."
+  },
+  "Illustrations/card_boss_01.jpg": {
+   "size": [
+    864,
+    1152
+   ],
+   "placeholder": true,
+   "note": "sample illustration (AI-generated placeholder). Aspect-fill (Envelope) into the art rect."
+  },
+  "Illustrations/card_shop_01.jpg": {
+   "size": [
+    720,
+    1040
+   ],
+   "placeholder": true,
+   "note": "sample illustration (AI-generated placeholder, new for this package)"
+  },
+  "Illustrations/card_danger_01.jpg": {
+   "size": [
+    720,
+    1280
+   ],
+   "placeholder": true,
+   "note": "sample illustration (AI-generated placeholder, new for this package)"
+  },
+  "Route/bg_hell_town_1920x1080.jpg": {
+   "size": [
+    1920,
+    1080
+   ],
+   "note": "shared background for lottery / route / build (blurred, vignetted, darkened). Replace freely."
+  },
+  "Route/band_plate_2x.png": {
+   "size": [
+    16,
+    148
+   ],
+   "scale": "2x",
+   "note": "status band plate (stretch horizontally to 1920; y 1006-1080 at 1x)"
+  },
+  "Route/band_plate_1x.png": {
+   "size": [
+    8,
+    74
+   ],
+   "scale": "1x",
+   "note": "status band plate (stretch horizontally to 1920; y 1006-1080 at 1x)"
+  },
+  "Route/band_shadow_2x.png": {
+   "size": [
+    16,
+    28
+   ],
+   "scale": "2x",
+   "note": "shadow above the band (y 992-1006 at 1x), stretch horizontally"
+  },
+  "Route/band_shadow_1x.png": {
+   "size": [
+    8,
+    14
+   ],
+   "scale": "1x",
+   "note": "shadow above the band (y 992-1006 at 1x), stretch horizontally"
+  },
+  "Route/iron_strip_tile_2x.png": {
+   "size": [
+    128,
+    32
+   ],
+   "scale": "2x",
+   "image_type": "Tiled",
+   "note": "tile horizontally; band top edge at y=BY0-7 (999) at 1x, height 16"
+  },
+  "Route/iron_strip_tile_1x.png": {
+   "size": [
+    64,
+    16
+   ],
+   "scale": "1x",
+   "image_type": "Tiled",
+   "note": "tile horizontally; band top edge at y=BY0-7 (999) at 1x, height 16"
+  },
+  "Route/wallet_plate_9s_2x.png": {
+   "size": [
+    96,
+    104
+   ],
+   "scale": "2x",
+   "note": "wallet plate (1620,24)-(1896,76) at 1x",
+   "border_LBRT": [
+    28,
+    28,
+    28,
+    28
+   ],
+   "image_type": "Sliced"
+  },
+  "Route/wallet_plate_9s_1x.png": {
+   "size": [
+    48,
+    52
+   ],
+   "scale": "1x",
+   "note": "wallet plate (1620,24)-(1896,76) at 1x",
+   "border_LBRT": [
+    14,
+    14,
+    14,
+    14
+   ],
+   "image_type": "Sliced"
+  },
+  "Route/icon_coin_2x.png": {
+   "size": [
+    64,
+    64
+   ],
+   "scale": "2x",
+   "note": "wallet coin 32px (1x)"
+  },
+  "Route/icon_coin_1x.png": {
+   "size": [
+    32,
+    32
+   ],
+   "scale": "1x",
+   "note": "wallet coin 32px (1x)"
+  },
+  "Route/trust_track_9s_2x.png": {
+   "size": [
+    48,
+    20
+   ],
+   "scale": "2x",
+   "note": "trust gauge track 196x6 (1x)",
+   "border_LBRT": [
+    10,
+    8,
+    10,
+    8
+   ],
+   "image_type": "Sliced"
+  },
+  "Route/trust_track_9s_1x.png": {
+   "size": [
+    24,
+    10
+   ],
+   "scale": "1x",
+   "note": "trust gauge track 196x6 (1x)",
+   "border_LBRT": [
+    5,
+    4,
+    5,
+    4
+   ],
+   "image_type": "Sliced"
+  },
+  "Route/trust_fill_9s_2x.png": {
+   "size": [
+    48,
+    16
+   ],
+   "scale": "2x",
+   "note": "trust gauge fill, white, tint (226,168,96); Image Type Filled Horizontal or width = value",
+   "border_LBRT": [
+    8,
+    6,
+    8,
+    6
+   ],
+   "image_type": "Sliced"
+  },
+  "Route/trust_fill_9s_1x.png": {
+   "size": [
+    24,
+    8
+   ],
+   "scale": "1x",
+   "note": "trust gauge fill, white, tint (226,168,96); Image Type Filled Horizontal or width = value",
+   "border_LBRT": [
+    4,
+    3,
+    4,
+    3
+   ],
+   "image_type": "Sliced"
+  },
+  "Route/bubble_tail_2x.png": {
+   "size": [
+    40,
+    24
+   ],
+   "scale": "2x",
+   "note": "bubble tail, tint (14,10,12,215)"
+  },
+  "Route/bubble_tail_1x.png": {
+   "size": [
+    20,
+    12
+   ],
+   "scale": "1x",
+   "note": "bubble tail, tint (14,10,12,215)"
+  },
+  "Route/bubble_outline_9s_2x.png": {
+   "size": [
+    160,
+    112
+   ],
+   "scale": "2x",
+   "note": "bubble outline tint (214,120,52,170)",
+   "border_LBRT": [
+    56,
+    54,
+    56,
+    54
+   ],
+   "image_type": "Sliced"
+  },
+  "Route/bubble_outline_9s_1x.png": {
+   "size": [
+    80,
+    56
+   ],
+   "scale": "1x",
+   "note": "bubble outline tint (214,120,52,170)",
+   "border_LBRT": [
+    28,
+    27,
+    28,
+    27
+   ],
+   "image_type": "Sliced"
+  },
+  "Build/board_slot_9s_2x.png": {
+   "size": [
+    96,
+    96
+   ],
+   "scale": "2x",
+   "note": "board cell recess; RectTransform = cell +4px each side (104x104 at 1x for 96 cells)",
+   "border_LBRT": [
+    32,
+    32,
+    32,
+    32
+   ],
+   "image_type": "Sliced"
+  },
+  "Build/board_slot_9s_1x.png": {
+   "size": [
+    48,
+    48
+   ],
+   "scale": "1x",
+   "note": "board cell recess; RectTransform = cell +4px each side (104x104 at 1x for 96 cells)",
+   "border_LBRT": [
+    16,
+    16,
+    16,
+    16
+   ],
+   "image_type": "Sliced"
+  },
+  "Build/piece_cell_outline_9s_2x.png": {
+   "size": [
+    96,
+    96
+   ],
+   "scale": "2x",
+   "note": "piece grouping outline per cell (+2px around tile). tint = type tint x1.25 (special: flame). Bridges between cells of the same piece: stretch the same sprite across the 6px gap or draw a 2px bar.",
+   "border_LBRT": [
+    32,
+    32,
+    32,
+    32
+   ],
+   "image_type": "Sliced"
+  },
+  "Build/piece_cell_outline_9s_1x.png": {
+   "size": [
+    48,
+    48
+   ],
+   "scale": "1x",
+   "note": "piece grouping outline per cell (+2px around tile). tint = type tint x1.25 (special: flame). Bridges between cells of the same piece: stretch the same sprite across the 6px gap or draw a 2px bar.",
+   "border_LBRT": [
+    16,
+    16,
+    16,
+    16
+   ],
+   "image_type": "Sliced"
+  },
+  "Build/ghost_cell_9s_2x.png": {
+   "size": [
+    96,
+    96
+   ],
+   "scale": "2x",
+   "note": "ghost fill (white). In practice: draw the piece tiles at alpha .38 + Common/glow_rect_9s tint flame alpha .9 per cell",
+   "border_LBRT": [
+    32,
+    32,
+    32,
+    32
+   ],
+   "image_type": "Sliced"
+  },
+  "Build/ghost_cell_9s_1x.png": {
+   "size": [
+    48,
+    48
+   ],
+   "scale": "1x",
+   "note": "ghost fill (white). In practice: draw the piece tiles at alpha .38 + Common/glow_rect_9s tint flame alpha .9 per cell",
+   "border_LBRT": [
+    16,
+    16,
+    16,
+    16
+   ],
+   "image_type": "Sliced"
+  },
+  "Build/palette_card_normal_9s_2x.png": {
+   "size": [
+    128,
+    128
+   ],
+   "scale": "2x",
+   "note": "記憶の欠片 card 192x146 (1x)",
+   "border_LBRT": [
+    32,
+    32,
+    32,
+    32
+   ],
+   "image_type": "Sliced"
+  },
+  "Build/palette_card_normal_9s_1x.png": {
+   "size": [
+    64,
+    64
+   ],
+   "scale": "1x",
+   "note": "記憶の欠片 card 192x146 (1x)",
+   "border_LBRT": [
+    16,
+    16,
+    16,
+    16
+   ],
+   "image_type": "Sliced"
+  },
+  "Build/palette_card_special_9s_2x.png": {
+   "size": [
+    128,
+    128
+   ],
+   "scale": "2x",
+   "note": "記憶の欠片 card 192x146 (1x)",
+   "border_LBRT": [
+    32,
+    32,
+    32,
+    32
+   ],
+   "image_type": "Sliced"
+  },
+  "Build/palette_card_special_9s_1x.png": {
+   "size": [
+    64,
+    64
+   ],
+   "scale": "1x",
+   "note": "記憶の欠片 card 192x146 (1x)",
+   "border_LBRT": [
+    16,
+    16,
+    16,
+    16
+   ],
+   "image_type": "Sliced"
+  },
+  "Build/palette_card_locked_9s_2x.png": {
+   "size": [
+    128,
+    128
+   ],
+   "scale": "2x",
+   "note": "記憶の欠片 card 192x146 (1x)",
+   "border_LBRT": [
+    32,
+    32,
+    32,
+    32
+   ],
+   "image_type": "Sliced"
+  },
+  "Build/palette_card_locked_9s_1x.png": {
+   "size": [
+    64,
+    64
+   ],
+   "scale": "1x",
+   "note": "記憶の欠片 card 192x146 (1x)",
+   "border_LBRT": [
+    16,
+    16,
+    16,
+    16
+   ],
+   "image_type": "Sliced"
+  },
+  "Build/tag_plate_9s_2x.png": {
+   "size": [
+    64,
+    52
+   ],
+   "scale": "2x",
+   "note": "「つかみ中」 tag 84x26 (1x)",
+   "border_LBRT": [
+    16,
+    16,
+    16,
+    16
+   ],
+   "image_type": "Sliced"
+  },
+  "Build/tag_plate_9s_1x.png": {
+   "size": [
+    32,
+    26
+   ],
+   "scale": "1x",
+   "note": "「つかみ中」 tag 84x26 (1x)",
+   "border_LBRT": [
+    8,
+    8,
+    8,
+    8
+   ],
+   "image_type": "Sliced"
+  },
+  "Build/lane_bar_track_9s_2x.png": {
+   "size": [
+    32,
+    12
+   ],
+   "scale": "2x",
+   "note": "lane rate bar track, width = column width - 34, height 5",
+   "border_LBRT": [
+    6,
+    4,
+    6,
+    4
+   ],
+   "image_type": "Sliced"
+  },
+  "Build/lane_bar_track_9s_1x.png": {
+   "size": [
+    16,
+    6
+   ],
+   "scale": "1x",
+   "note": "lane rate bar track, width = column width - 34, height 5",
+   "border_LBRT": [
+    3,
+    2,
+    3,
+    2
+   ],
+   "image_type": "Sliced"
+  },
+  "Build/lane_bar_fill_9s_2x.png": {
+   "size": [
+    32,
+    12
+   ],
+   "scale": "2x",
+   "note": "lane rate bar fill (white) tinted per type, width = track * rate",
+   "border_LBRT": [
+    6,
+    4,
+    6,
+    4
+   ],
+   "image_type": "Sliced"
+  },
+  "Build/lane_bar_fill_9s_1x.png": {
+   "size": [
+    16,
+    6
+   ],
+   "scale": "1x",
+   "note": "lane rate bar fill (white) tinted per type, width = track * rate",
+   "border_LBRT": [
+    3,
+    2,
+    3,
+    2
+   ],
+   "image_type": "Sliced"
+  },
+  "Build/icon_power_respin_2x.png": {
+   "size": [
+    88,
+    88
+   ],
+   "scale": "2x",
+   "note": "リスピン (placeholder icon)"
+  },
+  "Build/icon_power_respin_1x.png": {
+   "size": [
+    44,
+    44
+   ],
+   "scale": "1x",
+   "note": "リスピン (placeholder icon)"
+  },
+  "Build/icon_power_nudge_2x.png": {
+   "size": [
+    88,
+    88
+   ],
+   "scale": "2x",
+   "note": "ずらし (placeholder icon)"
+  },
+  "Build/icon_power_nudge_1x.png": {
+   "size": [
+    44,
+    44
+   ],
+   "scale": "1x",
+   "note": "ずらし (placeholder icon)"
+  },
+  "Build/save_slot_filled_9s_2x.png": {
+   "size": [
+    80,
+    80
+   ],
+   "scale": "2x",
+   "note": "記録 slot (saved) 62x64 (1x)",
+   "border_LBRT": [
+    24,
+    24,
+    24,
+    24
+   ],
+   "image_type": "Sliced"
+  },
+  "Build/save_slot_filled_9s_1x.png": {
+   "size": [
+    40,
+    40
+   ],
+   "scale": "1x",
+   "note": "記録 slot (saved) 62x64 (1x)",
+   "border_LBRT": [
+    12,
+    12,
+    12,
+    12
+   ],
+   "image_type": "Sliced"
+  },
+  "Build/save_slot_empty_9s_2x.png": {
+   "size": [
+    80,
+    80
+   ],
+   "scale": "2x",
+   "note": "記録 slot (empty)",
+   "border_LBRT": [
+    24,
+    24,
+    24,
+    24
+   ],
+   "image_type": "Sliced"
+  },
+  "Build/save_slot_empty_9s_1x.png": {
+   "size": [
+    40,
+    40
+   ],
+   "scale": "1x",
+   "note": "記録 slot (empty)",
+   "border_LBRT": [
+    12,
+    12,
+    12,
+    12
+   ],
+   "image_type": "Sliced"
+  }
+ },
+ "notes": {
+  "scale": "_2x = master (Pixels Per Unit 200 so it shows at 1x size when Canvas Reference PPU = 100); _1x provided for convenience. Cards/* are native card-space (route display scale 0.472, current card 0.500). hires/512 = masters.",
+  "border_LBRT": "Unity Sprite Editor border order is L,B,R,T (px of that file)."
+ }
+}

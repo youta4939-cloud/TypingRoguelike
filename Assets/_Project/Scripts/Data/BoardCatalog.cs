@@ -31,22 +31,22 @@ namespace TypingRoguelike.Data
             var catalog = CreateInstance<BoardCatalog>();
             catalog.presets = new[]
             {
-                Make("balance", "バランス", "BBBRRSTEE"),
-                Make("combat", "戦闘寄り", "BBBBBRTEE"),
-                Make("rest", "回復寄り", "BBBRRRRSE"),
-                Make("treasure", "宝寄り", "BBBTTTTXX")
+                Make("balance", "バランス", "BBRSTE"),
+                Make("combat", "戦闘寄り", "BBBBBX"),
+                Make("rest", "回復寄り", "BBRRRS", "BBRBTS", "BBRBTS"),
+                Make("treasure", "宝寄り", "TTBBRR", "TTXBBT", "TTXBBT")
             };
             return catalog;
         }
 
-        static BoardPreset Make(string id, string name, string columns)
+        static BoardPreset Make(string id, string name, string column1, string column2 = null, string column3 = null)
         {
             var preset = CreateInstance<BoardPreset>();
             preset.presetId = id;
             preset.displayName = name;
-            preset.column1 = columns;
-            preset.column2 = columns;
-            preset.column3 = columns;
+            preset.column1 = column1;
+            preset.column2 = column2 ?? column1;
+            preset.column3 = column3 ?? column1;
             return preset;
         }
     }

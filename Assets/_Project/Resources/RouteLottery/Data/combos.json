@@ -1,0 +1,140 @@
+{
+ "_note": "役テーブル（データ駆動）。priority が小さいほど優先。pattern=[一の列,二の列,三の列]、\"*\"=任意。216通りを全列挙し、各結果は一致した最上位の役 1 つだけに数える。fallback（？？？）= 100% − 表示役の合計。値はすべて仮。",
+ "combos": [
+  {
+   "id": "c01",
+   "priority": 1,
+   "name": "戦戦戦",
+   "pattern": [
+    "battle",
+    "battle",
+    "battle"
+   ],
+   "effect": "取得経験値 +50%",
+   "provisional": true
+  },
+  {
+   "id": "c02",
+   "priority": 2,
+   "name": "休休休",
+   "pattern": [
+    "rest",
+    "rest",
+    "rest"
+   ],
+   "effect": "最大HP +20%（次の層まで）",
+   "provisional": true
+  },
+  {
+   "id": "c03",
+   "priority": 3,
+   "name": "宝宝宝",
+   "pattern": [
+    "treasure",
+    "treasure",
+    "treasure"
+   ],
+   "effect": "レアアイテムの出現率 +50%",
+   "provisional": true
+  },
+  {
+   "id": "c04",
+   "priority": 4,
+   "name": "ショップ×3",
+   "pattern": [
+    "shop",
+    "shop",
+    "shop"
+   ],
+   "effect": "全アイテム 20%OFF",
+   "provisional": true
+  },
+  {
+   "id": "c05",
+   "priority": 5,
+   "name": "イベント×3",
+   "pattern": [
+    "event",
+    "event",
+    "event"
+   ],
+   "effect": "特別なイベントが発生",
+   "provisional": true
+  },
+  {
+   "id": "c06",
+   "priority": 6,
+   "name": "Danger×3",
+   "pattern": [
+    "danger",
+    "danger",
+    "danger"
+   ],
+   "effect": "強力なボスが出現（報酬2倍）",
+   "provisional": true
+  },
+  {
+   "id": "c07",
+   "priority": 7,
+   "name": "戦戦休",
+   "pattern": [
+    "battle",
+    "battle",
+    "rest"
+   ],
+   "effect": "戦闘後のHP回復量 +30%",
+   "provisional": true
+  },
+  {
+   "id": "c08",
+   "priority": 8,
+   "name": "ショップショップ宝",
+   "pattern": [
+    "shop",
+    "shop",
+    "treasure"
+   ],
+   "effect": "ショップにレアアイテムが追加",
+   "provisional": true
+  },
+  {
+   "id": "c09",
+   "priority": 9,
+   "name": "イベント休イベント",
+   "pattern": [
+    "event",
+    "rest",
+    "event"
+   ],
+   "effect": "ランダムな強化を1つ獲得",
+   "provisional": true
+  },
+  {
+   "id": "c10",
+   "priority": 10,
+   "name": "戦イベント戦",
+   "pattern": [
+    "battle",
+    "event",
+    "battle"
+   ],
+   "effect": "次の戦闘でクリティカル率 +20%",
+   "provisional": true
+  }
+ ],
+ "fallback": {
+  "id": "c99",
+  "name": "？？？",
+  "effect": "その他の組み合わせ：特殊効果",
+  "provisional": true
+ },
+ "rules": {
+  "rows": 6,
+  "lanes": 3,
+  "lane_rate": "count/6 (empty cell = danger)",
+  "combo_rate": "product of the three lane rates, summed over the 216 outcomes assigned to the top-priority matching combo",
+  "min_battle_per_lane": 2,
+  "base_rate_only": true,
+  "reel_powers_not_included": true
+ }
+}

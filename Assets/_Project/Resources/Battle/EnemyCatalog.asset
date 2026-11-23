@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 137014f51b63d1f45ae3cc74ab6b8b71, type: 3}
+  m_Name: EnemyCatalog
+  m_EditorClassIdentifier: TypingRoguelike::TypingRoguelike.Data.EnemyCatalogDefinition
+  enemies:
+  - {fileID: 11400000, guid: 2460b1da83f9eb0449d4a908f14c2153, type: 2}
+  - {fileID: 11400000, guid: a51a53a88237afd4e8bad1d56cdb0ebe, type: 2}
+  - {fileID: 11400000, guid: 8b9b6b3b37abd7f41bdcdeac602c44e3, type: 2}
+  - {fileID: 11400000, guid: 5559f03a9d9d38242b05e6a8f41959b7, type: 2}
+  - {fileID: 11400000, guid: d4b02f8c6e5a4b3f0c7d9e1a2b3c4d5e, type: 2}
+  - {fileID: 11400000, guid: ff743e2b7ef74974a84ba2ab84ca02ee, type: 2}
+  - {fileID: 11400000, guid: b56123db3535c3749b6be76bf95b2a8d, type: 2}
+  - {fileID: 11400000, guid: c3a91e7b5d4f4a2e9b6c8d0f1a2b3c4d, type: 2}

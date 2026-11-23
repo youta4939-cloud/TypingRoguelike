@@ -1,0 +1,14 @@
+/* Full artwork with the ink menu; no illustration frame. */
+.screen{background:#151214;isolation:isolate}
+.illustration{position:absolute;inset:0;margin:0;height:100%;z-index:-2}
+.illustration:before,.illustration figcaption,.scene-note{display:none}
+.image-mat{border:0;padding:0;background:none;height:100%}.image-mat:before{display:none}
+.illustration .art{width:100%;height:100%;object-fit:cover;object-position:center;opacity:1;filter:saturate(.6)}
+.room-shift .illustration .art{filter:saturate(.65) brightness(1.03)}
+.veil{display:block;position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(90deg,#100e10ed 0%,#100e10df 25%,#100e1099 40%,#100e1026 63%,#100e1000 80%),linear-gradient(0deg,#100e10c9 0%,transparent 20%,transparent 82%,#100e10ad 100%)}
+.top{background:none;border-color:#72434a66}
+nav{top:185px}.caption{color:#bda89b;border-color:#72434a77}
+.bottom{border-color:#72434a66;background:none}.credit{color:#a08a80}.money{color:#e1d2c0}
+@media(min-width:1500px){.illustration{height:100%}nav{top:200px}}
+@media(max-width:1000px) and (min-width:761px){.illustration{inset:0;height:100%}.illustration .art{object-position:63% center}}
+@media(max-width:760px){.screen{height:100svh;min-height:820px;padding-bottom:0}.illustration{inset:0;height:100%}.illustration .art{object-position:65% center}.veil{background:linear-gradient(90deg,#100e10ec 0%,#100e10bf 48%,#100e1070 100%),linear-gradient(0deg,#100e10d9,transparent 50%)}nav{top:190px;left:10%;width:76%;max-width:420px}.credit{max-width:75%}.top{height:110px}}

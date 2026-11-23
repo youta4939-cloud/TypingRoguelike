@@ -1,0 +1,1877 @@
+{
+  "version": 2,
+  "events": [
+    {
+      "id": "sleeping_brute", "category": "battle", "title": "眠る大亡者", "minLayer": 1, "maxLayer": 15,
+      "conditions": [],
+      "body": "通路をふさぐように、大きな亡者が膝を抱えて眠っている。背中には塔片でふくらんだ袋。寝息にあわせて、じゃらりと鳴る。",
+      "options": [
+        { "label": "寝込みを襲う", "stance": "aggressive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "振りかぶった一撃で、寝息が悲鳴に変わった。", "effects": [
+            { "type": "battle", "kind": "elite" }, { "type": "battle_enemy_hp_percent", "value": -30 }, { "type": "coins", "value": 25 } ] } ] },
+        { "label": "忍び足で通る", "stance": "defensive", "knowledge": "unknown", "outcomes": [
+          { "chance": 75, "text": "足音ひとつ立てずに通り抜けた。", "effects": [] },
+          { "chance": 25, "text": "袋がじゃらりと鳴った。亡者が目を開けた。", "effects": [
+            { "type": "battle", "kind": "elite" }, { "type": "battle_opening_seconds", "value": -2 } ] } ] }
+      ]
+    },
+    {
+      "id": "wandering_patrol", "category": "battle", "title": "巡回の終点", "minLayer": 1, "maxLayer": 15,
+      "conditions": [],
+      "body": "獄卒の帽子をかぶった亡者が、同じ角から何度も現れる。帽子の裏に刻印の写しが覗いていた。足元には白線が一本。線を越えるたびに、亡者は背丈を測るようにこちらを見た。さっきより、目の高さが近い。",
+      "options": [
+        { "label": "帽子を剥がす", "stance": "aggressive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "帽子を失った亡者の殻を割ると、写しが床に落ちた。帽子の内側には、何人もの頭の形が縫い重ねられている。最後の縫い目だけが、まだこちらへ伸びていた。", "effects": [
+            { "type": "battle", "kind": "normal" }, { "type": "card_choices", "value": 1 } ] } ] },
+        { "label": "巡回路を尋ねる", "stance": "defensive", "knowledge": "unknown", "outcomes": [
+          { "chance": 60, "text": "亡者は白線の先を指し、塔片を渡した。曲がり角を抜けて振り返ると、今度は壁に向かって同じ案内をしている。そこに誰が立っているのかは見えなかった。", "effects": [
+            { "type": "coins", "value": 10 } ] },
+          { "chance": 40, "text": "説明を聞き終えても、亡者の口が止まらない。十七回目で気づいた。繰り返されているのは道順ではなく、こちらが今まで曲がった角の順番だった。", "effects": [
+            { "type": "madness", "value": 60 } ] } ] }
+      ]
+    },
+    {
+      "id": "bone_arena", "category": "battle", "title": "骨の闘技場", "minLayer": 1, "maxLayer": 15,
+      "conditions": [],
+      "body": "円形の広間で、骸骨の観客がカタカタと拍手している。真ん中に立つ亡者が、こちらに手招きをした。",
+      "options": [
+        { "label": "受けて立つ", "stance": "aggressive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "勝負がつくと、観客の拍手が骨の雨になって降ってきた。中に塔片が混じっている。", "effects": [
+            { "type": "battle", "kind": "normal" }, { "type": "battle_enemy_hp_percent", "value": 20 }, { "type": "coins", "value": 30 } ] } ] },
+        { "label": "観客席に紛れる", "stance": "defensive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "隣の骸骨が、骨付き肉を分けてくれた。何の骨かは聞かなかった。", "effects": [
+            { "type": "hp_percent", "value": 10 }, { "type": "madness", "value": 50 } ] } ] }
+      ]
+    },
+    {
+      "id": "ambush_ahead", "category": "battle", "title": "曲がり角の気配", "minLayer": 1, "maxLayer": 15,
+      "conditions": [],
+      "body": "曲がり角の先から、息を殺す気配が三つ。向こうがこちらに気づいているかどうかは、わからない。",
+      "options": [
+        { "label": "先に飛び込む", "stance": "aggressive", "knowledge": "unknown", "outcomes": [
+          { "chance": 100, "text": "不意を突かれた亡者たちは、武器を逆さに構えていた。", "effects": [
+            { "type": "battle", "kind": "normal" }, { "type": "battle_enemy_hp_percent", "value": -20 }, { "type": "battle_opening_seconds", "value": 3 } ] } ] },
+        { "label": "遠回りする", "stance": "defensive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "遠回りの道は長く、ぬかるんでいた。", "effects": [
+            { "type": "hp_percent", "value": -5 }, { "type": "madness", "value": 40 } ] } ] }
+      ]
+    },
+    {
+      "id": "chained_guardian", "category": "battle", "title": "鎖の番人", "minLayer": 1, "maxLayer": 15,
+      "conditions": [],
+      "body": "宝箱の前に、鎖で繋がれた番人が座っている。鎖の長さは、宝箱にぎりぎり届かないくらいだ。",
+      "options": [
+        { "label": "番人を倒す", "stance": "aggressive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "番人が崩れると、宝箱の鍵が足元に転がった。", "effects": [
+            { "type": "battle", "kind": "elite" }, { "type": "relic_gain", "value": 1 } ] } ] },
+        { "label": "届かない所から手を伸ばす", "stance": "defensive", "knowledge": "unknown", "outcomes": [
+          { "chance": 50, "text": "指先がぎりぎり宝箱のふちに届いた。", "effects": [
+            { "type": "coins", "value": 20 } ] },
+          { "chance": 50, "text": "番人の鎖は、思ったより一つ長かった。", "effects": [
+            { "type": "hp_percent", "value": -8 } ] } ] }
+      ]
+    },
+    {
+      "id": "imp_challenge", "category": "battle", "title": "折り目のない挑戦状", "minLayer": 1, "maxLayer": 15,
+      "conditions": [],
+      "body": "小鬼が挑戦状を差し出した。紙は乾いているのに、握った指に貼りつく。勝者への賞金と、辞退者からの徴収額が書かれていた。署名欄には、まだ書いていないこちらの名前。小鬼はその文字から目を離さない。",
+      "options": [
+        { "label": "署名を裂いて勝負する", "stance": "aggressive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "小鬼の殻を割ると、紙から署名が剥がれた。賞金の塔片には、一枚ずつ爪の跡がある。最後の一枚を拾うころには、挑戦状は最初から白紙だったように見えた。", "effects": [
+            { "type": "battle", "kind": "normal" }, { "type": "battle_enemy_hp_percent", "value": -40 }, { "type": "coins", "value": 15 } ] } ] },
+        { "label": "挑戦状を返す", "stance": "defensive", "knowledge": "unknown", "outcomes": [
+          { "chance": 70, "text": "返した紙が財布の口へ折れ込み、塔片を包んで抜けていった。小鬼の手には何もない。壁に映ったその影だけが、まだ金を数えていた。", "effects": [
+            { "type": "coins_percent", "value": -10 } ] },
+          { "chance": 30, "text": "小鬼は白い塊を掌に残した。口に入れると傷の熱が引く。包み紙の内側には、こちらが今から言おうとしていた断り文句が、一字違わず書かれていた。", "effects": [
+            { "type": "hp_percent", "value": 5 } ] } ] }
+      ]
+    },
+    {
+      "id": "mirror_shadow", "category": "battle", "title": "鏡の向こうの交代要員", "minLayer": 1, "maxLayer": 15,
+      "conditions": [],
+      "body": "鏡の中だけ、三人がこちらに背を向けている。手前には自分と同じ姿が立ち、鏡の縁に指をかけていた。指には見覚えのない傷がある。「そろそろ代わろう」。口は動かなかったが、声はすぐ隣から聞こえた。",
+      "options": [
+        { "label": "指を叩いて引き剥がす", "stance": "aggressive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "鏡から剥がれた影の殻を割った。向こう側の三人は、最後まで背を向けたままだ。指の傷だけが自分の手にもある気がして、何度も掌を確かめた。", "effects": [
+            { "type": "battle", "kind": "normal" }, { "type": "battle_enemy_hp_percent", "value": -15 }, { "type": "battle_opening_seconds", "value": 5 }, { "type": "madness", "value": 50 } ] } ] },
+        { "label": "鏡を壁へ向ける", "stance": "defensive", "knowledge": "unknown", "outcomes": [
+          { "chance": 60, "text": "壁へ向けると気配が薄れた。三人がいつもの距離に戻る。鏡の裏には引っ掻き傷が四本あり、一番新しい一本だけが、いま目の前で短くなっていた。", "effects": [
+            { "type": "madness", "value": -40 } ] },
+          { "chance": 40, "text": "鏡を回した途端、壁から腕が伸びた。三人はすぐ武器を構える。その影だけが、武器を構えるより先にこちらへ駆け寄ってきた。", "effects": [
+            { "type": "battle", "kind": "normal" }, { "type": "battle_opening_seconds", "value": -2 } ] } ] }
+      ]
+    },
+    {
+      "id": "hungry_hound", "category": "battle", "title": "声を嗅ぐ番犬", "minLayer": 1, "maxLayer": 15,
+      "conditions": [ { "type": "min_coins", "value": 10 } ],
+      "body": "三つ首の犬が道を塞いでいる。顔は同じなのに、息の音だけがそれぞれ違った。鎖の先に「給餌十塔片」の箱。{target}が声を出すと、真ん中の首だけが、懐かしい呼び方を聞いたように耳を立てた。",
+      "options": [
+        { "label": "鎖ごと追い払う", "stance": "aggressive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "番犬の殻が崩れると、首輪の塔片がほどけた。三つの口が閉じる直前、同じ息を吐いた。{target}がその音を真似しようとして、途中でやめた。", "effects": [
+            { "type": "battle", "kind": "normal" }, { "type": "battle_enemy_hp_percent", "value": -25 }, { "type": "coins", "value": 10 } ] } ] },
+        { "label": "箱に給餌代を入れる", "stance": "defensive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "箱が塔片を飲み込むと、犬は脇道へ伏せた。そこからなら敵の背後へ回れる。通り過ぎたあとも、真ん中の首だけが、こちらの会話に耳を立てていた。", "effects": [
+            { "type": "coins", "value": -10 }, { "type": "layer_opening_seconds", "value": 2 } ] } ] }
+      ]
+    },
+
+    {
+      "id": "red_cauldron", "category": "hp", "title": "赤い湯の釜", "minLayer": 1, "maxLayer": 15,
+      "conditions": [],
+      "body": "大釜の中で、赤い湯がゆっくり渦を巻いている。湯気を吸うだけで傷がうずき、ふさがりかけていく。釜の底で、何か硬いものが光った。",
+      "options": [
+        { "label": "浸かる", "stance": "defensive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "傷はふさがった。熱だけが、頭の奥に残っている。", "effects": [
+            { "type": "hp_percent", "value": 25 }, { "type": "madness", "value": 80 } ] } ] },
+        { "label": "底をさらう", "stance": "aggressive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "指先は少しやけどしたが、底の塔片はぜんぶ拾えた。", "effects": [
+            { "type": "hp_percent", "value": -5 }, { "type": "coins", "value": 20 } ] } ] }
+      ]
+    },
+    {
+      "id": "herb_garden", "category": "hp", "title": "地獄の薬草畑", "minLayer": 1, "maxLayer": 15,
+      "conditions": [],
+      "body": "岩の隙間に、赤黒い草がびっしり生えている。葉をちぎると、苦い匂いと甘い匂いが交互にする。",
+      "options": [
+        { "label": "苦い葉を噛む", "stance": "defensive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "涙が出るほど苦い。そのぶん、よく効いた。", "effects": [
+            { "type": "hp_percent", "value": 20 }, { "type": "madness", "value": 30 } ] } ] },
+        { "label": "甘い葉を噛む", "stance": "aggressive", "knowledge": "unknown", "outcomes": [
+          { "chance": 60, "text": "甘い。悩みごとがどうでもよくなった。", "effects": [
+            { "type": "hp_percent", "value": 10 }, { "type": "madness", "value": -80 } ] },
+          { "chance": 40, "text": "甘いのは最初だけだった。お腹が痛い。", "effects": [
+            { "type": "hp_percent", "value": -8 } ] } ] }
+      ]
+    },
+    {
+      "id": "needle_mountain", "category": "hp", "title": "針の山の近道", "minLayer": 1, "maxLayer": 15,
+      "conditions": [],
+      "body": "針の山を越える近道がある。山頂で何かがきらりと光った。遠回りの道からは、亡者の鼻歌が聞こえてくる。",
+      "options": [
+        { "label": "針の山を越える", "stance": "aggressive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "足の裏はちくちくするが、山頂には塔片が落ちていた。", "effects": [
+            { "type": "hp_percent", "value": -10 }, { "type": "coins", "value": 25 } ] } ] },
+        { "label": "遠回りする", "stance": "defensive", "knowledge": "unknown", "outcomes": [
+          { "chance": 70, "text": "鼻歌が耳から離れなくなった。", "effects": [
+            { "type": "madness", "value": 50 } ] },
+          { "chance": 30, "text": "鼻歌の主は、歌を邪魔されるのが大嫌いだった。", "effects": [
+            { "type": "battle", "kind": "normal" } ] } ] }
+      ]
+    },
+    {
+      "id": "field_clinic", "category": "hp", "title": "縫い目のない出張所", "minLayer": 1, "maxLayer": 15,
+      "conditions": [ { "type": "min_coins", "value": 10 } ],
+      "body": "「出張修復・十塔片」。仕切りの向こうで、白衣の職員が包帯を巻いている。椅子は空なのに、包帯は誰かの輪郭を保っていた。「通常修復と、見本への協力。どちらにしますか」。職員は空いた椅子を一つ引いた。",
+      "options": [
+        { "label": "通常修復を受ける", "stance": "defensive", "knowledge": "unknown", "outcomes": [
+          { "chance": 70, "text": "包帯を巻かれた場所から傷が閉じた。職員は支払いを受け取り、空の椅子にも同じ処置をする。そちらの包帯まで、こちらの呼吸に合わせて緩んだ。", "effects": [
+            { "type": "coins", "value": -10 }, { "type": "hp_percent", "value": 30 } ] },
+          { "chance": 30, "text": "傷の浅い部分だけが塞がった。「本日はここまで」。職員が示した見本は、まだ傷だらけだった。仕切りの向こうで、その輪郭がわずかに身じろぎした。", "effects": [
+            { "type": "coins", "value": -10 }, { "type": "hp_percent", "value": 10 } ] } ] },
+        { "label": "採寸の見本を引き受ける", "stance": "aggressive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "測定の針が古傷まで拾っていく。謝礼の塔片を受け取って立ち上がると、空席の包帯がさっきの自分と同じ姿勢に変わった。職員はそれを見て、採寸を終えた。", "effects": [
+            { "type": "hp_percent", "value": -5 }, { "type": "coins", "value": 15 } ] } ] }
+      ]
+    },
+    {
+      "id": "blood_fruit", "category": "hp", "title": "血の色の果樹", "minLayer": 1, "maxLayer": 15,
+      "conditions": [],
+      "body": "血の色をした木に、真っ赤な実が三つなっている。根元の立て札には「一人一つまで」。",
+      "options": [
+        { "label": "全部もぐ", "stance": "aggressive", "knowledge": "unknown", "outcomes": [
+          { "chance": 50, "text": "三つ目を食べたところで、木がこちらを睨んだ。", "effects": [
+            { "type": "hp_percent", "value": 30 }, { "type": "madness", "value": 100 } ] },
+          { "chance": 50, "text": "木は何も言わなかった。たぶん、見ていなかった。", "effects": [
+            { "type": "hp_percent", "value": 30 } ] } ] },
+        { "label": "決まりどおり一つずつ", "stance": "defensive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "三人で分けた実は、思ったより甘かった。", "effects": [
+            { "type": "hp_percent", "value": 15 }, { "type": "trust", "target": "all", "value": 1 } ] } ] }
+      ]
+    },
+    {
+      "id": "sulfur_spring", "category": "hp", "title": "硫黄の湯", "minLayer": 1, "maxLayer": 15,
+      "conditions": [],
+      "body": "硫黄の匂いの湯が湧いている。湯気の向こうに「効能：傷　副作用：のぼせ」の札。",
+      "options": [
+        { "label": "肩まで浸かる", "stance": "defensive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "傷は消えたが、指先がまだふわふわしている。", "effects": [
+            { "type": "hp_percent", "value": 25 }, { "type": "layer_word_damage_percent", "value": -10 } ] } ] },
+        { "label": "足湯だけにする", "stance": "aggressive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "足だけでも、けっこう効いた。", "effects": [
+            { "type": "hp_percent", "value": 10 } ] } ] }
+      ]
+    },
+    {
+      "id": "falling_rocks", "category": "hp", "title": "落石の通路", "minLayer": 1, "maxLayer": 15,
+      "conditions": [],
+      "body": "天井がみしみし鳴っている。急げば抜けられそうだ。床には、誰かが落とした袋が転がっている。",
+      "options": [
+        { "label": "袋を拾って走る", "stance": "aggressive", "knowledge": "unknown", "outcomes": [
+          { "chance": 60, "text": "袋を抱えて転がり出た。背中に小石が当たった。", "effects": [
+            { "type": "coins", "value": 20 }, { "type": "hp_percent", "value": -5 } ] },
+          { "chance": 40, "text": "袋は拾えた。かわりに、天井の半分が降ってきた。", "effects": [
+            { "type": "coins", "value": 20 }, { "type": "hp_percent", "value": -15 } ] } ] },
+        { "label": "まっすぐ駆け抜ける", "stance": "defensive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "髪に砂がかかっただけで済んだ。", "effects": [] } ] }
+      ]
+    },
+
+    {
+      "id": "whispering_wall", "category": "madness", "title": "名前を呼ぶ壁", "minLayer": 1, "maxLayer": 15,
+      "conditions": [],
+      "body": "壁一面に、びっしりと名前が刻まれている。近づくと、名前が一つずつ、小さな声で自分を名乗りはじめた。",
+      "options": [
+        { "label": "聞き届ける", "stance": "aggressive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "最後の名前を聞き終えたころには、頭の中がにぎやかになっていた。", "effects": [
+            { "type": "madness", "value": 150 }, { "type": "card_choices", "value": 1 } ] } ] },
+        { "label": "名前をなぞって鎮める", "stance": "defensive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "指が擦りむけるころ、声は一つずつ眠っていった。", "effects": [
+            { "type": "madness", "value": -100 }, { "type": "hp_percent", "value": -5 } ] } ] }
+      ]
+    },
+    {
+      "id": "lullaby_ghost", "category": "madness", "title": "子守唄の亡者", "minLayer": 1, "maxLayer": 15,
+      "conditions": [],
+      "body": "通路の隅で、亡者が子守唄を歌っている。歌詞はでたらめなのに、妙に眠くなる。",
+      "options": [
+        { "label": "聴き入る", "stance": "defensive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "頭の中が静かになった。ついでに、少しぼんやりしている。", "effects": [
+            { "type": "madness", "value": -120 }, { "type": "layer_rerolls", "value": -1 } ] } ] },
+        { "label": "一緒に歌う", "stance": "aggressive", "knowledge": "unknown", "outcomes": [
+          { "chance": 50, "text": "調子外れの合唱に、亡者が泣いて喜んだ。", "effects": [
+            { "type": "madness", "value": -200 } ] },
+          { "chance": 50, "text": "でたらめな歌詞が、頭から離れなくなった。", "effects": [
+            { "type": "madness", "value": 80 } ] } ] }
+      ]
+    },
+    {
+      "id": "laughing_mirror", "category": "madness", "title": "笑う鏡", "minLayer": 1, "maxLayer": 15,
+      "conditions": [],
+      "body": "鏡の中の自分たちが、こちらより少し楽しそうに笑っている。",
+      "options": [
+        { "label": "笑い返す", "stance": "aggressive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "笑っているうちに、なんだか強くなった気がしてきた。", "effects": [
+            { "type": "madness", "value": 100 }, { "type": "layer_word_damage_percent", "value": 15 } ] } ] },
+        { "label": "布をかける", "stance": "defensive", "knowledge": "unknown", "outcomes": [
+          { "chance": 70, "text": "鏡は布の下でまだ笑っていたが、もう気にならない。", "effects": [
+            { "type": "madness", "value": -60 } ] },
+          { "chance": 30, "text": "布をかけた瞬間、鏡の笑い声が大きくなった。", "effects": [
+            { "type": "madness", "value": 40 } ] } ] }
+      ]
+    },
+    {
+      "id": "incense_seller", "category": "madness", "title": "線香売り", "minLayer": 1, "maxLayer": 15,
+      "conditions": [ { "type": "min_coins", "value": 20 } ],
+      "body": "亡者が線香を売っている。「心が落ち着く線香、二十塔片。心がざわつく線香、タダ」",
+      "options": [
+        { "label": "落ち着く方を買う", "stance": "defensive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "煙を吸うと、頭の中のざわめきがすっと引いた。", "effects": [
+            { "type": "coins", "value": -20 }, { "type": "madness", "value": -180 } ] } ] },
+        { "label": "タダの方をもらう", "stance": "aggressive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "「タダより高いものはない」と亡者は言い、なぜか小銭までくれた。", "effects": [
+            { "type": "madness", "value": 100 }, { "type": "coins", "value": 10 } ] } ] }
+      ]
+    },
+    {
+      "id": "worry_box", "category": "madness", "title": "お悩み投書箱", "minLayer": 1, "maxLayer": 15,
+      "conditions": [ { "type": "min_coins", "value": 5 } ],
+      "body": "「悩みを書いて入れてください　地獄庁」と書かれた木箱。投函料は五塔片。中身はもうぱんぱんだ。",
+      "options": [
+        { "label": "悩みを書いて入れる", "stance": "defensive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "書き出してみると、悩みは三行で済んだ。", "effects": [
+            { "type": "coins", "value": -5 }, { "type": "madness", "value": -100 } ] } ] },
+        { "label": "他人の悩みを読む", "stance": "aggressive", "knowledge": "unknown", "outcomes": [
+          { "chance": 50, "text": "重たい悩みばかりだった。封筒の一つに、塔片が同封されていた。", "effects": [
+            { "type": "madness", "value": 80 }, { "type": "coins", "value": 15 } ] },
+          { "chance": 50, "text": "みんな同じことで悩んでいた。少し安心した。", "effects": [
+            { "type": "madness", "value": -50 } ] } ] }
+      ]
+    },
+    {
+      "id": "nap_room", "category": "madness", "title": "獄卒用の仮眠室", "minLayer": 1, "maxLayer": 15,
+      "conditions": [],
+      "body": "「仮眠室・五分まで」。ベッドは一つだけで、枕元に目覚まし時計が三つ置いてある。",
+      "options": [
+        { "label": "交代で寝る", "stance": "defensive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "ぐっすり眠れた。そのあいだに、この階の亡者は守りを固めたようだ。", "effects": [
+            { "type": "madness", "value": -150 }, { "type": "layer_enemy_hp_percent", "value": 10 } ] } ] },
+        { "label": "寝ずに家探しする", "stance": "aggressive", "knowledge": "unknown", "outcomes": [
+          { "chance": 60, "text": "ベッドの下から、誰かのへそくりが出てきた。", "effects": [
+            { "type": "coins", "value": 20 } ] },
+          { "chance": 40, "text": "目覚まし時計が三つ同時に鳴った。", "effects": [
+            { "type": "madness", "value": 60 } ] } ] }
+      ]
+    },
+    {
+      "id": "forbidden_drum", "category": "madness", "title": "叩くなの大太鼓", "minLayer": 1, "maxLayer": 15,
+      "conditions": [],
+      "body": "「叩くな」と書かれた大太鼓。バチは、ちょうど手の届くところに置いてある。",
+      "options": [
+        { "label": "叩く", "stance": "aggressive", "knowledge": "unknown", "outcomes": [
+          { "chance": 100, "text": "腹の底に響く音で、全員の目が据わった。", "effects": [
+            { "type": "madness", "value": 150 }, { "type": "layer_word_damage_percent", "value": 20 } ] } ] },
+        { "label": "バチだけ持っていく", "stance": "defensive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "立派なバチは高く売れそうだ。{target}は名残惜しそうに太鼓を振り返った。", "effects": [
+            { "type": "coins", "value": 10 }, { "type": "trust", "target": "random", "value": -2 } ] } ] }
+      ]
+    },
+
+    {
+      "id": "dice_den", "category": "coins", "title": "亡者の賭場", "minLayer": 1, "maxLayer": 15,
+      "conditions": [ { "type": "min_coins", "value": 10 } ],
+      "body": "三人の亡者が骨のサイコロを囲んでいる。胴元らしい一人が、空いた座布団をこちらへ押しやった。「張るかい」",
+      "options": [
+        { "label": "有り金の半分を張る", "stance": "aggressive", "knowledge": "unknown", "outcomes": [
+          { "chance": 50, "text": "サイコロは、こちらの願いどおりの目を出した。", "effects": [
+            { "type": "coins_percent", "value": 50 } ] },
+          { "chance": 50, "text": "サイコロは、こちらが見ていないあいだに目を変えた。", "effects": [
+            { "type": "coins_percent", "value": -50 }, { "type": "madness", "value": 30 } ] } ] },
+        { "label": "見物だけする", "stance": "defensive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "野次はうるさかったが、足元に転がってきた小銭は拾えた。", "effects": [
+            { "type": "coins", "value": 5 }, { "type": "madness", "value": 30 } ] } ] }
+      ]
+    },
+    {
+      "id": "lost_wallet", "category": "coins", "title": "落とし物の財布", "minLayer": 1, "maxLayer": 15,
+      "conditions": [],
+      "body": "通路に、ふくらんだ財布が落ちている。少し先で、亡者が一人、ポケットを探りながらきょろきょろしている。",
+      "options": [
+        { "label": "中身をいただく", "stance": "aggressive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "財布は軽くなり、良心は少し重くなった。", "effects": [
+            { "type": "coins", "value": 25 }, { "type": "madness", "value": 40 } ] } ] },
+        { "label": "持ち主に返す", "stance": "defensive", "knowledge": "unknown", "outcomes": [
+          { "chance": 60, "text": "持ち主は涙を流して喜び、お礼に一割くれた。三人も嬉しそうだ。", "effects": [
+            { "type": "coins", "value": 10 }, { "type": "trust", "target": "all", "value": 1 } ] },
+          { "chance": 40, "text": "持ち主は「それ、私のじゃないです」と言って去っていった。", "effects": [
+            { "type": "madness", "value": 30 } ] } ] }
+      ]
+    },
+    {
+      "id": "tower_ferry", "category": "coins", "title": "塔の中の渡し舟", "minLayer": 1, "maxLayer": 15,
+      "conditions": [ { "type": "min_coins", "value": 15 } ],
+      "body": "塔の中を、細い川が流れている。渡し守の亡者が「渡し賃　十五塔片」の札を掲げている。",
+      "options": [
+        { "label": "払って舟に乗る", "stance": "defensive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "舟の上で、少しだけ眠れた。", "effects": [
+            { "type": "coins", "value": -15 }, { "type": "hp_percent", "value": 15 } ] } ] },
+        { "label": "泳いで渡る", "stance": "aggressive", "knowledge": "unknown", "outcomes": [
+          { "chance": 70, "text": "冷たかったが、川底で塔片を拾った。", "effects": [
+            { "type": "hp_percent", "value": -8 }, { "type": "coins", "value": 10 } ] },
+          { "chance": 30, "text": "川の水は、誰かの昔話でできていた。", "effects": [
+            { "type": "hp_percent", "value": -8 }, { "type": "madness", "value": 80 } ] } ] }
+      ]
+    },
+    {
+      "id": "coin_jizo", "category": "coins", "title": "塔片を吐く地蔵", "minLayer": 1, "maxLayer": 15,
+      "conditions": [ { "type": "min_coins", "value": 10 } ],
+      "body": "地蔵の口に塔片を入れると、たまに倍以上になって出てくるらしい。地蔵の頭には、たんこぶがたくさんある。",
+      "options": [
+        { "label": "十塔片を入れる", "stance": "aggressive", "knowledge": "unknown", "outcomes": [
+          { "chance": 40, "text": "地蔵の口から、塔片がざらざらとあふれ出た。", "effects": [
+            { "type": "coins", "value": 20 } ] },
+          { "chance": 60, "text": "地蔵は小さくげっぷをした。", "effects": [
+            { "type": "coins", "value": -10 } ] } ] },
+        { "label": "拝むだけにする", "stance": "defensive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "地蔵の顔が、少しだけ笑った気がした。", "effects": [
+            { "type": "madness", "value": -50 } ] } ] }
+      ]
+    },
+    {
+      "id": "debt_collector", "category": "coins", "title": "地獄庁の取り立て", "minLayer": 1, "maxLayer": 15,
+      "conditions": [ { "type": "min_coins", "value": 1 } ],
+      "body": "地獄庁の取り立て係が、分厚い帳簿をめくっている。「そちら、前回の探索の未払い分がありますね」",
+      "options": [
+        { "label": "おとなしく払う", "stance": "defensive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "払い終えると、係は救急箱を貸してくれた。", "effects": [
+            { "type": "coins_percent", "value": -20 }, { "type": "hp_percent", "value": 10 } ] } ] },
+        { "label": "人違いだと言い張る", "stance": "aggressive", "knowledge": "unknown", "outcomes": [
+          { "chance": 60, "text": "係は帳簿を三回見直し、首をかしげて去っていった。", "effects": [] },
+          { "chance": 40, "text": "係は帳簿を閉じ、腕まくりをした。勝てば手当てが出るらしい。", "effects": [
+            { "type": "battle", "kind": "normal" }, { "type": "coins", "value": 15 } ] } ] }
+      ]
+    },
+    {
+      "id": "wishing_pool", "category": "coins", "title": "願いの泉", "minLayer": 1, "maxLayer": 15,
+      "conditions": [ { "type": "min_coins", "value": 5 } ],
+      "body": "泉の底に、塔片が山ほど沈んでいる。看板には「投げ入れた塔片は願いとなります」。",
+      "options": [
+        { "label": "拾い集める", "stance": "aggressive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "冷たい水の底で、誰かの願いが指に絡みついた。", "effects": [
+            { "type": "coins", "value": 30 }, { "type": "madness", "value": 80 } ] } ] },
+        { "label": "五塔片を投げ入れる", "stance": "defensive", "knowledge": "unknown", "outcomes": [
+          { "chance": 50, "text": "体が軽くなった。願いは叶うものらしい。", "effects": [
+            { "type": "coins", "value": -5 }, { "type": "hp_percent", "value": 15 } ] },
+          { "chance": 50, "text": "頭の中が晴れた。願いは叶うものらしい。", "effects": [
+            { "type": "coins", "value": -5 }, { "type": "madness", "value": -80 } ] } ] }
+      ]
+    },
+    {
+      "id": "pushy_peddler", "category": "coins", "title": "押し売りの亡者", "minLayer": 1, "maxLayer": 15,
+      "conditions": [ { "type": "min_coins", "value": 20 } ],
+      "body": "亡者が袖を引いて離さない。「いい刻印の研ぎ粉あるよ、二十塔片。見るだけ、見るだけ」",
+      "options": [
+        { "label": "買う", "stance": "aggressive", "knowledge": "unknown", "outcomes": [
+          { "chance": 75, "text": "粉をまぶすと、刻印が一段くっきりした。", "effects": [
+            { "type": "coins", "value": -20 }, { "type": "skill_upgrade_random", "value": 1 } ] },
+          { "chance": 25, "text": "中身は、ただの灰だった。", "effects": [
+            { "type": "coins", "value": -20 } ] } ] },
+        { "label": "振りほどく", "stance": "defensive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "「また来てね」という声が、しばらく耳に残った。", "effects": [
+            { "type": "madness", "value": 30 } ] } ] }
+      ]
+    },
+
+    {
+      "id": "ghost_lantern", "category": "layer_buff", "title": "鬼火の灯籠", "minLayer": 1, "maxLayer": 15,
+      "conditions": [],
+      "body": "錆びた灯籠の中で、青い鬼火が揺れている。手をかざすと指先に力がこもる。そのかわり、暗がりがいっせいにこちらを向いた気がした。",
+      "options": [
+        { "label": "持っていく", "stance": "aggressive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "灯籠の火が、心臓と同じ速さで脈を打ちはじめた。", "effects": [
+            { "type": "layer_word_damage_percent", "value": 20 }, { "type": "layer_damage_taken_percent", "value": 10 } ] } ] },
+        { "label": "吹き消す", "stance": "defensive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "暗くなった通路で、亡者たちはこちらを見失ったようだ。拾い物も見えにくい。", "effects": [
+            { "type": "layer_opening_seconds", "value": 3 }, { "type": "layer_battle_coin_percent", "value": -30 } ] } ] }
+      ]
+    },
+    {
+      "id": "command_scroll", "category": "layer_buff", "title": "号令の巻物", "minLayer": 1, "maxLayer": 15,
+      "conditions": [],
+      "body": "詰所の机に、獄卒用の「号令」を書いた巻物がある。読み上げると士気が上がるらしいが、文字がやたらと多い。",
+      "options": [
+        { "label": "声に出して読み上げる", "stance": "aggressive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "三回噛んだが、最後まで読み切った。頭はくらくらする。", "effects": [
+            { "type": "layer_rerolls", "value": 2 }, { "type": "madness", "value": 60 } ] } ] },
+        { "label": "黙読する", "stance": "defensive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "気合いは入らなかったが、要点はつかめた。", "effects": [
+            { "type": "layer_rerolls", "value": 1 } ] } ] }
+      ]
+    },
+    {
+      "id": "smoke_bombs", "category": "layer_buff", "title": "煙玉の箱", "minLayer": 1, "maxLayer": 15,
+      "conditions": [],
+      "body": "獄卒用の煙玉が、箱いっぱいに詰まっている。ラベルには「目くらまし用。むせます」。",
+      "options": [
+        { "label": "持っていく", "stance": "defensive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "敵の目はくらませそうだ。自分たちも、少しむせている。", "effects": [
+            { "type": "layer_opening_seconds", "value": 4 }, { "type": "layer_word_damage_percent", "value": -10 } ] } ] },
+        { "label": "箱ごと燃やす", "stance": "aggressive", "knowledge": "unknown", "outcomes": [
+          { "chance": 100, "text": "煙は通路の奥まで流れ、あちこちで亡者が咳き込んだ。こちらも咳き込んだ。", "effects": [
+            { "type": "layer_enemy_hp_percent", "value": -10 }, { "type": "hp_percent", "value": -5 } ] } ] }
+      ]
+    },
+    {
+      "id": "whetstone_shrine", "category": "layer_buff", "title": "研ぎ石の祠", "minLayer": 1, "maxLayer": 15,
+      "conditions": [],
+      "body": "小さな祠に、研ぎ石が祀られている。「研げば鋭く。ただし血を一滴」",
+      "options": [
+        { "label": "研ぐ", "stance": "aggressive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "一滴のつもりが、三滴になった。そのぶん、よく研げた。", "effects": [
+            { "type": "layer_word_damage_percent", "value": 25 }, { "type": "hp_percent", "value": -8 } ] } ] },
+        { "label": "拝むだけにする", "stance": "defensive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "祠が、少しだけ守ってくれる気がする。", "effects": [
+            { "type": "layer_damage_taken_percent", "value": -10 } ] } ] }
+      ]
+    },
+    {
+      "id": "old_armor", "category": "layer_buff", "title": "獄卒の古い鎧", "minLayer": 1, "maxLayer": 15,
+      "conditions": [],
+      "body": "錆びた鎧が壁に掛かっている。分厚くて頑丈そうだが、着たら絶対に重い。",
+      "options": [
+        { "label": "着込む", "stance": "defensive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "がしゃん、がしゃん。攻撃は通らなさそうだが、腕も上がらない。", "effects": [
+            { "type": "layer_damage_taken_percent", "value": -20 }, { "type": "layer_word_damage_percent", "value": -10 } ] } ] },
+        { "label": "金具を外して売る", "stance": "aggressive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "金具は、意外といい値になりそうだ。", "effects": [
+            { "type": "coins", "value": 15 } ] } ] }
+      ]
+    },
+    {
+      "id": "hell_fortune", "category": "layer_buff", "title": "地獄みくじ", "minLayer": 1, "maxLayer": 15,
+      "conditions": [ { "type": "min_coins", "value": 5 } ],
+      "body": "「地獄みくじ　一回五塔片」。箱を振ると、中でなにかが暴れている。",
+      "options": [
+        { "label": "引く", "stance": "aggressive", "knowledge": "unknown", "outcomes": [
+          { "chance": 40, "text": "大吉。「この階、何をやってもうまくいく」", "effects": [
+            { "type": "coins", "value": -5 }, { "type": "layer_word_damage_percent", "value": 20 }, { "type": "layer_battle_coin_percent", "value": 50 } ] },
+          { "chance": 40, "text": "吉。「落とし物が見つかる」", "effects": [
+            { "type": "coins", "value": -5 }, { "type": "layer_battle_coin_percent", "value": 30 } ] },
+          { "chance": 20, "text": "凶。「背後に注意」。振り返ると誰もいなかった。", "effects": [
+            { "type": "coins", "value": -5 }, { "type": "layer_damage_taken_percent", "value": 15 } ] } ] },
+        { "label": "引かずに去る", "stance": "defensive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "引かなかった結果が、ちょっとだけ気になる。", "effects": [
+            { "type": "madness", "value": 20 } ] } ] }
+      ]
+    },
+    {
+      "id": "bounty_board", "category": "layer_buff", "title": "手配書の掲示板", "minLayer": 1, "maxLayer": 15,
+      "conditions": [],
+      "body": "掲示板に、この階の亡者の手配書が貼ってある。「討伐一体につき報奨金」。ただし、亡者の方も手配書を読んでいる。",
+      "options": [
+        { "label": "手配書を受ける", "stance": "aggressive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "受けた瞬間、通路の奥で亡者たちが武器を研ぎはじめた。", "effects": [
+            { "type": "layer_battle_coin_percent", "value": 100 }, { "type": "layer_enemy_hp_percent", "value": 15 } ] } ] },
+        { "label": "手配書を剥がしておく", "stance": "defensive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "手配書が消えて、亡者たちはすっかり気が緩んだようだ。", "effects": [
+            { "type": "layer_opening_seconds", "value": 2 } ] } ] }
+      ]
+    },
+    {
+      "id": "jizo_charms", "category": "layer_buff", "title": "地蔵のお守り", "minLayer": 1, "maxLayer": 15,
+      "conditions": [],
+      "body": "地蔵の首に、お守りが三つ掛かっている。刺繍は「戦いのあとに」。",
+      "options": [
+        { "label": "一つだけ借りる", "stance": "defensive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "お守りはほんのり温かい。", "effects": [
+            { "type": "layer_heal_after_battle_percent", "value": 5 } ] } ] },
+        { "label": "三つとも借りる", "stance": "aggressive", "knowledge": "unknown", "outcomes": [
+          { "chance": 50, "text": "地蔵の視線が、背中に刺さり続けた。", "effects": [
+            { "type": "layer_heal_after_battle_percent", "value": 12 }, { "type": "madness", "value": 80 } ] },
+          { "chance": 50, "text": "地蔵は寝ていた。", "effects": [
+            { "type": "layer_heal_after_battle_percent", "value": 12 } ] } ] }
+      ]
+    },
+
+    {
+      "id": "twin_passages", "category": "warp", "title": "二つの抜け道", "minLayer": 2, "maxLayer": 15,
+      "conditions": [ { "type": "can_warp_up" }, { "type": "can_warp_down" } ],
+      "body": "崩れた壁の裏に、通路が二本隠れていた。一本は上へ伸びる縦穴で、風が鳴っている。もう一本は下り階段で、来た道の静けさが漂ってくる。",
+      "options": [
+        { "label": "縦穴を登る", "stance": "aggressive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "腕がぱんぱんになったころ、二つ上の階に転がり出た。", "effects": [
+            { "type": "warp", "value": 2 }, { "type": "hp_percent", "value": -10 } ] } ] },
+        { "label": "階段を下りる", "stance": "defensive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "来た道は静かで、ひと息つけた。", "effects": [
+            { "type": "warp", "value": -1 }, { "type": "hp_percent", "value": 15 }, { "type": "madness", "value": -80 } ] } ] }
+      ]
+    },
+    {
+      "id": "rattling_lift", "category": "warp", "title": "震える昇降機", "minLayer": 1, "maxLayer": 15,
+      "conditions": [ { "type": "can_warp_up" } ],
+      "body": "動かないはずの昇降機が、ガタガタ震えている。ボタンは「上」だけ。なぜか三つある。",
+      "options": [
+        { "label": "乗ってみる", "stance": "aggressive", "knowledge": "unknown", "outcomes": [
+          { "chance": 60, "text": "昇降機は一つ上の階で、咳き込みながら止まった。", "effects": [
+            { "type": "warp", "value": 1 } ] },
+          { "chance": 40, "text": "昇降機は一つ上の階の天井に、勢いよく激突した。", "effects": [
+            { "type": "warp", "value": 1 }, { "type": "hp_percent", "value": -10 } ] } ] },
+        { "label": "部品を外す", "stance": "defensive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "外した歯車は、行商人に売れそうだ。", "effects": [
+            { "type": "coins", "value": 15 } ] } ] }
+      ]
+    },
+    {
+      "id": "imp_burrow", "category": "warp", "title": "小鬼の抜け穴", "minLayer": 1, "maxLayer": 15,
+      "conditions": [ { "type": "can_warp_up" } ],
+      "body": "壁の下に、小鬼が掘ったらしい穴がある。穴の奥から「近道だよー」と声がする。",
+      "options": [
+        { "label": "潜ってみる", "stance": "aggressive", "knowledge": "unknown", "outcomes": [
+          { "chance": 70, "text": "本当に近道だった。", "effects": [
+            { "type": "warp", "value": 1 } ] },
+          { "chance": 30, "text": "穴はぐるっと一周して、元の場所に出た。", "effects": [
+            { "type": "madness", "value": 80 } ] } ] },
+        { "label": "穴をふさぐ", "stance": "defensive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "怒った小鬼が石を投げてきた。石には塔片が埋まっていた。", "effects": [
+            { "type": "hp_percent", "value": -3 }, { "type": "coins", "value": 10 } ] } ] }
+      ]
+    },
+    {
+      "id": "rest_slide", "category": "warp", "title": "休憩所行きの滑り台", "minLayer": 2, "maxLayer": 15,
+      "conditions": [ { "type": "can_warp_down" } ],
+      "body": "床に、つるつるの滑り台が口を開けている。「休憩所行き」と書いた札が添えてある。",
+      "options": [
+        { "label": "滑る", "stance": "defensive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "一つ下の階の、本当に休憩所に着いた。", "effects": [
+            { "type": "warp", "value": -1 }, { "type": "hp_percent", "value": 25 }, { "type": "madness", "value": -100 } ] } ] },
+        { "label": "札を信じない", "stance": "aggressive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "滑り台の手すりに、誰かの塔片が挟まっていた。", "effects": [
+            { "type": "coins", "value": 5 } ] } ] }
+      ]
+    },
+    {
+      "id": "ash_stairs", "category": "warp", "title": "灰の大階段", "minLayer": 1, "maxLayer": 15,
+      "conditions": [ { "type": "can_warp_up" } ],
+      "body": "灰でできた大階段が、上へ上へと続いている。一段のぼるごとに、足元が崩れていく。",
+      "options": [
+        { "label": "一気に駆け上がる", "stance": "aggressive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "振り返ると、階段はもうどこにもなかった。", "effects": [
+            { "type": "warp", "value": 2 }, { "type": "madness", "value": 100 } ] } ] },
+        { "label": "崩れる前に降りる", "stance": "defensive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "灰をはたいて、元の道へ戻った。崩れる景色は、なぜか心が落ち着いた。", "effects": [
+            { "type": "madness", "value": -30 } ] } ] }
+      ]
+    },
+    {
+      "id": "scribbled_map", "category": "warp", "title": "走り書きの地図", "minLayer": 1, "maxLayer": 15,
+      "conditions": [ { "type": "can_warp_up" } ],
+      "body": "詰所の床に、塔の古い地図が落ちている。赤い丸と「ここ通れる」の走り書きがある。",
+      "options": [
+        { "label": "赤丸を目指す", "stance": "aggressive", "knowledge": "unknown", "outcomes": [
+          { "chance": 70, "text": "走り書きは正しかった。", "effects": [
+            { "type": "warp", "value": 1 } ] },
+          { "chance": 30, "text": "赤丸は、亡者の巣の印だった。", "effects": [
+            { "type": "battle", "kind": "normal" } ] } ] },
+        { "label": "地図を売る", "stance": "defensive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "地図は、思ったよりいい値で売れそうだ。", "effects": [
+            { "type": "coins", "value": 20 } ] } ] }
+      ]
+    },
+
+    {
+      "id": "old_roster", "category": "trust", "title": "百年前の勤務表", "minLayer": 1, "maxLayer": 15,
+      "conditions": [],
+      "body": "詰所の壁に、色あせた勤務表が貼られている。日付は百年前。並んだ名前の中に、{target}とまったく同じ名前がある。",
+      "options": [
+        { "label": "{target}に見せる", "stance": "aggressive", "knowledge": "unknown", "outcomes": [
+          { "chance": 100, "text": "{target}は長いこと紙を見つめ、「同姓同名ですね」と笑った。少し距離が縮まった気がする。", "effects": [
+            { "type": "trust", "target": "random", "value": 4 }, { "type": "madness", "value": 80 } ] } ] },
+        { "label": "そっと剥がす", "stance": "defensive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "裏に古銭が挟まっていた。{target}は「何を隠したんです」と不満そうだ。", "effects": [
+            { "type": "trust", "target": "random", "value": -2 }, { "type": "madness", "value": -40 }, { "type": "coins", "value": 10 } ] } ] }
+      ]
+    },
+    {
+      "id": "left_bento", "category": "trust", "title": "好物だけの弁当", "minLayer": 1, "maxLayer": 15,
+      "conditions": [],
+      "body": "弁当が三つ、名前を伏せて置かれている。三人は蓋を開ける前から、自分の分を迷わず手に取った。中身を見て{target}が笑う。「これ、好きだったんです」。誰が置いたかを尋ねると、三人とも手が止まった。",
+      "options": [
+        { "label": "三人に食べてもらう", "stance": "defensive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "三人は味を確かめるように、ゆっくり食べた。{target}が「次はあなたの分も」と言いかけ、箸を止める。弁当箱の底には、四人目の名前を削った跡があった。", "effects": [
+            { "type": "trust", "target": "all", "value": 2 } ] } ] },
+        { "label": "一つずつ自分で味見する", "stance": "aggressive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "味見しただけで、傷の痛みが薄れた。三人は蓋を閉めて待っている。毒見だと説明しても、{target}は自分の好物の名前だけ、どうしても思い出せなくなっていた。", "effects": [
+            { "type": "hp_percent", "value": 15 }, { "type": "trust", "target": "all", "value": -1 } ] } ] }
+      ]
+    },
+    {
+      "id": "tea_break", "category": "trust", "title": "湯気の立つお茶", "minLayer": 1, "maxLayer": 15,
+      "conditions": [],
+      "body": "誰かが淹れたままのお茶が、まだ湯気を立てている。湯呑みはきっちり四つ。",
+      "options": [
+        { "label": "一息つく", "stance": "defensive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "久しぶりに、四人で他愛ない話をした。長居のあいだに、この階の亡者は騒ぎ出している。", "effects": [
+            { "type": "trust", "target": "all", "value": 1 }, { "type": "madness", "value": -50 }, { "type": "layer_enemy_hp_percent", "value": 10 } ] } ] },
+        { "label": "先を急ぐ", "stance": "aggressive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "気合いは入った。三人は湯呑みを名残惜しそうに見ていた。", "effects": [
+            { "type": "layer_word_damage_percent", "value": 10 }, { "type": "trust", "target": "all", "value": -1 } ] } ] }
+      ]
+    },
+    {
+      "id": "training_dummies", "category": "trust", "title": "藁人形の稽古場", "minLayer": 1, "maxLayer": 15,
+      "conditions": [],
+      "body": "藁人形が並ぶ稽古場。「一人ずつ、順番に」の札が下がっている。{target}がそわそわしている。",
+      "options": [
+        { "label": "{target}の相手をする", "stance": "aggressive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "{target}の打ち込みは、思ったより重かった。", "effects": [
+            { "type": "trust", "target": "random", "value": 3 }, { "type": "hp_percent", "value": -8 } ] } ] },
+        { "label": "全員で軽く流す", "stance": "defensive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "ほどよく汗をかいた。{target}だけは物足りなさそうだ。", "effects": [
+            { "type": "trust", "target": "all", "value": 1 }, { "type": "trust", "target": "random", "value": -1 } ] } ] }
+      ]
+    },
+    {
+      "id": "clingy_imp", "category": "trust", "title": "迷子の小鬼", "minLayer": 1, "maxLayer": 15,
+      "conditions": [],
+      "body": "迷子の小鬼が、{target}の裾をつかんで離さない。泣いてはいないが、離す気もなさそうだ。",
+      "options": [
+        { "label": "出口まで送る", "stance": "defensive", "knowledge": "unknown", "outcomes": [
+          { "chance": 60, "text": "小鬼の言う出口は、三回目でやっと正解だった。{target}は満足そうだ。", "effects": [
+            { "type": "trust", "target": "random", "value": 3 }, { "type": "hp_percent", "value": -5 } ] },
+          { "chance": 40, "text": "別れぎわ、小鬼はぴかぴかの塔片を{target}に渡した。", "effects": [
+            { "type": "trust", "target": "random", "value": 3 }, { "type": "coins", "value": 10 } ] } ] },
+        { "label": "ほかの小鬼に任せる", "stance": "aggressive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "{target}は少しむくれたが、肩の荷は下りた。", "effects": [
+            { "type": "trust", "target": "random", "value": -1 }, { "type": "madness", "value": -30 } ] } ] }
+      ]
+    },
+    {
+      "id": "split_opinion", "category": "trust", "title": "覚えのある分かれ道", "minLayer": 1, "maxLayer": 15,
+      "conditions": [],
+      "body": "分かれ道の壁に、四人分の手形が残っている。{target}は右へ行った覚えがあると言い、もう一人は左で傷を負ったと言う。どちらにも新しい足跡はない。手形の一つだけが、掌を当てる前から温かかった。",
+      "options": [
+        { "label": "{target}の記憶を頼る", "stance": "aggressive", "knowledge": "unknown", "outcomes": [
+          { "chance": 50, "text": "右の壁の窪みに、塔片が残されていた。{target}は喜ぶより先に、その数を言い当てた。「覚えていたんですね」。そう言われても、頷くことはできなかった。", "effects": [
+            { "type": "trust", "target": "random", "value": 3 }, { "type": "coins", "value": 15 } ] },
+          { "chance": 50, "text": "行き止まりの崩れた床で傷を負った。{target}は何度も謝ったあと、「でも、今度は一人じゃなかった」と言った。その続きは、本人にも分からないらしかった。", "effects": [
+            { "type": "trust", "target": "random", "value": 3 }, { "type": "hp_percent", "value": -8 } ] } ] },
+        { "label": "手形を避けて自分で決める", "stance": "defensive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "三人の記憶を退けて進むと、敵の背後に出た。判断は正しかった。{target}は武器を抜きながら、「前も、そうでしたか」と一度だけ尋ねた。", "effects": [
+            { "type": "trust", "target": "all", "value": -1 }, { "type": "layer_opening_seconds", "value": 2 } ] } ] }
+      ]
+    },
+    {
+      "id": "hell_photo", "category": "trust", "title": "まだ乾かない集合写真", "minLayer": 1, "maxLayer": 15,
+      "conditions": [ { "type": "min_coins", "value": 10 } ],
+      "body": "写真屋の見本に、四人の集合写真がある。三人の立ち位置も装備も今と同じだが、中央の顔だけ滲んでいた。「撮り直し十塔片」。亡者は写真を裏返す。撮影日の欄だけが、まだ空白だった。",
+      "options": [
+        { "label": "四人で撮り直す", "stance": "defensive", "knowledge": "known", "outcomes": [
+          { "chance": 100, "text": "今度は四人ともはっきり写った。三人が肩を寄せて覗き込み、少し笑う。見本の写真を探すと、台紙の下でまだ乾いていない。新しい写真と同じ場所に、同じ指紋がついていた。", "effects": [
+            { "type": "coins", "value": -10 }, { "type": "trust", "target": "all", "value": 2 } ] } ] },
+        { "label": "写真屋をこちらから撮る", "stance": "aggressive", "knowledge": "unknown", "outcomes": [
+          { "chance": 50, "text": "写真屋は写った自分の輪郭を指でなぞり、塔片を渡した。笑顔は写真の中だけに残った。台紙を片づける手には、最初から顔の影がなかった。", "effects": [
+            { "type": "coins", "value": 15 } ] },
+          { "chance": 50, "text": "現像されたのは、カメラを構えるこちらの背中だった。その向こうで三人が誰かを囲んでいる。写真屋は人数を数え直し、何も言わず台紙を伏せた。", "effects": [
+            { "type": "madness", "value": 50 } ] } ] }
+      ]
+    },
+    {
+      "id": "unclaimed_pain",
+      "category": "hp",
+      "title": "未受領の痛み",
+      "minLayer": 1,
+      "maxLayer": 15,
+      "conditions": [],
+      "body": "出張所の棚に、包帯ではなく封筒が並んでいる。「痛み、一時お預かり」。一通だけ内側から濡れていた。係員は傷口を見て、空の封筒と、すでに宛名のある封筒を差し出す。後者には、こちらの筆跡で「返却不要」とある。",
+      "options": [
+        {
+          "label": "自分の痛みを預ける",
+          "stance": "defensive",
+          "knowledge": "known",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "封をした途端、傷が閉じた。封筒は棚の中で激しく震えている。遠ざかっても紙の擦れる音だけが、耳のすぐ内側から聞こえた。",
+              "effects": [
+                {
+                  "type": "hp_percent",
+                  "value": 25
+                },
+                {
+                  "type": "madness",
+                  "value": 80
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "返却不要の封筒を引き取る",
+          "stance": "aggressive",
+          "knowledge": "unknown",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "掌に重ねた封筒から、古い傷の痛みが戻った。不思議と息はしやすい。中に同封されていた保管料を受け取ると、係員は初めてこちらの顔を見た。",
+              "effects": [
+                {
+                  "type": "hp_percent",
+                  "value": -8
+                },
+                {
+                  "type": "madness",
+                  "value": -70
+                },
+                {
+                  "type": "coins",
+                  "value": 15
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "measuring_sutures",
+      "category": "hp",
+      "title": "傷の採寸",
+      "minLayer": 1,
+      "maxLayer": 15,
+      "conditions": [
+        {
+          "type": "min_coins",
+          "value": 15
+        }
+      ],
+      "body": "仕立て屋のような机で、職員が空中に針を通している。「傷に体を合わせますか。体に傷を合わせますか」。巻尺の目盛りは、近づくほど減っていく。三人はいつもの修復だと思っているらしく、順番を待った。",
+      "options": [
+        {
+          "label": "体に合わせて縫ってもらう",
+          "stance": "defensive",
+          "knowledge": "known",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "傷口が綺麗に揃い、代金の塔片が机の引き出しに消えた。職員は切り落とした糸を長さ別に保存する。糸の端が、こちらの脈に合わせて跳ねていた。",
+              "effects": [
+                {
+                  "type": "coins",
+                  "value": -15
+                },
+                {
+                  "type": "hp_percent",
+                  "value": 25
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "傷に合わせて縫ってもらう",
+          "stance": "aggressive",
+          "knowledge": "unknown",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "縫われた箇所だけ、動きが軽い。代わりに呼吸のたび、糸がもう一目ずつ締まる。職員は「今の層を出れば馴染みます」と告げ、次の針に糸を通した。",
+              "effects": [
+                {
+                  "type": "hp_percent",
+                  "value": 10
+                },
+                {
+                  "type": "layer_word_damage_percent",
+                  "value": 20
+                },
+                {
+                  "type": "layer_damage_taken_percent",
+                  "value": 10
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "breathing_canteen",
+      "category": "hp",
+      "title": "蓋のない水筒",
+      "minLayer": 1,
+      "maxLayer": 15,
+      "conditions": [],
+      "body": "壁から水筒が吊られている。口を下に向けても水は落ちず、底を握ると浅い呼吸が返ってきた。添え書きは「飲む分だけ、息を止めてください」。水面には傷のない手が映っている。",
+      "options": [
+        {
+          "label": "息を止めて飲む",
+          "stance": "aggressive",
+          "knowledge": "unknown",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "飲み込むたびに傷の熱が引いた。最後の一口で水筒が深く息を吸う。こちらが呼吸を再開しても、その音だけは止まらなかった。",
+              "effects": [
+                {
+                  "type": "hp_percent",
+                  "value": 20
+                },
+                {
+                  "type": "madness",
+                  "value": 60
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "水を傷口にだけ落とす",
+          "stance": "defensive",
+          "knowledge": "known",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "水は傷を塞いだあと、皮膚の上で小さな玉になった。玉を拭うと、指先の動きまで少し鈍る。水筒の中では、まだ誰かが息を止めていた。",
+              "effects": [
+                {
+                  "type": "hp_percent",
+                  "value": 10
+                },
+                {
+                  "type": "layer_word_damage_percent",
+                  "value": -10
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "quiet_counter",
+      "category": "madness",
+      "title": "無音の窓口",
+      "minLayer": 1,
+      "maxLayer": 15,
+      "conditions": [],
+      "body": "窓口の向こうだけ、音がない。職員が「お預かりする声を一つ」と書いた紙を出す。三人の足音も、自分の息も、紙の上では同じ細い線になっている。一番太い線は、誰も話していない今も伸び続けていた。",
+      "options": [
+        {
+          "label": "太い線を切り取って渡す",
+          "stance": "defensive",
+          "knowledge": "unknown",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "頭の奥のざわめきが消えた。同時に、刻印を使う手順の一部が遠くなる。窓口に残った線は、こちらが立ち去ったあとも書き足されていた。",
+              "effects": [
+                {
+                  "type": "madness",
+                  "value": -100
+                },
+                {
+                  "type": "layer_word_damage_percent",
+                  "value": -15
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "線の続きを読み取る",
+          "stance": "aggressive",
+          "knowledge": "unknown",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "文字ではなかった。それでも、次にどこを打てばよいかが分かる。窓口の職員が耳を塞いだ。こちらには、まだ何も聞こえない。",
+              "effects": [
+                {
+                  "type": "madness",
+                  "value": 70
+                },
+                {
+                  "type": "layer_word_damage_percent",
+                  "value": 20
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "counting_knocks",
+      "category": "madness",
+      "title": "四つ目の足音",
+      "minLayer": 1,
+      "maxLayer": 15,
+      "conditions": [],
+      "body": "止まると、一歩だけ足音が遅れて止まる。三人に足元を見せてもらうが、誰も靴を引きずってはいない。床に「返事は一度だけ」と刻まれていた。先へ進むと、今度は四つの音が先に歩き出す。",
+      "options": [
+        {
+          "label": "一度だけ床を踏み返す",
+          "stance": "aggressive",
+          "knowledge": "unknown",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "四つ目の音が足元に重なった。体は軽く、暗がりの敵が動く前に気配が分かる。止まっているあいだだけ、靴の中で誰かが歩き続けていた。",
+              "effects": [
+                {
+                  "type": "madness",
+                  "value": 60
+                },
+                {
+                  "type": "layer_opening_seconds",
+                  "value": 3
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "三人と歩調を数え直す",
+          "stance": "defensive",
+          "knowledge": "known",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "声に合わせると、余分な足音が遠のいた。数えるために止まった時間は短くない。前方から近づく足音は、もうこちらを待ってくれなかった。",
+              "effects": [
+                {
+                  "type": "madness",
+                  "value": -60
+                },
+                {
+                  "type": "layer_opening_seconds",
+                  "value": -2
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "blank_complaint",
+      "category": "madness",
+      "title": "白紙の苦情",
+      "minLayer": 1,
+      "maxLayer": 15,
+      "conditions": [
+        {
+          "type": "min_coins",
+          "value": 10
+        }
+      ],
+      "body": "苦情受けの箱から、白い紙が一枚ずつ吐き出されている。何も書いていないのに、読むと胸が詰まった。背後の三人が、同時に「誰の字ですか」と尋ねる。紙を伏せると、ようやく呼吸が戻った。",
+      "options": [
+        {
+          "label": "最後の一枚まで読む",
+          "stance": "aggressive",
+          "knowledge": "unknown",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "終わりの一枚には、刻印の組み方だけが残った。苦情はもう読めない。何を訴えていたか思い出そうとすると、喉が勝手に詰まる。",
+              "effects": [
+                {
+                  "type": "card_choices",
+                  "value": 1
+                },
+                {
+                  "type": "madness",
+                  "value": 80
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "塔片を重しにして箱を閉じる",
+          "stance": "defensive",
+          "knowledge": "known",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "箱の蓋が静かになった。重しの塔片は隙間に吸い込まれる。通路を離れる直前、箱の中から一度だけ、礼をするような紙の音がした。",
+              "effects": [
+                {
+                  "type": "coins",
+                  "value": -10
+                },
+                {
+                  "type": "madness",
+                  "value": -70
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "warm_change",
+      "category": "coins",
+      "title": "温かい釣銭",
+      "minLayer": 1,
+      "maxLayer": 15,
+      "conditions": [
+        {
+          "type": "min_coins",
+          "value": 10
+        }
+      ],
+      "body": "無人の両替窓口に、掌の形をした皿がある。「十枚を二十五枚に」。皿へ近づけた塔片が、人肌まで温まった。窓口の奥には、同じ皿が隙間なく並んでいる。どれも何かを待つように窪んでいた。",
+      "options": [
+        {
+          "label": "塔片十枚を置く",
+          "stance": "aggressive",
+          "knowledge": "unknown",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "十枚が沈み、二十五枚がせり上がった。受け取ると皿が掌を握り返す。離した手には傷も跡もない。ただ、新しい塔片だけがいつまでも冷めない。",
+              "effects": [
+                {
+                  "type": "coins",
+                  "value": -10
+                },
+                {
+                  "type": "coins",
+                  "value": 25
+                },
+                {
+                  "type": "madness",
+                  "value": 60
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "皿を裏返して仕組みを探る",
+          "stance": "defensive",
+          "knowledge": "known",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "皿の下には、取り残された塔片が五枚あった。拾うと皿の縁が指を切る。裏側にも掌の線があり、傷ついた指と同じ場所だけ赤くなっていた。",
+              "effects": [
+                {
+                  "type": "hp_percent",
+                  "value": -4
+                },
+                {
+                  "type": "coins",
+                  "value": 5
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "shadow_toll",
+      "category": "coins",
+      "title": "影の通行料",
+      "minLayer": 1,
+      "maxLayer": 15,
+      "conditions": [
+        {
+          "type": "min_coins",
+          "value": 15
+        }
+      ],
+      "body": "検札係は顔を上げず、床だけを見ている。「四名分ですね」。壁に四人の影はある。足元には、三つしかない。「不足分は塔片で。現物でも結構です」。係員が差し出した鋏は、床にだけ影を落とさなかった。",
+      "options": [
+        {
+          "label": "塔片で不足分を払う",
+          "stance": "defensive",
+          "knowledge": "known",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "係員は受領印を押し、四つ目の影を足元に描いた。妙に頭が静かになった。その影だけ、こちらが動くより少し先に、通路の奥を指している。",
+              "effects": [
+                {
+                  "type": "coins",
+                  "value": -15
+                },
+                {
+                  "type": "madness",
+                  "value": -50
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "壁の影を切り取らせる",
+          "stance": "aggressive",
+          "knowledge": "unknown",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "鋏が閉じると、体のどこかが鋭く痛んだ。「超過分です」と塔片が返される。壁に残った影は、首から上だけこちらを見ていた。",
+              "effects": [
+                {
+                  "type": "hp_percent",
+                  "value": -8
+                },
+                {
+                  "type": "coins",
+                  "value": 20
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sealed_wages",
+      "category": "coins",
+      "title": "未開封の給与袋",
+      "minLayer": 1,
+      "maxLayer": 15,
+      "conditions": [],
+      "body": "詰所の机に給与袋が四つある。三人の名前と、判読できない一名分。どれも今日の日付で、受領印だけが済んでいた。一つを持ち上げると、机の下で同じ重さのものが落ちる音がした。",
+      "options": [
+        {
+          "label": "四袋とも持っていく",
+          "stance": "aggressive",
+          "knowledge": "unknown",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "袋には確かに塔片が入っていた。部屋を出ると、背後で四つ椅子が引かれる。振り向かなかった三人も、数を間違えずに聞いていた。",
+              "effects": [
+                {
+                  "type": "coins",
+                  "value": 30
+                },
+                {
+                  "type": "madness",
+                  "value": 80
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "封を切らず保管庫へ返す",
+          "stance": "defensive",
+          "knowledge": "known",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "保管庫に袋を入れると、内側から手が重なった。留め金で指を挟む。手を抜いたあと、受領印の朱肉だけが消えていた。頭に残る物音も少し薄れた。",
+              "effects": [
+                {
+                  "type": "hp_percent",
+                  "value": -5
+                },
+                {
+                  "type": "madness",
+                  "value": -60
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "spare_bell",
+      "category": "layer_buff",
+      "title": "鳴り終わらない鈴",
+      "minLayer": 1,
+      "maxLayer": 15,
+      "conditions": [],
+      "body": "倒れた獄卒の装備置き場に、小さな鈴がある。振っていないのに、音の終わりだけが続いている。札には「敵より先に気づきます」。裏を読むと「敵も同様です」と、細い字が足されていた。",
+      "options": [
+        {
+          "label": "鈴を武器に結ぶ",
+          "stance": "aggressive",
+          "knowledge": "known",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "敵の気配が、音の切れ目として分かるようになった。鈴はこちらの呼吸にも反応する。隠れるたび、隠れた場所だけがよく響いた。",
+              "effects": [
+                {
+                  "type": "layer_opening_seconds",
+                  "value": 3
+                },
+                {
+                  "type": "layer_damage_taken_percent",
+                  "value": 15
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "綿を詰めて携帯する",
+          "stance": "defensive",
+          "knowledge": "unknown",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "音を失った鈴が、迫る気配に合わせて掌を冷やす。身を守るには使える。ただし武器を振るたび、綿の中で音が膨らみ、腕を押し戻した。",
+              "effects": [
+                {
+                  "type": "layer_damage_taken_percent",
+                  "value": -15
+                },
+                {
+                  "type": "layer_word_damage_percent",
+                  "value": -10
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "unfinished_order",
+      "category": "layer_buff",
+      "title": "最後の一字",
+      "minLayer": 1,
+      "maxLayer": 15,
+      "conditions": [],
+      "body": "号令書の最後の一字だけが空白になっている。読みかけると三人の背筋が伸び、やめると元に戻った。余白には、異なる筆跡で同じ一字が何度も試されている。最後の筆跡だけ、自分のものに似ていた。",
+      "options": [
+        {
+          "label": "空白を埋めて読み切る",
+          "stance": "aggressive",
+          "knowledge": "unknown",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "三人の動きが、恐ろしいほど噛み合った。誰も合図を待たない。足並みが揃うたび、頭の奥にも同じ一字が刻まれていく。",
+              "effects": [
+                {
+                  "type": "layer_word_damage_percent",
+                  "value": 25
+                },
+                {
+                  "type": "madness",
+                  "value": 80
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "最後の一行を切り離して配る",
+          "stance": "defensive",
+          "knowledge": "known",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "三人は一枚ずつ受け取り、自分の動きを確かめた。やり直しは利きそうだ。切り口から薄い墨が滲み、次の戦いの取り分まで黒く塗りつぶした。",
+              "effects": [
+                {
+                  "type": "layer_rerolls",
+                  "value": 1
+                },
+                {
+                  "type": "layer_battle_coin_percent",
+                  "value": -25
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "borrowed_pulse",
+      "category": "layer_buff",
+      "title": "貸し出し中の鼓動",
+      "minLayer": 1,
+      "maxLayer": 15,
+      "conditions": [],
+      "body": "硝子瓶が拍動している。「返却期限、この層を出るまで」。瓶の内側に耳を当てると、傷口が少し縮んだ。隣には空の瓶があり、「対価は血液でも雑音でも」と書かれている。",
+      "options": [
+        {
+          "label": "血を入れて借りる",
+          "stance": "defensive",
+          "knowledge": "known",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "瓶が満ちると、胸の奥にもう一つ脈が増えた。戦いを越えるたびに体を繕うという。初めの一拍だけが深く刺さり、膝から力を抜いた。",
+              "effects": [
+                {
+                  "type": "hp_percent",
+                  "value": -10
+                },
+                {
+                  "type": "layer_heal_after_battle_percent",
+                  "value": 8
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "頭に残る音を吹き込む",
+          "stance": "aggressive",
+          "knowledge": "unknown",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "瓶は口元から離しても鳴り続けた。代わりの鼓動が、戦いのたび傷を塞ぐ。音の出所が外に移っただけだと分かっても、耳を塞ぐ手が止まらない。",
+              "effects": [
+                {
+                  "type": "madness",
+                  "value": 80
+                },
+                {
+                  "type": "layer_heal_after_battle_percent",
+                  "value": 8
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "inside_door",
+      "category": "battle",
+      "title": "内側からの施錠",
+      "minLayer": 1,
+      "maxLayer": 15,
+      "conditions": [],
+      "body": "扉に「開けないでください」とある。内側から鍵が回り、隙間から刻印の写しが押し出された。「これで足りますか」。写しを取ろうとすると、奥で重いものを引きずる音がした。",
+      "options": [
+        {
+          "label": "扉ごと押し込む",
+          "stance": "aggressive",
+          "knowledge": "known",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "扉の裏に貼りついていた亡者の殻を割った。床には写しが何枚も積まれている。全部同じ箇所を繰り返し直してあり、最後の一枚だけ線が途切れていた。",
+              "effects": [
+                {
+                  "type": "battle",
+                  "value": 0,
+                  "kind": "normal"
+                },
+                {
+                  "type": "battle_enemy_hp_percent",
+                  "value": -20
+                },
+                {
+                  "type": "card_choices",
+                  "value": 1
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "写しを受け取って鍵を戻す",
+          "stance": "defensive",
+          "knowledge": "unknown",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "紙の裏から、指が一緒に滑り出してきた。薄い爪が手首を掻く。それでも扉を閉めると、向こうから小さく施錠の音がした。写しは手元に残っている。",
+              "effects": [
+                {
+                  "type": "hp_percent",
+                  "value": -8
+                },
+                {
+                  "type": "card_choices",
+                  "value": 1
+                },
+                {
+                  "type": "madness",
+                  "value": 40
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "funeral_practice",
+      "category": "battle",
+      "title": "出棺の予行",
+      "minLayer": 1,
+      "maxLayer": 15,
+      "conditions": [],
+      "body": "棺の周りで亡者たちが起立と着席を繰り返している。棺は空なのに、蓋だけが内側から叩かれた。進行表には「代理出席者へ謝礼」。三人の名前が参列者欄に並び、喪主の欄だけ空いていた。",
+      "options": [
+        {
+          "label": "棺を開いて進行を止める",
+          "stance": "aggressive",
+          "knowledge": "unknown",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "棺から立ち上がった殻を割ると、参列者は壁に向かって座り直した。謝礼の塔片が棺に残っている。進行表の喪主欄には、今も乾かない指の跡がついていた。",
+              "effects": [
+                {
+                  "type": "battle",
+                  "value": 0,
+                  "kind": "elite"
+                },
+                {
+                  "type": "battle_enemy_hp_percent",
+                  "value": -20
+                },
+                {
+                  "type": "coins",
+                  "value": 25
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "空欄のまま式を進める",
+          "stance": "defensive",
+          "knowledge": "known",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "蓋を叩く音が、式の間だけ三人の鼓動と重なった。終わると傷の痛みが薄れる。参列者は一斉に礼をしたが、頭を上げた者はいなかった。",
+              "effects": [
+                {
+                  "type": "hp_percent",
+                  "value": 20
+                },
+                {
+                  "type": "madness",
+                  "value": 90
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wounded_echo",
+      "category": "battle",
+      "title": "救援を待つ声",
+      "minLayer": 1,
+      "maxLayer": 15,
+      "conditions": [],
+      "body": "壁の向こうで、{target}の声が救援を求めている。隣の本人は声を出していない。武器を握り直すと、向こうも同じ音を立てた。「先にそっちを助けて」。声はそう言って、急に遠くなる。",
+      "options": [
+        {
+          "label": "{target}と壁を破る",
+          "stance": "aggressive",
+          "knowledge": "unknown",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "壁の奥にいた亡者の殻を割った。{target}は最後まで目を逸らさなかった。声は途切れたが、本人の口元には、しばらく同じ言葉の形が残っていた。",
+              "effects": [
+                {
+                  "type": "battle",
+                  "value": 0,
+                  "kind": "normal"
+                },
+                {
+                  "type": "battle_opening_seconds",
+                  "value": -1
+                },
+                {
+                  "type": "trust",
+                  "value": 3,
+                  "target": "random"
+                },
+                {
+                  "type": "madness",
+                  "value": 40
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "本人の手を引いて離れる",
+          "stance": "defensive",
+          "knowledge": "known",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "握った手が握り返してきた。通路を曲がるまで、助けを求める声は足元から聞こえ続けた。{target}は何も尋ねず、こちらが手を離すのを待った。",
+              "effects": [
+                {
+                  "type": "trust",
+                  "value": 1,
+                  "target": "random"
+                },
+                {
+                  "type": "madness",
+                  "value": 60
+                },
+                {
+                  "type": "layer_opening_seconds",
+                  "value": 2
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "return_slot",
+      "category": "warp",
+      "title": "返却口の階段",
+      "minLayer": 1,
+      "maxLayer": 15,
+      "conditions": [
+        {
+          "type": "can_warp_up",
+          "value": 0
+        }
+      ],
+      "body": "搬入口に、人の通れる返却口が開いている。奥は上り階段だが、札には「返却先」とある。縁に残る手形は、どれも外へ這い出した向きだった。三人は口を揃えて、ここには来たことがないと言う。",
+      "options": [
+        {
+          "label": "返却口に入る",
+          "stance": "aggressive",
+          "knowledge": "unknown",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "上り切ると、出口の札には「貸出済」とあった。体に異常はない。出口を閉じる直前、階段の下で四人分の足音が一斉に上を向いた。",
+              "effects": [
+                {
+                  "type": "warp",
+                  "value": 1
+                },
+                {
+                  "type": "madness",
+                  "value": 70
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "入口を封じて元の道を進む",
+          "stance": "defensive",
+          "knowledge": "known",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "戸の隙間に指を挟みながら、閂を下ろした。最後の隙間から、静かな空気が抜けた。三人の否定する声も、もう重なっていなかった。",
+              "effects": [
+                {
+                  "type": "hp_percent",
+                  "value": -5
+                },
+                {
+                  "type": "madness",
+                  "value": -60
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lower_floor_call",
+      "category": "warp",
+      "title": "下の階からの呼び出し",
+      "minLayer": 2,
+      "maxLayer": 15,
+      "conditions": [
+        {
+          "type": "can_warp_down",
+          "value": 0
+        }
+      ],
+      "body": "使われていない伝声管から、三人の名前が順に呼ばれた。「お忘れ物です」。下り階段の踊り場には包帯と水が置かれている。声の主を尋ねると、管の向こうも同じ質問を返してきた。",
+      "options": [
+        {
+          "label": "忘れ物を取りに戻る",
+          "stance": "defensive",
+          "knowledge": "unknown",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "下の階で、まだ温かい包帯を受け取った。誰からかは分からない。傷の手当てを終えると、伝声管が上の階へ向けて、また三人の名前を呼び始めた。",
+              "effects": [
+                {
+                  "type": "warp",
+                  "value": -1
+                },
+                {
+                  "type": "hp_percent",
+                  "value": 25
+                },
+                {
+                  "type": "madness",
+                  "value": -60
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "管を塞いで先を急ぐ",
+          "stance": "aggressive",
+          "knowledge": "known",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "管を塞ぐと、呼び出しは止まった。静けさのおかげで、この先の敵の息遣いがよく聞こえる。{target}だけが一度、忘れ物のない掌を見た。",
+              "effects": [
+                {
+                  "type": "layer_opening_seconds",
+                  "value": 3
+                },
+                {
+                  "type": "trust",
+                  "value": -2,
+                  "target": "random"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wrong_handwriting",
+      "category": "trust",
+      "title": "筆跡照合",
+      "minLayer": 1,
+      "maxLayer": 15,
+      "conditions": [],
+      "body": "落ちた手帳に、{target}の癖と同じ字が並んでいる。今日使った合図まで一致した。最後の頁は「次は、あの人の判断に任せない」。{target}が横から覗き、「読んでもいいですか」と尋ねた。",
+      "options": [
+        {
+          "label": "最後の頁も渡す",
+          "stance": "aggressive",
+          "knowledge": "unknown",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "{target}は否定も肯定もせず、最後まで読んだ。「今は、任せています」。手帳を閉じた指は震えていた。その言葉をどこかで聞いた気がして、こちらも頁から目を離せない。",
+              "effects": [
+                {
+                  "type": "trust",
+                  "value": 4,
+                  "target": "random"
+                },
+                {
+                  "type": "madness",
+                  "value": 70
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "合図の頁だけ見せる",
+          "stance": "defensive",
+          "knowledge": "known",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "古い合図を確かめれば、次の戦いで先手を取れる。{target}は破られた最後の頁を見つめた。「続きは」。答えるまでの間だけが、通路に残った。",
+              "effects": [
+                {
+                  "type": "trust",
+                  "value": -2,
+                  "target": "random"
+                },
+                {
+                  "type": "layer_opening_seconds",
+                  "value": 3
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "empty_chair",
+      "category": "trust",
+      "title": "一脚多い休憩室",
+      "minLayer": 1,
+      "maxLayer": 15,
+      "conditions": [],
+      "body": "休憩室に椅子が五脚ある。一脚だけ座面が温かい。{target}はそこを避け、立ったまま休もうとした。「誰かが戻ってきそうで」。机には、席を詰めれば届く距離に修復薬が置かれている。",
+      "options": [
+        {
+          "label": "空いた席の隣で一緒に待つ",
+          "stance": "defensive",
+          "knowledge": "unknown",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "結局、誰も戻らなかった。{target}は礼を言い、机の薬を全員に配った。立ち去るとき、温かい椅子だけがゆっくりこちらへ向き直った。",
+              "effects": [
+                {
+                  "type": "trust",
+                  "value": 3,
+                  "target": "random"
+                },
+                {
+                  "type": "hp_percent",
+                  "value": 10
+                },
+                {
+                  "type": "layer_enemy_hp_percent",
+                  "value": 15
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "温かい椅子を廊下へ出す",
+          "stance": "aggressive",
+          "knowledge": "known",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "椅子を運ぶと、頭の重さが不意に抜けた。部屋へ戻ると全員が立っている。{target}は廊下を見て、「まだ座っていたかもしれないのに」と言った。",
+              "effects": [
+                {
+                  "type": "madness",
+                  "value": -80
+                },
+                {
+                  "type": "trust",
+                  "value": -2,
+                  "target": "random"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "shared_receipt",
+      "category": "trust",
+      "title": "四人分の受領証",
+      "minLayer": 1,
+      "maxLayer": 15,
+      "conditions": [
+        {
+          "type": "min_coins",
+          "value": 10
+        }
+      ],
+      "body": "無人の窓口に「休息受領証」がある。四つの署名欄に一人ずつ署名すれば、休息が支給されるらしい。三人が書き終えた瞬間、最後の欄に薄い文字が浮いた。そこだけ、何度も消した跡がある。",
+      "options": [
+        {
+          "label": "薄い文字に重ねて署名する",
+          "stance": "defensive",
+          "knowledge": "unknown",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "四つの署名が揃うと、肩の緊張がほどけた。三人が珍しく同時に笑う。こちらの署名だけは紙から消えず、下の文字と重なって、別の名前に見えた。",
+              "effects": [
+                {
+                  "type": "trust",
+                  "value": 2,
+                  "target": "all"
+                },
+                {
+                  "type": "hp_percent",
+                  "value": 10
+                },
+                {
+                  "type": "madness",
+                  "value": 70
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "label": "自分の欄を切り取り三人分を申請する",
+          "stance": "aggressive",
+          "knowledge": "known",
+          "outcomes": [
+            {
+              "chance": 100,
+              "text": "不足欄の手数料として十塔片を払い、三人分の薬を受け取った。{target}は受領証を揃え直し、足りない角を一度なぞった。誰も礼を口にしなかったが、薬は分け合っていた。",
+              "effects": [
+                {
+                  "type": "trust",
+                  "value": 1,
+                  "target": "all"
+                },
+                {
+                  "type": "hp_percent",
+                  "value": 10
+                },
+                {
+                  "type": "coins",
+                  "value": -10
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

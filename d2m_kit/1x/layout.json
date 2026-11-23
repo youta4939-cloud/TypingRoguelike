@@ -1,0 +1,281 @@
+{
+ "canvas": [
+  750,
+  1050
+ ],
+ "scale": 1,
+ "units": "px (this folder's resolution)",
+ "layer_order": [
+  "art (your illustration, 750x1050)",
+  "card_mask (clip art alpha)",
+  "shade_bottom",
+  "shade_top (incl. level plate fill)",
+  "frame_{rarity} (incl. level plate outline + divider)",
+  "level text (program)",
+  "name + effect text (program)",
+  "gem capsule (program, pieces/capsule_{rarity}_n{N}.png)",
+  "gems (program)"
+ ],
+ "frame": {
+  "band_outer_inset": 3,
+  "band_width": 13,
+  "band_corner_radius": 16,
+  "inner_hairline_inset": 18.6,
+  "art_window_inset": 16,
+  "ornament_scale": 1.25,
+  "ornaments_by_rarity": {
+   "silver": "band only",
+   "gold": "corners",
+   "rainbow": "corners + top crest + bottom crest + side garnets + sheen"
+  }
+ },
+ "level": {
+  "plate_box": [
+   275,
+   26,
+   475,
+   76
+  ],
+  "plate_polygon": [
+   [
+    275,
+    51.0
+   ],
+   [
+    297,
+    26
+   ],
+   [
+    453,
+    26
+   ],
+   [
+    475,
+    51.0
+   ],
+   [
+    453,
+    76
+   ],
+   [
+    297,
+    76
+   ]
+  ],
+  "center": [
+   375,
+   51.0
+  ],
+  "align": "centre the whole run horizontally; baseline = plate centre_y + capHeight(main glyphs)/2",
+  "font": "Cinzel Bold (wght 700)",
+  "sizes": {
+   "Lv": 24,
+   "number": 38,
+   "MAX": 31,
+   "/max": 24
+  },
+  "space_between_Lv_and_number": "thin space U+2009 (at the 'Lv' size)",
+  "formats": {
+   "normal": "Lv 1 / Lv 2",
+   "fraction": "Lv 2/3 ('/3' small + dim)",
+   "max": "Lv MAX"
+  },
+  "colors": {
+   "normal": "#ECE8F4",
+   "fraction_dim": "#A8A0B8",
+   "max_gradient_top": "#FFF6C8",
+   "max_gradient_bottom": "#E8A434",
+   "max_glow": "#FFC44A alpha 120, blur 6px"
+  },
+  "style": {
+   "outline_px": 2,
+   "outline_color": "#100C16",
+   "underlay": {
+    "color": "#000000",
+    "alpha": 200,
+    "offset_y_px": 2,
+    "dilate_px": 3,
+    "softness_blur_px": 3
+   }
+  },
+  "previews": "preview/level_{lv1,lv2,lvmax,lv2of3}.png",
+  "max_piece": "pieces/level_max_text.png (optional pre-rendered)"
+ },
+ "name": {
+  "font": "Shippori Mincho ExtraBold",
+  "size_max": 84,
+  "size_min": 52,
+  "auto_size": "largest size that fits max_width_by_gem_count",
+  "x": 50,
+  "baseline_y": 860,
+  "anchor": "left-baseline",
+  "max_width_by_gem_count": {
+   "1": 558,
+   "2": 490,
+   "3": 422,
+   "4": 354
+  },
+  "color_ivory": "#FCF6EE",
+  "color_by_rarity_option": {
+   "silver": "#ECF2FC",
+   "gold": "#FFE9B0",
+   "rainbow_per_character_cycle": [
+    "#FFD6E8",
+    "#FFF0C4",
+    "#D6FFDE",
+    "#D0E8FF",
+    "#EAD8FF"
+   ]
+  },
+  "style": {
+   "outline_px": 2,
+   "outline_color": "#100C16",
+   "underlay": {
+    "color": "#000000",
+    "alpha": 200,
+    "offset_y_px": 2,
+    "dilate_px": 3,
+    "softness_blur_px": 5
+   }
+  }
+ },
+ "divider": {
+  "y": 886,
+  "x0": 50,
+  "x1": 700,
+  "width": 1.4,
+  "note": "inside frame_{rarity}.png"
+ },
+ "effect": {
+  "font": "Noto Sans JP Bold (alt: Shippori Mincho Bold)",
+  "size": 40,
+  "x": 50,
+  "first_line_top": 902,
+  "line_height": 52,
+  "max_lines": 2,
+  "max_width": 650,
+  "box": [
+   50,
+   902,
+   700,
+   1006
+  ],
+  "color": "#F0ECF6",
+  "number_color": "#F2D58A",
+  "number_regex": "[+＋\\-−]?[0-9０-９]+(?:[.．][0-9０-９]+)?[%％]?",
+  "style": {
+   "outline_px": 2,
+   "outline_color": "#100C16",
+   "underlay": {
+    "color": "#000000",
+    "alpha": 200,
+    "offset_y_px": 2,
+    "dilate_px": 3,
+    "softness_blur_px": 3
+   }
+  },
+  "wrap": "break after 。、 or before （「 (if the line is >=35% full); never start a line with 、。）」』！？ー%"
+ },
+ "gems": {
+  "style": "B brilliant cut",
+  "size": 60,
+  "gap": 8,
+  "row_center_y": 830,
+  "center_x_for_n": {
+   "1": [
+    662.0
+   ],
+   "2": [
+    594.0,
+    662.0
+   ],
+   "3": [
+    526.0,
+    594.0,
+    662.0
+   ],
+   "4": [
+    458.0,
+    526.0,
+    594.0,
+    662.0
+   ]
+  },
+  "png_note": "gem PNGs include a 1px margin: draw centred on the centre point",
+  "files": "gems/gem_{R,Y,G,B,P}_{on,dim3}.png (B=blue)",
+  "capsule": {
+   "box_for_n": {
+    "1": [
+     624,
+     792.0,
+     700,
+     868.0
+    ],
+    "2": [
+     556,
+     792.0,
+     700,
+     868.0
+    ],
+    "3": [
+     488,
+     792.0,
+     700,
+     868.0
+    ],
+    "4": [
+     420,
+     792.0,
+     700,
+     868.0
+    ]
+   },
+   "padding": 8,
+   "height": 76,
+   "piece": "pieces/capsule_{rarity}_n{N}.png, place top-left at box_for_n[N] minus 8 px (shadow margin)",
+   "look": "fill #08060C alpha 218, rarity-colour 1.6px line, 1px ink outside, soft shadow"
+  }
+ },
+ "shade_bottom": {
+  "y0": 660,
+  "y_full": 880,
+  "max_alpha": 244,
+  "color": "#06040A",
+  "curve": "alpha = max * t^1.5"
+ },
+ "art_safe": {
+  "face_zone": [
+   110,
+   100,
+   640,
+   640
+  ],
+  "face_ideal_center": [
+   380,
+   380
+  ],
+  "keep_clear_top": [
+   230,
+   0,
+   520,
+   100
+  ],
+  "text_zone_darkened": [
+   0,
+   660,
+   750,
+   1050
+  ],
+  "gem_zone_max": [
+   412,
+   784.0,
+   708,
+   876.0
+  ],
+  "frame_and_ornaments_margin": 56
+ },
+ "level_max_piece_topleft": [
+  309,
+  25
+ ]
+}

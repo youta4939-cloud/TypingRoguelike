@@ -13,9 +13,10 @@ MonoBehaviour:
   m_Name: Char_Ellen
   m_EditorClassIdentifier: TypingRoguelike::TypingRoguelike.Data.CharacterDefinition
   characterName: "\u30A8\u30EC\u30F3"
-  roleLabel: "\u30D2\u30FC\u30E9\u30FC"
+  roleLabel: "\u652F\u63F4\u578B"
   battlePortrait: {fileID: 21300000, guid: 79a3a351a6155cc46a65de62f350b57d, type: 3}
   innateSkill: {fileID: 11400000, guid: 4cc1f4ecdb350924095e2f8d2daa86b8, type: 2}
-  attack: 3
-  defense: 6
-  luck: 2
+  hp: 400
+  attack: 80
+  defense: 200
+  luck: 20

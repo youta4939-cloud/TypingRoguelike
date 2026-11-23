@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "agreeAffinity": 5,
+  "passive1Threshold": 25,
+  "passive1Message": "{name} パッシブ1解放",
+  "defaultTag": "attack",
+  "mood": { "high": 7, "low": 2 },
+  "chart": { "stages": 5, "percentMax": 100, "weightMin": 1, "weightMax": 7 },
+  "axes": [
+    { "name": "社交性", "source": "talk" },
+    { "name": "勇敢さ", "source": "w_attack" },
+    { "name": "用心深さ", "source": "w_careful" },
+    { "name": "好奇心", "source": "w_explore" },
+    { "name": "協調性", "source": "yieldRate" }
+  ],
+  "tagAliases": [
+    { "tag": "attack", "names": ["attack", "攻め", "aggressive"] },
+    { "tag": "careful", "names": ["careful", "慎重", "defensive"] },
+    { "tag": "explore", "names": ["explore", "探る", "unknown"] }
+  ],
+  "tagRules": [
+    { "tag": "explore", "when": "knowledge", "equals": "unknown" },
+    { "tag": "careful", "when": "stance", "equals": "defensive" },
+    { "tag": "attack", "when": "stance", "equals": "aggressive" }
+  ],
+  "debugAffinity": [0, 25, 50, 75, 100],
+  "characters": [
+    {
+      "id": "chara01",
+      "name": "chara01",
+      "talk": 70,
+      "w_attack": 7,
+      "w_careful": 1,
+      "w_explore": 3,
+      "yieldRate": 30,
+      "mood_random": false,
+      "lines_agree": ["こっちだ。", "私は引かない。"],
+      "lines_disagree": ["それは違う。", "やめとけ。"],
+      "lines_yield": ["…好きにしろ。"]
+    },
+    {
+      "id": "chara02",
+      "name": "chara02",
+      "talk": 50,
+      "w_attack": 1,
+      "w_careful": 7,
+      "w_explore": 2,
+      "yieldRate": 60,
+      "mood_random": false,
+      "lines_agree": ["待った方がいい。", "危ないほうは避ける。"],
+      "lines_disagree": ["今は攻めない。"],
+      "lines_yield": ["あんたの好きにして。"]
+    },
+    {
+      "id": "chara03",
+      "name": "chara03",
+      "talk": 55,
+      "w_attack": 2,
+      "w_careful": 2,
+      "w_explore": 7,
+      "yieldRate": 50,
+      "mood_random": false,
+      "lines_agree": ["見てみたい。", "奥が気になる。"],
+      "lines_disagree": ["それはもう知ってる。"],
+      "lines_yield": ["どっちでもいいよ。"]
+    }
+  ]
+}

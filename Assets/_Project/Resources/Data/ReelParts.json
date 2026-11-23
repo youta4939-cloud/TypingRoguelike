@@ -3,9 +3,7 @@
     {
       "id": "P01",
       "name": "戦闘・縦3",
-      "stock": 3,
-      "debugStock": 0,
-      "locked": false,
+      "locked": true,
       "cells": [
         { "x": 0, "y": 0, "type": "B" },
         { "x": 0, "y": 1, "type": "B" },
@@ -15,8 +13,6 @@
     {
       "id": "P02",
       "name": "戦闘・L字",
-      "stock": 0,
-      "debugStock": 2,
       "locked": true,
       "cells": [
         { "x": 0, "y": 0, "type": "B" },
@@ -27,8 +23,6 @@
     {
       "id": "P03",
       "name": "戦闘・横2",
-      "stock": 0,
-      "debugStock": 2,
       "locked": true,
       "cells": [
         { "x": 0, "y": 0, "type": "B" },
@@ -36,42 +30,18 @@
       ]
     },
     {
-      "id": "P04",
-      "name": "回復・単",
-      "stock": 0,
-      "debugStock": 2,
-      "locked": true,
-      "cells": [
-        { "x": 0, "y": 0, "type": "R" }
-      ]
-    },
-    {
       "id": "P05",
       "name": "回復・縦2",
-      "stock": 3,
-      "debugStock": 0,
-      "locked": false,
+      "locked": true,
       "cells": [
         { "x": 0, "y": 0, "type": "R" },
         { "x": 0, "y": 1, "type": "R" }
       ]
     },
     {
-      "id": "P06",
-      "name": "店・単",
-      "stock": 3,
-      "debugStock": 0,
-      "locked": false,
-      "cells": [
-        { "x": 0, "y": 0, "type": "S" }
-      ]
-    },
-    {
       "id": "P07",
       "name": "宝・横2",
-      "stock": 1,
-      "debugStock": 0,
-      "locked": false,
+      "locked": true,
       "cells": [
         { "x": 0, "y": 0, "type": "T" },
         { "x": 1, "y": 0, "type": "T" }
@@ -80,8 +50,6 @@
     {
       "id": "P08",
       "name": "宝・T字",
-      "stock": 0,
-      "debugStock": 2,
       "locked": true,
       "cells": [
         { "x": 0, "y": 0, "type": "T" },
@@ -93,9 +61,7 @@
     {
       "id": "P09",
       "name": "イベント・縦2",
-      "stock": 3,
-      "debugStock": 0,
-      "locked": false,
+      "locked": true,
       "cells": [
         { "x": 0, "y": 0, "type": "E" },
         { "x": 0, "y": 1, "type": "E" }
@@ -104,8 +70,6 @@
     {
       "id": "P10",
       "name": "イベント・コ字",
-      "stock": 0,
-      "debugStock": 2,
       "locked": true,
       "cells": [
         { "x": 0, "y": 0, "type": "E" },
@@ -116,13 +80,73 @@
       ]
     },
     {
-      "id": "P11",
-      "name": "宝・単",
-      "stock": 1,
-      "debugStock": 0,
+      "id": "P12",
+      "name": "戦闘・縦2",
       "locked": false,
       "cells": [
-        { "x": 0, "y": 0, "type": "T" }
+        { "x": 0, "y": 0, "type": "B" },
+        { "x": 0, "y": 1, "type": "B" }
+      ]
+    },
+    {
+      "id": "P14",
+      "name": "戦闘・四角",
+      "locked": false,
+      "cells": [
+        { "x": 0, "y": 0, "type": "B" },
+        { "x": 1, "y": 0, "type": "B" },
+        { "x": 0, "y": 1, "type": "B" },
+        { "x": 1, "y": 1, "type": "B" }
+      ]
+    },
+    {
+      "id": "P15",
+      "name": "回復・横3",
+      "locked": false,
+      "cells": [
+        { "x": 0, "y": 0, "type": "R" },
+        { "x": 1, "y": 0, "type": "R" },
+        { "x": 2, "y": 0, "type": "R" }
+      ]
+    },
+    {
+      "id": "P16",
+      "name": "店・横3",
+      "locked": false,
+      "cells": [
+        { "x": 0, "y": 0, "type": "S" },
+        { "x": 1, "y": 0, "type": "S" },
+        { "x": 2, "y": 0, "type": "S" }
+      ]
+    },
+    {
+      "id": "P17",
+      "name": "宝・横3",
+      "locked": false,
+      "cells": [
+        { "x": 0, "y": 0, "type": "T" },
+        { "x": 1, "y": 0, "type": "T" },
+        { "x": 2, "y": 0, "type": "T" }
+      ]
+    },
+    {
+      "id": "P18",
+      "name": "イベント・横3",
+      "locked": false,
+      "cells": [
+        { "x": 0, "y": 0, "type": "E" },
+        { "x": 1, "y": 0, "type": "E" },
+        { "x": 2, "y": 0, "type": "E" }
+      ]
+    },
+    {
+      "id": "P19",
+      "name": "戦闘・横3",
+      "locked": true,
+      "cells": [
+        { "x": 0, "y": 0, "type": "B" },
+        { "x": 1, "y": 0, "type": "B" },
+        { "x": 2, "y": 0, "type": "B" }
       ]
     }
   ]

@@ -1,0 +1,49 @@
+{
+  "yaku": [
+    {
+      "name": "罠で不成立",
+      "pattern": "AnyTrap",
+      "type": "X",
+      "count": 1,
+      "bonus": "None",
+      "bonusValue": 0,
+      "effect": "ボーナスなし。罠の効果だけ。"
+    },
+    {
+      "name": "戦闘×3",
+      "pattern": "AllSame",
+      "type": "B",
+      "count": 3,
+      "bonus": "CombatCardChoices",
+      "bonusValue": 1,
+      "effect": "この層の戦闘は、刻印の選択肢+1"
+    },
+    {
+      "name": "回復×3",
+      "pattern": "AllSame",
+      "type": "R",
+      "count": 3,
+      "bonus": "HealBeforeFourth",
+      "bonusValue": 0.2,
+      "effect": "4マス目の前にHP 20% 回復"
+    },
+    {
+      "name": "宝×3",
+      "pattern": "AllSame",
+      "type": "T",
+      "count": 3,
+      "bonus": "CoinGainPercent",
+      "bonusValue": 0.5,
+      "effect": "この層で得る塔片 +50%"
+    },
+    {
+      "name": "3つとも違う",
+      "pattern": "AllDifferent",
+      "type": "B",
+      "count": 3,
+      "bonus": "FlatCoins",
+      "bonusValue": 20,
+      "effect": "塔片 +20"
+    }
+  ]
+}

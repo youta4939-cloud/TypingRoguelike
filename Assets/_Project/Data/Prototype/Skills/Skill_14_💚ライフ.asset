@@ -16,9 +16,10 @@ MonoBehaviour:
   characterName: "\u30A8\u30EC\u30F3"
   displayName: "\U0001F49A\u30E9\u30A4\u30D5"
   pattern: 0200000000000000
+  damagePercent: 0
   damage: 0
-  heal: 14
-  effectText: "14\u56DE\u5FA9"
+  heal: 83
+  effectText: 83回復
   effectKind: 1
   effectValue: 0
   effectValueInt: 0

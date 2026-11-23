@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using TMPro;
 using TypingRoguelike.Data;
+using TypingRoguelike.Battle.Visual;
 using TypingRoguelike.Run;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,19 +10,22 @@ namespace TypingRoguelike.Battle
 {
     public sealed class BattleUIRefs
     {
-        public Text PlayerHpText;
-        public Text EnemyHpText;
+        public TMP_Text PlayerHpText;
+        public TMP_Text EnemyHpText;
         public Text EnemyEmoji;
-        public Text LogText;
-        public Text RerollBadge;
-        public Text JackpotMeterText;
+        public TMP_Text LogText;
+        public TMP_Text RerollBadge;
+        public TMP_Text JackpotMeterText;
         public Image MadnessFill;
-        public Text MadnessText;
-        public Text AttackBarLabel;
+        public Image MadnessEmpty;
+        public TMP_Text MadnessText;
+        public TMP_Text AttackBarLabel;
         public Image PlayerHpBar;
         public Image EnemyHpBar;
         public BossHpGauge EnemyHpGauge;
+        public EnemyStatusHud EnemyStatus;
         public Image AttackBar;
+        public bool AttackRingFillsOnApproach;
         public Image EnemyAttackRing;
         public Image EnemyAttackRingTrack;
         public Image DamageOverlay;
@@ -34,6 +39,12 @@ namespace TypingRoguelike.Battle
         public WordBoxUI[] WordBoxes = new WordBoxUI[3];
         public Dictionary<int, RectTransform> SkillPatternOrbHosts = new();
         public Dictionary<int, Graphic> SkillRowGraphics = new();
+        public Dictionary<int, GameObject> SkillReadyMarks = new();
+        public Dictionary<int, BattlePartyCardUI.SkillRowView> SkillRows = new();
+        public BattleE5bStage E5b;
+        public StockPanel Stock;
+        public Image E5bNoticeFill;
+        public Image E5bNoticeOutline;
         public Dictionary<string, RectTransform> CharCards = new();
         public Dictionary<string, Image> CharPortraits = new();
         public Image BossPortrait;
@@ -44,8 +55,13 @@ namespace TypingRoguelike.Battle
         public RectTransform EnemyStage;
         public RectTransform EnemyHitRoot;
         public Image EnemyAura;
+        public GameObject HeavyAttackCallout;
+        public Text HeavyAttackLabel;
+        public Image HeavyAttackGauge;
         public BigMouthIdle BigMouth;
-        public EnemyBiteFx EnemyBiteFx;
+        public PaperAngelIdle PaperAngel;
+        public SkeletonSamuraiIdle SkeletonSamurai;
+        public EnemySpritePairPresenter SpritePairPresenter;
         public GameObject CountdownOverlay;
         public Image CountdownRing;
         public Text CountdownText;
@@ -58,10 +74,15 @@ namespace TypingRoguelike.Battle
         public Text JackpotDamageText;
         public GameObject ResultOverlay;
         public CanvasGroup ResultCanvasGroup;
-        public Text ResultRank;
-        public Text ResultStats;
+        public Text ResultTitle;
+        public Text ResultHp;
+        public Text ResultMadness;
+        public Text ResultTime;
         public Button ResultContinueButton;
         public Button DebugKillButton;
+        public Text DebugCombatReadout;
+        public Button DebugCritTestButton;
+        public Button DebugAliceSlashButton;
     }
 
     public sealed class WordBoxUI
@@ -72,13 +93,16 @@ namespace TypingRoguelike.Battle
         public Image Fill;
         public Image Progress;
         public Image ElementStripe;
-        public Text TagText;
-        public Text RubyText;
-        public Text WordText;
+        public TMP_Text TagText;
+        public TMP_Text RubyText;
+        public TMP_Text WordText;
+        public bool E5b;
     }
 
     public static class BattleUIBuilder
     {
+        public static bool SuppressPrefab;
+
         public static BattleUIRefs Build(
             Transform parent,
             IReadOnlyList<BattleSkillData> skills,
@@ -86,6 +110,12 @@ namespace TypingRoguelike.Battle
             BattleVisualContext visuals = null)
         {
             visuals ??= BattleVisualContext.FromEncounter(null, null);
+            if (!SuppressPrefab)
+            {
+                var bound = TryBindPrefab(parent, skills, visuals);
+                if (bound != null)
+                    return bound;
+            }
             var template = BattleUITemplateLoader.Default;
             var refs = new BattleUIRefs();
 
@@ -107,75 +137,11 @@ namespace TypingRoguelike.Battle
             refs.RootCard = CreatePanel(bg.transform, "BattleHud", Vector2.zero, Vector2.one,
                 new Color(0, 0, 0, 0)).GetComponent<RectTransform>();
 
+            BattleLayoutE5b.BuildContactShadow(refs.RootCard);
             BuildArena(refs.RootCard, refs, visuals);
-            BuildTypingRail(refs.RootCard, refs);
-
-            // 左レール: 情報量を保ちつつ画面幅を抑える。
-            var partyWindow = BattleUIChrome.CreateLuxuryWindow(refs.RootCard, "PartyWindow",
-                new Vector2(0.012f, 0.055f), new Vector2(0.28f, 0.96f), "PARTY", BattleUITheme.MainPurple);
-            SetPanelOpacity(partyWindow, 0.92f);
-            var partyBody = partyWindow.Find("Body");
-            BattlePartyCardUI.Build(
-                partyBody != null ? partyBody : partyWindow,
-                refs,
-                skills,
-                innateSkillIds,
-                visuals);
-            BuildMadnessMeter(partyBody != null ? partyBody : partyWindow, refs);
+            BattleLayoutE5b.Build(refs.RootCard, refs, skills, visuals);
 
             BuildBossPlate(refs, visuals);
-            BuildBattleLog(refs);
-            BuildPartyHpStrip(refs);
-            BuildControlStrip(refs);
-
-            // 最下部: 左にストック、右に発動候補。候補が少なくても巨大な空白を作らない。
-            var orbHud = CreatePanel(refs.RootCard, "OrbHud", new Vector2(0.295f, 0.02f),
-                new Vector2(0.535f, 0.138f), new Color(0.02f, 0.025f, 0.05f, 0.9f), template?.windowPanel);
-            AddOutline(orbHud.gameObject, new Color(0.95f, 0.62f, 0.08f, 0.55f), 1);
-            refs.JackpotMeterText = CreateLabel(
-                orbHud,
-                "JackpotMeter",
-                "次 0%",
-                14,
-                TextAnchor.UpperLeft,
-                new Vector2(0.04f, 0.52f),
-                new Vector2(0.96f, 0.98f),
-                Vector2.zero,
-                Vector2.zero,
-                BattleUITheme.Gold);
-            refs.JackpotMeterText.fontStyle = FontStyle.Bold;
-            refs.JackpotMeterText.horizontalOverflow = HorizontalWrapMode.Wrap;
-            refs.JackpotMeterText.verticalOverflow = VerticalWrapMode.Overflow;
-            var stockRow = new GameObject("StockOrbs");
-            stockRow.transform.SetParent(orbHud, false);
-            refs.StockOrbsContainer = stockRow.AddComponent<RectTransform>();
-            refs.StockOrbsContainer.anchorMin = new Vector2(0.04f, 0.06f);
-            refs.StockOrbsContainer.anchorMax = new Vector2(0.96f, 0.5f);
-            refs.StockOrbsContainer.offsetMin = Vector2.zero;
-            refs.StockOrbsContainer.offsetMax = Vector2.zero;
-            var hlg = stockRow.AddComponent<HorizontalLayoutGroup>();
-            hlg.spacing = 12;
-            hlg.childAlignment = TextAnchor.MiddleCenter;
-            hlg.childControlWidth = false;
-            hlg.childControlHeight = false;
-
-            var skillHud = CreatePanel(refs.RootCard, "SkillHintHud", new Vector2(0.545f, 0.02f),
-                new Vector2(0.975f, 0.138f), new Color(0.02f, 0.025f, 0.05f, 0.9f), template?.windowPanel);
-            AddOutline(skillHud.gameObject, new Color(0.55f, 0.4f, 0.95f, 0.55f), 1);
-            CreateLabel(skillHud, "NextLabel", "NEXT SKILL", 12, TextAnchor.UpperLeft,
-                new Vector2(0.025f, 0.7f), new Vector2(0.975f, 0.96f), Vector2.zero, Vector2.zero,
-                new Color(0.72f, 0.62f, 1f));
-            var candRow = new GameObject("Candidates");
-            candRow.transform.SetParent(skillHud, false);
-            refs.CandidatesContainer = candRow.AddComponent<RectTransform>();
-            refs.CandidatesContainer.anchorMin = new Vector2(0.02f, 0.04f);
-            refs.CandidatesContainer.anchorMax = new Vector2(0.98f, 0.7f);
-            refs.CandidatesContainer.offsetMin = Vector2.zero;
-            refs.CandidatesContainer.offsetMax = Vector2.zero;
-            var vlg = candRow.AddComponent<VerticalLayoutGroup>();
-            vlg.spacing = 4;
-            vlg.childControlHeight = true;
-            vlg.childForceExpandHeight = false;
 
             refs.DamageOverlay = CreatePanel(refs.RootCard, "DamageOverlay", Vector2.zero, Vector2.one,
                 new Color(1f, 0, 0, 0)).GetComponent<Image>();
@@ -223,49 +189,27 @@ namespace TypingRoguelike.Battle
                 moon.GetComponent<Image>().raycastTarget = false;
             }
 
-            BattleUIChrome.CreateGlow(bg, "CrimsonNebula", new Vector2(0.37f, 0.25f),
-                new Vector2(1.02f, 1.08f), new Color(0.82f, 0.04f, 0.14f, 0.19f));
-            BattleUIChrome.CreateGlow(bg, "ArcaneNebula", new Vector2(0.05f, 0.36f),
-                new Vector2(0.58f, 1.02f), new Color(0.25f, 0.2f, 0.86f, 0.12f));
+        }
 
-            var topGradient = CreatePanel(bg, "AtmosphereGradient", new Vector2(0, 0.32f), Vector2.one,
-                new Color(0.18f, 0.05f, 0.2f, 0.22f));
-            topGradient.GetComponent<Image>().sprite = BattleUISprites.VerticalGradient;
-            topGradient.GetComponent<Image>().raycastTarget = false;
+        /// <summary>背景を沈め、周辺を落として中央の敵へ視線を集める。</summary>
+        static void BuildBackdropShading(RectTransform bg)
+        {
+            var dim = CreatePanel(bg, "Dim", Vector2.zero, Vector2.one, new Color(0.01f, 0.008f, 0.014f, 0.5f));
+            dim.GetComponent<Image>().raycastTarget = false;
 
-            for (var i = 0; i < 22; i++)
-            {
-                var star = new GameObject($"ArcaneMote_{i}");
-                star.transform.SetParent(bg, false);
-                var rt = star.AddComponent<RectTransform>();
-                var x = Mathf.Repeat(i * 0.173f + 0.07f, 1f);
-                var y = 0.34f + Mathf.Repeat(i * 0.287f, 1f) * 0.62f;
-                rt.anchorMin = new Vector2(x, y);
-                rt.anchorMax = new Vector2(x, y);
-                var size = 2f + (i % 4);
-                rt.sizeDelta = new Vector2(size, size);
-                var image = star.AddComponent<Image>();
-                image.sprite = i % 3 == 0 ? BattleUISprites.Diamond : BattleUISprites.Circle;
-                image.color = i % 2 == 0
-                    ? new Color(1f, 0.55f, 0.38f, 0.28f)
-                    : new Color(0.48f, 0.62f, 1f, 0.22f);
-                image.raycastTarget = false;
-            }
-
-            // 周辺をグラデーションで落とし、アリーナ中央へ視線を集める。
-            CreateGradientShade(bg, "LeftShade", Vector2.zero, new Vector2(0.36f, 1f), false, true, 0.82f);
-            CreateGradientShade(bg, "RightShade", new Vector2(0.86f, 0f), Vector2.one, false, false, 0.55f);
-            CreateGradientShade(bg, "TopShade", new Vector2(0f, 0.74f), Vector2.one, true, false, 0.7f);
-            CreateGradientShade(bg, "BottomShade", Vector2.zero, new Vector2(1f, 0.34f), true, true, 0.85f);
+            CreateGradientShade(bg, "LeftShade", Vector2.zero, new Vector2(0.34f, 1f), false, true, 0.9f);
+            CreateGradientShade(bg, "RightShade", new Vector2(0.8f, 0f), Vector2.one, false, false, 0.8f);
+            CreateGradientShade(bg, "TopShade", new Vector2(0f, 0.8f), Vector2.one, true, false, 0.75f);
+            CreateGradientShade(bg, "BottomShade", Vector2.zero, new Vector2(1f, 0.3f), true, true, 0.9f);
 
             var spot = new GameObject("ArenaSpotlight");
             spot.transform.SetParent(bg, false);
             var spotRt = spot.AddComponent<RectTransform>();
             spotRt.anchorMin = spotRt.anchorMax = ArenaAnchor;
-            spotRt.sizeDelta = new Vector2(1250f, 1050f);
+            spotRt.sizeDelta = new Vector2(1100f, 1000f);
             var spotImg = spot.AddComponent<Image>();
             spotImg.sprite = BattleUISprites.RadialGlow;
-            spotImg.color = new Color(0.16f, 0.32f, 0.85f, 0.22f);
+            spotImg.color = new Color(0.1f, 0.35f, 0.45f, 0.16f);
             spotImg.raycastTarget = false;
         }
 
@@ -290,14 +234,13 @@ namespace TypingRoguelike.Battle
                 rt.localScale = vertical ? new Vector3(1f, -1f, 1f) : new Vector3(-1f, 1f, 1f);
         }
 
-        // 敵ステージ＝右上の斜め平面。タイピングカードは傾けない（重なり防止）。
-        static readonly Vector2 ArenaAnchor = new(0.735f, 0.58f);
+        // 敵は画面中央。単語カードは円の左・右・下。
+        static readonly Vector2 ArenaAnchor = new(0.6f, 0.515f);
         static readonly Vector2 EnemyFocusLocal = Vector2.zero;
-        static readonly Vector3 ArenaTiltEuler = new(6f, -18f, 0f);
-        const float ArenaSize = 780f;
-        const float AttackRingDiameter = 260f;
+        const float ArenaSize = 600f;
+        const float AttackRingDiameter = 560f;
+        static readonly Vector2 WordCardSize = new(252f, 106f);
         static readonly Color ArenaAccent = new(0.78f, 0.58f, 0.22f);
-        static readonly Vector2 WordCardSize = new(300f, 112f);
 
         static RectTransform CreateCentered(Transform parent, string name, Vector2 position, Vector2 size)
         {
@@ -329,72 +272,59 @@ namespace TypingRoguelike.Battle
             arenaGo.transform.SetParent(root, false);
             var arena = arenaGo.AddComponent<RectTransform>();
             arena.anchorMin = arena.anchorMax = ArenaAnchor;
-            arena.pivot = new Vector2(0.5f, 0.42f);
+            arena.pivot = new Vector2(0.5f, 0.5f);
             arena.sizeDelta = new Vector2(ArenaSize, ArenaSize);
-            arena.localRotation = Quaternion.Euler(ArenaTiltEuler);
             refs.ArenaRoot = arena;
 
-            BuildGroundPlane(arena);
-
-            var focus = CreateCentered(arena, "CombatFocus", EnemyFocusLocal, new Vector2(420f, 420f));
-            BuildAttackRing(focus, refs);
+            var focus = CreateCentered(arena, "CombatFocus", EnemyFocusLocal,
+                new Vector2(AttackRingDiameter, AttackRingDiameter));
             BuildEnemy(focus, refs, visuals);
             BuildPartyApproachSlot(root, refs);
         }
 
-        /// <summary>タイピング用カード列（画面正面・敵と別レイヤー）。</summary>
+        /// <summary>単語カードは攻撃円の左・右・下。板では囲まない。</summary>
         static void BuildTypingRail(RectTransform root, BattleUIRefs refs)
         {
-            var template = BattleUITemplateLoader.Default;
-            var rail = CreatePanel(root, "TypingRail", new Vector2(0.27f, 0.188f), new Vector2(0.975f, 0.348f),
-                new Color(0.02f, 0.022f, 0.045f, 0.82f), template?.windowPanel);
-            AddOutline(rail.gameObject, new Color(BattleUITheme.Gold.r, BattleUITheme.Gold.g, BattleUITheme.Gold.b, 0.45f), 1);
-            CreateLabel(rail, "RailLabel", "TYPE", 11, TextAnchor.UpperLeft,
-                new Vector2(0.02f, 0.86f), new Vector2(0.12f, 0.98f), Vector2.zero, Vector2.zero, BattleUITheme.TextMuted)
-                .fontStyle = FontStyle.Bold;
-
-            var rowGo = new GameObject("WordRow");
-            rowGo.transform.SetParent(rail, false);
-            var row = rowGo.AddComponent<RectTransform>();
-            row.anchorMin = new Vector2(0.02f, 0.06f);
-            row.anchorMax = new Vector2(0.98f, 0.84f);
-            row.offsetMin = Vector2.zero;
-            row.offsetMax = Vector2.zero;
-            var hlg = rowGo.AddComponent<HorizontalLayoutGroup>();
-            hlg.spacing = 18;
-            hlg.padding = new RectOffset(4, 4, 2, 2);
-            hlg.childAlignment = TextAnchor.MiddleCenter;
-            hlg.childControlWidth = true;
-            hlg.childControlHeight = true;
-            hlg.childForceExpandWidth = true;
-            hlg.childForceExpandHeight = true;
-
+            // 円の中心からのオフセット（参照解像度 1920x1080 の px）。
+            var offsets = new[]
+            {
+                new Vector2(-282f, 18f),
+                new Vector2(292f, 18f),
+                new Vector2(0f, -284f)
+            };
             for (var i = 0; i < refs.WordBoxes.Length; i++)
-                refs.WordBoxes[i] = CreateWordCardLayoutChild(row, $"WordBox{i}", WordCardSize);
+            {
+                var rt = BattleHudKit.Place(root, $"WordBox{i}", ArenaAnchor, new Vector2(0.5f, 0.5f), offsets[i],
+                    WordCardSize);
+                refs.WordBoxes[i] = PopulateWordCard(rt, WordCardSize);
+            }
         }
 
         static void BuildGroundPlane(RectTransform arena)
         {
-            var floorSprite = BattleUISprites.ArenaFloorPremium;
-            if (floorSprite != null)
-            {
-                var floor = CreateCenteredImage(arena, "ArenaFloor", new Vector2(0f, -72f), new Vector2(520f, 300f),
-                    floorSprite, new Color(1f, 1f, 1f, 0.75f));
-                floor.transform.localScale = new Vector3(1f, 0.48f, 1f);
-            }
-
-            CreateCenteredImage(arena, "FloorShadow", new Vector2(0f, -68f), new Vector2(480f, 160f),
+            CreateCenteredImage(arena, "InnerDark", Vector2.zero, new Vector2(AttackRingDiameter, AttackRingDiameter),
                 BattleUISprites.RadialGlow, new Color(0f, 0f, 0f, 0.55f));
         }
 
         static void BuildAttackRing(RectTransform focus, BattleUIRefs refs)
         {
             var d = AttackRingDiameter;
-            var ringPos = new Vector2(0f, -88f);
+            var ringPos = Vector2.zero;
+            var cyan = new Color(0.55f, 0.95f, 1f);
+            CreateCenteredImage(focus, "AttackRingGlow", ringPos, new Vector2(d + 90f, d + 90f),
+                BattleUISprites.RadialGlow, new Color(cyan.r, cyan.g, cyan.b, 0.1f));
+            CreateCenteredImage(focus, "AttackRingOuterHair", ringPos, new Vector2(d + 26f, d + 26f),
+                BattleUISprites.ThinRing, new Color(cyan.r, cyan.g, cyan.b, 0.22f));
             refs.EnemyAttackRingTrack = CreateCenteredImage(focus, "AttackRingTrack", ringPos,
-                new Vector2(d, d), BattleUISprites.Ring, new Color(0.04f, 0.05f, 0.1f, 0.65f));
+                new Vector2(d, d), BattleUISprites.Ring, new Color(0.05f, 0.12f, 0.14f, 0.7f));
             refs.EnemyAttackRing = CreateCenteredImage(focus, "AttackRingFill", ringPos, new Vector2(d, d),
-                BattleUISprites.Ring, WithAlpha(new Color(0.95f, 0.35f, 0.28f), 0.88f));
+                BattleUISprites.Ring, new Color(0.72f, 0.98f, 1f, 0.95f));
+            var ringBloom = CreateCenteredImage(refs.EnemyAttackRing.transform, "Bloom", Vector2.zero,
+                new Vector2(d + 14f, d + 14f), BattleUISprites.Ring, new Color(cyan.r, cyan.g, cyan.b, 0.35f));
+            ringBloom.type = Image.Type.Filled;
+            ringBloom.fillMethod = Image.FillMethod.Radial360;
+            ringBloom.fillOrigin = (int)Image.Origin360.Top;
+            refs.EnemyAttackRing.gameObject.AddComponent<RingBloomFollow>().Bloom = ringBloom;
             refs.EnemyAttackRing.type = Image.Type.Filled;
             refs.EnemyAttackRing.fillMethod = Image.FillMethod.Radial360;
             refs.EnemyAttackRing.fillOrigin = (int)Image.Origin360.Top;
@@ -402,26 +332,62 @@ namespace TypingRoguelike.Battle
             refs.EnemyAttackRing.fillAmount = 1f;
             refs.AttackBar = refs.EnemyAttackRing;
 
-            var plate = CreateCentered(focus, "AttackLabelPlate", ringPos + new Vector2(0f, -d * 0.5f - 16f),
-                new Vector2(140f, 22f));
-            var plateImg = plate.gameObject.AddComponent<Image>();
-            BattleUITheme.StylePanel(plateImg, new Color(0.01f, 0.02f, 0.05f, 0.75f));
-            plateImg.raycastTarget = false;
-            refs.AttackBarLabel = CreateLabel(plate, "AttackLabel", "次の攻撃", 12, TextAnchor.MiddleCenter,
-                Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, BattleUITheme.TextMuted);
-            refs.AttackBarLabel.fontStyle = FontStyle.Bold;
+            var label = CreateCentered(focus, "AttackLabel", new Vector2(0f, d * 0.5f + 24f), new Vector2(160f, 30f));
+            refs.AttackBarLabel = BattleHudKit.Text(label, "Text", "", BattleHudKit.Condensed, 24f, Color.white,
+                TextAlignmentOptions.Center, Vector2.zero, Vector2.one);
+            BattleHudKit.Outline(refs.AttackBarLabel, 0.22f, Color.black);
+        }
+
+        static void CreateAnimatedEnemy(BattleUIRefs refs, BattleVisualContext visuals)
+        {
+            var kind = visuals?.BattleVisual ?? EnemyBattleVisualKind.Auto;
+            if (kind == EnemyBattleVisualKind.StaticIllustration)
+                return;
+
+            if (kind == EnemyBattleVisualKind.SkeletonSamurai)
+            {
+                refs.SkeletonSamurai = SkeletonSamuraiAssembler.CreateUi(refs.EnemyHitRoot);
+                if (refs.SkeletonSamurai != null)
+                    return;
+            }
+
+            if (kind == EnemyBattleVisualKind.PaperAngel)
+            {
+                refs.PaperAngel = PaperAngelAssembler.CreateUi(refs.EnemyHitRoot);
+                if (refs.PaperAngel != null)
+                    return;
+            }
+
+            if (kind == EnemyBattleVisualKind.BigMouth || kind == EnemyBattleVisualKind.Auto)
+                refs.BigMouth = BigMouthAssembler.CreateUi(refs.EnemyHitRoot);
         }
 
         static void BuildEnemy(RectTransform focus, BattleUIRefs refs, BattleVisualContext visuals)
         {
-            refs.EnemyStage = CreateCentered(focus, "EnemyStage", new Vector2(0f, 36f), new Vector2(360f, 360f));
-            refs.EnemyHitRoot = CreateCentered(refs.EnemyStage, "EnemyHitRoot", Vector2.zero, new Vector2(360f, 360f));
+            refs.EnemyStage = CreateCentered(focus, "EnemyStage", new Vector2(0f, 10f), new Vector2(420f, 420f));
+            refs.EnemyHitRoot = CreateCentered(refs.EnemyStage, "EnemyHitRoot", Vector2.zero, new Vector2(420f, 420f));
 
-            refs.EnemyAura = CreateCenteredImage(refs.EnemyHitRoot, "EnemyAura", new Vector2(0f, 20f), new Vector2(380f, 380f),
-                BattleUISprites.RadialGlow, new Color(0.88f, 0.08f, 0.18f, 0.12f));
+            refs.EnemyAura = CreateCenteredImage(refs.EnemyHitRoot, "EnemyAura", new Vector2(0f, 10f), new Vector2(460f, 460f),
+                BattleUISprites.RadialGlow, new Color(0.88f, 0.08f, 0.18f, 0.14f));
 
-            refs.BigMouth = BigMouthAssembler.CreateUi(refs.EnemyHitRoot);
-            if (refs.BigMouth == null)
+            if (visuals != null && visuals.UseSpritePair)
+            {
+                refs.SpritePairPresenter = EnemySpritePairPresenter.Create(refs.EnemyHitRoot, visuals);
+                if (refs.SpritePairPresenter != null)
+                {
+                    refs.BossPortrait = refs.SpritePairPresenter.MainImage;
+                    refs.EnemyEmoji = CreateLabel(refs.EnemyHitRoot, "EnemyEmoji", string.Empty, 160,
+                        TextAnchor.MiddleCenter, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, Color.clear);
+                    refs.EnemyEmoji.raycastTarget = false;
+                    AttachEnemyDamagePopups(refs);
+                    BuildHeavyAttackCallout(refs);
+                    return;
+                }
+            }
+
+            CreateAnimatedEnemy(refs, visuals);
+
+            if (refs.BigMouth == null && refs.PaperAngel == null && refs.SkeletonSamurai == null)
             {
                 var bossImgGo = new GameObject("BossIllustration");
                 bossImgGo.transform.SetParent(refs.EnemyHitRoot, false);
@@ -442,12 +408,19 @@ namespace TypingRoguelike.Battle
                 bossShadow.effectDistance = new Vector2(0f, -10f);
             }
 
-            var showEmoji = refs.BigMouth == null && visuals.BossIllustration == null;
+            var showEmoji = refs.BigMouth == null && refs.PaperAngel == null && refs.SkeletonSamurai == null
+                            && visuals.BossIllustration == null;
             refs.EnemyEmoji = CreateLabel(refs.EnemyHitRoot, "EnemyEmoji", visuals.BossEmojiNormal, 160,
                 TextAnchor.MiddleCenter, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero,
                 showEmoji ? BattleUITheme.TextPrimary : Color.clear);
             refs.EnemyEmoji.raycastTarget = false;
 
+            AttachEnemyDamagePopups(refs);
+            BuildHeavyAttackCallout(refs);
+        }
+
+        static void AttachEnemyDamagePopups(BattleUIRefs refs)
+        {
             var popupLayer = new GameObject("EnemyDamagePopups");
             popupLayer.transform.SetParent(refs.EnemyHitRoot, false);
             refs.EnemyDamagePopupRoot = popupLayer.AddComponent<RectTransform>();
@@ -455,87 +428,130 @@ namespace TypingRoguelike.Battle
             refs.EnemyDamagePopupRoot.anchorMax = Vector2.one;
             refs.EnemyDamagePopupRoot.offsetMin = Vector2.zero;
             refs.EnemyDamagePopupRoot.offsetMax = Vector2.zero;
+            RaiseDamagePopups(refs.EnemyDamagePopupRoot);
+        }
 
-            refs.EnemyBiteFx = EnemyBiteFx.Create(focus);
+        static void BuildHeavyAttackCallout(BattleUIRefs refs)
+        {
+            var callout = CreateCentered(refs.EnemyStage, "HeavyCallout", new Vector2(0f, 214f), new Vector2(240f, 72f));
+            refs.HeavyAttackCallout = callout.gameObject;
+            var plate = callout.gameObject.AddComponent<Image>();
+            plate.sprite = BattleUISprites.Solid;
+            plate.color = new Color(0.28f, 0.03f, 0.04f, 0.88f);
+            plate.raycastTarget = false;
+
+            refs.HeavyAttackLabel = CreateLabel(callout, "Label", "強攻撃！", 22, TextAnchor.MiddleCenter,
+                new Vector2(0f, 0.42f), new Vector2(1f, 1f), Vector2.zero, Vector2.zero,
+                new Color(1f, 0.84f, 0.28f));
+            refs.HeavyAttackLabel.fontStyle = FontStyle.Bold;
+            AddOutline(refs.HeavyAttackLabel.gameObject, new Color(0.35f, 0.04f, 0.02f, 1f), 1);
+
+            CreateCenteredImage(callout, "GaugeTrack", new Vector2(0f, -16f), new Vector2(200f, 12f),
+                BattleUISprites.Solid, new Color(0.12f, 0.06f, 0.06f, 1f));
+            refs.HeavyAttackGauge = CreateCenteredImage(callout, "GaugeFill", new Vector2(0f, -16f), new Vector2(200f, 12f),
+                BattleUISprites.Solid, new Color(1f, 0.28f, 0.12f, 1f));
+            refs.HeavyAttackGauge.type = Image.Type.Filled;
+            refs.HeavyAttackGauge.fillMethod = Image.FillMethod.Horizontal;
+            refs.HeavyAttackGauge.fillOrigin = (int)Image.OriginHorizontal.Left;
+            refs.HeavyAttackGauge.fillAmount = 1f;
+            callout.gameObject.SetActive(false);
         }
 
         /// <summary>手前の味方側スロット。将来「飛んで着地して攻撃」の出発／着地に使う。</summary>
         static void BuildPartyApproachSlot(RectTransform root, BattleUIRefs refs)
         {
-            refs.PartyApproachRoot = CreatePanel(root, "PartyApproachRoot", new Vector2(0.27f, 0.355f),
-                new Vector2(0.36f, 0.445f), Color.clear).GetComponent<RectTransform>();
-            var pad = CreateCenteredImage(refs.PartyApproachRoot, "LaunchPad", Vector2.zero, new Vector2(180f, 64f),
-                BattleUISprites.Circle, new Color(0.06f, 0.12f, 0.1f, 0.45f));
-            pad.transform.localScale = new Vector3(1f, 0.42f, 1f);
-            CreateCenteredImage(refs.PartyApproachRoot, "LaunchRim", Vector2.zero, new Vector2(180f, 64f),
-                BattleUISprites.ThinRing, WithAlpha(BattleUITheme.AccentAlly, 0.4f)).transform.localScale =
-                new Vector3(1f, 0.42f, 1f);
-            CreateLabel(refs.PartyApproachRoot, "LaunchLabel", "ALLY", 10, TextAnchor.LowerCenter,
-                new Vector2(0f, 0f), new Vector2(1f, 0.35f), Vector2.zero, Vector2.zero, BattleUITheme.AccentAlly)
-                .fontStyle = FontStyle.Bold;
+            refs.PartyApproachRoot = CreatePanel(root, "PartyApproachRoot", new Vector2(0.40f, 0.34f),
+                new Vector2(0.48f, 0.42f), Color.clear).GetComponent<RectTransform>();
+            refs.PartyApproachRoot.GetComponent<Image>().raycastTarget = false;
         }
 
         static void BuildBossPlate(BattleUIRefs refs, BattleVisualContext visuals)
         {
-            var title = string.IsNullOrEmpty(visuals.BossDisplayName)
-                ? "BOSS"
-                : visuals.BossDisplayName.ToUpperInvariant();
+            refs.EnemyStatus = EnemyStatusHud.Create(refs.RootCard,
+                string.IsNullOrEmpty(visuals.BossDisplayName) ? "敵" : visuals.BossDisplayName);
+            refs.EnemyHpGauge = null;
+        }
 
-            var plate = CreateTopCentered(refs.RootCard, "BossPlate", -4f, new Vector2(820f, 36f));
-            plate.anchorMin = plate.anchorMax = new Vector2(0.687f, 1f);
-            var bg = plate.gameObject.AddComponent<Image>();
-            BattleUITheme.StylePanel(bg, new Color(0.015f, 0.012f, 0.035f, 0.72f));
-            bg.raycastTarget = false;
+        /// <summary>枠・暗い溝・遅れて減るトレイル・艶のあるフィルで構成した HP バー。</summary>
+        static Image BuildHpBar(RectTransform parent, string name, Vector2 offsetMin, Vector2 offsetMax,
+            Color frame, Color track, Color fill, Color trail, int segments)
+        {
+            var root = BattleHudKit.Rect(parent, name, new Vector2(0f, 1f), new Vector2(1f, 1f), offsetMin, offsetMax);
+            BattleHudKit.Img(root, "Shadow", BattleUISprites.Solid, new Color(0f, 0f, 0f, 0.55f), Vector2.zero,
+                Vector2.one, new Vector2(-4f, -6f), new Vector2(4f, 3f));
+            BattleHudKit.Img(root, "Track", BattleUISprites.Solid, track, Vector2.zero, Vector2.one);
+            var trailImg = BattleHudKit.Img(root, "Trail", BattleUISprites.Solid, trail, Vector2.zero, Vector2.one,
+                new Vector2(3f, 3f), new Vector2(-3f, -3f));
+            trailImg.type = Image.Type.Filled;
+            trailImg.fillMethod = Image.FillMethod.Horizontal;
+            trailImg.fillAmount = 1f;
+            var fillImg = BattleHudKit.Img(root, "Fill", BattleHudKit.BarGloss, fill, Vector2.zero, Vector2.one,
+                new Vector2(3f, 3f), new Vector2(-3f, -3f));
+            fillImg.type = Image.Type.Filled;
+            fillImg.fillMethod = Image.FillMethod.Horizontal;
+            fillImg.fillAmount = 1f;
+            BattleHudKit.Img(root, "Sheen", BattleUISprites.Solid, new Color(1f, 1f, 1f, 0.1f),
+                new Vector2(0f, 0.62f), new Vector2(1f, 0.8f), new Vector2(3f, 0f), new Vector2(-3f, 0f));
+            for (var i = 1; i < segments; i++)
+            {
+                var x = i / (float)segments;
+                BattleHudKit.Img(root, $"Tick{i}", BattleUISprites.Solid, new Color(0f, 0f, 0f, 0.35f),
+                    new Vector2(x, 0f), new Vector2(x, 1f), new Vector2(-1f, 3f), new Vector2(1f, -3f));
+            }
 
-            CreateLabel(plate, "Tag", "ENEMY", 12, TextAnchor.MiddleLeft,
-                new Vector2(0.03f, 0f), new Vector2(0.22f, 1f), Vector2.zero, Vector2.zero,
-                new Color(0.95f, 0.45f, 0.45f, 0.9f)).fontStyle = FontStyle.Bold;
-            var name = CreateLabel(plate, "BossName", $"◆  {title}  ◆", 22, TextAnchor.MiddleCenter,
-                new Vector2(0.18f, 0f), new Vector2(0.97f, 1f), Vector2.zero, Vector2.zero, BattleUITheme.TextPrimary);
-            name.fontStyle = FontStyle.Bold;
-            BattleUITheme.AddTextShadow(name, new Color(0, 0, 0, 0.95f), new Vector2(2, -2));
-
-            refs.EnemyHpGauge = BossHpGauge.Create(refs.RootCard, new Vector2(0.687f, 1f), -42f, 0.78f);
+            BattleHudKit.Img(root, "Frame", BattleHudKit.FrameThin, frame, Vector2.zero, Vector2.one);
+            var trailFx = root.gameObject.AddComponent<HudBarTrail>();
+            trailFx.Fill = fillImg;
+            trailFx.Trail = trailImg;
+            return fillImg;
         }
 
         static void BuildBattleLog(BattleUIRefs refs)
         {
-            var plate = CreateTopCentered(refs.RootCard, "BattleLog", -228f, new Vector2(720f, 34f));
-            plate.anchorMin = plate.anchorMax = new Vector2(0.687f, 1f);
-            var bg = plate.gameObject.AddComponent<Image>();
-            BattleUITheme.StylePanel(bg, new Color(0f, 0f, 0f, 0.55f));
-            bg.raycastTarget = false;
-            refs.LogText = CreateLabel(plate, "Log", "戦闘開始！", 17, TextAnchor.MiddleCenter,
-                Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, new Color(1f, 0.74f, 0.5f));
-            BattleUITheme.AddTextShadow(refs.LogText, new Color(0, 0, 0, 0.9f), new Vector2(1, -1));
+            var host = BattleHudKit.Place(refs.RootCard, "Log", new Vector2(ArenaAnchor.x, 0f), new Vector2(0.5f, 0f),
+                new Vector2(0f, 70f), new Vector2(560f, 28f));
+            refs.LogText = BattleHudKit.Text(host, "Text", "戦闘開始！", BattleHudKit.Gothic, 17f,
+                new Color(1f, 0.82f, 0.62f), TextAlignmentOptions.Center, Vector2.zero, Vector2.one);
+            refs.LogText.overflowMode = TextOverflowModes.Ellipsis;
+            BattleHudKit.Outline(refs.LogText, 0.16f, Color.black);
         }
+
+        const float PlayerBarLeft = 572f;
+        const float PlayerBarRightMargin = 92f;
 
         static void BuildPartyHpStrip(BattleUIRefs refs)
         {
-            var strip = CreatePanel(refs.RootCard, "PartyHpStrip", new Vector2(0.295f, 0.148f),
-                new Vector2(0.5f, 0.182f), Color.clear);
-            strip.GetComponent<Image>().raycastTarget = false;
-            CreateLabel(strip, "Label", "PARTY HP", 13, TextAnchor.MiddleLeft,
-                Vector2.zero, new Vector2(0.24f, 1f), Vector2.zero, Vector2.zero, BattleUITheme.AccentAlly).fontStyle =
-                FontStyle.Bold;
-            refs.PlayerHpBar = CreateBar(strip, "PlayerHpBar", new Vector2(0.25f, 0.12f), new Vector2(1f, 0.88f),
-                BattleUITheme.BarTrack, BattleUITheme.AccentAlly);
-            refs.PlayerHpText = CreateLabel(strip, "PlayerHp", "100 / 100", 13, TextAnchor.MiddleCenter,
-                new Vector2(0.25f, 0f), Vector2.one, Vector2.zero, Vector2.zero, Color.white);
-            refs.PlayerHpText.fontStyle = FontStyle.Bold;
-            BattleUITheme.AddTextShadow(refs.PlayerHpText, new Color(0, 0, 0, 1f), new Vector2(1, -1));
+            var strip = BattleHudKit.Rect(refs.RootCard, "PartyHpStrip", new Vector2(0f, 0f), new Vector2(1f, 0f),
+                new Vector2(PlayerBarLeft, 22f), new Vector2(-PlayerBarRightMargin, 22f + 38f));
+            BattleHudKit.Img(strip, "Glow", BattleUISprites.RadialGlow, new Color(0.2f, 0.55f, 1f, 0.12f),
+                Vector2.zero, Vector2.one, new Vector2(-60f, -30f), new Vector2(60f, 30f));
+            var holder = BattleHudKit.Rect(strip, "BarHolder", new Vector2(0f, 0f), new Vector2(1f, 1f));
+            refs.PlayerHpBar = BuildHpBar(holder, "PlayerBar", new Vector2(0f, -38f), new Vector2(0f, 0f),
+                new Color(0.3f, 0.66f, 1f, 1f), new Color(0.015f, 0.04f, 0.09f, 0.97f),
+                new Color(0.16f, 0.5f, 0.98f, 1f), new Color(0.78f, 0.92f, 1f, 0.85f), 10);
+
+            var hpTag = BattleHudKit.Text(strip, "HpTag", "HP", BattleHudKit.Condensed, 24f,
+                new Color(0.82f, 0.92f, 1f), TextAlignmentOptions.MidlineLeft, Vector2.zero, Vector2.one,
+                new Vector2(14f, 0f), Vector2.zero);
+            hpTag.characterSpacing = 10f;
+            BattleHudKit.Outline(hpTag, 0.24f, Color.black);
+
+            refs.PlayerHpText = BattleHudKit.Text(strip, "PlayerHp", "100 / 100", BattleHudKit.Mincho, 27f,
+                Color.white, TextAlignmentOptions.MidlineRight, Vector2.zero, Vector2.one,
+                Vector2.zero, new Vector2(-14f, 1f));
+            BattleHudKit.Outline(refs.PlayerHpText, 0.26f, Color.black);
         }
 
         static void BuildControlStrip(BattleUIRefs refs)
         {
-            var strip = CreatePanel(refs.RootCard, "ControlStrip", new Vector2(0.71f, 0.148f),
-                new Vector2(0.975f, 0.182f), Color.clear);
-            strip.GetComponent<Image>().raycastTarget = false;
-            CreateLabel(strip, "Hint", "Space ポーズ　Enter リロール", 13, TextAnchor.MiddleLeft,
-                Vector2.zero, new Vector2(0.62f, 1f), Vector2.zero, Vector2.zero, BattleUITheme.TextMuted);
-            refs.RerollBadge = CreateLabel(strip, "Reroll", "リロール 3/3", 14, TextAnchor.MiddleRight,
-                new Vector2(0.62f, 0f), Vector2.one, Vector2.zero, Vector2.zero, BattleUITheme.AccentBoss);
-            refs.RerollBadge.fontStyle = FontStyle.Bold;
+            var strip = BattleHudKit.Place(refs.RootCard, "ControlStrip", new Vector2(0f, 0f), new Vector2(0f, 0f),
+                new Vector2(PlayerBarLeft + 4f, 68f), new Vector2(300f, 26f));
+            var hint = BattleHudKit.Text(strip, "Hint", "Space ポーズ   Enter リロール", BattleHudKit.Gothic, 13f,
+                BattleHudKit.TextDim, TextAlignmentOptions.MidlineLeft, Vector2.zero, new Vector2(0.62f, 1f));
+            BattleHudKit.Outline(hint, 0.1f, Color.black, 0.4f);
+            refs.RerollBadge = BattleHudKit.Text(strip, "Reroll", "リロール 3/3", BattleHudKit.Gothic, 15f,
+                BattleUITheme.AccentBoss, TextAlignmentOptions.MidlineLeft, new Vector2(0.64f, 0f), Vector2.one);
+            BattleHudKit.Outline(refs.RerollBadge, 0.16f, Color.black);
         }
 
         static RectTransform CreateTopCentered(Transform parent, string name, float y, Vector2 size)
@@ -592,50 +608,60 @@ namespace TypingRoguelike.Battle
         static void BuildResultOverlay(BattleUIRefs refs, BattleUITemplateDefinition template)
         {
             refs.ResultOverlay = CreatePanel(refs.RootCard, "ResultOverlay", Vector2.zero, Vector2.one,
-                new Color(0.004f, 0.006f, 0.018f, 0.94f)).gameObject;
+                new Color(0.02f, 0.01f, 0.03f, 0.68f)).gameObject;
             refs.ResultCanvasGroup = refs.ResultOverlay.AddComponent<CanvasGroup>();
-            BattleUIChrome.CreateGlow(refs.ResultOverlay.transform, "VictoryGoldGlow",
-                new Vector2(0.14f, 0.04f), new Vector2(0.86f, 0.96f),
-                new Color(BattleUITheme.Gold.r, BattleUITheme.Gold.g, BattleUITheme.Gold.b, 0.2f));
 
-            var window = BattleUIChrome.CreateLuxuryWindow(refs.ResultOverlay.transform, "ResultWindow",
-                new Vector2(0.235f, 0.13f), new Vector2(0.765f, 0.87f), "BATTLE REPORT", BattleUITheme.Gold, template);
-            var body = window.Find("Body") ?? window;
-            var victory = CreateLabel(body, "Victory", "VICTORY", 48, TextAnchor.MiddleCenter,
-                new Vector2(0.1f, 0.76f), new Vector2(0.9f, 0.96f), Vector2.zero, Vector2.zero, BattleUITheme.Gold);
-            victory.fontStyle = FontStyle.Bold;
-            BattleUITheme.AddTextShadow(victory, new Color(0, 0, 0, 0.95f), new Vector2(4, -4));
+            var window = CreatePanel(refs.ResultOverlay.transform, "ResultWindow",
+                new Vector2(0.31f, 0.22f), new Vector2(0.69f, 0.78f),
+                new Color(0.07f, 0.045f, 0.04f, 0.96f), template?.windowPanel);
+            AddOutline(window.gameObject, BattleUITheme.Gold, 2);
 
-            refs.ResultRank = CreateLabel(body, "Rank", "A", 104, TextAnchor.MiddleCenter,
-                new Vector2(0.12f, 0.43f), new Vector2(0.42f, 0.76f), Vector2.zero, Vector2.zero, Color.white);
-            refs.ResultRank.fontStyle = FontStyle.Bold;
-            BattleUITheme.AddTextShadow(refs.ResultRank, new Color(BattleUITheme.Gold.r, BattleUITheme.Gold.g,
-                BattleUITheme.Gold.b, 0.8f), new Vector2(4, -4));
-            refs.ResultStats = CreateLabel(body, "Stats", "", 18, TextAnchor.MiddleLeft,
-                new Vector2(0.44f, 0.39f), new Vector2(0.9f, 0.76f), Vector2.zero, Vector2.zero,
-                BattleUITheme.TextPrimary);
+            refs.ResultTitle = CreateLabel(window, "Victory", "Victory", 54, TextAnchor.MiddleCenter,
+                new Vector2(0.08f, 0.74f), new Vector2(0.92f, 0.94f), Vector2.zero, Vector2.zero, BattleUITheme.Gold);
+            refs.ResultTitle.font = BattleUITheme.FontDisplay;
+            refs.ResultTitle.fontStyle = FontStyle.Bold;
+            BattleUITheme.AddTextShadow(refs.ResultTitle, new Color(0f, 0f, 0f, 0.9f), new Vector2(3f, -3f));
 
-            var buttonRt = CreatePanel(body, "ContinueButton", new Vector2(0.22f, 0.08f),
-                new Vector2(0.78f, 0.22f), Color.white, template?.button);
+            var rule = CreatePanel(window, "Rule", new Vector2(0.22f, 0.72f), new Vector2(0.78f, 0.735f),
+                new Color(BattleUITheme.Gold.r, BattleUITheme.Gold.g, BattleUITheme.Gold.b, 0.85f));
+            rule.GetComponent<Image>().raycastTarget = false;
+
+            refs.ResultHp = CreateStatLine(window, "HpLine", 0.56f);
+            refs.ResultMadness = CreateStatLine(window, "MadnessLine", 0.42f);
+            refs.ResultTime = CreateStatLine(window, "TimeLine", 0.28f);
+
+            var buttonRt = CreatePanel(window, "ContinueButton", new Vector2(0.30f, 0.07f),
+                new Vector2(0.70f, 0.20f), Color.white, template?.button);
             refs.ResultContinueButton = buttonRt.gameObject.AddComponent<Button>();
             var buttonColors = refs.ResultContinueButton.colors;
-            buttonColors.highlightedColor = new Color(1.18f, 1.12f, 1.02f, 1f);
-            buttonColors.pressedColor = new Color(0.75f, 0.7f, 0.72f, 1f);
+            buttonColors.highlightedColor = new Color(1.12f, 1.08f, 0.96f, 1f);
+            buttonColors.pressedColor = new Color(0.72f, 0.64f, 0.48f, 1f);
             refs.ResultContinueButton.colors = buttonColors;
-            var buttonText = CreateLabel(buttonRt, "Text", "報酬へ進む", 19, TextAnchor.MiddleCenter,
-                Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, Color.white);
+            var buttonText = CreateLabel(buttonRt, "Text", "NEXT", 26, TextAnchor.MiddleCenter,
+                Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, new Color(0.16f, 0.08f, 0.04f, 1f));
+            buttonText.font = BattleUITheme.FontDisplay;
             buttonText.fontStyle = FontStyle.Bold;
-            BattleUITheme.AddTextShadow(buttonText, new Color(0, 0, 0, 0.95f), new Vector2(2, -2));
 
             refs.ResultOverlay.SetActive(false);
+        }
+
+        static Text CreateStatLine(Transform parent, string name, float y)
+        {
+            var label = CreateLabel(parent, name, "", 28, TextAnchor.MiddleCenter,
+                new Vector2(0.08f, y), new Vector2(0.92f, y + 0.12f), Vector2.zero, Vector2.zero,
+                BattleUITheme.TextPrimary);
+            label.font = BattleUITheme.FontDisplay;
+            label.fontStyle = FontStyle.Bold;
+            BattleUITheme.AddTextShadow(label, new Color(0f, 0f, 0f, 0.75f), new Vector2(2f, -2f));
+            return label;
         }
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
         /// <summary>テスト用：戦闘画面中央の「撃破」ボタン。</summary>
         static void BuildDebugKillButton(BattleUIRefs refs, BattleUITemplateDefinition template)
         {
-            var buttonRt = CreatePanel(refs.RootCard, "DebugKillButton", new Vector2(0.885f, 0.79f),
-                new Vector2(0.975f, 0.84f), new Color(0.45f, 0.1f, 0.12f, 0.82f), template?.button);
+            var buttonRt = CreatePanel(refs.RootCard, "DebugKillButton", new Vector2(0.925f, 0.945f),
+                new Vector2(0.985f, 0.982f), new Color(0.45f, 0.1f, 0.12f, 0.82f), template?.button);
             buttonRt.SetAsLastSibling();
             AddOutline(buttonRt.gameObject, new Color(1f, 0.35f, 0.35f, 0.85f), 2);
             refs.DebugKillButton = buttonRt.gameObject.AddComponent<Button>();
@@ -647,6 +673,32 @@ namespace TypingRoguelike.Battle
                 Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, Color.white);
             buttonText.fontStyle = FontStyle.Bold;
             BattleUITheme.AddTextShadow(buttonText, new Color(0, 0, 0, 0.95f), new Vector2(2, -2));
+
+            refs.DebugCombatReadout = CreateLabel(refs.RootCard, "DebugCombatReadout", "", 16, TextAnchor.UpperLeft,
+                new Vector2(0.58f, 0.82f), new Vector2(0.985f, 0.94f), Vector2.zero, Vector2.zero,
+                Color.white);
+            refs.DebugCombatReadout.horizontalOverflow = HorizontalWrapMode.Wrap;
+            refs.DebugCombatReadout.verticalOverflow = VerticalWrapMode.Overflow;
+            refs.DebugCombatReadout.raycastTarget = false;
+            refs.DebugCombatReadout.fontStyle = FontStyle.Bold;
+            BattleUITheme.AddTextShadow(refs.DebugCombatReadout, new Color(0, 0, 0, 0.9f), new Vector2(1, -1));
+
+            var critRt = CreatePanel(refs.RootCard, "DebugCritTestButton", new Vector2(0.58f, 0.772f),
+                new Vector2(0.76f, 0.812f), new Color(0.28f, 0.16f, 0.08f, 0.9f), template?.button);
+            critRt.SetAsLastSibling();
+            refs.DebugCritTestButton = critRt.gameObject.AddComponent<Button>();
+            var critText = CreateLabel(critRt, "Text", "会心テスト", 16, TextAnchor.MiddleCenter,
+                Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, Color.white);
+            critText.fontStyle = FontStyle.Bold;
+
+            var slashRt = CreatePanel(refs.RootCard, "DebugAliceSlashButton", new Vector2(0.77f, 0.772f),
+                new Vector2(0.985f, 0.812f), new Color(0.18f, 0.12f, 0.28f, 0.9f), template?.button);
+            slashRt.SetAsLastSibling();
+            refs.DebugAliceSlashButton = slashRt.gameObject.AddComponent<Button>();
+            var slashText = CreateLabel(slashRt, "Text", "テスト：アリス ATK30%", 15, TextAnchor.MiddleCenter,
+                Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, Color.white);
+            slashText.fontStyle = FontStyle.Bold;
+            buttonRt.SetAsLastSibling();
         }
 #endif
 
@@ -815,28 +867,84 @@ namespace TypingRoguelike.Battle
             image.color = color;
         }
 
+        static void BuildRightRail(BattleUIRefs refs)
+        {
+            const float railWidth = 330f;
+            var rail = BattleHudKit.Place(refs.RootCard, "RightRail", new Vector2(1f, 1f), new Vector2(1f, 1f),
+                new Vector2(-16f, -132f), new Vector2(railWidth, 520f));
+            BuildRailHeader(rail, "NEXT SKILL", 0f);
+
+            refs.CandidatesContainer = BattleHudKit.Rect(rail, "Candidates", new Vector2(0f, 0f), new Vector2(1f, 1f),
+                new Vector2(0f, 0f), new Vector2(0f, -48f));
+            var vlg = refs.CandidatesContainer.gameObject.AddComponent<VerticalLayoutGroup>();
+            vlg.spacing = 0;
+            vlg.childAlignment = TextAnchor.UpperLeft;
+            vlg.childControlHeight = true;
+            vlg.childControlWidth = true;
+            vlg.childForceExpandHeight = false;
+            vlg.childForceExpandWidth = true;
+
+            var stock = BattleHudKit.Place(refs.RootCard, "Stock", new Vector2(1f, 0f), new Vector2(1f, 0f),
+                new Vector2(-16f, 104f), new Vector2(railWidth, 104f));
+            BuildRailHeader(stock, "STOCK", 0f);
+
+            refs.StockOrbsContainer = BattleHudKit.Rect(stock, "StockOrbs", new Vector2(0f, 0f), new Vector2(1f, 0f),
+                new Vector2(4f, 0f), new Vector2(0f, 54f));
+            var hlg = refs.StockOrbsContainer.gameObject.AddComponent<HorizontalLayoutGroup>();
+            hlg.spacing = 14;
+            hlg.childAlignment = TextAnchor.MiddleLeft;
+            hlg.childControlWidth = false;
+            hlg.childControlHeight = false;
+            hlg.childForceExpandWidth = false;
+            hlg.childForceExpandHeight = false;
+
+            var jackpot = BattleHudKit.Place(refs.RootCard, "JackpotMeter", new Vector2(1f, 0f), new Vector2(1f, 0f),
+                new Vector2(-16f, 66f), new Vector2(railWidth, 30f));
+            refs.JackpotMeterText = BattleHudKit.Text(jackpot, "Text", "次 0%", BattleHudKit.Gothic, 12f,
+                BattleHudKit.TextDim, TextAlignmentOptions.BottomRight, Vector2.zero, Vector2.one);
+            refs.JackpotMeterText.textWrappingMode = TextWrappingModes.Normal;
+            BattleHudKit.Outline(refs.JackpotMeterText, 0.1f, Color.black, 0.4f);
+        }
+
+        /// <summary>英字の見出しと、その下で右へ消える細線。</summary>
+        static void BuildRailHeader(RectTransform parent, string title, float top)
+        {
+            var label = BattleHudKit.Text(parent, title + "Label", title, BattleHudKit.Condensed, 25f,
+                new Color(0.96f, 0.94f, 0.9f), TextAlignmentOptions.BottomLeft, new Vector2(0f, 1f), new Vector2(1f, 1f),
+                new Vector2(2f, top - 36f), new Vector2(0f, top));
+            label.characterSpacing = 16f;
+            BattleHudKit.Outline(label, 0.2f, Color.black);
+            BattleHudKit.Img(parent, title + "Rule", BattleHudKit.FadeRight, new Color(1f, 1f, 1f, 0.35f),
+                new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0f, top - 42f), new Vector2(0f, top - 40f));
+        }
+
         static void BuildMadnessMeter(Transform parent, BattleUIRefs refs)
         {
-            CreateLabel(parent, "MadnessHeader", "狂気", 11, TextAnchor.UpperLeft,
-                new Vector2(0.04f, 0.24f), new Vector2(0.96f, 0.28f), Vector2.zero, Vector2.zero,
-                BattleUITheme.TextMuted).fontStyle = FontStyle.Bold;
+            var capsule = BattleHudKit.Place(parent, "MadnessCapsule", Vector2.zero, Vector2.zero,
+                new Vector2(10f, 10f), new Vector2(440f, 123f));
+            BattleHudKit.Img(capsule, "Glow", BattleUISprites.RadialGlow, new Color(0.45f, 1f, 0.2f, 0.16f),
+                Vector2.zero, Vector2.one, new Vector2(-30f, -40f), new Vector2(30f, 40f));
+            var art = BattleHudKit.Art("MadnessCapsule");
+            BattleHudKit.Img(capsule, "Capsule", art, Color.white, Vector2.zero, Vector2.one);
 
-            var track = CreatePanel(parent, "MadnessTrack", new Vector2(0.06f, 0.05f), new Vector2(0.2f, 0.23f),
-                BattleUITheme.BarTrack);
-            track.GetComponent<Image>().raycastTarget = false;
-            var fillGo = CreatePanel(track, "MadnessFill", new Vector2(0.12f, 0.04f), new Vector2(0.88f, 0.96f),
-                RunMadnessState.StageColor(RunMadnessState.MadnessStage.Calm), BattleUITemplateLoader.Default?.barFill);
-            refs.MadnessFill = fillGo.GetComponent<Image>();
+            // 画像内のガラス部分（脳より右）をゲージとして使う。
+            var gauge = BattleHudKit.Rect(capsule, "Gauge", new Vector2(0.45f, 0.18f), new Vector2(0.78f, 0.82f));
+            refs.MadnessFill = BattleHudKit.Img(gauge, "Tint", BattleUISprites.Solid,
+                new Color(0.5f, 1f, 0.3f, 0.2f), Vector2.zero, Vector2.one);
             refs.MadnessFill.type = Image.Type.Filled;
-            refs.MadnessFill.fillMethod = Image.FillMethod.Vertical;
-            refs.MadnessFill.fillOrigin = (int)Image.OriginVertical.Bottom;
+            refs.MadnessFill.fillMethod = Image.FillMethod.Horizontal;
+            refs.MadnessFill.fillOrigin = (int)Image.OriginHorizontal.Left;
             refs.MadnessFill.fillAmount = 0f;
-            refs.MadnessFill.raycastTarget = false;
+            refs.MadnessEmpty = BattleHudKit.Img(gauge, "Empty", BattleUISprites.Solid,
+                new Color(0.01f, 0.02f, 0.015f, 0.72f), Vector2.zero, Vector2.one);
+            refs.MadnessEmpty.type = Image.Type.Filled;
+            refs.MadnessEmpty.fillMethod = Image.FillMethod.Horizontal;
+            refs.MadnessEmpty.fillOrigin = (int)Image.OriginHorizontal.Right;
+            refs.MadnessEmpty.fillAmount = 1f;
 
-            refs.MadnessText = CreateLabel(parent, "MadnessValue", "0 / 1000", 13, TextAnchor.MiddleLeft,
-                new Vector2(0.22f, 0.05f), new Vector2(0.96f, 0.23f), Vector2.zero, Vector2.zero,
-                BattleUITheme.TextPrimary);
-            refs.MadnessText.fontStyle = FontStyle.Bold;
+            refs.MadnessText = BattleHudKit.Text(gauge, "MadnessValue", "", BattleHudKit.Mincho, 28f, Color.white,
+                TextAlignmentOptions.MidlineRight, Vector2.zero, Vector2.one, Vector2.zero, new Vector2(-8f, 0f));
+            BattleHudKit.Outline(refs.MadnessText, 0.3f, Color.black);
         }
 
         static WordBoxUI CreateWordCardLayoutChild(Transform parent, string name, Vector2 size)
@@ -855,69 +963,58 @@ namespace TypingRoguelike.Battle
 
         static WordBoxUI PopulateWordCard(RectTransform root, Vector2 size)
         {
-            var tpl = BattleUITemplateLoader.Default;
-            var premium = BattleUISprites.WordCardPremium;
+            _ = size;
+            var glow = BattleHudKit.Img(root, "Glow", BattleUISprites.RadialGlow, new Color(1f, 1f, 1f, 0.08f),
+                Vector2.zero, Vector2.one, new Vector2(-46f, -40f), new Vector2(46f, 40f));
+            BattleHudKit.Img(root, "Shadow", BattleUISprites.Solid, new Color(0f, 0f, 0f, 0.6f), Vector2.zero,
+                Vector2.one, new Vector2(6f, -8f), new Vector2(6f, -8f));
 
-            var glowRt = CreatePanel(root, "Glow", Vector2.zero, Vector2.one, Color.clear);
-            glowRt.offsetMin = new Vector2(-12f, -8f);
-            glowRt.offsetMax = new Vector2(12f, 8f);
-            var glow = glowRt.GetComponent<Image>();
-            glow.sprite = BattleUISprites.RadialGlow;
-            glow.color = WithAlpha(ArenaAccent, 0.08f);
-            glow.raycastTarget = false;
+            var fill = BattleHudKit.Img(root, "Fill", BattleUISprites.Solid, new Color(0.01f, 0.01f, 0.015f, 0.97f),
+                Vector2.zero, Vector2.one);
+            var frame = BattleHudKit.Img(root, "Frame", BattleHudKit.FrameThick, Color.white, Vector2.zero, Vector2.one);
 
-            var frameRt = CreatePanel(root, "Frame", Vector2.zero, Vector2.one, Color.white);
-            var frame = frameRt.GetComponent<Image>();
-            if (premium != null)
-            {
-                frame.sprite = premium;
-                frame.type = Image.Type.Sliced;
-                frame.color = Color.white;
-            }
-            else
-                BattleUIImage.ApplyPanel(frame, Color.white, tpl?.wordBox ?? tpl?.windowPanel);
-            frame.raycastTarget = false;
-
-            var fill = CreatePanel(frameRt, "Fill", Vector2.zero, Vector2.one, new Color(0, 0, 0, 0));
-            fill.offsetMin = new Vector2(16f, 14f);
-            fill.offsetMax = new Vector2(-16f, -14f);
-
-            var badgePanel = CreatePanel(fill, "ElementBadge", new Vector2(0.8f, 0.7f), new Vector2(0.98f, 0.96f),
-                new Color(0.02f, 0.03f, 0.07f, 0.92f));
-            var badgeImg = badgePanel.GetComponent<Image>();
-            BattleUITheme.EnsureSprite(badgeImg);
-            var tag = CreateLabel(badgePanel, "Tag", "?", 12, TextAnchor.MiddleCenter,
-                Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, BattleUITheme.TextPrimary);
-            tag.fontStyle = FontStyle.Bold;
-
-            var word = CreateLabel(fill, "Word", "", 30, TextAnchor.UpperCenter,
-                new Vector2(0.04f, 0.4f), new Vector2(0.78f, 0.98f), Vector2.zero, Vector2.zero, BattleUITheme.TextPrimary);
-            word.supportRichText = true;
-            word.fontStyle = FontStyle.Bold;
-            BattleUITheme.AddTextShadow(word, new Color(0, 0, 0, 0.95f), new Vector2(2, -2));
-
-            var ruby = CreateLabel(fill, "Ruby", "", 18, TextAnchor.LowerCenter,
-                new Vector2(0.04f, 0.16f), new Vector2(0.96f, 0.44f), Vector2.zero, Vector2.zero, BattleUITheme.TextMuted);
-            ruby.supportRichText = true;
-            ruby.fontStyle = FontStyle.Bold;
-
-            var track = CreatePanel(fill, "ProgressTrack", new Vector2(0.06f, 0.05f), new Vector2(0.94f, 0.12f),
-                new Color(1f, 1f, 1f, 0.08f));
-            track.GetComponent<Image>().raycastTarget = false;
-            var progressRt = CreatePanel(track, "Progress", Vector2.zero, Vector2.one, BattleUITheme.TextTyped);
-            var progress = progressRt.GetComponent<Image>();
+            var track = BattleHudKit.Img(root, "ProgressTrack", BattleUISprites.Solid, new Color(1f, 1f, 1f, 0.06f),
+                new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(12f, 12f), new Vector2(-12f, 16f));
+            var progress = BattleHudKit.Img(track.rectTransform, "Progress", BattleUISprites.Solid,
+                BattleUITheme.TextTyped, Vector2.zero, Vector2.one);
             progress.type = Image.Type.Filled;
             progress.fillMethod = Image.FillMethod.Horizontal;
             progress.fillAmount = 0f;
-            progress.raycastTarget = false;
+
+            var word = BattleHudKit.Text(root, "Word", "", BattleHudKit.Mincho, 40f, Color.white,
+                TextAlignmentOptions.Center, new Vector2(0f, 0.42f), new Vector2(1f, 1f),
+                new Vector2(14f, 0f), new Vector2(-14f, -6f));
+            word.enableAutoSizing = true;
+            word.fontSizeMin = 24f;
+            word.fontSizeMax = 40f;
+            BattleHudKit.Outline(word, 0.2f, Color.black);
+
+            var ruby = BattleHudKit.Text(root, "Ruby", "", BattleHudKit.Condensed, 25f, BattleUITheme.TextUntyped,
+                TextAlignmentOptions.Center, new Vector2(0f, 0.12f), new Vector2(1f, 0.46f),
+                new Vector2(12f, 0f), new Vector2(-12f, 0f));
+            ruby.characterSpacing = 4f;
+            ruby.enableAutoSizing = true;
+            ruby.fontSizeMin = 16f;
+            ruby.fontSizeMax = 25f;
+            BattleHudKit.Outline(ruby, 0.16f, Color.black, 0.5f);
+
+            // 属性の宝石。カード左上の角に重ねる。
+            var gem = BattleHudKit.Place(root, "ElementGem", new Vector2(0f, 1f), new Vector2(0.5f, 0.5f),
+                new Vector2(4f, -4f), new Vector2(38f, 38f));
+            BattleHudKit.AddImage(gem, BattleUISprites.Diamond, Color.white);
+            var gemFill = BattleHudKit.Img(gem, "Fill", BattleUISprites.Diamond, Color.white, Vector2.zero, Vector2.one,
+                new Vector2(4f, 4f), new Vector2(-4f, -4f));
+            var tag = BattleHudKit.Text(gem, "Tag", "", BattleHudKit.Gothic, 15f, Color.white,
+                TextAlignmentOptions.Center, Vector2.zero, Vector2.one, Vector2.zero, new Vector2(0f, 1f));
+            BattleHudKit.Outline(tag, 0.25f, Color.black, 0.4f);
 
             return new WordBoxUI
             {
                 FrameRoot = root,
                 Glow = glow,
                 Frame = frame,
-                Fill = fill.GetComponent<Image>(),
-                ElementStripe = badgeImg,
+                Fill = fill,
+                ElementStripe = gemFill,
                 Progress = progress,
                 TagText = tag,
                 RubyText = ruby,
@@ -1021,6 +1118,502 @@ namespace TypingRoguelike.Battle
             var rt = glow.GetComponent<RectTransform>();
             rt.sizeDelta = new Vector2(900, 500);
             glow.SetAsFirstSibling();
+        }
+
+        public static GameObject BuildPrefabSource()
+        {
+            SuppressPrefab = true;
+            var host = new GameObject("BattlePrefabHost");
+            try
+            {
+                var skills = new List<BattleSkillData>
+                {
+                    new(1, "アリス", "見本スキル", new[] { ElementColor.Red, ElementColor.Red }, 10, 0, "見本"),
+                    new(2, "エレン", "見本スキル", new[] { ElementColor.Blue, ElementColor.Blue }, 10, 0, "見本"),
+                    new(3, "ルナ", "見本スキル", new[] { ElementColor.Green, ElementColor.Green }, 10, 0, "見本")
+                };
+                var refs = Build(host.transform, skills, null, BattleVisualContext.FromEncounter(null, null));
+                if (refs.CountdownOverlay != null)
+                    refs.CountdownOverlay.SetActive(false);
+                return host.transform.Find("BattleCanvas").gameObject;
+            }
+            catch
+            {
+                if (host != null)
+                    UnityEngine.Object.DestroyImmediate(host);
+                throw;
+            }
+            finally
+            {
+                SuppressPrefab = false;
+            }
+        }
+
+        static BattleUIRefs TryBindPrefab(Transform parent, IReadOnlyList<BattleSkillData> skills, BattleVisualContext visuals)
+        {
+            var prefab = Resources.Load<GameObject>("UI/BattleHud");
+            if (prefab == null)
+                return null;
+            GameObject canvas = null;
+            try
+            {
+                canvas = UnityEngine.Object.Instantiate(prefab, parent);
+                canvas.name = "BattleCanvas";
+                var hud = FindDeep(canvas.transform, "BattleHud") as RectTransform;
+                if (hud == null)
+                {
+                    UnityEngine.Object.DestroyImmediate(canvas);
+                    return null;
+                }
+
+                var refs = new BattleUIRefs { RootCard = hud };
+                BindBattleHud(refs, hud, skills, visuals);
+                return refs;
+            }
+            catch (System.Exception error)
+            {
+                Debug.LogWarning("戦闘プレハブを使えなかったので、コードで画面を作ります: " + error.Message);
+                if (canvas != null)
+                    UnityEngine.Object.DestroyImmediate(canvas);
+                return null;
+            }
+        }
+
+        static void EnsureHorizontalFill(Image image, Sprite sprite)
+        {
+            if (image == null)
+                return;
+            if (image.sprite == null && sprite != null)
+                image.sprite = sprite;
+            image.type = Image.Type.Filled;
+            image.fillMethod = Image.FillMethod.Horizontal;
+            image.fillOrigin = (int)Image.OriginHorizontal.Left;
+        }
+
+        static void BindBattleHud(BattleUIRefs refs, RectTransform hud, IReadOnlyList<BattleSkillData> skills,
+            BattleVisualContext visuals)
+        {
+            refs.PlayerHpBar = ImageOf(hud, "HpFill");
+            refs.PlayerHpText = TmpOf(hud, "HpValue");
+            refs.MadnessFill = ImageOf(hud, "MadnessLiquid");
+            refs.MadnessText = TmpOf(hud, "MadnessValue");
+            refs.LogText = TmpOf(hud, "NoticeText");
+            refs.RerollBadge = TmpOf(hud, "Reroll");
+            refs.JackpotMeterText = TmpOf(hud, "Jackpot");
+            refs.E5bNoticeFill = ImageOf(hud, "NoticeFill");
+            refs.E5bNoticeOutline = ImageOf(hud, "NoticeOutline");
+            refs.DamageOverlay = ImageOf(hud, "DamageOverlay");
+            refs.ArenaRoot = FindDeep(hud, "Arena") as RectTransform;
+            refs.PartyApproachRoot = FindDeep(hud, "PartyApproachRoot") as RectTransform;
+            refs.EnemyStage = FindDeep(hud, "EnemyStage") as RectTransform;
+            refs.EnemyHitRoot = FindDeep(hud, "EnemyHitRoot") as RectTransform;
+            refs.EnemyAura = FindDeep(refs.EnemyHitRoot, "EnemyAura")?.GetComponent<Image>();
+            refs.EnemyEmoji = FindDeep(refs.EnemyHitRoot, "EnemyEmoji")?.GetComponent<Text>();
+            refs.EnemyDamagePopupRoot = FindDeep(refs.EnemyHitRoot, "EnemyDamagePopups") as RectTransform;
+            refs.EnemyHpText = FindDeep(hud, "EnemyHp")?.GetComponent<TMP_Text>();
+            var enemyBar = FindDeep(hud, "EnemyBar") ?? FindDeep(hud, "EnemyBarBg");
+            var enemyFill = enemyBar != null ? enemyBar.Find("Fill")?.GetComponent<Image>() : null;
+            var enemyTrail = enemyBar != null ? enemyBar.Find("Trail")?.GetComponent<Image>() : null;
+            var enemyFrame = enemyBar != null ? enemyBar.Find("Frame")?.GetComponent<Image>() : null;
+            var enemyTrack = enemyBar != null ? enemyBar.Find("Track")?.GetComponent<Image>() : null;
+            // プレハブ保存で実行時の絵が外れる。絵の無い Image は矩形いっぱいに塗られ、減る設定が画面に出ない。
+            EnsureHorizontalFill(enemyFill, BattleHudKit.BarGloss);
+            EnsureHorizontalFill(enemyTrail, BattleUISprites.Solid);
+            if (enemyTrack != null && enemyTrack.sprite == null)
+                enemyTrack.sprite = BattleUISprites.Solid;
+            if (enemyFrame != null && enemyFrame.sprite == null)
+            {
+                enemyFrame.sprite = BattleHudKit.FrameThin;
+                enemyFrame.type = Image.Type.Sliced;
+            }
+
+            refs.EnemyHpBar = enemyFill;
+
+            var ring = hud.Find("AttackRing");
+            if (ring != null)
+            {
+                refs.EnemyAttackRingTrack = ring.GetComponent<Image>();
+                var progress = ring.Find("Progress")?.GetComponent<Image>();
+                refs.AttackBar = progress;
+                refs.EnemyAttackRing = progress;
+                refs.AttackBarLabel = ring.Find("Countdown")?.GetComponent<TMP_Text>();
+                refs.AttackRingFillsOnApproach = true;
+            }
+
+            var heavy = FindDeep(hud, "HeavyCallout");
+            if (heavy != null)
+            {
+                refs.HeavyAttackLabel = heavy.Find("Label")?.GetComponent<Text>();
+                refs.HeavyAttackGauge = heavy.Find("GaugeFill")?.GetComponent<Image>();
+            }
+
+            var tag = hud.Find("HeavyTag");
+            if (tag != null)
+                refs.HeavyAttackCallout = tag.gameObject;
+            var orbs = hud.Find("E5bStock") as RectTransform;
+            refs.StockOrbsContainer = orbs;
+            var counter = orbs != null ? orbs.GetComponent<BattleE5bStock>() : null;
+            if (counter != null)
+                counter.Next = 0;
+
+            for (var i = 0; i < refs.WordBoxes.Length; i++)
+            {
+                var card = hud.Find("WordCard" + i);
+                if (card != null)
+                    refs.WordBoxes[i] = ReadWordCard(card);
+            }
+
+            var ally = hud.Find("AllyPanel");
+            if (ally != null)
+            {
+                var stage = ally.GetComponent<BattleE5bStage>();
+                if (stage == null)
+                    stage = ally.gameObject.AddComponent<BattleE5bStage>();
+                refs.E5b = stage;
+                stage.Portrait = FindDeep(ally, "AllyPortrait")?.GetComponent<Image>();
+                stage.Leaver = FindDeep(ally, "AllyPortraitLeaving")?.GetComponent<Image>();
+                var liveHost = ally.Find("AllyLive");
+                if (liveHost != null)
+                {
+                    stage.Live = liveHost.GetComponent<PortraitPanelView>();
+                    if (stage.Live == null)
+                        stage.Live = liveHost.gameObject.AddComponent<PortraitPanelView>();
+                    stage.Live.EnsureBuilt();
+                }
+
+                var lunaHost = ally.Find("AllyLuna");
+                if (lunaHost != null)
+                {
+                    stage.Luna = lunaHost.GetComponent<KatanaPortraitPanelView>();
+                    if (stage.Luna == null)
+                        stage.Luna = lunaHost.gameObject.AddComponent<KatanaPortraitPanelView>();
+                    stage.Luna.EnsureBuilt();
+                }
+
+                stage.SkillName = FindDeep(ally, "SkillCallout")?.GetComponent<TextMeshProUGUI>();
+                stage.Log = refs.LogText;
+                stage.NoticeFill = refs.E5bNoticeFill;
+                stage.NoticeOutline = refs.E5bNoticeOutline;
+                var noticeFace = hud.Find("NoticeFace")?.GetComponent<Image>();
+                if (noticeFace != null)
+                    stage.NoticeFace = noticeFace;
+                var flash = hud.Find("SeamEdgeFlash")?.GetComponent<Image>();
+                if (flash != null)
+                    stage.Flash = flash;
+                BattleLayoutE5b.RefreshStage(stage, visuals);
+            }
+
+            BattleLayoutE5b.RefillSkills(hud.Find("SkillList") as RectTransform, refs, skills, visuals);
+            RespawnEnemy(refs, visuals);
+            RebuildStock(hud, refs);
+            BindOverlay(refs, hud);
+            RepairBattleVisuals(hud);
+            // Saved HUDs retain the old enemy plate; replace it on both prefab and code paths.
+            var oldPlate = FindDeep(hud, "EnemyHpPlate");
+            if (oldPlate != null) oldPlate.gameObject.SetActive(false);
+            var savedStatus = FindDeep(hud, "EnemyStatusHud");
+            if (savedStatus != null) savedStatus.gameObject.SetActive(false);
+            refs.EnemyStatus = EnemyStatusHud.Create(hud, visuals.BossDisplayName);
+            refs.EnemyHpText = null;
+            refs.EnemyHpBar = null;
+            refs.EnemyHpGauge = null;
+        }
+
+        static void BindOverlay(BattleUIRefs refs, RectTransform hud)
+        {
+            refs.CountdownOverlay = hud.Find("CountdownOverlay")?.gameObject;
+            refs.CountdownRing = FindDeep(refs.CountdownOverlay != null ? refs.CountdownOverlay.transform : null, "CountdownRing")
+                ?.GetComponent<Image>();
+            refs.CountdownText = FindDeep(refs.CountdownOverlay != null ? refs.CountdownOverlay.transform : null, "Count")
+                ?.GetComponent<Text>();
+            refs.ResultOverlay = hud.Find("ResultOverlay")?.gameObject;
+            if (refs.ResultOverlay != null)
+            {
+                refs.ResultCanvasGroup = refs.ResultOverlay.GetComponent<CanvasGroup>();
+                var window = FindDeep(refs.ResultOverlay.transform, "ResultWindow");
+                refs.ResultTitle = window != null ? window.Find("Victory")?.GetComponent<Text>() : null;
+                refs.ResultHp = window != null ? window.Find("HpLine")?.GetComponent<Text>() : null;
+                refs.ResultMadness = window != null ? window.Find("MadnessLine")?.GetComponent<Text>() : null;
+                refs.ResultTime = window != null ? window.Find("TimeLine")?.GetComponent<Text>() : null;
+                refs.ResultContinueButton = FindDeep(refs.ResultOverlay.transform, "ContinueButton")?.GetComponent<Button>();
+            }
+
+            refs.PauseOverlay = hud.Find("PauseOverlay")?.gameObject;
+            refs.CutinOverlay = hud.Find("CutinOverlay")?.gameObject;
+            if (refs.CutinOverlay != null)
+            {
+                var banner = FindDeep(refs.CutinOverlay.transform, "Banner");
+                refs.CutinPortrait = FindDeep(banner, "Portrait")?.GetComponent<Image>();
+                refs.CutinChar = banner != null ? banner.Find("Char")?.GetComponent<Text>() : null;
+                refs.CutinSkill = banner != null ? banner.Find("Skill")?.GetComponent<Text>() : null;
+            }
+
+            refs.JackpotOverlay = hud.Find("JackpotOverlay")?.gameObject;
+            if (refs.JackpotOverlay != null)
+            {
+                refs.JackpotBlackout = FindDeep(refs.JackpotOverlay.transform, "Blackout")?.GetComponent<Image>();
+                refs.JackpotLightStreak = FindDeep(refs.JackpotOverlay.transform, "LightStreak") as RectTransform;
+                refs.JackpotCutinRoot = FindDeep(refs.JackpotOverlay.transform, "TripleCutin") as RectTransform;
+                refs.JackpotCutinGroup = refs.JackpotCutinRoot != null
+                    ? refs.JackpotCutinRoot.GetComponent<CanvasGroup>()
+                    : null;
+                refs.JackpotTitle = refs.JackpotCutinRoot != null
+                    ? refs.JackpotCutinRoot.Find("Title")?.GetComponent<Text>()
+                    : null;
+                refs.JackpotDamageText = FindDeep(refs.JackpotOverlay.transform, "JackpotDamage")?.GetComponent<Text>();
+            }
+
+            var debug = hud.Find("DebugKillButton");
+            var readout = hud.Find("DebugCombatReadout");
+            var critTest = hud.Find("DebugCritTestButton");
+            var aliceSlash = hud.Find("DebugAliceSlashButton");
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            refs.DebugKillButton = debug != null ? debug.GetComponent<Button>() : null;
+            refs.DebugCombatReadout = readout != null ? readout.GetComponent<Text>() : refs.DebugCombatReadout;
+            refs.DebugCritTestButton = critTest != null ? critTest.GetComponent<Button>() : refs.DebugCritTestButton;
+            refs.DebugAliceSlashButton = aliceSlash != null ? aliceSlash.GetComponent<Button>() : refs.DebugAliceSlashButton;
+#else
+            if (debug != null)
+                UnityEngine.Object.Destroy(debug.gameObject);
+            if (readout != null)
+                UnityEngine.Object.Destroy(readout.gameObject);
+            if (critTest != null)
+                UnityEngine.Object.Destroy(critTest.gameObject);
+            if (aliceSlash != null)
+                UnityEngine.Object.Destroy(aliceSlash.gameObject);
+#endif
+        }
+
+        static void RespawnEnemy(BattleUIRefs refs, BattleVisualContext visuals)
+        {
+            if (refs.EnemyHitRoot == null)
+                return;
+            refs.BigMouth = null;
+            refs.PaperAngel = null;
+            refs.SkeletonSamurai = null;
+            refs.BossPortrait = null;
+            refs.SpritePairPresenter = null;
+            for (var i = refs.EnemyHitRoot.childCount - 1; i >= 0; i--)
+            {
+                var child = refs.EnemyHitRoot.GetChild(i);
+                var childName = child.name;
+                if (childName == "EnemyAura" || childName == "EnemyEmoji" || childName == "EnemyDamagePopups")
+                    continue;
+                UnityEngine.Object.DestroyImmediate(child.gameObject);
+            }
+
+            // 本番はほぼプレハブ経由。ここで SpritePair を作らないとゲーム画面では静止立ち絵のままになる。
+            if (visuals != null && visuals.UseSpritePair)
+            {
+                refs.SpritePairPresenter = EnemySpritePairPresenter.Create(refs.EnemyHitRoot, visuals);
+                if (refs.SpritePairPresenter != null)
+                {
+                    refs.BossPortrait = refs.SpritePairPresenter.MainImage;
+                    if (refs.EnemyEmoji != null)
+                    {
+                        refs.EnemyEmoji.text = string.Empty;
+                        refs.EnemyEmoji.color = Color.clear;
+                    }
+                    FinishEnemyRespawnFx(refs);
+                    return;
+                }
+            }
+
+            CreateAnimatedEnemy(refs, visuals);
+            if (refs.BigMouth == null && refs.PaperAngel == null && refs.SkeletonSamurai == null)
+            {
+                var bossImgGo = new GameObject("BossIllustration");
+                bossImgGo.transform.SetParent(refs.EnemyHitRoot, false);
+                var bossRt = bossImgGo.AddComponent<RectTransform>();
+                bossRt.anchorMin = new Vector2(0.08f, 0.02f);
+                bossRt.anchorMax = new Vector2(0.92f, 0.96f);
+                bossRt.offsetMin = Vector2.zero;
+                bossRt.offsetMax = Vector2.zero;
+                refs.BossPortrait = bossImgGo.AddComponent<Image>();
+                refs.BossPortrait.sprite = visuals != null ? visuals.BossIllustration : null;
+                refs.BossPortrait.preserveAspect = true;
+                refs.BossPortrait.color = refs.BossPortrait.sprite != null
+                    ? Color.white
+                    : new Color(1f, 1f, 1f, 0f);
+                refs.BossPortrait.raycastTarget = false;
+            }
+
+            if (refs.EnemyEmoji != null)
+            {
+                var showEmoji = refs.BigMouth == null && refs.PaperAngel == null && refs.SkeletonSamurai == null
+                                && (visuals == null || visuals.BossIllustration == null);
+                refs.EnemyEmoji.text = visuals != null ? visuals.BossEmojiNormal : "";
+                refs.EnemyEmoji.color = showEmoji ? BattleUITheme.TextPrimary : Color.clear;
+            }
+
+            FinishEnemyRespawnFx(refs);
+        }
+
+        static void FinishEnemyRespawnFx(BattleUIRefs refs)
+        {
+            // 旧円型かみつき演出 EnemyBiteFx は廃止（StrikeFX_v1 に置換）
+            RaiseDamagePopups(refs.EnemyDamagePopupRoot);
+        }
+
+        /// <summary>ダメージ数字を敵画像や後から乗ったHUDより手前に出す。</summary>
+        public static void RaiseDamagePopups(RectTransform popupRoot)
+        {
+            if (popupRoot == null)
+                return;
+            popupRoot.SetAsLastSibling();
+            Canvas host = null;
+            var canvases = popupRoot.GetComponentsInParent<Canvas>(true);
+            for (var i = 0; i < canvases.Length; i++)
+            {
+                if (canvases[i].gameObject != popupRoot.gameObject)
+                {
+                    host = canvases[i];
+                    break;
+                }
+            }
+
+            var canvas = popupRoot.GetComponent<Canvas>();
+            if (canvas == null)
+                canvas = popupRoot.gameObject.AddComponent<Canvas>();
+            if (host != null)
+                canvas.additionalShaderChannels = host.additionalShaderChannels;
+            canvas.overrideSorting = true;
+            canvas.sortingOrder = 40;
+        }
+
+        static void RebuildStock(RectTransform hud, BattleUIRefs refs)
+        {
+            var old = hud.Find("StockPanel") as RectTransform;
+            var oldOverlay = hud.Find("StockPanelOverlayUnderCards") as RectTransform;
+            var panelRect = CaptureRect(old);
+            var overlayRect = CaptureRect(oldOverlay);
+            if (old != null)
+                UnityEngine.Object.DestroyImmediate(old.gameObject);
+            if (oldOverlay != null)
+                UnityEngine.Object.DestroyImmediate(oldOverlay.gameObject);
+            refs.Stock = StockPanel.Create(hud, BattleHudKit.SerifRegular, BattleHudKit.Sans);
+            ApplyRect(refs.Stock != null ? refs.Stock.GetComponent<RectTransform>() : null, panelRect);
+            ApplyRect(hud.Find("StockPanelOverlayUnderCards") as RectTransform, overlayRect);
+        }
+
+        struct SavedRect
+        {
+            public bool Ok;
+            public Vector2 AnchorMin;
+            public Vector2 AnchorMax;
+            public Vector2 Pivot;
+            public Vector2 AnchoredPosition;
+            public Vector2 SizeDelta;
+            public Vector2 OffsetMin;
+            public Vector2 OffsetMax;
+        }
+
+        static SavedRect CaptureRect(RectTransform rect)
+        {
+            if (rect == null)
+                return default;
+            return new SavedRect
+            {
+                Ok = true,
+                AnchorMin = rect.anchorMin,
+                AnchorMax = rect.anchorMax,
+                Pivot = rect.pivot,
+                AnchoredPosition = rect.anchoredPosition,
+                SizeDelta = rect.sizeDelta,
+                OffsetMin = rect.offsetMin,
+                OffsetMax = rect.offsetMax
+            };
+        }
+
+        static void ApplyRect(RectTransform rect, SavedRect saved)
+        {
+            if (rect == null || !saved.Ok)
+                return;
+            rect.anchorMin = saved.AnchorMin;
+            rect.anchorMax = saved.AnchorMax;
+            rect.pivot = saved.Pivot;
+            rect.anchoredPosition = saved.AnchoredPosition;
+            rect.sizeDelta = saved.SizeDelta;
+            rect.offsetMin = saved.OffsetMin;
+            rect.offsetMax = saved.OffsetMax;
+        }
+
+        static WordBoxUI ReadWordCard(Transform card)
+        {
+            var track = card.Find("RubyTrack");
+            return new WordBoxUI
+            {
+                FrameRoot = card as RectTransform,
+                Frame = card.GetComponent<Image>(),
+                Fill = card.Find("Fill")?.GetComponent<Image>(),
+                WordText = card.Find("Kanji")?.GetComponent<TMP_Text>(),
+                RubyText = card.Find("Ruby")?.GetComponent<TMP_Text>(),
+                Progress = track != null ? track.Find("RubyFill")?.GetComponent<Image>() : null,
+                ElementStripe = card.Find("Stripe")?.GetComponent<Image>(),
+                TagText = card.Find("Tag")?.GetComponent<TMP_Text>(),
+                E5b = true
+            };
+        }
+
+        static Image ImageOf(Transform hud, string name)
+        {
+            var child = hud.Find(name);
+            return child != null ? child.GetComponent<Image>() : null;
+        }
+
+        static TMP_Text TmpOf(Transform hud, string name)
+        {
+            var child = hud.Find(name);
+            return child != null ? child.GetComponent<TMP_Text>() : null;
+        }
+
+        static void RepairBattleVisuals(Transform root)
+        {
+            foreach (var image in root.GetComponentsInChildren<Image>(true))
+            {
+                if (image.sprite != null)
+                    continue;
+                var imageName = image.name;
+                if (imageName.IndexOf("Aura", System.StringComparison.Ordinal) >= 0
+                    || imageName.IndexOf("Glow", System.StringComparison.Ordinal) >= 0)
+                    image.sprite = BattleUISprites.RadialGlow;
+                else if (imageName.IndexOf("Ring", System.StringComparison.Ordinal) >= 0)
+                    image.sprite = BattleUISprites.Circle;
+                else
+                    image.sprite = BattleUISprites.Solid;
+            }
+
+            foreach (var tmp in root.GetComponentsInChildren<TMP_Text>(true))
+            {
+                tmp.font = tmp.fontSize >= 40f ? BattleHudKit.SerifRegular : BattleHudKit.Sans;
+                if (tmp.font == null)
+                    tmp.font = BattleHudKit.Gothic;
+            }
+
+            foreach (var text in root.GetComponentsInChildren<Text>(true))
+            {
+                if (text.font != null)
+                    continue;
+                text.font = text.fontSize >= 28
+                    ? BattleUITheme.FontDisplay ?? BattleUITheme.FontBold
+                    : BattleUITheme.FontBold ?? BattleUITheme.FontDisplay;
+            }
+        }
+
+        static Transform FindDeep(Transform root, string name)
+        {
+            if (root == null)
+                return null;
+            if (root.name == name)
+                return root;
+            for (var i = 0; i < root.childCount; i++)
+            {
+                var found = FindDeep(root.GetChild(i), name);
+                if (found != null)
+                    return found;
+            }
+
+            return null;
         }
     }
 }

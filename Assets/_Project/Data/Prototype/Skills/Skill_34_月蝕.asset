@@ -16,6 +16,7 @@ MonoBehaviour:
   characterName: ルナ
   displayName: 月蝕
   pattern: 04000000010000000300000004000000
+  damagePercent: 0.583333
   damage: 70
   heal: 0
   effectText: 70ダメ

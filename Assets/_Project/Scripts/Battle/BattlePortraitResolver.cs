@@ -10,7 +10,8 @@ namespace TypingRoguelike.Battle
 
         public static Sprite LoadCharacter(string characterName)
         {
-            var key = characterName switch
+            var art = StarterCharacters.ArtKey(characterName);
+            var key = art switch
             {
                 "アリス" => "Alice",
                 "エレン" => "Ellen",
@@ -39,11 +40,17 @@ namespace TypingRoguelike.Battle
 
         public static Sprite ResolveBossIllustration(EnemyDefinition enemy)
         {
-            var fromResources = LoadBossFromResources();
-            if (fromResources != null)
-                return fromResources;
+            if (enemy != null && enemy.visual.graphicMode == EnemyGraphicMode.SpritePair)
+            {
+                var idle = enemy.visual.ResolveIdle(enemy);
+                if (idle != null)
+                    return idle;
+            }
 
-            return enemy?.battleIllustration;
+            if (enemy?.battleIllustration != null)
+                return enemy.battleIllustration;
+
+            return LoadBossFromResources();
         }
 
         public static Sprite LoadSpriteFromResources(string pathWithoutExtension)

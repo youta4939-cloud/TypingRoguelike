@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using TypingRoguelike.Data;
+using TypingRoguelike.Run;
 using UnityEngine;
 
 namespace TypingRoguelike.Battle
@@ -15,8 +16,9 @@ namespace TypingRoguelike.Battle
 
             foreach (var member in party.members)
             {
+                var attack = RunPartyState.GetAttack(member.character);
                 if (member.character?.innateSkill != null)
-                    list.Add(member.character.innateSkill.ToRuntimeData());
+                    list.Add(member.character.innateSkill.ToRuntimeData(1, attack));
 
                 if (member.equippedCards == null)
                     continue;
@@ -24,7 +26,7 @@ namespace TypingRoguelike.Battle
                 foreach (var card in member.equippedCards)
                 {
                     if (card != null)
-                        list.Add(card.ToRuntimeData());
+                        list.Add(card.ToRuntimeData(1, attack));
                 }
             }
 
@@ -71,13 +73,13 @@ namespace TypingRoguelike.Battle
                 new(2, "アリス", "💥ヴォルテックス",
                     new[] { ElementColor.Red, ElementColor.Yellow, ElementColor.Purple, ElementColor.Green, ElementColor.Red },
                     98, 0, "98大ダメ"),
-                new(3, "エレン", "🍃プチヒール", new[] { ElementColor.Green, ElementColor.Yellow }, 0, 15, "15回復",
+                new(3, "エレン", "🍃プチヒール", new[] { ElementColor.Green, ElementColor.Yellow }, 0, 83, "83回復",
                     SkillEffectKind.HealOnly),
-                new(4, "エレン", "🌿ヒール", new[] { ElementColor.Green, ElementColor.Green, ElementColor.Blue }, 0, 28,
-                    "28回復", SkillEffectKind.HealOnly),
+                new(4, "エレン", "🌿ヒール", new[] { ElementColor.Green, ElementColor.Green, ElementColor.Blue }, 0, 167,
+                    "167回復", SkillEffectKind.HealOnly),
                 new(5, "エレン", "✨パーフェクトケア",
-                    new[] { ElementColor.Green, ElementColor.Yellow, ElementColor.Green, ElementColor.Purple }, 0, 42,
-                    "42回復", SkillEffectKind.HealOnly),
+                    new[] { ElementColor.Green, ElementColor.Yellow, ElementColor.Green, ElementColor.Purple }, 0, 250,
+                    "250回復", SkillEffectKind.HealOnly),
                 new(6, "ルナ", "💧ウォータ", new[] { ElementColor.Blue, ElementColor.Purple }, 28, 0, "28ダメ"),
                 new(7, "ルナ", "⚡バースト", new[] { ElementColor.Yellow, ElementColor.Yellow, ElementColor.Red }, 58, 0,
                     "58ダメ"),

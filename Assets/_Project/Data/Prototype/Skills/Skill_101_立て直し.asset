@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a75d71813750e046b8834d9207ae380, type: 3}
+  m_Name: Skill_101_立て直し
+  m_EditorClassIdentifier: TypingRoguelike::TypingRoguelike.Data.SkillDefinition
+  skillId: 101
+  characterName: アリス
+  displayName: 立て直し
+  pattern: 0100000002000000
+  damagePercent: 0
+  damage: 0
+  heal: 0
+  effectText: 次に受けるダメージを25%軽減し、リロール+1
+  effectKind: 0
+  effectValue: 0
+  effectValueInt: 0
+  description: 次に受けるダメージを25%軽減し、リロール+1
+  logicKey: tatenaoshi
+  rarity: N

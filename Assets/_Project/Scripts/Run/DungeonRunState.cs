@@ -8,6 +8,8 @@ namespace TypingRoguelike.Run
         public int Index { get; }
         public DungeonNodeType Type { get; }
         public bool Cleared { get; set; }
+        /// <summary>抽選結果の種類。danger のときだけ罠ではなく狂気が増える。</summary>
+        public string RoadId { get; set; }
         public int Id => Index;
 
         public LayerSquare(int index, DungeonNodeType type)
@@ -63,19 +65,33 @@ namespace TypingRoguelike.Run
             int restoreIndex,
             IReadOnlyCollection<int> clearedSquareIndices,
             bool startAtElevator,
-            bool preFourthHealApplied)
+            bool preFourthHealApplied,
+            string[] roadIds = null)
         {
             Floor = System.Math.Max(1, floor);
             TotalFloors = System.Math.Max(1, totalFloors);
             BoardId = boardId ?? "";
             PreFourthHealApplied = preFourthHealApplied;
             var types = LayerSquares.DrawSquares(Floor, runSeed, config, board);
+            if (roadIds != null)
+            {
+                BoardId = "memory";
+                for (var i = 0; i < 3 && i < types.Length && i < roadIds.Length; i++)
+                {
+                    if (!string.IsNullOrEmpty(roadIds[i]))
+                        types[i] = LayerSquares.FromRoadId(roadIds[i]);
+                }
+            }
             ActiveYaku = types.Length >= 3
                 ? YakuEvaluator.Evaluate(types[0], types[1], types[2], yakuCatalog)
                 : null;
             Squares = new LayerSquare[types.Length];
             for (var i = 0; i < types.Length; i++)
+            {
                 Squares[i] = new LayerSquare(i, types[i]);
+                if (roadIds != null && i < 3 && i < roadIds.Length)
+                    Squares[i].RoadId = roadIds[i];
+            }
 
             if (startAtElevator)
             {

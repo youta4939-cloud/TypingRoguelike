@@ -16,6 +16,7 @@ MonoBehaviour:
   characterName: "\u30A2\u30EA\u30B9"
   displayName: "\U0001F300\u65CB\u98A8"
   pattern: 030000000100000002000000
+  damagePercent: 0.26
   damage: 52
   heal: 0
   effectText: "52\u30C0\u30E1"

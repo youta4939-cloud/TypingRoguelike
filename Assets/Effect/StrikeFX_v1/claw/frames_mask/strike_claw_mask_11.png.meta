@@ -1,0 +1,975 @@
+fileFormatVersion: 2
+guid: a29547836328e7f43b081239724b691d
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 7841648905657564962
+    second: strike_claw_mask_11_0
+  - first:
+      213: -4217534293423885824
+    second: strike_claw_mask_11_1
+  - first:
+      213: 4727034337388158462
+    second: strike_claw_mask_11_2
+  - first:
+      213: 8691118437951166271
+    second: strike_claw_mask_11_3
+  - first:
+      213: -8897038651261735063
+    second: strike_claw_mask_11_4
+  - first:
+      213: 8024500081470604125
+    second: strike_claw_mask_11_5
+  - first:
+      213: 5743634539088633618
+    second: strike_claw_mask_11_6
+  - first:
+      213: -3143505692860832183
+    second: strike_claw_mask_11_7
+  - first:
+      213: 2428711178851934539
+    second: strike_claw_mask_11_8
+  - first:
+      213: -541632272030967906
+    second: strike_claw_mask_11_9
+  - first:
+      213: -7569212354560831033
+    second: strike_claw_mask_11_10
+  - first:
+      213: 7169107533908593424
+    second: strike_claw_mask_11_11
+  - first:
+      213: 6648964608535115493
+    second: strike_claw_mask_11_12
+  - first:
+      213: -8959665671199480838
+    second: strike_claw_mask_11_13
+  - first:
+      213: 1396480501678383523
+    second: strike_claw_mask_11_14
+  - first:
+      213: 8810827543394047788
+    second: strike_claw_mask_11_15
+  - first:
+      213: -6068792997578176051
+    second: strike_claw_mask_11_16
+  - first:
+      213: -6972986528658417807
+    second: strike_claw_mask_11_17
+  - first:
+      213: 2627050475885625628
+    second: strike_claw_mask_11_18
+  - first:
+      213: 6348253016504039506
+    second: strike_claw_mask_11_19
+  - first:
+      213: -4367717389889014451
+    second: strike_claw_mask_11_20
+  - first:
+      213: 875908221009074095
+    second: strike_claw_mask_11_21
+  - first:
+      213: -3118140275137262706
+    second: strike_claw_mask_11_22
+  - first:
+      213: 8491245970040175594
+    second: strike_claw_mask_11_23
+  - first:
+      213: -3285679681618126842
+    second: strike_claw_mask_11_24
+  - first:
+      213: 5720508487557660301
+    second: strike_claw_mask_11_25
+  - first:
+      213: -270327477227117084
+    second: strike_claw_mask_11_26
+  - first:
+      213: 6558078165143887004
+    second: strike_claw_mask_11_27
+  - first:
+      213: 5305260648428474991
+    second: strike_claw_mask_11_28
+  - first:
+      213: -6541799027468043268
+    second: strike_claw_mask_11_29
+  - first:
+      213: 7510674332454767478
+    second: strike_claw_mask_11_30
+  - first:
+      213: -6867640927550005366
+    second: strike_claw_mask_11_31
+  - first:
+      213: 1013450201954542373
+    second: strike_claw_mask_11_32
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 0
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 0
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: strike_claw_mask_11_0
+      rect:
+        serializedVersion: 2
+        x: 167
+        y: 273
+        width: 7
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 22fbc03022223dc60800000000000000
+      internalID: 7841648905657564962
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_claw_mask_11_1
+      rect:
+        serializedVersion: 2
+        x: 177
+        y: 229
+        width: 7
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 002f074d7ee4875c0800000000000000
+      internalID: -4217534293423885824
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_claw_mask_11_2
+      rect:
+        serializedVersion: 2
+        x: 186
+        y: 234
+        width: 12
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: efd58195facc99140800000000000000
+      internalID: 4727034337388158462
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_claw_mask_11_3
+      rect:
+        serializedVersion: 2
+        x: 229
+        y: 216
+        width: 18
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f375deafb2e0d9870800000000000000
+      internalID: 8691118437951166271
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_claw_mask_11_4
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 194
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 96faf963c7e578480800000000000000
+      internalID: -8897038651261735063
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_claw_mask_11_5
+      rect:
+        serializedVersion: 2
+        x: 109
+        y: 201
+        width: 7
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d530628fe40cc5f60800000000000000
+      internalID: 8024500081470604125
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_claw_mask_11_6
+      rect:
+        serializedVersion: 2
+        x: 260
+        y: 138
+        width: 91
+        height: 73
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 21fda06ae2d75bf40800000000000000
+      internalID: 5743634539088633618
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_claw_mask_11_7
+      rect:
+        serializedVersion: 2
+        x: 235
+        y: 174
+        width: 6
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 946ac933a360064d0800000000000000
+      internalID: -3143505692860832183
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_claw_mask_11_8
+      rect:
+        serializedVersion: 2
+        x: 150
+        y: 158
+        width: 6
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b416d7503f384b120800000000000000
+      internalID: 2428711178851934539
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_claw_mask_11_9
+      rect:
+        serializedVersion: 2
+        x: 196
+        y: 155
+        width: 7
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e97d4ba715cbb78f0800000000000000
+      internalID: -541632272030967906
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_claw_mask_11_10
+      rect:
+        serializedVersion: 2
+        x: 107
+        y: 131
+        width: 7
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7c157e88771c4f690800000000000000
+      internalID: -7569212354560831033
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_claw_mask_11_11
+      rect:
+        serializedVersion: 2
+        x: 133
+        y: 106
+        width: 13
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 01bc23b8159cd7360800000000000000
+      internalID: 7169107533908593424
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_claw_mask_11_12
+      rect:
+        serializedVersion: 2
+        x: 178
+        y: 123
+        width: 7
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5e631ef651ed54c50800000000000000
+      internalID: 6648964608535115493
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_claw_mask_11_13
+      rect:
+        serializedVersion: 2
+        x: 60
+        y: 115
+        width: 9
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: af3a4e9da8fd8a380800000000000000
+      internalID: -8959665671199480838
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_claw_mask_11_14
+      rect:
+        serializedVersion: 2
+        x: 72
+        y: 74
+        width: 15
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3a1ac4e0e9b416310800000000000000
+      internalID: 1396480501678383523
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_claw_mask_11_15
+      rect:
+        serializedVersion: 2
+        x: 72
+        y: 60
+        width: 9
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c27da3d08f8564a70800000000000000
+      internalID: 8810827543394047788
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_claw_mask_11_16
+      rect:
+        serializedVersion: 2
+        x: 75
+        y: 110
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dc989fb2ce057cba0800000000000000
+      internalID: -6068792997578176051
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_claw_mask_11_17
+      rect:
+        serializedVersion: 2
+        x: 79
+        y: 86
+        width: 7
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1771bb752b9fa3f90800000000000000
+      internalID: -6972986528658417807
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_claw_mask_11_18
+      rect:
+        serializedVersion: 2
+        x: 85
+        y: 100
+        width: 10
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c110f263d78257420800000000000000
+      internalID: 2627050475885625628
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_claw_mask_11_19
+      rect:
+        serializedVersion: 2
+        x: 92
+        y: 95
+        width: 9
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2587609eb76891850800000000000000
+      internalID: 6348253016504039506
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_claw_mask_11_20
+      rect:
+        serializedVersion: 2
+        x: 99
+        y: 68
+        width: 8
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d457e50dc20c263c0800000000000000
+      internalID: -4367717389889014451
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_claw_mask_11_21
+      rect:
+        serializedVersion: 2
+        x: 117
+        y: 62
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fa71711e2e9d72c00800000000000000
+      internalID: 875908221009074095
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_claw_mask_11_22
+      rect:
+        serializedVersion: 2
+        x: 158
+        y: 77
+        width: 6
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e8bca9cb0f32ab4d0800000000000000
+      internalID: -3118140275137262706
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_claw_mask_11_23
+      rect:
+        serializedVersion: 2
+        x: 179
+        y: 102
+        width: 7
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: aeb36b0a837f6d570800000000000000
+      internalID: 8491245970040175594
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_claw_mask_11_24
+      rect:
+        serializedVersion: 2
+        x: 231
+        y: 107
+        width: 6
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 608de63ecbbe662d0800000000000000
+      internalID: -3285679681618126842
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_claw_mask_11_25
+      rect:
+        serializedVersion: 2
+        x: 259
+        y: 67
+        width: 49
+        height: 63
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d8e3b7f2924536f40800000000000000
+      internalID: 5720508487557660301
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_claw_mask_11_26
+      rect:
+        serializedVersion: 2
+        x: 76
+        y: 38
+        width: 8
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4e5a9da779a9f3cf0800000000000000
+      internalID: -270327477227117084
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_claw_mask_11_27
+      rect:
+        serializedVersion: 2
+        x: 105
+        y: 54
+        width: 7
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c9c95a25859f20b50800000000000000
+      internalID: 6558078165143887004
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_claw_mask_11_28
+      rect:
+        serializedVersion: 2
+        x: 164
+        y: 34
+        width: 28
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f621076837210a940800000000000000
+      internalID: 5305260648428474991
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_claw_mask_11_29
+      rect:
+        serializedVersion: 2
+        x: 229
+        y: 47
+        width: 6
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cfb75c7c17cd635a0800000000000000
+      internalID: -6541799027468043268
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_claw_mask_11_30
+      rect:
+        serializedVersion: 2
+        x: 239
+        y: 32
+        width: 6
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 67b4c9913864b3860800000000000000
+      internalID: 7510674332454767478
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_claw_mask_11_31
+      rect:
+        serializedVersion: 2
+        x: 111
+        y: 1
+        width: 14
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a8f927476fc31b0a0800000000000000
+      internalID: -6867640927550005366
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_claw_mask_11_32
+      rect:
+        serializedVersion: 2
+        x: 171
+        y: 0
+        width: 35
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5236c05d69f701e00800000000000000
+      internalID: 1013450201954542373
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      strike_claw_mask_11_0: 7841648905657564962
+      strike_claw_mask_11_1: -4217534293423885824
+      strike_claw_mask_11_10: -7569212354560831033
+      strike_claw_mask_11_11: 7169107533908593424
+      strike_claw_mask_11_12: 6648964608535115493
+      strike_claw_mask_11_13: -8959665671199480838
+      strike_claw_mask_11_14: 1396480501678383523
+      strike_claw_mask_11_15: 8810827543394047788
+      strike_claw_mask_11_16: -6068792997578176051
+      strike_claw_mask_11_17: -6972986528658417807
+      strike_claw_mask_11_18: 2627050475885625628
+      strike_claw_mask_11_19: 6348253016504039506
+      strike_claw_mask_11_2: 4727034337388158462
+      strike_claw_mask_11_20: -4367717389889014451
+      strike_claw_mask_11_21: 875908221009074095
+      strike_claw_mask_11_22: -3118140275137262706
+      strike_claw_mask_11_23: 8491245970040175594
+      strike_claw_mask_11_24: -3285679681618126842
+      strike_claw_mask_11_25: 5720508487557660301
+      strike_claw_mask_11_26: -270327477227117084
+      strike_claw_mask_11_27: 6558078165143887004
+      strike_claw_mask_11_28: 5305260648428474991
+      strike_claw_mask_11_29: -6541799027468043268
+      strike_claw_mask_11_3: 8691118437951166271
+      strike_claw_mask_11_30: 7510674332454767478
+      strike_claw_mask_11_31: -6867640927550005366
+      strike_claw_mask_11_32: 1013450201954542373
+      strike_claw_mask_11_4: -8897038651261735063
+      strike_claw_mask_11_5: 8024500081470604125
+      strike_claw_mask_11_6: 5743634539088633618
+      strike_claw_mask_11_7: -3143505692860832183
+      strike_claw_mask_11_8: 2428711178851934539
+      strike_claw_mask_11_9: -541632272030967906
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

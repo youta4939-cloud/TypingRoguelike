@@ -1,0 +1,756 @@
+{
+ "_note": "抽選画面 1920x1080。座標は左上原点・y 下向き・1x px。Unity: anchor/pivot=(0,1), anchoredPosition=(x,-y)。text = TMP (font, size px, weight, colour, anchor)。",
+ "background": "Route/bg_hell_town_1920x1080",
+ "title": {
+  "text_key": "lottery.title",
+  "pos": [
+   56,
+   78
+  ],
+  "anchor": "left-middle",
+  "font": "serif",
+  "size": 58,
+  "weight": "Bold",
+  "color": [
+   240,
+   228,
+   210
+  ],
+  "outline": {
+   "width_px": 3,
+   "color": [
+    10,
+    6,
+    6
+   ]
+  },
+  "badge": {
+   "rect_from_title_end": [
+    22,
+    52,
+    128,
+    52
+   ],
+   "sprite": "Common/rounded_r10_9s",
+   "fill": [
+    20,
+    12,
+    12,
+    230
+   ],
+   "outline": [
+    110,
+    90,
+    84
+   ],
+   "inner_line": [
+    150,
+    70,
+    40,
+    160
+   ],
+   "text_key": "lottery.layer_badge",
+   "size": 32,
+   "font": "serif",
+   "weight": "Bold"
+  },
+  "subtitle": {
+   "text_key": "lottery.subtitle",
+   "pos": [
+    58,
+    128
+   ],
+   "font": "sans",
+   "size": 24,
+   "weight": "Medium",
+   "color": [
+    196,
+    184,
+    172
+   ]
+  }
+ },
+ "list_panel": {
+  "rect": [
+   36,
+   160,
+   612,
+   1044
+  ],
+  "sprite": "Common/iron_panel_9s (PPU multiplier 1 = 0.5 frame scale)",
+  "title": {
+   "text_key": "lottery.list.title",
+   "local": [
+    288,
+    54
+   ],
+   "anchor": "center",
+   "font": "serif",
+   "size": 36,
+   "weight": "Bold"
+  },
+  "sub": {
+   "text_key": "lottery.list.sub",
+   "local": [
+    44,
+    96
+   ],
+   "anchor": "left-middle",
+   "font": "sans",
+   "size": 19,
+   "color": [
+    160,
+    148,
+    138
+   ]
+  },
+  "rate_header": {
+   "text_key": "lottery.list.rate_header",
+   "local": [
+    532,
+    96
+   ],
+   "anchor": "right-middle",
+   "font": "sans",
+   "size": 17,
+   "weight": "Medium",
+   "color": [
+    170,
+    156,
+    140
+   ]
+  },
+  "rows": {
+   "count": 11,
+   "first_row_top_local": 114,
+   "row_h": 66,
+   "row_rect_local": [
+    34,
+    4,
+    542,
+    62
+   ],
+   "bg_sprite": "Common/rounded_r10_9s",
+   "bg_even": [
+    26,
+    18,
+    18,
+    170
+   ],
+   "bg_odd": [
+    18,
+    12,
+    13,
+    170
+   ],
+   "bg_hit": [
+    70,
+    30,
+    14,
+    200
+   ],
+   "symbols": {
+    "size": 44,
+    "x0_local": 44,
+    "step": 48
+   },
+   "name": {
+    "x_local": 202,
+    "dy": -12,
+    "font": "serif",
+    "size": 24,
+    "weight": "Bold",
+    "color": [
+     240,
+     228,
+     210
+    ],
+    "color_hit": [
+     255,
+     214,
+     150
+    ]
+   },
+   "effect": {
+    "x_local": 202,
+    "dy": 16,
+    "font": "sans",
+    "size": 19,
+    "weight": "Medium",
+    "color": [
+     176,
+     164,
+     152
+    ],
+    "color_hit": [
+     255,
+     190,
+     110
+    ]
+   },
+   "rate": {
+    "x_right_local": 530,
+    "dy": -12,
+    "font": "sans",
+    "size": 22,
+    "weight": "Bold",
+    "color": [
+     214,
+     200,
+     184
+    ],
+    "color_reach": [
+     255,
+     170,
+     70
+    ],
+    "color_hit": [
+     255,
+     214,
+     150
+    ],
+    "outline": {
+     "width_px": 2,
+     "color": [
+      8,
+      5,
+      6,
+      200
+     ]
+    },
+    "format": "{0:0.0}%"
+   },
+   "reach_glow": {
+    "sprite": "Common/glow_rect_9s",
+    "tint": [
+     255,
+     170,
+     70
+    ],
+    "alpha": 0.75,
+    "hit_tint": [
+     255,
+     190,
+     90
+    ],
+    "hit_alpha": 1.0
+   },
+   "dim": {
+    "rgb_mul": 0.45,
+    "alpha_mul": 0.55,
+    "note": "dimmed row: colour *= 1-0.55*dim, alpha *= 1-0.45*dim (applies to the % too)"
+   }
+  }
+ },
+ "machine": {
+  "rect": [
+   690,
+   206,
+   1330,
+   790
+  ],
+  "sprite": "Common/iron_panel_dark_9s (PPU multiplier 0.91 = 0.55 frame scale)",
+  "top_medallion": {
+   "center_local": [
+    320,
+    27
+   ],
+   "size": [
+    96,
+    95
+   ],
+   "sprite": "Common/medallion_1x",
+   "gem": "Lottery/machine_gem",
+   "gem_center_local": [
+    320,
+    28
+   ]
+  },
+  "reels": [
+   {
+    "center_x": 820,
+    "window": [
+     734,
+     260,
+     172,
+     480
+    ],
+    "slot_rect": [
+     728,
+     254,
+     184,
+     492
+    ]
+   },
+   {
+    "center_x": 1010,
+    "window": [
+     924,
+     260,
+     172,
+     480
+    ],
+    "slot_rect": [
+     918,
+     254,
+     184,
+     492
+    ]
+   },
+   {
+    "center_x": 1200,
+    "window": [
+     1114,
+     260,
+     172,
+     480
+    ],
+    "slot_rect": [
+     1108,
+     254,
+     184,
+     492
+    ]
+   }
+  ],
+  "tile_size": 150,
+  "tile_x_in_window": 11,
+  "pitch": 160,
+  "payline_y": 500,
+  "window_bg": [
+   16,
+   12,
+   14
+  ],
+  "cylinder": "Lottery/reel_cylinder_shade",
+  "payline_markers": [
+   {
+    "tip": [
+     730,
+     500
+    ],
+    "dir": "right"
+   },
+   {
+    "tip": [
+     1290,
+     500
+    ],
+    "dir": "left"
+   }
+  ],
+  "payline_color_from": [
+   120,
+   80,
+   50
+  ],
+  "payline_color_to": [
+   255,
+   170,
+   70
+  ]
+ },
+ "flow_panel": {
+  "rect": [
+   1410,
+   160,
+   1884,
+   806
+  ],
+  "title": {
+   "text_key": "lottery.flow.title",
+   "local": [
+    237,
+    58
+   ],
+   "font": "serif",
+   "size": 32,
+   "weight": "Bold"
+  },
+  "steps": [
+   {
+    "y_local": 140,
+    "medal_center_local": [
+     70,
+     140
+    ],
+    "medal_size": [
+     60,
+     59
+    ],
+    "num_size": 30,
+    "title_x_local": 112,
+    "title_size": 30,
+    "body_y_local": [
+     180,
+     210
+    ],
+    "body_size": 20,
+    "active_glow_rect_local": [
+     34,
+     102,
+     440,
+     232
+    ],
+    "arrow_local": [
+     63,
+     264
+    ]
+   },
+   {
+    "y_local": 305,
+    "medal_center_local": [
+     70,
+     305
+    ],
+    "medal_size": [
+     60,
+     59
+    ],
+    "num_size": 30,
+    "title_x_local": 112,
+    "title_size": 30,
+    "body_y_local": [
+     345,
+     375
+    ],
+    "body_size": 20,
+    "active_glow_rect_local": [
+     34,
+     267,
+     440,
+     397
+    ],
+    "arrow_local": [
+     63,
+     429
+    ]
+   },
+   {
+    "y_local": 470,
+    "medal_center_local": [
+     70,
+     470
+    ],
+    "medal_size": [
+     60,
+     59
+    ],
+    "num_size": 30,
+    "title_x_local": 112,
+    "title_size": 30,
+    "body_y_local": [
+     510,
+     540
+    ],
+    "body_size": 20,
+    "active_glow_rect_local": [
+     34,
+     432,
+     440,
+     562
+    ],
+    "arrow_local": [
+     63,
+     594
+    ]
+   }
+  ],
+  "colors": {
+   "active": [
+    255,
+    170,
+    70
+   ],
+   "active_title": [
+    255,
+    214,
+    160
+   ],
+   "idle": [
+    196,
+    199,
+    206
+   ],
+   "done": [
+    150,
+    146,
+    144
+   ]
+  }
+ },
+ "start_button": {
+  "rect": [
+   835,
+   816,
+   1185,
+   890
+  ],
+  "glow_pad": 30,
+  "label_size": 40
+ },
+ "rebuild_button": {
+  "rect": [
+   1424,
+   828,
+   1870,
+   896
+  ],
+  "sprite": "Common/iron_panel_9s (PPU multiplier 2.5 -> 0.2 frame scale)",
+  "fill": [
+   30,
+   18,
+   16,
+   240
+  ],
+  "fill_disabled": [
+   20,
+   16,
+   16,
+   235
+  ],
+  "icon": "Lottery/icon_reel_rebuild",
+  "icon_center": [
+   1468,
+   862
+  ],
+  "label": {
+   "text_key": "lottery.button.rebuild",
+   "center": [
+    1663,
+    862
+   ],
+   "font": "serif",
+   "size": 28,
+   "weight": "Bold"
+  },
+  "sub": {
+   "text_key_enabled": "lottery.rebuild.sub.enabled",
+   "text_key_disabled": "lottery.rebuild.sub.disabled",
+   "center": [
+    1647,
+    916
+   ],
+   "size": 17
+  },
+  "disabled_look": {
+   "saturation": 0.3,
+   "brightness": 0.62,
+   "label_color": [
+    120,
+    112,
+    108
+   ]
+  },
+  "enabled_glow": {
+   "sprite": "Common/glow_button_9s",
+   "tint": [
+    230,
+    90,
+    30
+   ],
+   "alpha": 0.32
+  }
+ },
+ "skip_button": {
+  "rect": [
+   1500,
+   928,
+   1794,
+   984
+  ],
+  "sprite": "Common/rounded_r10_9s",
+  "fill": [
+   22,
+   16,
+   16,
+   230
+  ],
+  "outline": [
+   110,
+   90,
+   84
+  ],
+  "label": {
+   "text_key": "lottery.button.skip",
+   "size": 30,
+   "font": "serif",
+   "weight": "Bold",
+   "color": [
+    214,
+    204,
+    192
+   ]
+  },
+  "sub": {
+   "text_key": "lottery.skip.sub",
+   "center": [
+    1647,
+    1006
+   ],
+   "size": 18,
+   "color": [
+    150,
+    140,
+    132
+   ]
+  }
+ },
+ "narration": {
+  "rect": [
+   690,
+   918,
+   1330,
+   1030
+  ],
+  "fill": [
+   12,
+   8,
+   9,
+   225
+  ],
+  "outline": [
+   110,
+   90,
+   84
+  ],
+  "inner_line": [
+   60,
+   40,
+   36
+  ],
+  "text_x_local": 40,
+  "font": "serif",
+  "size": 32,
+  "weight": "Medium",
+  "color": [
+   240,
+   228,
+   210
+  ]
+ },
+ "reach_text": {
+  "symbols": {
+   "text": "戦戦戦 (= three short names)",
+   "center": [
+    905,
+    628
+   ],
+   "font": "serif",
+   "weight": "Black",
+   "size": 60,
+   "tracking": 0.02
+  },
+  "reach": {
+   "text_key": "lottery.reach",
+   "center": [
+    905,
+    710
+   ],
+   "font": "brush",
+   "size": 110,
+   "tracking": -0.1
+  },
+  "style": {
+   "italic_shear": -0.12,
+   "face_gradient_top_to_bottom": [
+    [
+     255,
+     232,
+     170
+    ],
+    [
+     255,
+     158,
+     56
+    ],
+    [
+     214,
+     70,
+     22
+    ],
+    [
+     150,
+     30,
+     14
+    ]
+   ],
+   "face_texture": "Lottery/brush_face_streaks",
+   "outline": {
+    "color": [
+     26,
+     8,
+     6
+    ],
+    "width_px": 3
+   },
+   "glow": {
+    "sprite": "Lottery/fx_reach_glow",
+    "tint": [
+     220,
+     90,
+     30
+    ],
+    "alpha": 0.55,
+    "size": [
+     400,
+     140
+    ]
+   },
+   "dilate_note": "brush look: TMP Face Dilate 0.25, Outline 0.2"
+  },
+  "constraint": "must not overlap reel 3 window (x>=1108) nor the right panel"
+ },
+ "hit_banner": {
+  "rect": [
+   690,
+   140,
+   640,
+   52
+  ],
+  "fill": [
+   40,
+   14,
+   10,
+   230
+  ],
+  "outline": [
+   200,
+   110,
+   50
+  ],
+  "name": {
+   "local": [
+    24,
+    26
+   ],
+   "size": 28,
+   "font": "serif",
+   "weight": "Bold",
+   "color": [
+    255,
+    214,
+    150
+   ]
+  },
+  "effect": {
+   "local_right": [
+    620,
+    26
+   ],
+   "size": 26,
+   "font": "sans",
+   "weight": "Bold",
+   "color": [
+    255,
+    190,
+    110
+   ]
+  }
+ },
+ "fonts": {
+  "serif": "Noto Serif JP",
+  "sans": "Noto Sans JP",
+  "brush": "Yuji Syuku"
+ }
+}

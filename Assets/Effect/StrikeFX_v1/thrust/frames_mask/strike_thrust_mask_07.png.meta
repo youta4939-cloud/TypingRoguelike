@@ -1,0 +1,637 @@
+fileFormatVersion: 2
+guid: a8bac5d30ff7c8449aeeeec78de494bb
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 6211357443093469328
+    second: strike_thrust_mask_07_0
+  - first:
+      213: 5026207040276384243
+    second: strike_thrust_mask_07_1
+  - first:
+      213: 7226971259019364407
+    second: strike_thrust_mask_07_2
+  - first:
+      213: -6600344905286786086
+    second: strike_thrust_mask_07_3
+  - first:
+      213: -5363191895596262076
+    second: strike_thrust_mask_07_4
+  - first:
+      213: -1827113993488349139
+    second: strike_thrust_mask_07_5
+  - first:
+      213: -7472499715197860852
+    second: strike_thrust_mask_07_6
+  - first:
+      213: -5933108742896730841
+    second: strike_thrust_mask_07_7
+  - first:
+      213: 1520188025417284293
+    second: strike_thrust_mask_07_8
+  - first:
+      213: 681217912893153797
+    second: strike_thrust_mask_07_9
+  - first:
+      213: 8694350733214901529
+    second: strike_thrust_mask_07_10
+  - first:
+      213: 3196789301466579398
+    second: strike_thrust_mask_07_11
+  - first:
+      213: -2978931873633343585
+    second: strike_thrust_mask_07_12
+  - first:
+      213: 893190111005045125
+    second: strike_thrust_mask_07_13
+  - first:
+      213: -4319773901508417209
+    second: strike_thrust_mask_07_14
+  - first:
+      213: 5436142454084287031
+    second: strike_thrust_mask_07_15
+  - first:
+      213: 2036367444096397985
+    second: strike_thrust_mask_07_16
+  - first:
+      213: 5607166170977058160
+    second: strike_thrust_mask_07_17
+  - first:
+      213: 5219253924694151641
+    second: strike_thrust_mask_07_18
+  - first:
+      213: -1338019078743599772
+    second: strike_thrust_mask_07_19
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 0
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 0
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: strike_thrust_mask_07_0
+      rect:
+        serializedVersion: 2
+        x: 122
+        y: 393
+        width: 52
+        height: 88
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 09890907fac233650800000000000000
+      internalID: 6211357443093469328
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_mask_07_1
+      rect:
+        serializedVersion: 2
+        x: 183
+        y: 454
+        width: 19
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3f9cd335caca0c540800000000000000
+      internalID: 5026207040276384243
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_mask_07_2
+      rect:
+        serializedVersion: 2
+        x: 198
+        y: 408
+        width: 22
+        height: 90
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7388ec7e11c5b4460800000000000000
+      internalID: 7226971259019364407
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_mask_07_3
+      rect:
+        serializedVersion: 2
+        x: 286
+        y: 396
+        width: 36
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ad3625d574dd664a0800000000000000
+      internalID: -6600344905286786086
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_mask_07_4
+      rect:
+        serializedVersion: 2
+        x: 167
+        y: 361
+        width: 11
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 44d1bb8e26d1295b0800000000000000
+      internalID: -5363191895596262076
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_mask_07_5
+      rect:
+        serializedVersion: 2
+        x: 176
+        y: 73
+        width: 233
+        height: 362
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d284bfdd089c4a6e0800000000000000
+      internalID: -1827113993488349139
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_mask_07_6
+      rect:
+        serializedVersion: 2
+        x: 224
+        y: 357
+        width: 44
+        height: 90
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c048c6b99195c4890800000000000000
+      internalID: -7472499715197860852
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_mask_07_7
+      rect:
+        serializedVersion: 2
+        x: 399
+        y: 346
+        width: 71
+        height: 54
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 72d30e5880d59ada0800000000000000
+      internalID: -5933108742896730841
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_mask_07_8
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 142
+        width: 171
+        height: 199
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5cabcce64fac81510800000000000000
+      internalID: 1520188025417284293
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_mask_07_9
+      rect:
+        serializedVersion: 2
+        x: 163
+        y: 339
+        width: 7
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 50221a0251c247900800000000000000
+      internalID: 681217912893153797
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_mask_07_10
+      rect:
+        serializedVersion: 2
+        x: 169
+        y: 301
+        width: 10
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9156eed5de988a870800000000000000
+      internalID: 8694350733214901529
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_mask_07_11
+      rect:
+        serializedVersion: 2
+        x: 344
+        y: 260
+        width: 104
+        height: 63
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6c14fafaee64d5c20800000000000000
+      internalID: 3196789301466579398
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_mask_07_12
+      rect:
+        serializedVersion: 2
+        x: 162
+        y: 246
+        width: 16
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f97eef57e35b8a6d0800000000000000
+      internalID: -2978931873633343585
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_mask_07_13
+      rect:
+        serializedVersion: 2
+        x: 363
+        y: 252
+        width: 59
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 581f8537caf356c00800000000000000
+      internalID: 893190111005045125
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_mask_07_14
+      rect:
+        serializedVersion: 2
+        x: 102
+        y: 24
+        width: 93
+        height: 179
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 749669216841d04c0800000000000000
+      internalID: -4319773901508417209
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_mask_07_15
+      rect:
+        serializedVersion: 2
+        x: 174
+        y: 170
+        width: 35
+        height: 63
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 73a3d1492ce017b40800000000000000
+      internalID: 5436142454084287031
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_mask_07_16
+      rect:
+        serializedVersion: 2
+        x: 132
+        y: 11
+        width: 50
+        height: 95
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1a23989b661a24c10800000000000000
+      internalID: 2036367444096397985
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_mask_07_17
+      rect:
+        serializedVersion: 2
+        x: 195
+        y: 42
+        width: 19
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 07dbca9ace7a0dd40800000000000000
+      internalID: 5607166170977058160
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_mask_07_18
+      rect:
+        serializedVersion: 2
+        x: 253
+        y: 65
+        width: 11
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9d155fdaac38e6840800000000000000
+      internalID: 5219253924694151641
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_thrust_mask_07_19
+      rect:
+        serializedVersion: 2
+        x: 289
+        y: 34
+        width: 25
+        height: 45
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 465daccacb66e6de0800000000000000
+      internalID: -1338019078743599772
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      strike_thrust_mask_07_0: 6211357443093469328
+      strike_thrust_mask_07_1: 5026207040276384243
+      strike_thrust_mask_07_10: 8694350733214901529
+      strike_thrust_mask_07_11: 3196789301466579398
+      strike_thrust_mask_07_12: -2978931873633343585
+      strike_thrust_mask_07_13: 893190111005045125
+      strike_thrust_mask_07_14: -4319773901508417209
+      strike_thrust_mask_07_15: 5436142454084287031
+      strike_thrust_mask_07_16: 2036367444096397985
+      strike_thrust_mask_07_17: 5607166170977058160
+      strike_thrust_mask_07_18: 5219253924694151641
+      strike_thrust_mask_07_19: -1338019078743599772
+      strike_thrust_mask_07_2: 7226971259019364407
+      strike_thrust_mask_07_3: -6600344905286786086
+      strike_thrust_mask_07_4: -5363191895596262076
+      strike_thrust_mask_07_5: -1827113993488349139
+      strike_thrust_mask_07_6: -7472499715197860852
+      strike_thrust_mask_07_7: -5933108742896730841
+      strike_thrust_mask_07_8: 1520188025417284293
+      strike_thrust_mask_07_9: 681217912893153797
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

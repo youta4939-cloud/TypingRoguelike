@@ -1,15 +1,17 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TypingRoguelike.Battle;
 using TypingRoguelike.Data;
+using TypingRoguelike.RouteLottery;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace TypingRoguelike.Run
 {
     /// <summary>塔探索フロー（ダンジョン探索仕様 v1.2）。UI は別系統。</summary>
-    public sealed class RunFlowController : MonoBehaviour
+    public sealed partial class RunFlowController : MonoBehaviour
     {
         [SerializeField] DungeonRunDefinition dungeonRun;
         [SerializeField] BattleEncounterDefinition fallbackEncounter;
@@ -20,9 +22,9 @@ namespace TypingRoguelike.Run
         readonly DungeonRunState _dungeon = new();
         readonly RunOverlayUI _overlay = new();
         readonly LayerPathUI _pathUi = new();
-        readonly ReelBuildUI _reel = new();
 
         BattleController _battle;
+        GameObject _resultRoot;
         LayerConfig _layerConfig;
         BoardCatalog _boards;
         YakuCatalog _yaku;
@@ -40,8 +42,10 @@ namespace TypingRoguelike.Run
         string _pendingTreasureRelicMsg;
         string _pendingTreasureRelicLine;
         bool _awaitingTreasureModal;
-        bool _cardRewardMustTake;
         Action _afterCardReward;
+        List<SkillDefinition> _pendingRewardChoices;
+        bool _pendingRewardMustTake;
+        string _pendingRewardNotice;
         int _merchantRelicSoldNodeId = -1;
         string _pendingOpinionSummary;
 
@@ -50,29 +54,41 @@ namespace TypingRoguelike.Run
 
         void Awake()
         {
-            Debug.Log("[TypingRoguelike] RunFlowController Awake");
-            if (dungeonRun == null)
-                dungeonRun = Resources.Load<DungeonRunDefinition>("Battle/PrototypeDungeonRun");
-            _layerConfig = LayerConfig.LoadOrFallback();
-            _boards = BoardCatalog.LoadOrFallback();
-            _yaku = YakuCatalog.LoadOrFallback();
+            try
+            {
+                Debug.Log("[TypingRoguelike] RunFlowController Awake");
+                if (dungeonRun == null)
+                    dungeonRun = Resources.Load<DungeonRunDefinition>("Battle/PrototypeDungeonRun");
+                _layerConfig = LayerConfig.LoadOrFallback();
+                _boards = BoardCatalog.LoadOrFallback();
+                _yaku = YakuCatalog.LoadOrFallback();
 
-            if (fallbackEncounter == null)
-                fallbackEncounter = Resources.Load<BattleEncounterDefinition>("Battle/PrototypeCombatEncounter")
-                                    ?? Resources.Load<BattleEncounterDefinition>("Battle/PrototypeBossEncounter");
+                if (fallbackEncounter == null)
+                    fallbackEncounter = Resources.Load<BattleEncounterDefinition>("Battle/PrototypeCombatEncounter")
+                                        ?? Resources.Load<BattleEncounterDefinition>("Battle/PrototypeBossEncounter");
 
-            var partyDef = ResolvePartyDefinition();
-            _party.InitializeForNewDungeonRun(partyDef);
-            _profile = MetaProgression.Load();
-            _trust = new TrustRoster(TrustCatalog.LoadOrFallback(), _profile);
+                var partyDef = ResolvePartyDefinition();
+                _party.InitializeForNewDungeonRun(partyDef);
+            ApplySwordsmanInnate();
+            ApplyAxeInnate();
+                _profile = MetaProgression.Load();
+                _trust = new TrustRoster(TrustCatalog.LoadOrFallback(), _profile);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"RunFlowController Awake 失敗: {ex.Message}\n{ex.StackTrace}");
+            }
         }
 
-        void Start()
+        void Start() => EnsureHubVisible();
+
+        /// <summary>拠点 UI。Start 失敗時の再試行用にも BattleSceneSetup から呼ぶ。</summary>
+        public void EnsureHubVisible()
         {
             try
             {
                 ShowHub();
-                Debug.Log("[TypingRoguelike] 拠点 UI を表示しました。SampleScene で Play しているか確認してください。");
+                Debug.Log("[TypingRoguelike] 拠点 UI を表示しました。");
             }
             catch (Exception ex)
             {
@@ -108,6 +124,7 @@ namespace TypingRoguelike.Run
             DestroyBattleIfAny();
             _runResultRecorded = false;
             _clearedNodesThisRun = 0;
+            RunScore.ClearOuting(_profile);
             _exploration.Clear();
             _dungeon.ClearSeenEvents();
 
@@ -120,6 +137,8 @@ namespace TypingRoguelike.Run
 
             var partyDef = ResolvePartyDefinition();
             _party.InitializeForNewDungeonRun(partyDef);
+            ApplySwordsmanInnate();
+            ApplyAxeInnate();
 
             ApplyProxyBrainRunMaxHp(preserveCurrentHp: false);
             _madness.ResetForNewRun(ComputeFullMadnessCap());
@@ -127,10 +146,11 @@ namespace TypingRoguelike.Run
             _runSeed = _profile.towerSeed;
             _opinionRng = null;
             _trust.ResetRunCounters(_profile);
+            PersonalityCatalog.RollMood(_profile, OpinionRng());
             OpenBoardPreparation(1, startAtElevator: false);
         }
 
-        int TotalFloors => Mathf.Clamp(_layerConfig != null ? _layerConfig.totalLayers : 15, 1, 99);
+        int TotalFloors => Mathf.Clamp(_layerConfig != null ? _layerConfig.totalLayers : 20, 1, 99);
 
         void GenerateFirstFloor() => OpenBoardPreparation(1, startAtElevator: false);
 
@@ -153,6 +173,9 @@ namespace TypingRoguelike.Run
 
         void LoadLayer(int floor, int restoreIndex, bool startAtElevator, BoardPreset board, bool preFourthHealApplied)
         {
+            if (_profile != null && _profile.layerBuffFloor != floor)
+                ClearLayerBuffs(floor);
+
             var index = restoreIndex;
             if (index < 0 || index >= LayerSquares.Count)
             {
@@ -172,14 +195,15 @@ namespace TypingRoguelike.Run
                 index,
                 _profile.clearedTowerNodeIds,
                 startAtElevator,
-                preFourthHealApplied);
+                preFourthHealApplied,
+                RoadFor(floor));
             RememberClearedSquares();
         }
 
         BoardGrid GridForLayer(BoardPreset board)
         {
             var catalog = ReelPartCatalog.Load();
-            var saved = ReelLayout.Parse(_profile?.reelLayout, catalog);
+            var saved = ReelLayout.Parse(_profile?.reelLayout, catalog, _profile != null && _profile.reelDebugUnlocked);
             if (saved != null)
                 return saved.ToGrid(catalog);
             if (board != null)
@@ -187,23 +211,96 @@ namespace TypingRoguelike.Run
             return ReelLayout.BalanceStarter(catalog).ToGrid(catalog);
         }
 
+        string[] RoadFor(int floor)
+        {
+            if (_profile == null || _profile.towerRunRoadFloor != floor || string.IsNullOrEmpty(_profile.towerRunRoad))
+                return null;
+            var parts = _profile.towerRunRoad.Split(',');
+            for (var i = 0; i < parts.Length; i++)
+                parts[i] = parts[i].Trim();
+            return parts;
+        }
+
+        void SaveMemoryBoard(string layout)
+        {
+            if (_profile == null)
+                return;
+            _profile.memoryBoard = layout ?? "";
+            MetaProgression.Save(_profile);
+        }
+
         void OpenBoardPreparation(int layer, bool startAtElevator)
         {
-            _pathUi.Hide();
-            var catalog = ReelPartCatalog.Load();
-            var layout = ReelLayout.Parse(_profile?.reelLayout, catalog) ?? ReelLayout.BalanceStarter(catalog);
-            _reel.Show(
-                transform,
-                catalog,
-                layout,
-                _profile != null && _profile.reelDebugUnlocked,
+            try
+            {
+                _overlay.HideAll();
+                _pathUi.Hide();
+                SyncMadnessCapFromRelics();
+                RouteLotteryPresenter.Show(
+                    transform,
+                    layer,
+                    _runSeed,
+                    LayerSquares.FixedSquare(layer, _layerConfig),
+                    startAtElevator,
+                    _profile != null ? _profile.memoryBoard : "",
+                    SaveMemoryBoard,
+                    ids => ConfirmLotteryRoad(ids, layer, startAtElevator),
+                    _party,
+                    _madness,
+                    _trust != null ? _trust.Gauges(_profile) : null);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"ダンジョンルーレットの表示に失敗: {ex.Message}\n{ex.StackTrace}");
+                EnsureHubVisible();
+            }
+        }
+
+        void ConfirmLotteryRoad(string[] ids, int layer, bool startAtElevator)
+        {
+            if (_profile == null || ids == null || ids.Length < 3)
+                return;
+            _profile.towerRunRoad = string.Join(",", ids);
+            _profile.towerRunRoadFloor = layer;
+            _profile.towerRunEventWarpFloor = 0;
+            _profile.clearedTowerNodeIds?.Clear();
+            _profile.towerRunPreFourthHealApplied = false;
+            LoadLayer(
                 layer,
-                TotalFloors,
-                LayerSquares.FixedSquare(layer, _layerConfig),
-                _layerConfig,
-                _boards,
-                (built, unlocked) => ConfirmBuiltBoard(built, unlocked, layer, startAtElevator),
-                grid => ReelDraw.LogThousandRolls(grid, "作った盤面", _yaku));
+                restoreIndex: startAtElevator ? LayerSquares.Count - 1 : 0,
+                startAtElevator,
+                ResolveBoard(_profile.towerRunBoardId),
+                preFourthHealApplied: startAtElevator);
+            if (!startAtElevator)
+                GrantFlatYakuCoins();
+            if (_profile.towerRunActive)
+                PersistActiveRun();
+            else
+                ActivateAndSaveRun();
+
+            if (!startAtElevator && _dungeon.ActiveYaku != null)
+            {
+                var yaku = _dungeon.ActiveYaku;
+                _pathUi.ShowModal(
+                    "役",
+                    $"{yaku.displayName}\n{yaku.DescribeEffect()}",
+                    new (string, System.Action)[] { ("進む", EnterOpenSquare) });
+                return;
+            }
+
+            EnterOpenSquare();
+        }
+
+        void EnterOpenSquare()
+        {
+            var index = _dungeon.FirstUnclearedIndex();
+            if (index < 0)
+            {
+                ShowMap();
+                return;
+            }
+
+            OnMapNodeSelected(index);
         }
 
         void ConfirmBuiltBoard(ReelLayout layout, bool debugUnlocked, int layer, bool startAtElevator)
@@ -293,8 +390,59 @@ namespace TypingRoguelike.Run
             if (TryPresentLayerExit())
                 return;
 
-            _pathUi.Show(transform, _dungeon, _party, _exploration, _madness, OnMapNodeSelected, AbandonRun,
-                OpenRunLoadout, OpenRunRelicManage, OpenRunPartyStats, _trust.Gauges(_profile), OpenTrustDebug);
+            _pathUi.Hide();
+            var squares = _dungeon.Squares;
+            var ids = new string[squares != null ? squares.Length : 0];
+            var cleared = new bool[ids.Length];
+            for (var i = 0; i < ids.Length; i++)
+            {
+                ids[i] = RoadTypeId(squares[i]);
+                cleared[i] = squares[i].Cleared;
+            }
+
+            try
+            {
+                RouteLotteryPresenter.ShowLayer(
+                    transform,
+                    _dungeon.Floor,
+                    LayerSquares.FixedSquare(_dungeon.Floor, _layerConfig),
+                    ids,
+                    cleared,
+                    _dungeon.FirstUnclearedIndex(),
+                    OnMapNodeSelected,
+                    OpenRunLoadout,
+                    OpenRunRelicManage,
+                    OpenRunPartyStats,
+                    AbandonRun,
+                    _party,
+                    _madness,
+                    _trust != null ? _trust.Gauges(_profile) : null);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"層ルートの表示に失敗: {ex.Message}\n{ex.StackTrace}");
+            }
+        }
+
+        static string RoadTypeId(LayerSquare square)
+        {
+            if (square == null)
+                return "battle";
+            if (!string.IsNullOrEmpty(square.RoadId))
+                return square.RoadId;
+            switch (square.Type)
+            {
+                case DungeonNodeType.Combat: return "battle";
+                case DungeonNodeType.Rest: return "rest";
+                case DungeonNodeType.Treasure: return "treasure";
+                case DungeonNodeType.Merchant: return "shop";
+                case DungeonNodeType.Event: return "event";
+                case DungeonNodeType.Trap: return "danger";
+                case DungeonNodeType.Elevator: return "elevator";
+                case DungeonNodeType.Boss:
+                case DungeonNodeType.MidBoss: return "boss";
+                default: return "battle";
+            }
         }
 
         bool TryPresentLayerExit()
@@ -385,6 +533,36 @@ namespace TypingRoguelike.Run
                 _madness);
         }
 
+        /// <summary>
+        /// 拠点へ帰還したあとの再入場。1階からでも、どの解放エレベーターからでも同じ。
+        /// 帰還前のセーブは、エレベーターマスで止まっているものを帰還扱いにする。
+        /// </summary>
+        bool ShouldRestoreVitalsAfterElevatorReturn()
+        {
+            if (_profile == null)
+                return false;
+            if (_profile.towerRunVitalsRested)
+                return true;
+            return _profile.towerRunNodeId == LayerSquares.Count - 1 && !_profile.towerRunElevatorRestConsumed;
+        }
+
+        void ApplyElevatorReturnVitals()
+        {
+            _madness.SetConfiguredMadnessCap(ComputeFullMadnessCap());
+            _madness.ClearDeviceCapPenalty();
+            _madness.RestoreCurrentAndJackpot(
+                0,
+                _profile.towerRunBonusJackpotChance,
+                _profile.towerRunJackpotAccumulatedChance);
+            _profile.towerRunVitalsRested = false;
+            _profile.towerRunElevatorRestConsumed = true;
+            _profile.towerRunCurrentHp = _party.CurrentHp;
+            _profile.towerRunMaxHp = _party.MaxHp;
+            _profile.towerRunMadnessCurrent = 0;
+            _profile.towerRunMadnessMax = _madness.MaxMadness;
+            MetaProgression.Save(_profile);
+        }
+
         void RestoreMadnessFromProfile()
         {
             _madness.SetConfiguredMadnessCap(ComputeFullMadnessCap());
@@ -423,7 +601,9 @@ namespace TypingRoguelike.Run
                 ResolveRelicCatalog(),
                 _exploration,
                 "マップに戻る",
-                ShowMap);
+                ShowMap,
+                PersonalityCatalog.BuildCharts(_profile),
+                SetDebugAffinityFromRun);
         }
 
         void OpenHubPartyStats()
@@ -434,8 +614,10 @@ namespace TypingRoguelike.Run
                 dungeonRun,
                 ResolveRelicCatalog(),
                 null,
-                "聖堂に戻る",
-                ShowHub);
+                "拠点に戻る",
+                ShowHub,
+                PersonalityCatalog.BuildCharts(_profile),
+                SetDebugAffinityFromHub);
         }
 
         void OpenRunRelicManage()
@@ -487,11 +669,21 @@ namespace TypingRoguelike.Run
 
         float ResolveEncounterBaselineMaxHp()
         {
+            var sum = 0;
+            if (_party?.Members != null)
+            {
+                foreach (var member in _party.Members)
+                    sum += member?.character != null ? member.character.hp : 0;
+            }
+
+            if (sum > 0)
+                return sum;
+
             var maxHp = dungeonRun?.bossEncounter?.playerMaxHp
                         ?? dungeonRun?.combatEncounter?.playerMaxHp
                         ?? fallbackEncounter?.playerMaxHp
-                        ?? 100f;
-            return maxHp * 1.2f;
+                        ?? 1000f;
+            return maxHp;
         }
 
         void ApplyProxyBrainRunMaxHp(bool preserveCurrentHp)
@@ -509,11 +701,67 @@ namespace TypingRoguelike.Run
         {
             var proxyBonus = ProxyBrainUpgrades.ComputeMadnessBaseBonus(_profile, ResolveProxyBrainCatalog());
             var relicBonus = RelicRunModifiers.Compute(_exploration, ResolveRelicCatalog()).MadnessMaxBonus;
-            return RunMadnessState.DefaultMaxMadness + Mathf.Max(0, proxyBonus) + Mathf.Max(0, relicBonus);
+            var raised = RunMadnessState.DefaultMaxMadness + Mathf.Max(0, proxyBonus) + Mathf.Max(0, relicBonus);
+            return Mathf.Clamp(raised, 1, RunMadnessState.MaxRaisedMadness);
+        }
+
+        void ShowRunResult(bool death, string subtitle, Action onHub)
+        {
+            CloseRunResult();
+            _overlay.HideAll();
+            _pathUi.Hide();
+            DestroyBattleIfAny();
+            var score = RunScore.Read(_profile);
+            RunScore.Bank(_profile, death);
+            MetaProgression.Save(_profile);
+
+            var canvasGo = new GameObject("RunResultCanvas");
+            canvasGo.transform.SetParent(transform, false);
+            var canvas = canvasGo.AddComponent<Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            canvas.sortingOrder = 80;
+            var scaler = canvasGo.AddComponent<CanvasScaler>();
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new Vector2(1920f, 1080f);
+            scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.Expand;
+            canvasGo.AddComponent<GraphicRaycaster>();
+            RunOverlayUI.EnsureGlobalEventSystem();
+
+            var source = RunResultView.Load();
+            if (source == null || !source.Ready)
+            {
+                Destroy(canvasGo);
+                onHub?.Invoke();
+                return;
+            }
+
+            var view = Instantiate(source, canvasGo.transform);
+            view.name = "RunResult";
+            var rt = view.GetComponent<RectTransform>();
+            rt.anchorMin = Vector2.zero;
+            rt.anchorMax = Vector2.one;
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
+            rt.localScale = Vector3.one;
+            view.Apply(subtitle, death, score, _profile.playerXp, () =>
+            {
+                CloseRunResult();
+                onHub?.Invoke();
+            });
+            _resultRoot = canvasGo;
+        }
+
+        void CloseRunResult()
+        {
+            if (_resultRoot == null)
+                return;
+            Destroy(_resultRoot);
+            _resultRoot = null;
         }
 
         void ShowHub()
         {
+            CloseRunResult();
             _pathUi.Hide();
             DestroyBattleIfAny();
             // TODO 未決事項6: 「中断した探索へ戻る（N階）」を残すかは未決。残したまま、1階と解放済みエレベーター階も同じ探索の再開にする。
@@ -533,7 +781,8 @@ namespace TypingRoguelike.Run
                 OpenHubRelicPanel,
                 OpenHubShopDevelopPanel,
                 OpenHubRepairPanel,
-                OpenHubPartyStats);
+                OpenHubPartyStats,
+                OpenJackpotDebug);
         }
 
         void BeginNewRunFromElevatorFloor(int floor)
@@ -555,6 +804,7 @@ namespace TypingRoguelike.Run
             DestroyBattleIfAny();
             _runResultRecorded = false;
             _clearedNodesThisRun = 0;
+            RunScore.ClearOuting(_profile);
             _exploration.Clear();
             _dungeon.ClearSeenEvents();
 
@@ -567,6 +817,8 @@ namespace TypingRoguelike.Run
 
             var partyDef = ResolvePartyDefinition();
             _party.InitializeForNewDungeonRun(partyDef);
+            ApplySwordsmanInnate();
+            ApplyAxeInnate();
 
             ApplyProxyBrainRunMaxHp(preserveCurrentHp: false);
             _madness.ResetForNewRun(ComputeFullMadnessCap());
@@ -574,6 +826,7 @@ namespace TypingRoguelike.Run
             _runSeed = _profile.towerSeed;
             _opinionRng = null;
             _trust.ResetRunCounters(_profile);
+            PersonalityCatalog.RollMood(_profile, OpinionRng());
             if (LayerSquares.FixedSquare(floor, _layerConfig) != DungeonNodeType.Elevator)
             {
                 Debug.LogWarning($"階 {floor} の4マス目がエレベーターではない。1 層から開始します。");
@@ -581,7 +834,36 @@ namespace TypingRoguelike.Run
                 return;
             }
 
-            OpenBoardPreparation(floor, startAtElevator: true);
+            OpenFloorAfterElevator(floor);
+        }
+
+        /// <summary>エレベーター階は踏破済みとして飛ばし、次の層のルーレットから始める。</summary>
+        void OpenFloorAfterElevator(int elevatorFloor)
+        {
+            var next = elevatorFloor + 1;
+            if (next > TotalFloors)
+            {
+                ShowHub();
+                return;
+            }
+
+            if (HasCommittedFloor(next))
+            {
+                LoadLayer(
+                    next,
+                    restoreIndex: 0,
+                    startAtElevator: false,
+                    ResolveBoard(_profile.towerRunBoardId),
+                    _profile.towerRunPreFourthHealApplied);
+                if (_profile.towerRunActive)
+                    PersistActiveRun();
+                else
+                    ActivateAndSaveRun();
+                ShowMap();
+                return;
+            }
+
+            OpenBoardPreparation(next, startAtElevator: false);
         }
 
         void ResumeActiveTowerRun()
@@ -593,14 +875,20 @@ namespace TypingRoguelike.Run
             }
 
             RestoreActiveRunState();
-            if (TryStartPendingEventBattle())
-                return;
             LoadLayer(
                 _profile.towerRunFloor,
                 _profile.towerRunNodeId,
                 startAtElevator: false,
                 ResolveBoard(_profile.towerRunBoardId),
                 _profile.towerRunPreFourthHealApplied);
+            if (TryResumeEventBattle())
+                return;
+            if (_profile.towerRunEventWarpFloor > 0)
+            {
+                OpenBoardPreparation(_profile.towerRunEventWarpFloor, startAtElevator: false);
+                return;
+            }
+
             ShowMap();
         }
 
@@ -628,13 +916,28 @@ namespace TypingRoguelike.Run
 
             var partyDef = ResolvePartyDefinition();
             _party.InitializeForNewDungeonRun(partyDef);
+            ApplySwordsmanInnate();
+            ApplyAxeInnate();
             _party.ApplyMemberSaves(_profile.towerRunMembers, GetSkillCatalog());
+            ApplySwordsmanInnate();
+            ApplyAxeInnate();
             _party.AddCoins(_profile.towerRunCoins);
+            _party.SetBlood(_profile.towerRunBlood);
+            _party.SetCarriedFocus(_profile.towerRunFocus);
 
             ApplyProxyBrainRunMaxHp(preserveCurrentHp: false);
-            if (_profile.towerRunCurrentHp > 0f)
-                _party.SetCurrentHp(_profile.towerRunCurrentHp);
-            RestoreMadnessFromProfile();
+            var rested = ShouldRestoreVitalsAfterElevatorReturn();
+            if (!rested && _profile.towerRunCurrentHp > 0f)
+            {
+                var savedMax = _profile.towerRunMaxHp > 0f ? _profile.towerRunMaxHp : _party.MaxHp;
+                var ratio = savedMax > 0f ? _profile.towerRunCurrentHp / savedMax : 1f;
+                _party.SetCurrentHp(_party.MaxHp * Mathf.Clamp01(ratio));
+            }
+
+            if (rested)
+                ApplyElevatorReturnVitals();
+            else
+                RestoreMadnessFromProfile();
 
             _profile.towerRunMaterialStacks ??= new List<MaterialStackSave>();
             _exploration.RestoreFromSave(
@@ -649,8 +952,6 @@ namespace TypingRoguelike.Run
         void ContinueActiveRun(int floor, bool fromElevator)
         {
             RestoreActiveRunState();
-            if (TryStartPendingEventBattle())
-                return;
             if (fromElevator)
             {
                 if (LayerSquares.FixedSquare(floor, _layerConfig) != DungeonNodeType.Elevator)
@@ -660,13 +961,13 @@ namespace TypingRoguelike.Run
                     return;
                 }
 
-                if (string.IsNullOrEmpty(_profile.towerRunBoardId) || floor != _profile.towerRunFloor)
-                {
-                    OpenBoardPreparation(floor, startAtElevator: true);
-                    return;
-                }
-
-                LoadLayer(floor, restoreIndex: 0, startAtElevator: true, ResolveBoard(_profile.towerRunBoardId), preFourthHealApplied: true);
+                OpenFloorAfterElevator(floor);
+                return;
+            }
+            else if (!HasCommittedFloor(floor))
+            {
+                OpenBoardPreparation(floor, startAtElevator: false);
+                return;
             }
             else
             {
@@ -693,7 +994,72 @@ namespace TypingRoguelike.Run
         SkillDefinition[] GetSkillCatalog()
         {
             var pool = ResolveRewardPool();
-            return pool?.cards ?? Array.Empty<SkillDefinition>();
+            if (pool?.cards == null)
+                return Array.Empty<SkillDefinition>();
+            var config = SwordsmanSkillConfig.Load();
+            var axe = AxeSkillConfig.Load();
+            var list = new List<SkillDefinition>();
+            foreach (var card in pool.cards)
+            {
+                if (card == null)
+                    continue;
+                if (config != null && config.HidesReward(card.skillId))
+                    continue;
+                if (axe != null && axe.HidesReward(card))
+                    continue;
+                list.Add(card);
+            }
+            return list.ToArray();
+        }
+
+        void ApplySwordsmanInnate()
+        {
+            var config = SwordsmanSkillConfig.Load();
+            var replace = config?.options == null || config.options.replaceAliceSkills;
+            SkillDefinition innate = null;
+            if (replace)
+            {
+                var id = config?.options != null ? config.options.aliceInnateSkillId : 100;
+                var pool = ResolveRewardPool();
+                if (pool?.cards != null)
+                {
+                    foreach (var card in pool.cards)
+                    {
+                        if (card != null && card.skillId == id)
+                        {
+                            innate = card;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            _party?.ApplySwordsmanInnate(innate, replace);
+        }
+
+        void ApplyAxeInnate()
+        {
+            var config = AxeSkillConfig.Load();
+            var replace = config?.options == null || config.options.replaceTargetSkills;
+            SkillDefinition innate = null;
+            if (replace)
+            {
+                var id = config != null ? config.InnateSkillId : 200;
+                var pool = ResolveRewardPool();
+                if (pool?.cards != null)
+                {
+                    foreach (var card in pool.cards)
+                    {
+                        if (card != null && card.skillId == id)
+                        {
+                            innate = card;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            _party?.ApplyAxeInnate(innate, replace, config != null ? config.targetCharacterName : "ルナ");
         }
 
         void AbandonRun()
@@ -712,11 +1078,12 @@ namespace TypingRoguelike.Run
         {
             ApplyWipe();
             _pathUi.Hide();
-            ShowHub();
+            ShowRunResult(true, "死亡", ShowHub);
         }
 
         void OnMapNodeSelected(int nodeId)
         {
+            RouteLotteryPresenter.Hide(transform);
             if (!_dungeon.CanEnter(nodeId))
                 return;
 
@@ -724,18 +1091,21 @@ namespace TypingRoguelike.Run
             var node = _dungeon.Current;
             if (node == null)
                 return;
-            if (node.Index < LayerSquares.Count - 1)
-            {
-                BeginOpinion(node);
-                return;
-            }
 
+            RunScore.AddSquare(_profile, _dungeon.Floor);
             EnterSquare(node);
         }
 
         void EnterSquare(LayerSquare node)
         {
-            _pathUi.Hide();
+            // Story mist owns the route until the screen is fully covered.
+            if (node.Type != DungeonNodeType.Event || node.RoadId == "danger")
+                _pathUi.Hide();
+            if (node.RoadId == "danger")
+            {
+                ResolveDangerNode();
+                return;
+            }
             switch (node.Type)
             {
                 case DungeonNodeType.Combat:
@@ -754,7 +1124,7 @@ namespace TypingRoguelike.Run
                     ResolveTreasureNode();
                     break;
                 case DungeonNodeType.Event:
-                    ResolveStoryEventNode();
+                    StartStoryEvent();
                     break;
                 case DungeonNodeType.Trap:
                     ResolveTrapNode();
@@ -771,82 +1141,6 @@ namespace TypingRoguelike.Run
             }
         }
 
-        void BeginOpinion(LayerSquare node)
-        {
-            if (_profile != null &&
-                _profile.opinionResolvedFloor == _dungeon.Floor &&
-                _profile.opinionResolvedIndex == node.Index)
-            {
-                EnterSquare(node);
-                return;
-            }
-
-            var roll = _trust.Roll(node.Type, _party, _profile, OpinionRng());
-            if (roll == null)
-            {
-                EnterSquare(node);
-                return;
-            }
-
-            if (_profile != null)
-                _profile.opinionDrawSerial++;
-            _pathUi.ShowOpinion(
-                _trust.BuildScreen(roll, _profile, _dungeon.Floor, node.Index, node.Type),
-                index => CommitOpinion(roll, index, node));
-        }
-
-        void CommitOpinion(OpinionRollResult roll, int choiceIndex, LayerSquare node)
-        {
-            var result = _trust.Commit(roll, choiceIndex, _dungeon.Floor, _profile, OpinionRng());
-            _profile.opinionResolvedFloor = _dungeon.Floor;
-            _profile.opinionResolvedIndex = node.Index;
-            ApplyOpinionEffect(result, node.Type);
-            if (_profile.towerRunActive)
-                PersistActiveRun();
-            else
-                MetaProgression.Save(_profile);
-            _pendingOpinionSummary = result != null ? result.Summary : "";
-            EnterSquare(node);
-        }
-
-        void ApplyOpinionEffect(OpinionCommitResult result, DungeonNodeType tile)
-        {
-            if (result == null || _profile == null)
-                return;
-            _profile.opinionCombatEnemyHpScale = 1f;
-            _profile.opinionCombatOpeningSeconds = 0f;
-            _profile.opinionCombatCoinScale = 1f;
-            ApplyImmediateOpinionEffect(result.Effect, result.EffectValue, tile);
-            ApplyImmediateOpinionEffect(result.Effect2, result.EffectValue2, tile);
-        }
-
-        void ApplyImmediateOpinionEffect(OpinionEffectKind kind, float value, DungeonNodeType tile)
-        {
-            switch (kind)
-            {
-                case OpinionEffectKind.Coins:
-                    var coins = Mathf.Max(0, Mathf.RoundToInt(value));
-                    if (coins > 0)
-                        _party.AddCoins(coins);
-                    break;
-                case OpinionEffectKind.HealFraction:
-                    _party.HealFraction(value);
-                    break;
-                case OpinionEffectKind.CardChoices:
-                    _profile.opinionPendingCardChoices += Mathf.Max(1, Mathf.RoundToInt(value));
-                    break;
-                case OpinionEffectKind.EnemyHpFraction when tile == DungeonNodeType.Combat:
-                    _profile.opinionCombatEnemyHpScale *= Mathf.Max(0.05f, 1f + value);
-                    break;
-                case OpinionEffectKind.OpeningAttackSeconds when tile == DungeonNodeType.Combat:
-                    _profile.opinionCombatOpeningSeconds += value;
-                    break;
-                case OpinionEffectKind.BattleCoinFraction when tile == DungeonNodeType.Combat:
-                    _profile.opinionCombatCoinScale *= Mathf.Max(0f, 1f + value);
-                    break;
-            }
-        }
-
         string TakeOpinionSummary()
         {
             var text = _pendingOpinionSummary;
@@ -854,16 +1148,32 @@ namespace TypingRoguelike.Run
             return string.IsNullOrWhiteSpace(text) ? "" : text.Trim();
         }
 
-        void ResolveStoryEventNode()
+        void SetDebugAffinityFromRun(string id, int value)
         {
-            var note = TakeOpinionSummary();
-            MarkCurrentCleared();
-            ShowMap();
-            _pathUi.ShowModal(
-                "出来事",
-                string.IsNullOrEmpty(note) ? "先へ進んだ。" : note,
-                new (string, Action)[] { ("マップに戻る", null) });
-            _pathUi.Refresh(_dungeon, _party, _exploration, _madness);
+            ApplyDebugAffinity(id, value);
+            OpenRunPartyStats();
+        }
+
+        void SetDebugAffinityFromHub(string id, int value)
+        {
+            ApplyDebugAffinity(id, value);
+            OpenHubPartyStats();
+        }
+
+        void ApplyDebugAffinity(string id, int value)
+        {
+            if (_trust == null || _profile == null || string.IsNullOrEmpty(id))
+                return;
+            _trust.SetTrust(id, value, _profile);
+            if (_profile.towerRunActive)
+                PersistActiveRun();
+            else
+                MetaProgression.Save(_profile);
+        }
+
+        void OpenJackpotDebug()
+        {
+            _overlay.ShowJackpotDebug(transform, null);
         }
 
         void OpenTrustDebug()
@@ -899,6 +1209,39 @@ namespace TypingRoguelike.Run
             }
 
             return _opinionRng;
+        }
+
+        void ResolveDangerNode()
+        {
+            var picked = DemeritCatalog.Pick(EventRng());
+            if (picked == null)
+            {
+                CompleteNodeAndReturnToMap("空白", "このマスの出来事を読めなかった。");
+                return;
+            }
+
+            if (ApplyDangerDemerit(picked, out var note))
+                return;
+            PersistActiveRun();
+            if (_party != null && _party.IsRunDead)
+            {
+                TryBeginRunDeath(fromBattle: false);
+                return;
+            }
+
+            CompleteNodeAndReturnToMap("空白", note);
+        }
+
+        bool HasCommittedFloor(int floor)
+        {
+            if (_profile == null)
+                return false;
+            if (_profile.towerRunRoadFloor == floor && !string.IsNullOrEmpty(_profile.towerRunRoad))
+                return true;
+            return _profile.towerRunActive
+                && _profile.towerRunFloor == floor
+                && (_profile.towerRunNodeId > 0
+                    || (_profile.clearedTowerNodeIds != null && _profile.clearedTowerNodeIds.Count > 0));
         }
 
         void ResolveTrapNode()
@@ -1291,6 +1634,7 @@ namespace TypingRoguelike.Run
         {
             MarkCurrentCleared();
             MetaProgression.UnlockElevatorFloor(_profile, _dungeon.Floor);
+            _profile.towerRunElevatorRestConsumed = true;
             PersistActiveRun();
             ShowElevatorChoice();
         }
@@ -1299,7 +1643,7 @@ namespace TypingRoguelike.Run
         {
             _pathUi.ShowModal(
                 "エレベーター",
-                $"この層はここまで。\n現在 {_dungeon.Floor} / {TotalFloors} 層。\n\n拠点へ帰還するか、次の層へ進む。",
+                $"この層はここまで。\n現在 {_dungeon.Floor} / {TotalFloors} 層。\n\n拠点へ帰還すると、HP は満タン、狂気は 0 に戻る。\n次の層へ進むと、HP も狂気も持ったまま。",
                 new (string, Action)[]
                 {
                     ("拠点へ帰還", ReturnToHubFromElevator),
@@ -1313,6 +1657,13 @@ namespace TypingRoguelike.Run
             DestroyBattleIfAny();
             _madness.ClearDeviceCapPenalty();
             SyncMadnessCapFromRelics();
+            if (_party.RunHpInitialized)
+                _party.SetCurrentHp(_party.MaxHp);
+            else
+                ApplyProxyBrainRunMaxHp(preserveCurrentHp: false);
+            _madness.ResetMadnessAfterJackpot();
+            _profile.towerRunVitalsRested = true;
+            _profile.towerRunElevatorRestConsumed = false;
             // TODO 未決事項5: 素材は倉庫へ移さず、探索の所持のまま保存する。
             _trust.LogEnd("帰還", _profile);
             MetaProgression.BankRunCoins(_profile, _party);
@@ -1326,7 +1677,7 @@ namespace TypingRoguelike.Run
                 _exploration,
                 _clearedNodesThisRun,
                 _madness);
-            ShowHub();
+            ShowRunResult(false, "エレベーター帰還", ShowHub);
         }
 
         string FormatHpLine() => $"現在 HP {(int)_party.CurrentHp} / {(int)_party.MaxHp}";
@@ -1438,13 +1789,17 @@ namespace TypingRoguelike.Run
             ApplyRelicBattleModifiers(ref mods);
             ApplyTrustBattleModifiers(ref mods);
             ApplyFloorStrengthBand(ref mods);
+            ApplyGlobalEnemyHpScale(ref mods);
             ApplyOpinionCombatModifiers(ref mods, node);
+            ApplyLayerCombatModifiers(ref mods);
+            ApplyEventBattleModifiers(ref mods, node);
             DestroyBattleIfAny();
             var root = new GameObject("BattleRoot");
             root.transform.SetParent(transform, false);
             _battle = root.AddComponent<BattleController>();
             try
             {
+                var floor = _dungeon.Floor;
                 _battle.Initialize(
                     enc,
                     _party,
@@ -1453,7 +1808,9 @@ namespace TypingRoguelike.Run
                     OnBattleDefeat,
                     OnBattleInsanity,
                     mods,
-                    PartyCombatStats.Compute(_party, dungeonRun));
+                    PartyCombatStats.Compute(_party, dungeonRun),
+                    floor);
+                _battle.OnCorrectCharacter = () => RunScore.AddTyped(_profile, floor, 1);
             }
             catch (Exception ex)
             {
@@ -1487,7 +1844,7 @@ namespace TypingRoguelike.Run
             mods.ShowEnemyAttackTime = bonus.ShowEnemyAttackTime;
         }
 
-        /// <summary>5層ごとに敵HP・攻撃を一段上げる。1–5層は基準、6–10層、11–15層。</summary>
+        /// <summary>5層ごとに敵が強くなる。1–5層は基準、6–10層が一段、11層以降がもう一段。</summary>
         void ApplyFloorStrengthBand(ref EncounterBattleModifiers mods)
         {
             var floor = _dungeon != null ? _dungeon.Floor : 1;
@@ -1495,9 +1852,30 @@ namespace TypingRoguelike.Run
             if (band <= 0)
                 return;
 
-            mods.EnemyHpMultiplier *= 1f + band * 0.45f;
-            mods.EnemyDamageMultiplier *= 1f + band * 0.3f;
+            if (band == 1)
+            {
+                mods.EnemyHpMultiplier *= 1.15f;
+                mods.EnemyDamageMultiplier *= 1.3f;
+                mods.EnemyAttackIntervalMultiplier = IntervalMultiplier(mods) * 0.9f;
+                return;
+            }
+
+            mods.EnemyHpMultiplier *= 1.3f;
+            mods.EnemyDamageMultiplier *= 1.6f;
+            mods.EnemyAttackIntervalMultiplier = IntervalMultiplier(mods) * 0.8f;
         }
+
+        void ApplyGlobalEnemyHpScale(ref EncounterBattleModifiers mods)
+        {
+            var scale = dungeonRun != null && dungeonRun.globalEnemyHpScale > 0f
+                ? dungeonRun.globalEnemyHpScale
+                : 1f;
+            var current = mods.EnemyHpMultiplier <= 0f ? 1f : mods.EnemyHpMultiplier;
+            mods.EnemyHpMultiplier = current * scale;
+        }
+
+        static float IntervalMultiplier(EncounterBattleModifiers mods) =>
+            mods.EnemyAttackIntervalMultiplier <= 0f ? 1f : mods.EnemyAttackIntervalMultiplier;
 
         void ApplyOpinionCombatModifiers(ref EncounterBattleModifiers mods, LayerSquare node)
         {
@@ -1525,8 +1903,8 @@ namespace TypingRoguelike.Run
         EncounterBattleModifiers BuildCombatMods() => new()
         {
             EnemyHpMultiplier = dungeonRun != null ? dungeonRun.combatEnemyHpMultiplier : 0.72f,
-            EnemyDamageMultiplier = 0.62f,
-            EnemySpeedMultiplier = 0.88f
+            EnemyDamageMultiplier = 1f,
+            EnemySpeedMultiplier = 1f
         };
 
         EncounterBattleModifiers BuildEliteMods()
@@ -1536,8 +1914,9 @@ namespace TypingRoguelike.Run
             return new EncounterBattleModifiers
             {
                 EnemyHpMultiplier = hp * Mathf.Clamp(eliteHpScale * 0.55f, 0.85f, 1.15f),
-                EnemyDamageMultiplier = Mathf.Max(0.55f, (dungeonRun?.eliteEnemyDamageMultiplier ?? 1.2f) * 0.62f),
-                EnemySpeedMultiplier = 0.88f,
+                EnemyDamageMultiplier = 1f,
+                EnemySpeedMultiplier = 1f,
+                EnemyTier = ExEnemyTier.Elite,
                 StartLogMessage = "💀 強敵が道を塞いでいる！"
             };
         }
@@ -1545,8 +1924,9 @@ namespace TypingRoguelike.Run
         static EncounterBattleModifiers BuildBossMods() => new()
         {
             EnemyHpMultiplier = 0.9f,
-            EnemyDamageMultiplier = 0.68f,
-            EnemySpeedMultiplier = 0.88f,
+            EnemyDamageMultiplier = 1f,
+            EnemySpeedMultiplier = 1f,
+            EnemyTier = ExEnemyTier.Boss,
             StartLogMessage = "🔥 塔の主が姿を現した！"
         };
 
@@ -1568,7 +1948,12 @@ namespace TypingRoguelike.Run
             }
 
             _battle?.SetRunMenuOpen(true);
+            if (IsTowerBossVictory())
+                RunScore.AddBoss(_profile, _dungeon.Floor);
+            else
+                RunScore.AddTrash(_profile, _dungeon.Floor);
             ApplyTrustPostBattleHeal();
+            ApplyLayerPostBattleHeal();
             if (IsTowerBossVictory())
             {
                 ClearOpinionCombatMods();
@@ -1579,8 +1964,13 @@ namespace TypingRoguelike.Run
 
             var coins = GrantCoinsForCurrentBattle();
             _party.AddCoins(coins);
+            var eventBattle = _profile?.eventBattle;
+            var victoryText = eventBattle?.active == true ? eventBattle.victoryText : "";
+            var eventTitle = eventBattle?.eventTitle;
+            if (ApplyEventBattleRewards(out var eventNote))
+                return;
             ClearOpinionCombatMods();
-            StartCoroutine(CombatVictoryRoutine(coins));
+            StartCoroutine(CombatVictoryRoutine(coins, eventNote, victoryText, eventTitle));
         }
 
         IEnumerator BossVictoryRoutine()
@@ -1592,8 +1982,7 @@ namespace TypingRoguelike.Run
             ClearPendingEventBattle();
             PersistActiveRun();
             OfferCardReward(
-                mustTake: true,
-                notice: "塔の主を倒した。刻印を1枚選ぶ。",
+                notice: "塔の主を倒した。刻印を1枚選ぶ。取らないこともできる。",
                 onFinished: () => StartCoroutine(FinishBossVictory()));
         }
 
@@ -1603,23 +1992,28 @@ namespace TypingRoguelike.Run
             if (cur == null)
                 return dungeonRun != null ? dungeonRun.combatCoinReward : 8;
 
-            if (cur.Type is DungeonNodeType.Combat or DungeonNodeType.MidBoss)
+            var eventElite = cur.Type == DungeonNodeType.Event
+                && _profile?.eventBattle != null
+                && _profile.eventBattle.active
+                && _profile.eventBattle.elite;
+            if (cur.Type is DungeonNodeType.Combat or DungeonNodeType.MidBoss || eventElite || cur.Type == DungeonNodeType.Event)
             {
-                var elite = cur.Type == DungeonNodeType.MidBoss;
+                var elite = cur.Type == DungeonNodeType.MidBoss || eventElite;
                 var reward = dungeonRun != null
                     ? elite ? dungeonRun.eliteCoinReward : dungeonRun.combatCoinReward
                     : elite ? 15 : 8;
                 reward = _dungeon.ScaleCoinGain(reward);
-                if (!elite && _profile != null && _profile.opinionCombatCoinScale > 0f &&
+                reward = ApplyLayerCoinScale(reward);
+                if (!elite && cur.Type == DungeonNodeType.Combat && _profile != null && _profile.opinionCombatCoinScale > 0f &&
                     !Mathf.Approximately(_profile.opinionCombatCoinScale, 1f))
                     reward = Mathf.Max(0, Mathf.RoundToInt(reward * _profile.opinionCombatCoinScale));
                 return reward;
             }
 
-            return _dungeon.ScaleCoinGain(dungeonRun != null ? dungeonRun.combatCoinReward : 8);
+            return ApplyLayerCoinScale(_dungeon.ScaleCoinGain(dungeonRun != null ? dungeonRun.combatCoinReward : 8));
         }
 
-        IEnumerator CombatVictoryRoutine(int coins)
+        IEnumerator CombatVictoryRoutine(int coins, string eventNote, string victoryText, string eventTitle)
         {
             yield return null;
             _overlay.HideAll();
@@ -1628,9 +2022,19 @@ namespace TypingRoguelike.Run
             ClearPendingEventBattle();
             MarkCurrentCleared();
             PersistActiveRun();
-            OfferCardReward(
-                mustTake: true,
-                notice: $"戦闘に勝った。塔片 +{coins}。刻印を1枚選ぶ。");
+            var notice = $"戦闘に勝った。塔片 +{coins}。刻印を1枚選ぶ。取らないこともできる。";
+            if (!string.IsNullOrEmpty(eventNote))
+                notice += "\n" + eventNote;
+            var followUp = _eventWarpFloor > 0 || _grantEventRelicAfterCards
+                ? (Action)FinishEventBattleExtras
+                : null;
+            if (string.IsNullOrWhiteSpace(victoryText))
+                OfferCardReward(notice: notice, onFinished: followUp);
+            else
+                _pathUi.ShowModal(eventTitle, victoryText, new (string, Action)[]
+                {
+                    ("次へ", () => OfferCardReward(notice: notice, onFinished: followUp))
+                });
         }
 
         bool IsTowerBossVictory()
@@ -1660,12 +2064,13 @@ namespace TypingRoguelike.Run
             _profile.clearedTowerNodeIds.Clear();
             _trust.LogEnd("クリア", _profile);
             _trust.ResetRunCounters(_profile);
+            PersonalityCatalog.ClearMood(_profile);
             _opinionRng = null;
             MetaProgression.RollTowerSeed(_profile);
             MetaProgression.Save(_profile);
             RecordRunResult(true);
             _pathUi.Hide();
-            ShowHub();
+            ShowRunResult(false, "塔を踏破", ShowHub);
         }
 
         void OnBattleDefeat()
@@ -1706,6 +2111,8 @@ namespace TypingRoguelike.Run
             _exploration.Clear();
             _party.ResetAcquiredSkillCards();
             _party.ClearRunCoins();
+            _party.ResetBlood();
+            _party.ResetCarriedFocus();
             _madness.ResetForNewRun(ComputeFullMadnessCap());
             _trust.LogEnd("全滅", _profile);
             _opinionRng = null;
@@ -1726,14 +2133,12 @@ namespace TypingRoguelike.Run
             DestroyBattleIfAny();
             ApplyWipe();
             _pathUi.Hide();
-            ShowHub();
-            _overlay.ShowDeathNotice(transform, 0, fromInsanity ? "狂気が限界に達し、探索は終わった。" : null);
+            ShowRunResult(true, fromInsanity ? "発狂" : "死亡", ShowHub);
             _defeatHandling = false;
         }
 
         void OfferCardReward(bool mustTake = false, string notice = null, Action onFinished = null)
         {
-            _cardRewardMustTake = mustTake;
             _afterCardReward = onFinished;
 
             var pool = ResolveRewardPool();
@@ -1765,15 +2170,45 @@ namespace TypingRoguelike.Run
                 .Select(m => m.character?.characterName)
                 .Where(n => !string.IsNullOrEmpty(n))
                 .ToList();
+            var excluded = _party.GetOwnedSkillIds();
+            var swordsman = SwordsmanSkillConfig.Load();
+            var axe = AxeSkillConfig.Load();
+            if (pool?.cards != null)
+            {
+                foreach (var card in pool.cards)
+                {
+                    if (card == null)
+                        continue;
+                    if (swordsman != null && swordsman.HidesReward(card.skillId))
+                        excluded.Add(card.skillId);
+                    if (axe != null && axe.HidesReward(card))
+                        excluded.Add(card.skillId);
+                }
+            }
+
             var choices = CardRewardPicker.PickChoices(
                 pool,
                 count,
                 null,
-                _party.GetMaxedSkillIds(),
+                excluded,
                 partyNames);
             if (choices.Count == 0)
             {
                 FinishCardReward("刻印", "入手できる新しい刻印はなかった。");
+                return;
+            }
+
+            _pendingRewardChoices = choices;
+            _pendingRewardMustTake = mustTake;
+            _pendingRewardNotice = notice;
+            ShowPendingCardReward();
+        }
+
+        void ShowPendingCardReward()
+        {
+            if (_pendingRewardChoices == null || _pendingRewardChoices.Count == 0)
+            {
+                FinishCardReward();
                 return;
             }
 
@@ -1783,10 +2218,10 @@ namespace TypingRoguelike.Run
                 _overlay.ShowCardReward(
                     transform,
                     _party,
-                    choices,
+                    _pendingRewardChoices,
                     HandleRewardCard,
-                    mustTake ? null : () => FinishCardReward(),
-                    notice);
+                    _pendingRewardMustTake ? null : BeginSkillXpGrant,
+                    _pendingRewardNotice);
             }
             catch (Exception ex)
             {
@@ -1795,11 +2230,34 @@ namespace TypingRoguelike.Run
             }
         }
 
+        void BeginSkillXpGrant()
+        {
+            _overlay.ShowSkillXpPick(
+                transform,
+                _party,
+                SkillProgression.XpPerSkippedReward,
+                (memberIndex, slotIndex) =>
+                {
+                    if (!_party.TryGrantSlotXp(memberIndex, slotIndex, SkillProgression.XpPerSkippedReward, out var grant))
+                    {
+                        ShowPendingCardReward();
+                        return;
+                    }
+
+                    _pendingRewardChoices = null;
+                    var body = grant.Leveled
+                        ? $"{grant.SkillName}\nLv.{grant.PreviousLevel} → Lv.{grant.NewLevel}\n{SkillProgression.FormatXp(grant.Xp)}"
+                        : $"{grant.SkillName}\n経験値 +{SkillProgression.XpPerSkippedReward}\n{SkillProgression.FormatXp(grant.Xp)}";
+                    FinishCardReward(grant.Leveled ? "刻印強化" : "経験値", body);
+                },
+                ShowPendingCardReward);
+        }
+
         void FinishCardReward(string modalTitle = null, string modalBody = null)
         {
             var next = _afterCardReward;
             _afterCardReward = null;
-            _cardRewardMustTake = false;
+            _pendingRewardChoices = null;
             if (next == null)
             {
                 CompleteNodeAndReturnToMap(modalTitle, modalBody);
@@ -1844,16 +2302,10 @@ namespace TypingRoguelike.Run
                     Debug.Log($"カード自動装備: {card.displayName}");
                     FinishCardReward();
                     break;
-                case RewardEquipOutcome.LeveledUp:
-                    FinishCardReward(
-                        "刻印強化",
-                        $"{card.displayName}\nLv.{newLevel - 1} → Lv.{newLevel}\n" +
-                        $"{SkillProgression.Describe(card, newLevel - 1)}\n→ {SkillProgression.Describe(card, newLevel)}");
-                    break;
-                case RewardEquipOutcome.AlreadyMax:
+                case RewardEquipOutcome.AlreadyOwned:
                     FinishCardReward(
                         "刻印",
-                        $"{card.displayName} はすでに Lv.{SkillProgression.MaxLevel} です。");
+                        $"{card.displayName} は所持済みです。\nレベルは戦闘の発動と、取得を見送ったときの経験値で上がります。");
                     break;
                 case RewardEquipOutcome.NeedReplace:
                     _overlay.ShowReplaceSlot(
@@ -1862,8 +2314,7 @@ namespace TypingRoguelike.Run
                         memberIndex,
                         card,
                         () => FinishCardReward(),
-                        _cardRewardMustTake ? null : () => FinishCardReward(),
-                        cardSlotsOnly: true);
+                        () => FinishCardReward());
                     break;
                 case RewardEquipOutcome.NoMatchingMember:
                     FinishCardReward(
@@ -1924,19 +2375,13 @@ namespace TypingRoguelike.Run
         }
 
 
-        bool TryStartPendingEventBattle()
-        {
-            if (_profile == null || !_profile.towerRunEventBattlePending)
-                return false;
-            ClearPendingEventBattle();
-            PersistActiveRun();
-            return false;
-        }
-
         void ClearPendingEventBattle()
         {
-            if (_profile != null)
-                _profile.towerRunEventBattlePending = false;
+            if (_profile == null)
+                return;
+            _profile.towerRunEventBattlePending = false;
+            if (_profile.eventBattle != null)
+                _profile.eventBattle.active = false;
         }
 
         void SyncSeenEventsToProfile()

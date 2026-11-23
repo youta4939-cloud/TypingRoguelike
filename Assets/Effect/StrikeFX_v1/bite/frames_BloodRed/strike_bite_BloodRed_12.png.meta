@@ -1,0 +1,1573 @@
+fileFormatVersion: 2
+guid: 47cc1ebfe5c35a94e872ac20786de8b7
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 5643187446838760255
+    second: strike_bite_BloodRed_12_0
+  - first:
+      213: 3268074391270402270
+    second: strike_bite_BloodRed_12_1
+  - first:
+      213: -6809175777699132636
+    second: strike_bite_BloodRed_12_2
+  - first:
+      213: 7030278630721123697
+    second: strike_bite_BloodRed_12_3
+  - first:
+      213: -6120715084398471532
+    second: strike_bite_BloodRed_12_4
+  - first:
+      213: -4736384948365749712
+    second: strike_bite_BloodRed_12_5
+  - first:
+      213: -2683946882954478157
+    second: strike_bite_BloodRed_12_6
+  - first:
+      213: 8472978234347553917
+    second: strike_bite_BloodRed_12_7
+  - first:
+      213: 4570514300641328998
+    second: strike_bite_BloodRed_12_8
+  - first:
+      213: -3360585574634007513
+    second: strike_bite_BloodRed_12_9
+  - first:
+      213: 2258074729833028442
+    second: strike_bite_BloodRed_12_10
+  - first:
+      213: 7265857786117603007
+    second: strike_bite_BloodRed_12_11
+  - first:
+      213: -3415722199384022797
+    second: strike_bite_BloodRed_12_12
+  - first:
+      213: 5436132279865959489
+    second: strike_bite_BloodRed_12_13
+  - first:
+      213: 3576758321179762814
+    second: strike_bite_BloodRed_12_14
+  - first:
+      213: -5406503114356888801
+    second: strike_bite_BloodRed_12_15
+  - first:
+      213: 5605374237863539342
+    second: strike_bite_BloodRed_12_16
+  - first:
+      213: 3636715277120044545
+    second: strike_bite_BloodRed_12_17
+  - first:
+      213: -8956199904135898051
+    second: strike_bite_BloodRed_12_18
+  - first:
+      213: -4151469656518633786
+    second: strike_bite_BloodRed_12_19
+  - first:
+      213: 9084994285704417777
+    second: strike_bite_BloodRed_12_20
+  - first:
+      213: -3783341991042681887
+    second: strike_bite_BloodRed_12_21
+  - first:
+      213: 7802536341359182580
+    second: strike_bite_BloodRed_12_22
+  - first:
+      213: 2010427127696238484
+    second: strike_bite_BloodRed_12_23
+  - first:
+      213: 2102972569796600643
+    second: strike_bite_BloodRed_12_24
+  - first:
+      213: -5823758184037393586
+    second: strike_bite_BloodRed_12_25
+  - first:
+      213: 2635591376896006491
+    second: strike_bite_BloodRed_12_26
+  - first:
+      213: -9210069514254257080
+    second: strike_bite_BloodRed_12_27
+  - first:
+      213: 826123781995474950
+    second: strike_bite_BloodRed_12_28
+  - first:
+      213: 5735334865463642492
+    second: strike_bite_BloodRed_12_29
+  - first:
+      213: -2194738226400214237
+    second: strike_bite_BloodRed_12_30
+  - first:
+      213: -7894701769544569282
+    second: strike_bite_BloodRed_12_31
+  - first:
+      213: -4529908844875355982
+    second: strike_bite_BloodRed_12_32
+  - first:
+      213: -8785535008099434012
+    second: strike_bite_BloodRed_12_33
+  - first:
+      213: -6530050185604629550
+    second: strike_bite_BloodRed_12_34
+  - first:
+      213: -1164132762692553961
+    second: strike_bite_BloodRed_12_35
+  - first:
+      213: -7711230347765026356
+    second: strike_bite_BloodRed_12_36
+  - first:
+      213: -6562577574101048869
+    second: strike_bite_BloodRed_12_37
+  - first:
+      213: 654696148187044217
+    second: strike_bite_BloodRed_12_38
+  - first:
+      213: -1650195881155384175
+    second: strike_bite_BloodRed_12_39
+  - first:
+      213: -6756051963661564077
+    second: strike_bite_BloodRed_12_40
+  - first:
+      213: -4953646558158903176
+    second: strike_bite_BloodRed_12_41
+  - first:
+      213: 7091996931970501379
+    second: strike_bite_BloodRed_12_42
+  - first:
+      213: -1345536465017581269
+    second: strike_bite_BloodRed_12_43
+  - first:
+      213: -8788493999512328950
+    second: strike_bite_BloodRed_12_44
+  - first:
+      213: -8725788934542209003
+    second: strike_bite_BloodRed_12_45
+  - first:
+      213: 1089179404661800691
+    second: strike_bite_BloodRed_12_46
+  - first:
+      213: -7836557216672908717
+    second: strike_bite_BloodRed_12_47
+  - first:
+      213: -586855174318116152
+    second: strike_bite_BloodRed_12_48
+  - first:
+      213: -7329170287860677610
+    second: strike_bite_BloodRed_12_49
+  - first:
+      213: -2231820140457080454
+    second: strike_bite_BloodRed_12_50
+  - first:
+      213: 4122659073637814
+    second: strike_bite_BloodRed_12_51
+  - first:
+      213: 6377284036922726945
+    second: strike_bite_BloodRed_12_52
+  - first:
+      213: -4629887172668045284
+    second: strike_bite_BloodRed_12_53
+  - first:
+      213: 5015973814334494957
+    second: strike_bite_BloodRed_12_54
+  - first:
+      213: 3577869481680053546
+    second: strike_bite_BloodRed_12_55
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 0
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_0
+      rect:
+        serializedVersion: 2
+        x: 37
+        y: 238
+        width: 96
+        height: 100
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f3394c18511a05e40800000000000000
+      internalID: 5643187446838760255
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_1
+      rect:
+        serializedVersion: 2
+        x: 317
+        y: 247
+        width: 32
+        height: 73
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ed8293708588a5d20800000000000000
+      internalID: 3268074391270402270
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_2
+      rect:
+        serializedVersion: 2
+        x: 387
+        y: 279
+        width: 66
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 42b8c0de4b2f081a0800000000000000
+      internalID: -6809175777699132636
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_3
+      rect:
+        serializedVersion: 2
+        x: 127
+        y: 247
+        width: 13
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 175f628aa21909160800000000000000
+      internalID: 7030278630721123697
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_4
+      rect:
+        serializedVersion: 2
+        x: 163
+        y: 247
+        width: 12
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 496dd074f0ade0ba0800000000000000
+      internalID: -6120715084398471532
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_5
+      rect:
+        serializedVersion: 2
+        x: 190
+        y: 239
+        width: 12
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0321721ebfaf44eb0800000000000000
+      internalID: -4736384948365749712
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_6
+      rect:
+        serializedVersion: 2
+        x: 205
+        y: 239
+        width: 12
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3bd3b75b784b0cad0800000000000000
+      internalID: -2683946882954478157
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_7
+      rect:
+        serializedVersion: 2
+        x: 231
+        y: 247
+        width: 12
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d7407e7ffc0169570800000000000000
+      internalID: 8472978234347553917
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_8
+      rect:
+        serializedVersion: 2
+        x: 250
+        y: 239
+        width: 12
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 66fb1927a8abd6f30800000000000000
+      internalID: 4570514300641328998
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_9
+      rect:
+        serializedVersion: 2
+        x: 270
+        y: 247
+        width: 12
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 72453aa993dcc51d0800000000000000
+      internalID: -3360585574634007513
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_10
+      rect:
+        serializedVersion: 2
+        x: 295
+        y: 239
+        width: 12
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a5bdbf3c00b465f10800000000000000
+      internalID: 2258074729833028442
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_11
+      rect:
+        serializedVersion: 2
+        x: 311
+        y: 239
+        width: 12
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fbebb0a092385d460800000000000000
+      internalID: 7265857786117603007
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_12
+      rect:
+        serializedVersion: 2
+        x: 349
+        y: 255
+        width: 10
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3f0ac46c1cae890d0800000000000000
+      internalID: -3415722199384022797
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_13
+      rect:
+        serializedVersion: 2
+        x: 374
+        y: 247
+        width: 12
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 144e175b185017b40800000000000000
+      internalID: 5436132279865959489
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_14
+      rect:
+        serializedVersion: 2
+        x: 400
+        y: 239
+        width: 12
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e70a75d1eb233a130800000000000000
+      internalID: 3576758321179762814
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_15
+      rect:
+        serializedVersion: 2
+        x: 452
+        y: 247
+        width: 10
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f1be6b7ff0e38f4b0800000000000000
+      internalID: -5406503114356888801
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_16
+      rect:
+        serializedVersion: 2
+        x: 504
+        y: 252
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e827bf8bb2a4acd40800000000000000
+      internalID: 5605374237863539342
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_17
+      rect:
+        serializedVersion: 2
+        x: 41
+        y: 245
+        width: 10
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 10ef9f1c645387230800000000000000
+      internalID: 3636715277120044545
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_18
+      rect:
+        serializedVersion: 2
+        x: 367
+        y: 244
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d3c9790a3af25b380800000000000000
+      internalID: -8956199904135898051
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_19
+      rect:
+        serializedVersion: 2
+        x: 461
+        y: 243
+        width: 10
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6c6d463c7540366c0800000000000000
+      internalID: -4151469656518633786
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_20
+      rect:
+        serializedVersion: 2
+        x: 78
+        y: 230
+        width: 7
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1f19dd12b22641e70800000000000000
+      internalID: 9084994285704417777
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_21
+      rect:
+        serializedVersion: 2
+        x: 109
+        y: 234
+        width: 7
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1e3f410118ede7bc0800000000000000
+      internalID: -3783341991042681887
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_22
+      rect:
+        serializedVersion: 2
+        x: 141
+        y: 231
+        width: 10
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4f24acd767d284c60800000000000000
+      internalID: 7802536341359182580
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_23
+      rect:
+        serializedVersion: 2
+        x: 156
+        y: 229
+        width: 9
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 497a42922d876eb10800000000000000
+      internalID: 2010427127696238484
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_24
+      rect:
+        serializedVersion: 2
+        x: 413
+        y: 237
+        width: 9
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 343ed1309624f2d10800000000000000
+      internalID: 2102972569796600643
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_25
+      rect:
+        serializedVersion: 2
+        x: 88
+        y: 219
+        width: 11
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e4b5da689cadd2fa0800000000000000
+      internalID: -5823758184037393586
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_26
+      rect:
+        serializedVersion: 2
+        x: 95
+        y: 217
+        width: 6
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b5918f0b460839420800000000000000
+      internalID: 2635591376896006491
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_27
+      rect:
+        serializedVersion: 2
+        x: 315
+        y: 215
+        width: 7
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8447836e2924f2080800000000000000
+      internalID: -9210069514254257080
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_28
+      rect:
+        serializedVersion: 2
+        x: 400
+        y: 220
+        width: 9
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 600b756e33bf67b00800000000000000
+      internalID: 826123781995474950
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_29
+      rect:
+        serializedVersion: 2
+        x: 409
+        y: 225
+        width: 10
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c798fdb4ca0089f40800000000000000
+      internalID: 5735334865463642492
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_30
+      rect:
+        serializedVersion: 2
+        x: 422
+        y: 213
+        width: 18
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 323c1781639ba81e0800000000000000
+      internalID: -2194738226400214237
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_31
+      rect:
+        serializedVersion: 2
+        x: 57
+        y: 208
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e3ee5aa8192607290800000000000000
+      internalID: -7894701769544569282
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_32
+      rect:
+        serializedVersion: 2
+        x: 125
+        y: 212
+        width: 7
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2b8ed44f7e78221c0800000000000000
+      internalID: -4529908844875355982
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_33
+      rect:
+        serializedVersion: 2
+        x: 144
+        y: 207
+        width: 7
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4e189783572831680800000000000000
+      internalID: -8785535008099434012
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_34
+      rect:
+        serializedVersion: 2
+        x: 156
+        y: 208
+        width: 7
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2dbff8134f99065a0800000000000000
+      internalID: -6530050185604629550
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_35
+      rect:
+        serializedVersion: 2
+        x: 388
+        y: 206
+        width: 6
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 713f0509b6b28dfe0800000000000000
+      internalID: -1164132762692553961
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_36
+      rect:
+        serializedVersion: 2
+        x: 490
+        y: 205
+        width: 12
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cc1f044cad43cf490800000000000000
+      internalID: -7711230347765026356
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_37
+      rect:
+        serializedVersion: 2
+        x: 1
+        y: 199
+        width: 13
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bd123c4677a0de4a0800000000000000
+      internalID: -6562577574101048869
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_38
+      rect:
+        serializedVersion: 2
+        x: 53
+        y: 196
+        width: 13
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 97951849da2f51900800000000000000
+      internalID: 654696148187044217
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_39
+      rect:
+        serializedVersion: 2
+        x: 424
+        y: 202
+        width: 9
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 19cabe5d6935919e0800000000000000
+      internalID: -1650195881155384175
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_40
+      rect:
+        serializedVersion: 2
+        x: 71
+        y: 191
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3574fddb88ead32a0800000000000000
+      internalID: -6756051963661564077
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_41
+      rect:
+        serializedVersion: 2
+        x: 72
+        y: 178
+        width: 14
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8782a1e63bc114bb0800000000000000
+      internalID: -4953646558158903176
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_42
+      rect:
+        serializedVersion: 2
+        x: 94
+        y: 169
+        width: 18
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 30b034672a5db6260800000000000000
+      internalID: 7091996931970501379
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_43
+      rect:
+        serializedVersion: 2
+        x: 135
+        y: 177
+        width: 33
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b21da4ac6b1b35de0800000000000000
+      internalID: -1345536465017581269
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_44
+      rect:
+        serializedVersion: 2
+        x: 425
+        y: 176
+        width: 14
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a056a68554ff80680800000000000000
+      internalID: -8788493999512328950
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_45
+      rect:
+        serializedVersion: 2
+        x: 438
+        y: 181
+        width: 9
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 510d39bf135c7e680800000000000000
+      internalID: -8725788934542209003
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_46
+      rect:
+        serializedVersion: 2
+        x: 455
+        y: 182
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3feb987d5ea8d1f00800000000000000
+      internalID: 1089179404661800691
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_47
+      rect:
+        serializedVersion: 2
+        x: 57
+        y: 167
+        width: 11
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 35aff263bb4fe3390800000000000000
+      internalID: -7836557216672908717
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_48
+      rect:
+        serializedVersion: 2
+        x: 301
+        y: 168
+        width: 7
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8c23b2804521bd7f0800000000000000
+      internalID: -586855174318116152
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_49
+      rect:
+        serializedVersion: 2
+        x: 331
+        y: 157
+        width: 17
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 61487bd647e894a90800000000000000
+      internalID: -7329170287860677610
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_50
+      rect:
+        serializedVersion: 2
+        x: 374
+        y: 164
+        width: 9
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a794e7d286bf601e0800000000000000
+      internalID: -2231820140457080454
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_51
+      rect:
+        serializedVersion: 2
+        x: 473
+        y: 173
+        width: 9
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6bd3d9d5985ae0000800000000000000
+      internalID: 4122659073637814
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_52
+      rect:
+        serializedVersion: 2
+        x: 26
+        y: 159
+        width: 13
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 12a5c841b0aa08850800000000000000
+      internalID: 6377284036922726945
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_53
+      rect:
+        serializedVersion: 2
+        x: 206
+        y: 127
+        width: 6
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c18cbfa85265fbfb0800000000000000
+      internalID: -4629887172668045284
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_54
+      rect:
+        serializedVersion: 2
+        x: 305
+        y: 127
+        width: 9
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: de8911ebb915c9540800000000000000
+      internalID: 5015973814334494957
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_bite_BloodRed_12_55
+      rect:
+        serializedVersion: 2
+        x: 455
+        y: 130
+        width: 15
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a252044565527a130800000000000000
+      internalID: 3577869481680053546
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      strike_bite_BloodRed_12_0: 5643187446838760255
+      strike_bite_BloodRed_12_1: 3268074391270402270
+      strike_bite_BloodRed_12_10: 2258074729833028442
+      strike_bite_BloodRed_12_11: 7265857786117603007
+      strike_bite_BloodRed_12_12: -3415722199384022797
+      strike_bite_BloodRed_12_13: 5436132279865959489
+      strike_bite_BloodRed_12_14: 3576758321179762814
+      strike_bite_BloodRed_12_15: -5406503114356888801
+      strike_bite_BloodRed_12_16: 5605374237863539342
+      strike_bite_BloodRed_12_17: 3636715277120044545
+      strike_bite_BloodRed_12_18: -8956199904135898051
+      strike_bite_BloodRed_12_19: -4151469656518633786
+      strike_bite_BloodRed_12_2: -6809175777699132636
+      strike_bite_BloodRed_12_20: 9084994285704417777
+      strike_bite_BloodRed_12_21: -3783341991042681887
+      strike_bite_BloodRed_12_22: 7802536341359182580
+      strike_bite_BloodRed_12_23: 2010427127696238484
+      strike_bite_BloodRed_12_24: 2102972569796600643
+      strike_bite_BloodRed_12_25: -5823758184037393586
+      strike_bite_BloodRed_12_26: 2635591376896006491
+      strike_bite_BloodRed_12_27: -9210069514254257080
+      strike_bite_BloodRed_12_28: 826123781995474950
+      strike_bite_BloodRed_12_29: 5735334865463642492
+      strike_bite_BloodRed_12_3: 7030278630721123697
+      strike_bite_BloodRed_12_30: -2194738226400214237
+      strike_bite_BloodRed_12_31: -7894701769544569282
+      strike_bite_BloodRed_12_32: -4529908844875355982
+      strike_bite_BloodRed_12_33: -8785535008099434012
+      strike_bite_BloodRed_12_34: -6530050185604629550
+      strike_bite_BloodRed_12_35: -1164132762692553961
+      strike_bite_BloodRed_12_36: -7711230347765026356
+      strike_bite_BloodRed_12_37: -6562577574101048869
+      strike_bite_BloodRed_12_38: 654696148187044217
+      strike_bite_BloodRed_12_39: -1650195881155384175
+      strike_bite_BloodRed_12_4: -6120715084398471532
+      strike_bite_BloodRed_12_40: -6756051963661564077
+      strike_bite_BloodRed_12_41: -4953646558158903176
+      strike_bite_BloodRed_12_42: 7091996931970501379
+      strike_bite_BloodRed_12_43: -1345536465017581269
+      strike_bite_BloodRed_12_44: -8788493999512328950
+      strike_bite_BloodRed_12_45: -8725788934542209003
+      strike_bite_BloodRed_12_46: 1089179404661800691
+      strike_bite_BloodRed_12_47: -7836557216672908717
+      strike_bite_BloodRed_12_48: -586855174318116152
+      strike_bite_BloodRed_12_49: -7329170287860677610
+      strike_bite_BloodRed_12_5: -4736384948365749712
+      strike_bite_BloodRed_12_50: -2231820140457080454
+      strike_bite_BloodRed_12_51: 4122659073637814
+      strike_bite_BloodRed_12_52: 6377284036922726945
+      strike_bite_BloodRed_12_53: -4629887172668045284
+      strike_bite_BloodRed_12_54: 5015973814334494957
+      strike_bite_BloodRed_12_55: 3577869481680053546
+      strike_bite_BloodRed_12_6: -2683946882954478157
+      strike_bite_BloodRed_12_7: 8472978234347553917
+      strike_bite_BloodRed_12_8: 4570514300641328998
+      strike_bite_BloodRed_12_9: -3360585574634007513
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

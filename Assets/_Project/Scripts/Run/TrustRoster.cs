@@ -110,7 +110,7 @@ namespace TypingRoguelike.Run
                     {
                         if (config == null)
                             continue;
-                        if (config.displayName == name || config.characterId == name)
+                        if (StarterCharacters.Same(config.characterId, name) || config.displayName == name)
                             matched.Add(config);
                     }
                 }
@@ -276,7 +276,7 @@ namespace TypingRoguelike.Run
             {
                 SceneTitle = string.IsNullOrEmpty(sceneName) ? $"{tileName}マス" : $"{tileName}マス — {sceneName}",
                 SceneText = roll.Event != null ? roll.Event.sceneText : "",
-                TileIcon = chrome != null ? chrome.IconFor(tile) : null,
+                TileIcon = chrome != null && chrome.IconFor(tile) != null ? chrome.IconFor(tile) : ReelBuildArt.Tile(tile),
                 Agreed = roll.Agreed,
                 Bubbles = bubbles,
                 Buttons = buttons,
@@ -390,7 +390,7 @@ namespace TypingRoguelike.Run
                 views.Add(new TrustGaugeView
                 {
                     CharacterId = character.characterId,
-                    Name = character.displayName,
+                    Name = StarterCharacters.Shown(character.characterId),
                     Personality = character.PersonalityName(Rules),
                     Trust = trust,
                     PassiveLabel = tier != null && !string.IsNullOrEmpty(tier.label) ? tier.label : "未発動"
@@ -400,15 +400,51 @@ namespace TypingRoguelike.Run
             return views.ToArray();
         }
 
+        public string AdjustTrust(string characterId, int delta, MetaProgressData profile)
+        {
+            if (string.IsNullOrEmpty(characterId) || delta == 0)
+                return "";
+            Bind(profile);
+            var save = FindSave(profile, characterId);
+            var current = save != null ? save.trust : 0;
+            return SetTrust(characterId, current + delta, profile);
+        }
+
+        public int GetTrust(string characterId, MetaProgressData profile)
+        {
+            if (string.IsNullOrEmpty(characterId) || profile == null)
+                return 0;
+            Bind(profile);
+            var save = FindSave(profile, characterId);
+            return save != null ? save.trust : 0;
+        }
+
         public string SetTrust(string characterId, int trust, MetaProgressData profile)
         {
-            Bind(profile);
-            var character = _catalog.FindCharacter(characterId);
-            var save = FindSave(profile, characterId);
-            if (character == null || save == null)
+            if (string.IsNullOrEmpty(characterId) || profile == null)
                 return "";
-            var before = character.ActiveTier(save.trust);
+            Bind(profile);
+            profile.characterTrust ??= new List<CharacterTrustSave>();
+            var save = FindSave(profile, characterId);
+            if (save == null)
+            {
+                var id = StarterCharacters.IsStarter(characterId)
+                    ? StarterCharacters.CanonicalId(characterId)
+                    : characterId;
+                save = new CharacterTrustSave { characterId = id };
+                profile.characterTrust.Add(save);
+            }
+
+            var beforeTrust = save.trust;
             save.trust = Mathf.Clamp(trust, 0, 100);
+            var character = _catalog.FindCharacter(characterId);
+            var name = StarterCharacters.IsStarter(characterId)
+                ? StarterCharacters.Shown(characterId)
+                : character != null ? character.displayName : PersonalityCatalog.DisplayName(characterId);
+            PersonalityCatalog.NotifyPassive1(name, beforeTrust, save.trust);
+            if (character == null)
+                return "";
+            var before = character.ActiveTier(beforeTrust);
             var after = character.ActiveTier(save.trust);
             var beforeLabel = before != null ? before.label : "未発動";
             var afterLabel = after != null ? after.label : "未発動";
@@ -544,6 +580,7 @@ namespace TypingRoguelike.Run
             profile.opinionCombatEnemyHpScale = 1f;
             profile.opinionCombatOpeningSeconds = 0f;
             profile.opinionCombatCoinScale = 1f;
+            PersonalityCatalog.ClearMood(profile);
         }
 
         float AggressiveChance(CharacterConfig character, CharacterTrustSave save, OpinionChoice left, OpinionChoice right)
@@ -659,10 +696,14 @@ namespace TypingRoguelike.Run
         {
             if (profile?.characterTrust == null || string.IsNullOrEmpty(characterId))
                 return null;
+            var id = StarterCharacters.CanonicalId(characterId);
             foreach (var save in profile.characterTrust)
             {
-                if (save != null && save.characterId == characterId)
-                    return save;
+                if (save == null || !StarterCharacters.Same(save.characterId, id))
+                    continue;
+                if (StarterCharacters.IsStarter(id))
+                    save.characterId = id;
+                return save;
             }
 
             return null;

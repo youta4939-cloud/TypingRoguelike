@@ -1,0 +1,185 @@
+{
+ "_note": "マスの種類 → 層ルートのカード。illustration は候補リストから選ぶ（同じ種類が並ぶときは順番に使う：例 戦闘×3 → 01,02,03）。",
+ "cards": [
+  {
+   "type": "battle",
+   "title": "戦闘",
+   "illustrations": [
+    "card_battle_01",
+    "card_battle_02",
+    "card_battle_03"
+   ]
+  },
+  {
+   "type": "rest",
+   "title": "休息",
+   "illustrations": [
+    "card_rest_01"
+   ]
+  },
+  {
+   "type": "treasure",
+   "title": "宝箱",
+   "illustrations": [
+    "card_treasure_01"
+   ]
+  },
+  {
+   "type": "shop",
+   "title": "ショップ",
+   "illustrations": [
+    "card_shop_01"
+   ]
+  },
+  {
+   "type": "event",
+   "title": "イベント",
+   "illustrations": [
+    "card_event_01"
+   ]
+  },
+  {
+   "type": "danger",
+   "title": "Danger",
+   "illustrations": [
+    "card_danger_01"
+   ]
+  },
+  {
+   "type": "boss",
+   "title": "強敵",
+   "illustrations": [
+    "card_boss_01"
+   ],
+   "fixed_slot": 4
+  }
+ ],
+ "states": {
+  "done": {
+   "label": null,
+   "art_tone": {
+    "saturation": 0.08,
+    "brightness": 0.72,
+    "tint": [
+     70,
+     66,
+     64
+    ],
+    "tint_amount": 0.25
+   },
+   "frame": "card_frame_done",
+   "medal": "medallion_done",
+   "crack": true,
+   "grad_bottom": "card_grad_bottom_done",
+   "alpha": 0.86,
+   "title_color": [
+    150,
+    144,
+    138
+   ],
+   "ordinal_color": [
+    168,
+    170,
+    176
+   ]
+  },
+  "current": {
+   "label": "現在地",
+   "label_color": [
+    255,
+    190,
+    90
+   ],
+   "art_tone": null,
+   "frame": "card_frame_normal",
+   "glow": "card_glow_current",
+   "edge_light": true,
+   "scale": 1.06,
+   "title_color": [
+    246,
+    236,
+    220
+   ],
+   "ordinal_color": [
+    255,
+    170,
+    70
+   ],
+   "line_tint": [
+    214,
+    120,
+    52
+   ]
+  },
+  "upcoming": {
+   "label": "未到達",
+   "label_color": [
+    168,
+    184,
+    210
+   ],
+   "art_tone": {
+    "saturation": 0.55,
+    "brightness": 0.62,
+    "tint": [
+     40,
+     58,
+     86
+    ],
+    "tint_amount": 0.28
+   },
+   "frame": "card_frame_upcoming",
+   "title_color": [
+    196,
+    204,
+    216
+   ],
+   "ordinal_color": [
+    196,
+    199,
+    206
+   ],
+   "line_tint": [
+    84,
+    98,
+    124
+   ]
+  },
+  "danger": {
+   "label": "未到達",
+   "label_color": [
+    214,
+    196,
+    200
+   ],
+   "art_tone": {
+    "saturation": 1.0,
+    "brightness": 0.92,
+    "tint": [
+     0,
+     0,
+     0
+    ],
+    "tint_amount": 0
+   },
+   "frame": "card_frame_normal",
+   "glow": "card_glow_boss",
+   "title_color": [
+    246,
+    214,
+    210
+   ],
+   "ordinal_color": [
+    240,
+    66,
+    60
+   ],
+   "line_tint": [
+    170,
+    30,
+    34
+   ],
+   "note": "4th 強敵 card. 未到達 label, red tone & glow kept"
+  }
+ }
+}

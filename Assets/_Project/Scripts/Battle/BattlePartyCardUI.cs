@@ -1,307 +1,246 @@
 using System.Collections.Generic;
+using TMPro;
 using TypingRoguelike.Data;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace TypingRoguelike.Battle
 {
-    /// <summary>戦闘左カラム：Dark Fantasy 風キャラ＋スキルカード。</summary>
+    /// <summary>戦闘左列。血しぶきの上の円形肖像と、装備スキル3段。</summary>
     public static class BattlePartyCardUI
     {
-        const string ArtRoot = "Battle/UI/Stylish/";
+        public static readonly Color SkillBand = BattleHudKit.Band;
+        public static readonly Color SkillBandCooldown = new(0.03f, 0.03f, 0.035f, 0.5f);
 
-        static readonly (string Name, float AnchorTop)[] Roster =
+        public const float ColumnWidth = 472f;
+        public const float MemberHeight = 214f;
+        const float MemberGap = 6f;
+        const float PortraitCenterX = 80f;
+        const float PortraitSize = 132f;
+        const float RowLeft = 170f;
+        const float RowHeight = 64f;
+        const float RowGap = 7f;
+
+        static readonly string[] Roster = { "アリス", "エレン", "ルナ" };
+
+        public sealed class SkillRowView
         {
-            ("アリス", 0.87f),
-            ("エレン", 0.57f),
-            ("ルナ", 0.27f)
-        };
-
-        static Sprite Art(string name) => Resources.Load<Sprite>(ArtRoot + name);
+            public BattleSkillData Skill;
+            public Image Band;
+            public Image Border;
+            public TextMeshProUGUI Name;
+            public TextMeshProUGUI Effect;
+            public BattleHudKit.DotsView Dots;
+            public GameObject Ready;
+            public CanvasGroup Group;
+            public BattleE5bRow E5b;
+        }
 
         public static void Build(
-            Transform partyPanel,
+            Transform partyColumn,
             BattleUIRefs refs,
             IReadOnlyList<BattleSkillData> skills,
             HashSet<int> innateSkillIds,
             BattleVisualContext visuals)
         {
+            _ = innateSkillIds;
             for (var i = 0; i < Roster.Length; i++)
-            {
-                var (name, anchorTop) = Roster[i];
-                BuildCharacterCard(
-                    partyPanel,
-                    refs,
-                    skills,
-                    innateSkillIds,
-                    visuals,
-                    name,
-                    anchorTop,
-                    i + 1);
-            }
+                BuildMember(partyColumn, refs, skills, visuals, Roster[i], i);
         }
 
-        static void BuildCharacterCard(
+        static void BuildMember(
             Transform parent,
             BattleUIRefs refs,
             IReadOnlyList<BattleSkillData> skills,
-            HashSet<int> innateSkillIds,
             BattleVisualContext visuals,
             string name,
-            float anchorTop,
-            int rosterIndex)
+            int index)
         {
             visuals.Characters.TryGetValue(name, out var visual);
-            var cardHeight = 0.28f;
-            var card = BattleUIBuilder.CreatePanelPublic(
-                parent,
-                $"Char_{name}",
-                new Vector2(0.02f, anchorTop - cardHeight),
-                new Vector2(0.98f, anchorTop),
-                new Color(0.04f, 0.02f, 0.06f, 0.92f));
-            refs.CharCards[name] = card;
+            var block = BattleHudKit.Place(parent, $"Char_{name}", new Vector2(0f, 1f), new Vector2(0f, 1f),
+                new Vector2(0f, -index * (MemberHeight + MemberGap)), new Vector2(ColumnWidth, MemberHeight));
+            refs.CharCards[name] = block;
 
-            var splashSprite = Art("InkSplash");
-            var splash = BattleUIBuilder.CreatePanelPublic(
-                card,
-                "InkSplash",
-                new Vector2(-0.02f, 0.02f),
-                new Vector2(0.48f, 0.98f),
-                Color.white,
-                splashSprite);
-            var splashImage = splash.GetComponent<Image>();
-            splashImage.raycastTarget = false;
-            if (splashSprite != null)
+            var splat = BattleHudKit.Place(block, "BloodSplatter", new Vector2(0f, 0.5f), new Vector2(0.5f, 0.5f),
+                new Vector2(PortraitCenterX, 0f), new Vector2(220f, 224f));
+            BattleHudKit.AddImage(splat, BattleHudKit.Art("BloodSplatter"), new Color(0.85f, 0.85f, 0.85f, 0.92f))
+                .preserveAspect = true;
+            splat.localRotation = Quaternion.Euler(0f, 0f, 35f + index * 110f);
+
+            refs.CharPortraits[name] = BattleHudKit.CirclePortrait(block, "Portrait", visual?.Portrait, PortraitSize,
+                new Vector2(0f, 0.5f), new Vector2(PortraitCenterX, 0f), new Color(0f, 0f, 0f, 0.85f), 3f);
+
+            var nameTag = BattleHudKit.Text(block, "CharName", StarterCharacters.Shown(name), BattleHudKit.Mincho, 17f, Color.white,
+                TextAlignmentOptions.Center, new Vector2(0f, 0f), new Vector2(0f, 0f),
+                new Vector2(PortraitCenterX - 60f, 2f), new Vector2(PortraitCenterX + 60f, 26f));
+            BattleHudKit.Outline(nameTag, 0.25f, Color.black);
+
+            var owned = new List<BattleSkillData>();
+            if (skills != null)
             {
-                splashImage.type = Image.Type.Simple;
-                splashImage.preserveAspect = true;
-                splashImage.color = new Color(1f, 1f, 1f, 0.85f);
+                foreach (var skill in skills)
+                {
+                    if (StarterCharacters.Same(skill.CharacterName, name))
+                        owned.Add(skill);
+                }
             }
 
-            var portrait = BattleUIChrome.CreatePortraitPanel(
-                card.transform,
-                visual?.Portrait,
-                BattleUITemplateLoader.Default,
-                88f,
-                112f);
-            var portraitFrameRt = portrait.transform.parent.GetComponent<RectTransform>();
-            portraitFrameRt.anchorMin = new Vector2(0, 0.5f);
-            portraitFrameRt.anchorMax = new Vector2(0, 0.5f);
-            portraitFrameRt.pivot = new Vector2(0, 0.5f);
-            portraitFrameRt.anchoredPosition = new Vector2(8f, 0f);
-            refs.CharPortraits[name] = portrait;
+            var total = 3 * RowHeight + 2 * RowGap;
+            var top = -(MemberHeight - total) * 0.5f;
+            for (var i = 0; i < owned.Count && i < 3; i++)
+                BuildSkillRow(block, refs, owned[i], top - i * (RowHeight + RowGap));
 
-            var numberSprite = Art($"Number{rosterIndex:00}");
-            if (numberSprite != null)
+            if (index < Roster.Length - 1)
             {
-                var numberPlate = BattleUIBuilder.CreatePanelPublic(
-                    card,
-                    "Number",
-                    new Vector2(0.02f, 0.04f),
-                    new Vector2(0.28f, 0.34f),
-                    Color.white,
-                    numberSprite);
-                var numberImage = numberPlate.GetComponent<Image>();
-                numberImage.type = Image.Type.Simple;
-                numberImage.preserveAspect = true;
-                numberImage.raycastTarget = false;
+                BattleHudKit.Img(block, "Separator", BattleHudKit.FadeRight, BattleHudKit.Separator,
+                    new Vector2(0f, 0f), new Vector2(1f, 0f),
+                    new Vector2(RowLeft, -MemberGap * 0.5f - 1f), new Vector2(0f, -MemberGap * 0.5f));
+            }
+        }
+
+        static void BuildSkillRow(RectTransform block, BattleUIRefs refs, BattleSkillData skill, float topY)
+        {
+            var row = BattleHudKit.Rect(block, $"Skill_{skill.Id}", new Vector2(0f, 1f), new Vector2(1f, 1f),
+                new Vector2(RowLeft, topY - RowHeight), new Vector2(0f, topY));
+            var group = row.gameObject.AddComponent<CanvasGroup>();
+            group.blocksRaycasts = false;
+
+            var band = BattleHudKit.AddImage(row, BattleUISprites.Solid, SkillBand);
+            refs.SkillRowGraphics[skill.Id] = band;
+
+            // 右端にスキル絵をうっすら敷く。
+            var artClip = BattleHudKit.Rect(row, "ArtClip", new Vector2(0.38f, 0f), new Vector2(1f, 1f));
+            artClip.gameObject.AddComponent<RectMask2D>();
+            var artSprite = BattleHudKit.SkillArt(skill, out var tint);
+            if (artSprite != null)
+            {
+                var art = BattleHudKit.Place(artClip, "Art", new Vector2(1f, 0.5f), new Vector2(1f, 0.5f),
+                    Vector2.zero, new Vector2(200f, 200f * artSprite.rect.height / Mathf.Max(1f, artSprite.rect.width)));
+                BattleHudKit.AddImage(art, artSprite, new Color(tint.r, tint.g, tint.b, 0.62f));
             }
 
-            CreateDivider(card);
+            BattleHudKit.Img(artClip, "ArtFade", BattleHudKit.FadeRight, SkillBand, Vector2.zero, new Vector2(0.75f, 1f));
 
-            var english = visual?.EnglishName ?? string.Empty;
-            CreateText(
-                card,
-                "NameJp",
-                name,
-                17,
-                BattleUITheme.FontBold,
-                FontStyle.Bold,
-                TextAnchor.UpperLeft,
-                new Vector2(0.44f, 0.72f),
-                new Vector2(0.98f, 0.96f),
-                Color.white);
-            if (!string.IsNullOrEmpty(english))
+            var border = BattleHudKit.Img(row, "ReadyBorder", BattleHudKit.FrameThin, BattleHudKit.Gold,
+                Vector2.zero, Vector2.one);
+            border.enabled = false;
+
+            var nameText = BattleHudKit.Text(row, "SkillName", skill.DisplayName, BattleHudKit.Mincho, 23f,
+                Color.white, TextAlignmentOptions.BottomLeft, new Vector2(0f, 0.46f), new Vector2(1f, 1f),
+                new Vector2(12f, 0f), new Vector2(-96f, -4f));
+            nameText.enableAutoSizing = true;
+            nameText.fontSizeMin = 15f;
+            nameText.fontSizeMax = 23f;
+            BattleHudKit.Outline(nameText, 0.22f, new Color(0f, 0f, 0f, 0.95f));
+
+            var effect = BattleHudKit.Text(row, "Effect", ShortEffect(skill), BattleHudKit.Gothic, 14f,
+                BattleHudKit.TextSoft, TextAlignmentOptions.TopLeft, new Vector2(0f, 0f), new Vector2(1f, 0.46f),
+                new Vector2(13f, 4f), new Vector2(-96f, -1f));
+            effect.overflowMode = TextOverflowModes.Ellipsis;
+            BattleHudKit.Outline(effect, 0.12f, new Color(0f, 0f, 0f, 0.9f), 0.5f);
+
+            var dots = BattleHudKit.Dots(row, skill.Pattern, 15f, 4f, new Vector2(-8f, -6f));
+            BattleHudKit.SetDots(dots, 0);
+            refs.SkillPatternOrbHosts[skill.Id] = dots.Root;
+
+            var ready = BattleHudKit.Text(row, "Ready", "READY", BattleHudKit.Condensed, 15f, BattleHudKit.Gold,
+                TextAlignmentOptions.TopRight, new Vector2(1f, 1f), new Vector2(1f, 1f),
+                new Vector2(-90f, -20f), new Vector2(-10f, -2f));
+            ready.characterSpacing = 8f;
+            BattleHudKit.Outline(ready, 0.2f, Color.black);
+            ready.gameObject.SetActive(false);
+            refs.SkillReadyMarks[skill.Id] = ready.gameObject;
+
+            refs.SkillRows[skill.Id] = new SkillRowView
             {
-                CreateText(
-                    card,
-                    "NameEn",
-                    english,
-                    11,
-                    BattleUITheme.FontDisplay,
-                    FontStyle.Bold,
-                    TextAnchor.UpperLeft,
-                    new Vector2(0.44f, 0.58f),
-                    new Vector2(0.98f, 0.72f),
-                    BattleUITheme.MainPurple);
+                Skill = skill,
+                Band = band,
+                Border = border,
+                Name = nameText,
+                Effect = effect,
+                Dots = dots,
+                Ready = ready.gameObject,
+                Group = group
+            };
+        }
+
+        /// <summary>ストック進捗・発動可・クールダウンを各行へ反映する。</summary>
+        public static void Refresh(BattleUIRefs refs, OrbStock stock, HashSet<int> readyIds,
+            ICollection<int> cooldownIds)
+        {
+            if (refs?.SkillRows == null)
+                return;
+
+            var queue = new List<int>();
+            foreach (var kv in refs.SkillRows)
+            {
+                if (kv.Value?.E5b == null || kv.Value.Skill?.Pattern == null)
+                    continue;
+                if (cooldownIds != null && cooldownIds.Contains(kv.Key))
+                    continue;
+                queue.Add(kv.Key);
             }
 
-            var role = visual?.Role ?? string.Empty;
-            if (!string.IsNullOrEmpty(role))
+            queue.Sort((a, b) =>
             {
-                CreateText(
-                    card,
-                    "Role",
-                    role,
-                    10,
-                    BattleUITheme.Font,
-                    FontStyle.Normal,
-                    TextAnchor.UpperLeft,
-                    new Vector2(0.44f, 0.48f),
-                    new Vector2(0.98f, 0.58f),
-                    BattleUITheme.Grey80);
-            }
+                var sa = refs.SkillRows[a].Skill;
+                var sb = refs.SkillRows[b].Skill;
+                var ma = BattleHudKit.MatchedPrefix(stock, sa.Pattern);
+                var mb = BattleHudKit.MatchedPrefix(stock, sb.Pattern);
+                var byMatch = mb.CompareTo(ma);
+                if (byMatch != 0)
+                    return byMatch;
+                var remain = (sa.Pattern.Length - ma).CompareTo(sb.Pattern.Length - mb);
+                return remain != 0 ? remain : a.CompareTo(b);
+            });
+            if (queue.Count > 3)
+                queue.RemoveRange(3, queue.Count - 3);
 
-            var skillY = 0.44f;
-            foreach (var skill in skills)
+            foreach (var kv in refs.SkillRows)
             {
-                if (skill.CharacterName != name)
+                var view = kv.Value;
+                var ready = readyIds != null && readyIds.Contains(kv.Key);
+                var cooling = cooldownIds != null && cooldownIds.Contains(kv.Key);
+                var matched = cooling ? 0 : BattleHudKit.MatchedPrefix(stock, view.Skill.Pattern);
+                if (view.E5b != null)
+                {
+                    var place = queue.IndexOf(kv.Key);
+                    view.E5b.Apply(matched, ready, cooling, place < 0 ? 0 : place + 1);
+                    continue;
+                }
+
+                if (view.Band == null || view.Name == null || view.Group == null)
                     continue;
 
-                skillY = BuildSkillRow(card, refs, skill, innateSkillIds, skillY);
-                if (skillY < 0.06f)
-                    break;
-            }
-
-            var frame = Art("CharacterFrame");
-            if (frame != null)
-            {
-                var overlay = BattleUIBuilder.CreatePanelPublic(
-                    card, "CharacterFrame", Vector2.zero, Vector2.one, Color.white, frame);
-                var frameImage = overlay.GetComponent<Image>();
-                frameImage.type = Image.Type.Simple;
-                frameImage.raycastTarget = false;
-                overlay.SetAsLastSibling();
-            }
-            else
-                BattleUIBuilder.AddOutlinePublic(card.gameObject, BattleUITheme.MainPurple, 2);
-        }
-
-        static float BuildSkillRow(
-            RectTransform card,
-            BattleUIRefs refs,
-            BattleSkillData skill,
-            HashSet<int> innateSkillIds,
-            float anchorTop)
-        {
-            const float rowHeight = 0.14f;
-            var isInnate = innateSkillIds != null && innateSkillIds.Contains(skill.Id);
-            var skillFrame = Art(isInnate ? "SkillFrame_Active" : "SkillFrame_Normal");
-            var row = BattleUIBuilder.CreatePanelPublic(
-                card,
-                $"Skill_{skill.Id}",
-                new Vector2(0.43f, anchorTop - rowHeight),
-                new Vector2(0.97f, anchorTop),
-                skillFrame != null ? Color.white : new Color(0.08f, 0.08f, 0.1f, 0.92f),
-                skillFrame);
-            var rowImage = row.GetComponent<Image>();
-            refs.SkillRowGraphics[skill.Id] = rowImage;
-            if (skillFrame != null)
-                rowImage.type = Image.Type.Simple;
-
-            var element = skill.Pattern != null && skill.Pattern.Length > 0 ? skill.Pattern[0] : ElementColor.Purple;
-            var elementSprite = ElementArt(element);
-            var icon = BattleUIBuilder.CreatePanelPublic(
-                row,
-                "ElementIcon",
-                new Vector2(0.02f, 0.08f),
-                new Vector2(0.16f, 0.92f),
-                elementSprite != null ? Color.white : ElementColorUtility.ToUnityColor(element),
-                elementSprite);
-            var iconImage = icon.GetComponent<Image>();
-            iconImage.raycastTarget = false;
-            if (elementSprite != null)
-            {
-                iconImage.type = Image.Type.Simple;
-                iconImage.preserveAspect = true;
-            }
-
-            CreateText(
-                row,
-                "SkillName",
-                skill.DisplayName,
-                13,
-                BattleUITheme.FontBold,
-                FontStyle.Bold,
-                TextAnchor.UpperLeft,
-                new Vector2(0.16f, 0.48f),
-                new Vector2(0.98f, 0.96f),
-                Color.white);
-
-            CreateText(
-                row,
-                "ConditionLabel",
-                "発動条件",
-                9,
-                BattleUITheme.Font,
-                FontStyle.Normal,
-                TextAnchor.UpperLeft,
-                new Vector2(0.16f, 0.08f),
-                new Vector2(0.42f, 0.46f),
-                BattleUITheme.Grey80);
-
-            var patternHost = BattleUIOrbPattern.CreateHost(row.transform, new Vector2(0.42f, 0.1f), new Vector2(0.98f, 0.9f));
-            refs.SkillPatternOrbHosts[skill.Id] = patternHost;
-            BattleUIOrbPattern.Apply(patternHost, skill.Pattern, 11f);
-
-            return anchorTop - rowHeight - 0.015f;
-        }
-
-        static void CreateDivider(RectTransform card)
-        {
-            var divider = Art("CharacterDivider");
-            var line = BattleUIBuilder.CreatePanelPublic(
-                card,
-                "Divider",
-                new Vector2(0.34f, 0.04f),
-                new Vector2(0.46f, 0.96f),
-                divider != null ? Color.white : new Color(BattleUITheme.MainPurple.r, BattleUITheme.MainPurple.g, BattleUITheme.MainPurple.b, 0.45f),
-                divider);
-            var image = line.GetComponent<Image>();
-            image.raycastTarget = false;
-            if (divider != null)
-            {
-                image.type = Image.Type.Simple;
-                image.preserveAspect = true;
+                BattleHudKit.SetDots(view.Dots, matched);
+                view.Band.color = ready
+                    ? new Color(0.16f, 0.11f, 0.03f, 0.9f)
+                    : cooling ? SkillBandCooldown : SkillBand;
+                view.Border.enabled = ready;
+                view.Name.color = ready ? BattleHudKit.Gold : Color.white;
+                view.Group.alpha = cooling ? 0.45f : 1f;
+                if (view.Ready != null)
+                    view.Ready.SetActive(ready);
             }
         }
 
-        static Sprite ElementArt(ElementColor element) => element switch
+        public static string ShortEffect(BattleSkillData skill)
         {
-            ElementColor.Red => Art("Element_Red"),
-            ElementColor.Green => Art("Element_Green"),
-            ElementColor.Yellow => Art("Element_Yellow"),
-            ElementColor.Purple => Art("Element_Purple"),
-            ElementColor.Blue => Art("Element_Purple"),
-            _ => null
-        };
+            if (skill == null)
+                return "";
+            if (!string.IsNullOrEmpty(skill.EffectText))
+            {
+                var line = skill.EffectText.Replace("\r", "").Replace("\n", " ");
+                return line.Length > 16 ? line.Substring(0, 16) + "…" : line;
+            }
 
-        static Text CreateText(
-            Transform parent,
-            string name,
-            string text,
-            int size,
-            Font font,
-            FontStyle style,
-            TextAnchor anchor,
-            Vector2 anchorMin,
-            Vector2 anchorMax,
-            Color color)
-        {
-            var label = BattleUIBuilder.CreateLabelPublic(
-                parent,
-                name,
-                text,
-                size,
-                anchor,
-                anchorMin,
-                anchorMax,
-                Vector2.zero,
-                Vector2.zero,
-                color);
-            label.font = font;
-            label.fontStyle = style;
-            return label;
+            if (skill.Damage > 0 && skill.Heal > 0)
+                return $"{skill.Damage}ダメージ / HP{skill.Heal}回復";
+            if (skill.Damage > 0)
+                return $"{skill.Damage}ダメージ";
+            if (skill.Heal > 0)
+                return $"HPを{skill.Heal}回復";
+            return "";
         }
     }
 }

@@ -1,0 +1,367 @@
+{
+ "_note": "確率エンジンのユニットテスト。combo_216 = 216 通り中の件数（厳密値）。percent は表示用（小数2桁で丸め）。",
+ "cases": {
+  "A_normal": {
+   "board_rows_top_to_bottom": [
+    [
+     "battle",
+     "battle",
+     "battle"
+    ],
+    [
+     "event",
+     "event",
+     "event"
+    ],
+    [
+     "shop",
+     "shop",
+     "treasure"
+    ],
+    [
+     "rest",
+     "treasure",
+     "treasure"
+    ],
+    [
+     "rest",
+     "rest",
+     "danger"
+    ],
+    [
+     "battle",
+     "battle",
+     "battle"
+    ]
+   ],
+   "lane_counts": [
+    {
+     "battle": 2,
+     "rest": 2,
+     "shop": 1,
+     "event": 1
+    },
+    {
+     "battle": 2,
+     "rest": 1,
+     "treasure": 1,
+     "shop": 1,
+     "event": 1
+    },
+    {
+     "battle": 2,
+     "treasure": 2,
+     "event": 1,
+     "danger": 1
+    }
+   ],
+   "lane_rates_percent": [
+    {
+     "battle": 33.3333,
+     "rest": 33.3333,
+     "shop": 16.6667,
+     "event": 16.6667
+    },
+    {
+     "battle": 33.3333,
+     "rest": 16.6667,
+     "treasure": 16.6667,
+     "shop": 16.6667,
+     "event": 16.6667
+    },
+    {
+     "battle": 33.3333,
+     "treasure": 33.3333,
+     "event": 16.6667,
+     "danger": 16.6667
+    }
+   ],
+   "combo_216": {
+    "c01": 8,
+    "c02": 0,
+    "c03": 0,
+    "c04": 0,
+    "c05": 1,
+    "c06": 0,
+    "c07": 0,
+    "c08": 2,
+    "c09": 1,
+    "c10": 4,
+    "c99": 200
+   },
+   "combo_percent": {
+    "c01": 3.7037,
+    "c02": 0.0,
+    "c03": 0.0,
+    "c04": 0.0,
+    "c05": 0.463,
+    "c06": 0.0,
+    "c07": 0.0,
+    "c08": 0.9259,
+    "c09": 0.463,
+    "c10": 1.8519,
+    "c99": 92.5926
+   },
+   "valid_lanes": [
+    true,
+    true,
+    true
+   ]
+  },
+  "B_before_drop": {
+   "board_rows_top_to_bottom": [
+    [
+     "battle",
+     "battle",
+     "battle"
+    ],
+    [
+     "event",
+     "event",
+     "event"
+    ],
+    [
+     "shop",
+     "shop",
+     "treasure"
+    ],
+    [
+     "danger",
+     "treasure",
+     "treasure"
+    ],
+    [
+     "danger",
+     "danger",
+     "danger"
+    ],
+    [
+     "battle",
+     "battle",
+     "battle"
+    ]
+   ],
+   "lane_counts": [
+    {
+     "battle": 2,
+     "shop": 1,
+     "event": 1,
+     "danger": 2
+    },
+    {
+     "battle": 2,
+     "treasure": 1,
+     "shop": 1,
+     "event": 1,
+     "danger": 1
+    },
+    {
+     "battle": 2,
+     "treasure": 2,
+     "event": 1,
+     "danger": 1
+    }
+   ],
+   "lane_rates_percent": [
+    {
+     "battle": 33.3333,
+     "shop": 16.6667,
+     "event": 16.6667,
+     "danger": 33.3333
+    },
+    {
+     "battle": 33.3333,
+     "treasure": 16.6667,
+     "shop": 16.6667,
+     "event": 16.6667,
+     "danger": 16.6667
+    },
+    {
+     "battle": 33.3333,
+     "treasure": 33.3333,
+     "event": 16.6667,
+     "danger": 16.6667
+    }
+   ],
+   "combo_216": {
+    "c01": 8,
+    "c02": 0,
+    "c03": 0,
+    "c04": 0,
+    "c05": 1,
+    "c06": 2,
+    "c07": 0,
+    "c08": 2,
+    "c09": 0,
+    "c10": 4,
+    "c99": 199
+   },
+   "combo_percent": {
+    "c01": 3.7037,
+    "c02": 0.0,
+    "c03": 0.0,
+    "c04": 0.0,
+    "c05": 0.463,
+    "c06": 0.9259,
+    "c07": 0.0,
+    "c08": 0.9259,
+    "c09": 0.0,
+    "c10": 1.8519,
+    "c99": 92.1296
+   },
+   "valid_lanes": [
+    true,
+    true,
+    true
+   ]
+  },
+  "C_validation_error": {
+   "board_rows_top_to_bottom": [
+    [
+     "battle",
+     "battle",
+     "battle"
+    ],
+    [
+     "event",
+     "event",
+     "event"
+    ],
+    [
+     "shop",
+     "shop",
+     "treasure"
+    ],
+    [
+     "rest",
+     "treasure",
+     "treasure"
+    ],
+    [
+     "rest",
+     "rest",
+     "danger"
+    ],
+    [
+     "battle",
+     "rest",
+     "shop"
+    ]
+   ],
+   "lane_counts": [
+    {
+     "battle": 2,
+     "rest": 2,
+     "shop": 1,
+     "event": 1
+    },
+    {
+     "battle": 1,
+     "rest": 2,
+     "treasure": 1,
+     "shop": 1,
+     "event": 1
+    },
+    {
+     "battle": 1,
+     "treasure": 2,
+     "shop": 1,
+     "event": 1,
+     "danger": 1
+    }
+   ],
+   "lane_rates_percent": [
+    {
+     "battle": 33.3333,
+     "rest": 33.3333,
+     "shop": 16.6667,
+     "event": 16.6667
+    },
+    {
+     "battle": 16.6667,
+     "rest": 33.3333,
+     "treasure": 16.6667,
+     "shop": 16.6667,
+     "event": 16.6667
+    },
+    {
+     "battle": 16.6667,
+     "treasure": 33.3333,
+     "shop": 16.6667,
+     "event": 16.6667,
+     "danger": 16.6667
+    }
+   ],
+   "combo_216": {
+    "c01": 2,
+    "c02": 0,
+    "c03": 0,
+    "c04": 1,
+    "c05": 1,
+    "c06": 0,
+    "c07": 0,
+    "c08": 2,
+    "c09": 2,
+    "c10": 2,
+    "c99": 206
+   },
+   "combo_percent": {
+    "c01": 0.9259,
+    "c02": 0.0,
+    "c03": 0.0,
+    "c04": 0.463,
+    "c05": 0.463,
+    "c06": 0.0,
+    "c07": 0.0,
+    "c08": 0.9259,
+    "c09": 0.9259,
+    "c10": 0.9259,
+    "c99": 95.3704
+   },
+   "valid_lanes": [
+    true,
+    false,
+    false
+   ]
+  },
+  "W_wildcard_priority_on_A": {
+   "board": "A_normal",
+   "combos": [
+    {
+     "id": "w1",
+     "priority": 1,
+     "pattern": [
+      "battle",
+      "battle",
+      "battle"
+     ]
+    },
+    {
+     "id": "w2",
+     "priority": 2,
+     "pattern": [
+      "battle",
+      "battle",
+      "*"
+     ]
+    },
+    {
+     "id": "w3",
+     "priority": 3,
+     "pattern": [
+      "*",
+      "*",
+      "danger"
+     ]
+    }
+   ],
+   "expected_216": {
+    "w1": 8,
+    "w2": 16,
+    "w3": 32,
+    "fallback": 160
+   },
+   "note": "w2 excludes outcomes already taken by w1 (8): 2*2*6=24 -> 16; w3 = 6*6*1=36 minus (戦,戦,Danger)=4 already taken by w2 -> 32"
+  }
+ }
+}

@@ -1,0 +1,410 @@
+{
+ "_note": "全 UI 文字列（画像に焼き込まない）。placeholder=true は仮文言。source=語部 は語部の仮案。{x} は差し込み。",
+ "strings": {
+  "lottery.title": {
+   "text": "ダンジョン突入",
+   "placeholder": false,
+   "source": null
+  },
+  "lottery.layer_badge": {
+   "text": "第{layer}層",
+   "placeholder": false,
+   "source": null
+  },
+  "lottery.subtitle": {
+   "text": "3つのリールを回して、この層の3つのマスを決定します。",
+   "placeholder": true,
+   "source": null
+  },
+  "lottery.list.title": {
+   "text": "役一覧",
+   "placeholder": false,
+   "source": null
+  },
+  "lottery.list.sub": {
+   "text": "中央の横1列で判定",
+   "placeholder": false,
+   "source": null
+  },
+  "lottery.list.rate_header": {
+   "text": "成立率（現在のビルド）",
+   "placeholder": false,
+   "source": null
+  },
+  "lottery.flow.title": {
+   "text": "抽選の流れ",
+   "placeholder": false,
+   "source": null
+  },
+  "lottery.flow.1.title": {
+   "text": "スタート",
+   "placeholder": false,
+   "source": null
+  },
+  "lottery.flow.1.body": {
+   "text": "3つのリールが回転し、\nこの層のマスを抽選します。",
+   "placeholder": true,
+   "source": null
+  },
+  "lottery.flow.2.title": {
+   "text": "リール停止",
+   "placeholder": false,
+   "source": null
+  },
+  "lottery.flow.2.body": {
+   "text": "左のリールから順に\n停止します。",
+   "placeholder": true,
+   "source": null
+  },
+  "lottery.flow.3.title": {
+   "text": "結果確定",
+   "placeholder": false,
+   "source": null
+  },
+  "lottery.flow.3.body": {
+   "text": "3つのマスが確定し、\nダンジョンに進みます。",
+   "placeholder": true,
+   "source": null
+  },
+  "lottery.button.start": {
+   "text": "スタート",
+   "placeholder": false,
+   "source": null
+  },
+  "lottery.button.stop": {
+   "text": "ストップ",
+   "placeholder": false,
+   "source": null
+  },
+  "lottery.button.skip": {
+   "text": "スキップ",
+   "placeholder": false,
+   "source": null
+  },
+  "lottery.skip.sub": {
+   "text": "演出をスキップして結果を表示",
+   "placeholder": true,
+   "source": null
+  },
+  "lottery.button.rebuild": {
+   "text": "リールを組み替える",
+   "placeholder": false,
+   "source": null
+  },
+  "lottery.rebuild.sub.enabled": {
+   "text": "回転前のみ変更できます",
+   "placeholder": true,
+   "source": null
+  },
+  "lottery.rebuild.sub.disabled": {
+   "text": "回転中は変更できません",
+   "placeholder": true,
+   "source": null
+  },
+  "lottery.reach": {
+   "text": "リーチ！",
+   "placeholder": false,
+   "source": null
+  },
+  "lottery.reach.symbols": {
+   "text": "{s1}{s2}{s3}",
+   "placeholder": false,
+   "source": null
+  },
+  "lottery.hit.banner": {
+   "text": "{combo} 成立",
+   "placeholder": false,
+   "source": null
+  },
+  "lottery.hit.effect": {
+   "text": "{effect}",
+   "placeholder": false,
+   "source": null
+  },
+  "route.title": {
+   "text": "第{layer}層",
+   "placeholder": false,
+   "source": null
+  },
+  "route.subtitle": {
+   "text": "記憶の路 ― 4マス目は固定（強敵）",
+   "placeholder": true,
+   "source": null
+  },
+  "route.status.current": {
+   "text": "現在地",
+   "placeholder": false,
+   "source": null
+  },
+  "route.status.upcoming": {
+   "text": "未到達",
+   "placeholder": false,
+   "source": null
+  },
+  "route.ordinal.suffix.1": {
+   "text": "st",
+   "placeholder": false,
+   "source": null
+  },
+  "route.ordinal.suffix.2": {
+   "text": "nd",
+   "placeholder": false,
+   "source": null
+  },
+  "route.ordinal.suffix.3": {
+   "text": "rd",
+   "placeholder": false,
+   "source": null
+  },
+  "route.ordinal.suffix.4": {
+   "text": "th",
+   "placeholder": false,
+   "source": null
+  },
+  "route.bubble.sample": {
+   "text": "エレン「全部、戦い……腕が鳴るね」",
+   "placeholder": true,
+   "source": null
+  },
+  "band.hp": {
+   "text": "HP",
+   "placeholder": false,
+   "source": null
+  },
+  "band.madness": {
+   "text": "狂気値",
+   "placeholder": false,
+   "source": null
+  },
+  "band.trust": {
+   "text": "信頼",
+   "placeholder": false,
+   "source": null
+  },
+  "build.title": {
+   "text": "記憶を編む",
+   "placeholder": false,
+   "source": "語部"
+  },
+  "build.layer_badge": {
+   "text": "第{layer}層",
+   "placeholder": false,
+   "source": null
+  },
+  "build.subtitle": {
+   "text": "記憶の欠片を盤に置いて、3つの記憶の列を編みます。欠片のない場所は Danger になります。",
+   "placeholder": true,
+   "source": null
+  },
+  "build.palette.title": {
+   "text": "記憶の欠片",
+   "placeholder": false,
+   "source": "語部"
+  },
+  "build.palette.sub": {
+   "text": "ドラッグして盤に置く",
+   "placeholder": true,
+   "source": null
+  },
+  "build.palette.remaining": {
+   "text": "残り {n} / {max}",
+   "placeholder": false,
+   "source": null
+  },
+  "build.palette.used": {
+   "text": "配置済",
+   "placeholder": false,
+   "source": null
+  },
+  "build.palette.fixed": {
+   "text": "固定の並び",
+   "placeholder": true,
+   "source": null
+  },
+  "build.palette.grabbing": {
+   "text": "つかみ中",
+   "placeholder": true,
+   "source": null
+  },
+  "build.palette.locked": {
+   "text": "未解放",
+   "placeholder": true,
+   "source": null
+  },
+  "build.lane.1": {
+   "text": "一の列",
+   "placeholder": false,
+   "source": "語部"
+  },
+  "build.lane.2": {
+   "text": "二の列",
+   "placeholder": false,
+   "source": "語部"
+  },
+  "build.lane.3": {
+   "text": "三の列",
+   "placeholder": false,
+   "source": "語部"
+  },
+  "build.lane.battle_check": {
+   "text": "戦闘 {n}/{min}",
+   "placeholder": false,
+   "source": null
+  },
+  "build.rates.title": {
+   "text": "記憶の列ごとの出現率",
+   "placeholder": false,
+   "source": null
+  },
+  "build.rates.formula": {
+   "text": "出現率 ＝ 枚数 / 6",
+   "placeholder": true,
+   "source": null
+  },
+  "build.danger.note": {
+   "text": "Danger：止まると 狂気+{madness}（仮）　思い出せない場所には、危険が待つ。",
+   "placeholder": false,
+   "source": null
+  },
+  "build.combos.title": {
+   "text": "役一覧",
+   "placeholder": false,
+   "source": null
+  },
+  "build.combos.formula": {
+   "text": "成立率＝3列の出現率の積（基本確率・リールの力は含まない）",
+   "placeholder": true,
+   "source": null
+  },
+  "build.combos.col.priority": {
+   "text": "優先",
+   "placeholder": false,
+   "source": null
+  },
+  "build.combos.col.symbols": {
+   "text": "図柄",
+   "placeholder": false,
+   "source": null
+  },
+  "build.combos.col.name": {
+   "text": "役",
+   "placeholder": false,
+   "source": null
+  },
+  "build.combos.col.effect": {
+   "text": "効果",
+   "placeholder": false,
+   "source": null
+  },
+  "build.combos.col.rate": {
+   "text": "成立率",
+   "placeholder": false,
+   "source": null
+  },
+  "build.combos.priority_note": {
+   "text": "同時に一致した場合は優先度の高い役のみ成立",
+   "placeholder": true,
+   "source": null
+  },
+  "build.combos.total": {
+   "text": "合計 {total}",
+   "placeholder": false,
+   "source": null
+  },
+  "build.powers.title": {
+   "text": "リールの力",
+   "placeholder": false,
+   "source": null
+  },
+  "build.powers.note": {
+   "text": "確率表示には含まれません",
+   "placeholder": true,
+   "source": null
+  },
+  "build.powers.respin": {
+   "text": "リスピン",
+   "placeholder": false,
+   "source": null
+  },
+  "build.powers.nudge": {
+   "text": "ずらし",
+   "placeholder": false,
+   "source": null
+  },
+  "build.powers.remaining": {
+   "text": "残り {n}",
+   "placeholder": false,
+   "source": null
+  },
+  "build.save.title": {
+   "text": "記録",
+   "placeholder": false,
+   "source": null
+  },
+  "build.save.sub": {
+   "text": "盤の並びを保存",
+   "placeholder": true,
+   "source": null
+  },
+  "build.save.slot.1": {
+   "text": "一",
+   "placeholder": false,
+   "source": null
+  },
+  "build.save.slot.2": {
+   "text": "二",
+   "placeholder": false,
+   "source": null
+  },
+  "build.save.slot.3": {
+   "text": "三",
+   "placeholder": false,
+   "source": null
+  },
+  "build.save.saved": {
+   "text": "保存済",
+   "placeholder": false,
+   "source": null
+  },
+  "build.save.empty": {
+   "text": "空き",
+   "placeholder": false,
+   "source": null
+  },
+  "build.go": {
+   "text": "この記憶で進む",
+   "placeholder": false,
+   "source": "語部"
+  },
+  "build.go.sub": {
+   "text": "記憶の列を確定して抽選へ",
+   "placeholder": true,
+   "source": null
+  },
+  "build.go.blocked": {
+   "text": "進めません：{lanes}の戦闘マスが不足（{n}/{min}）",
+   "placeholder": true,
+   "source": null
+  },
+  "build.board.validation": {
+   "text": "戦闘マスは各列2つ以上必要です",
+   "placeholder": true,
+   "source": null
+  },
+  "build.recall": {
+   "text": "道を思い出す",
+   "placeholder": true,
+   "source": "語部"
+  },
+  "route.enter": {
+   "text": "この層に入る",
+   "placeholder": true,
+   "source": null
+  },
+  "route.subtitle.elevator": {
+   "text": "記憶の路 ― 4マス目はエレベーター",
+   "placeholder": true,
+   "source": null
+  }
+ }
+}

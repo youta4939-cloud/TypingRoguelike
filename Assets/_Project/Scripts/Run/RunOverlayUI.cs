@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using TypingRoguelike.Battle;
 using TypingRoguelike.Data;
 using UnityEngine;
@@ -12,6 +13,7 @@ namespace TypingRoguelike.Run
 {
     public sealed class RunOverlayUI
     {
+        public static bool SuppressPrefab;
         Font _font;
         RectTransform _root;
         GameObject _hubPanel;
@@ -20,6 +22,7 @@ namespace TypingRoguelike.Run
         GameObject _replacePanel;
         GameObject _selectionPanel;
         GameObject _deathNoticePanel;
+        GameObject _jackpotDebugPanel;
         Action<SkillDefinition> _onRewardPicked;
         Action _onLoadoutClosed;
         RunPartyState _party;
@@ -79,165 +82,77 @@ namespace TypingRoguelike.Run
             Action onOpenRelicHub = null,
             Action onOpenHubShop = null,
             Action onOpenRepairShop = null,
-            Action onOpenPartyStats = null)
+            Action onOpenPartyStats = null,
+            Action onOpenJackpotDebug = null)
         {
             EnsureRoot(host);
             HideAll();
-            _hubPanel = CreateFullScreenPanel("ArcaneSanctum", new Color(0.004f, 0.007f, 0.022f, 1f));
-            _hubPanel.AddComponent<CanvasGroup>();
-            _hubPanel.AddComponent<RunPanelEntrance>();
-            BuildOverlayBackdrop(_hubPanel.transform, BattleUITheme.Arcane);
+            _hubPanel = CreateFullScreenPanel("OfficeHub", new Color(0.04f, 0.045f, 0.055f, 1));
+            _hubPanel.AddComponent<HubOfficeView>().Build(profile, onStartRun, onResumeRun,
+                elevatorFloors, onStartFromElevatorFloor, onOpenRelicHub, onOpenHubShop,
+                onOpenRepairShop, onOpenPartyStats);
+        }
 
-            var window = BattleUIChrome.CreateLuxuryWindow(_hubPanel.transform, "SanctumWindow",
-                new Vector2(0.08f, 0.08f), new Vector2(0.92f, 0.92f), "ARCANE SANCTUM", BattleUITheme.Gold);
+        public void ShowJackpotDebug(Transform host, Action onClosed)
+        {
+            EnsureRoot(host);
+            if (_jackpotDebugPanel != null)
+                UnityEngine.Object.Destroy(_jackpotDebugPanel);
+
+            _jackpotDebugPanel = CreateFullScreenPanel("JackpotDebug", new Color(0.005f, 0.008f, 0.02f, 0.94f));
+            var window = BattleUIChrome.CreateLuxuryWindow(
+                _jackpotDebugPanel.transform, "JackpotDebugWindow",
+                new Vector2(0.24f, 0.16f), new Vector2(0.76f, 0.84f),
+                "JACKPOT", BattleUITheme.Gold);
             var body = window.Find("Body") ?? window;
-            var title = CreateLabel(body, "Title", "刻印の聖堂", 38, TextAnchor.MiddleCenter,
-                new Vector2(0.2f, 0.84f), new Vector2(0.8f, 0.98f), Vector2.zero, Vector2.zero,
-                BattleUITheme.TextPrimary);
+            var title = CreateLabel(body, "Title", "ジャックポット抽選", 28, TextAnchor.MiddleCenter,
+                new Vector2(0.08f, 0.84f), new Vector2(0.92f, 0.96f), Vector2.zero, Vector2.zero, BattleUITheme.Gold);
             title.fontStyle = FontStyle.Bold;
-            BattleUITheme.AddTextShadow(title, new Color(0, 0, 0, 0.95f), new Vector2(3, -3));
-            CreateLabel(body, "Currency", $"◆ 魔石  {profile?.arcaneShards ?? 0}　　貯金 {profile?.bankedCoins ?? 0}", 21, TextAnchor.MiddleCenter,
-                new Vector2(0.35f, 0.76f), new Vector2(0.65f, 0.84f), Vector2.zero, Vector2.zero,
-                BattleUITheme.Gold);
-            var whMat = MetaProgression.WarehouseMaterialUnits(profile);
-            var whRel = profile?.warehouseRelicIds?.Count ?? 0;
-            CreateLabel(body, "Warehouse", $"素材倉庫 {whMat}　レリック倉庫 {whRel} 個", 16,
-                TextAnchor.MiddleCenter, new Vector2(0.28f, 0.7f), new Vector2(0.72f, 0.76f),
-                Vector2.zero, Vector2.zero, BattleUITheme.Cyan);
-            var hubBtnY = 0.64f;
-            if (onOpenRelicHub != null)
-            {
-                CreateButton(body, "レリック装備・倉庫",
-                    new Vector2(0.5f, hubBtnY), new Vector2(0.5f, hubBtnY), Vector2.zero, new Vector2(340, 52),
-                    onOpenRelicHub);
-                hubBtnY -= 0.08f;
-            }
-
-            if (onOpenHubShop != null)
-            {
-                CreateButton(body, "店・レリック開発",
-                    new Vector2(0.5f, hubBtnY), new Vector2(0.5f, hubBtnY), Vector2.zero, new Vector2(340, 52),
-                    onOpenHubShop);
-                hubBtnY -= 0.08f;
-            }
-
-            if (onOpenRepairShop != null)
-            {
-                CreateButton(body, "修復屋（代理脳）",
-                    new Vector2(0.5f, hubBtnY), new Vector2(0.5f, hubBtnY), Vector2.zero, new Vector2(340, 52),
-                    onOpenRepairShop);
-                hubBtnY -= 0.08f;
-            }
-
-            if (onOpenPartyStats != null)
-            {
-                CreateButton(body, "パーティステータス",
-                    new Vector2(0.5f, hubBtnY), new Vector2(0.5f, hubBtnY), Vector2.zero, new Vector2(340, 52),
-                    onOpenPartyStats);
-            }
-
-            var record = CreateSubPanel(body, "Record", new Vector2(0.05f, 0.18f), new Vector2(0.34f, 0.74f));
-            CreateLabel(record, "Header", "RUN RECORD", 15, TextAnchor.MiddleCenter,
-                new Vector2(0.05f, 0.84f), new Vector2(0.95f, 0.96f), Vector2.zero, Vector2.zero,
-                BattleUITheme.AccentAlly);
-            var recordText =
-                $"挑戦回数　{profile?.totalRuns ?? 0}\n\n" +
-                $"踏破 / 帰還　{profile?.completedRuns ?? 0} / {profile?.extractedRuns ?? 0}\n\n" +
-                $"最高進行　{profile?.bestClearedNodes ?? 0} ノード";
-            CreateLabel(record, "Stats", recordText, 18, TextAnchor.UpperLeft,
-                new Vector2(0.12f, 0.28f), new Vector2(0.88f, 0.78f), Vector2.zero, Vector2.zero,
-                BattleUITheme.TextPrimary);
-
-            var archive = CreateSubPanel(body, "Archive", new Vector2(0.66f, 0.18f), new Vector2(0.95f, 0.74f));
-            var totalCards = pool?.cards?.Count(card => card != null) ?? 0;
-            var unlockedCards = pool?.cards?.Count(card => card != null && profile != null &&
-                profile.IsUnlocked(card.skillId)) ?? 0;
-            var lockedCards = MetaProgression.CountUnlockableSkills(profile, pool);
-            CreateLabel(archive, "Header", "SIGIL ARCHIVE", 15, TextAnchor.MiddleCenter,
-                new Vector2(0.05f, 0.84f), new Vector2(0.95f, 0.96f), Vector2.zero, Vector2.zero,
-                BattleUITheme.Cyan);
-            CreateLabel(archive, "Progress", $"解放済み  {unlockedCards} / {totalCards}", 20, TextAnchor.MiddleCenter,
-                new Vector2(0.08f, 0.62f), new Vector2(0.92f, 0.82f), Vector2.zero, Vector2.zero,
-                BattleUITheme.TextPrimary);
-
-            var lastUnlocked = pool?.cards?.FirstOrDefault(card =>
-                card != null && profile != null && card.skillId == profile.lastUnlockedSkillId);
-            var elevatorLine = profile?.unlockedElevatorFloors != null && profile.unlockedElevatorFloors.Count > 0
-                ? $"解放エレベーター階: {string.Join(", ", profile.unlockedElevatorFloors)}F"
-                : "エレベーター未解放";
-            CreateLabel(archive, "Latest", elevatorLine, 14, TextAnchor.MiddleCenter,
-                new Vector2(0.08f, 0.36f), new Vector2(0.92f, 0.6f), Vector2.zero, Vector2.zero,
-                BattleUITheme.TextMuted);
-
-            var unlockLabel = lockedCards > 0 ? "図鑑（旧プロト）" : "図鑑（旧プロト）";
-            var unlockButton = CreateButton(archive, unlockLabel,
-                new Vector2(0.5f, 0.18f), new Vector2(0.5f, 0.18f), Vector2.zero, new Vector2(310, 58),
-                null);
-            unlockButton.interactable = false;
-
-            CreateLabel(body, "StartRule",
-                profile != null && profile.towerRunActive
-                    ? "中断中の探索は、刻印・レリックを持ったまま 1 階か解放済みエレベーター階から再開できる"
-                    : "出発時は各キャラの初期スキルのみ。カードは塔内で集める",
-                16,
-                TextAnchor.MiddleCenter, new Vector2(0.35f, 0.47f), new Vector2(0.65f, 0.54f),
-                Vector2.zero, Vector2.zero, BattleUITheme.TextMuted);
-
-            var hasElevatorRestart = elevatorFloors != null && elevatorFloors.Count > 0 &&
-                                     onStartFromElevatorFloor != null;
-            CreateLabel(body, "RunCopy",
-                profile != null && profile.towerRunActive
-                    ? "中断中の探索がある。拠点で整備してから塔へ戻れる。"
-                    : hasElevatorRestart
-                        ? "塔は再配置された。解放済みエレベーターから、新しい RUN を始められる。"
-                        : "1 階から新しく塔へ入る。",
+            CreateLabel(body, "Hint", "確率を入れて1000回引く。10 と 10% は10%。0.1 は10%。0.1% はそのまま。",
                 15, TextAnchor.MiddleCenter,
-                new Vector2(0.24f, 0.56f), new Vector2(0.76f, 0.68f), Vector2.zero, Vector2.zero,
-                BattleUITheme.TextMuted);
+                new Vector2(0.06f, 0.72f), new Vector2(0.94f, 0.84f), Vector2.zero, Vector2.zero, BattleUITheme.TextMuted);
 
-            var hasResume = onResumeRun != null && profile != null && profile.towerRunActive &&
-                            !string.IsNullOrEmpty(resumeRunLabel);
-            var anchorY = 0.42f;
-            if (hasResume)
-            {
-                CreateButton(body, resumeRunLabel,
-                    new Vector2(0.5f, anchorY), new Vector2(0.5f, anchorY), Vector2.zero, new Vector2(420, 72),
-                    onResumeRun);
-                anchorY -= 0.1f;
-                CreateButton(body, "1 階から再挑戦（踏破記録を保持）",
-                    new Vector2(0.5f, anchorY), new Vector2(0.5f, anchorY), Vector2.zero, new Vector2(420, 64),
-                    onStartRun);
-                anchorY -= 0.09f;
-            }
-            else
-            {
-                CreateButton(body, "ダンジョンへ出発（1 階）",
-                    new Vector2(0.5f, anchorY), new Vector2(0.5f, anchorY), Vector2.zero, new Vector2(390, 72),
-                    onStartRun);
-                anchorY -= 0.1f;
-            }
+            var field = CreateSubPanel(body, "ChanceField", new Vector2(0.22f, 0.58f), new Vector2(0.78f, 0.7f));
+            var fieldImage = field.GetComponent<Image>();
+            fieldImage.color = new Color(0.05f, 0.04f, 0.03f, 0.96f);
+            var inputText = CreateLabel(field, "Text", "", 24, TextAnchor.MiddleCenter,
+                new Vector2(0.04f, 0f), new Vector2(0.96f, 1f), Vector2.zero, Vector2.zero, BattleUITheme.TextPrimary);
+            inputText.supportRichText = false;
+            inputText.raycastTarget = false;
+            var input = field.gameObject.AddComponent<InputField>();
+            input.targetGraphic = fieldImage;
+            input.textComponent = inputText;
+            input.characterValidation = InputField.CharacterValidation.None;
+            input.text = "10%";
 
-            if (hasElevatorRestart)
-            {
-                foreach (var floor in elevatorFloors.OrderBy(f => f))
+            var result = CreateLabel(body, "Result", "まだ引いていない", 20, TextAnchor.UpperCenter,
+                new Vector2(0.08f, 0.22f), new Vector2(0.92f, 0.54f), Vector2.zero, Vector2.zero, BattleUITheme.TextPrimary);
+            result.horizontalOverflow = HorizontalWrapMode.Wrap;
+            result.verticalOverflow = VerticalWrapMode.Overflow;
+
+            CreateButton(body, "1000回抽選",
+                new Vector2(0.5f, 0.14f), new Vector2(0.5f, 0.14f), Vector2.zero, new Vector2(280, 52),
+                () =>
                 {
-                    var f = floor;
-                    var elevatorLabel = profile != null && profile.towerRunActive
-                        ? $"エレベーター（{f} 階）から続ける"
-                        : $"エレベーター（{f} 階）から再入";
-                    CreateButton(body, elevatorLabel,
-                        new Vector2(0.5f, anchorY), new Vector2(0.5f, anchorY), Vector2.zero, new Vector2(420, 58),
-                        () => onStartFromElevatorFloor(f));
-                    anchorY -= 0.075f;
-                }
-            }
+                    if (!JackpotRollSimulation.TryParseChance(input.text, out var chance))
+                    {
+                        result.text = "確率を読み取れない。10、10%、0.1、0.1% のように入れてください。";
+                        return;
+                    }
 
-            if (profile != null && profile.lastRunReward > 0)
-            {
-                CreateLabel(body, "LastReward", $"前回の獲得魔石  +{profile.lastRunReward}", 15,
-                    TextAnchor.MiddleCenter, new Vector2(0.35f, 0.25f), new Vector2(0.65f, 0.32f),
-                    Vector2.zero, Vector2.zero, BattleUITheme.Gold);
-            }
+                    var report = JackpotRollSimulation.Run(chance);
+                    result.text = report;
+                    Debug.Log("[JackpotRoll] " + report.Replace("\n", " / "));
+                });
+            CreateButton(_jackpotDebugPanel.transform, "閉じる",
+                new Vector2(0.5f, 0.08f), new Vector2(0.5f, 0.08f), Vector2.zero, new Vector2(220, 46),
+                () =>
+                {
+                    if (_jackpotDebugPanel != null)
+                        UnityEngine.Object.Destroy(_jackpotDebugPanel);
+                    _jackpotDebugPanel = null;
+                    onClosed?.Invoke();
+                });
         }
 
         public void ShowCardReward(
@@ -264,7 +179,7 @@ namespace TypingRoguelike.Run
             BattleUITheme.AddTextShadow(title, new Color(0, 0, 0, 0.95f), new Vector2(3, -3));
             CreateLabel(body, "Sub",
                 string.IsNullOrEmpty(notice)
-                    ? "空き枠へ自動装備。同じ刻印は Lv.3 まで強化。満杯なら入れ替え（初期スキルは残る）"
+                    ? "空き枠へ自動装備。所持済みは出ない。取得しない場合は装備中スキルの経験値+10"
                     : notice,
                 14, TextAnchor.UpperCenter,
                 new Vector2(0.06f, 0.79f), new Vector2(0.94f, 0.87f), Vector2.zero, Vector2.zero, BattleUITheme.TextMuted);
@@ -301,14 +216,167 @@ namespace TypingRoguelike.Run
 
             if (onDecline != null)
             {
-                CreateButton(_rewardPanel.transform, "見送る",
-                    new Vector2(0.38f, 0.08f), new Vector2(0.38f, 0.08f), Vector2.zero, new Vector2(210, 46),
+                CreateButton(_rewardPanel.transform, "取得せず経験値+10",
+                    new Vector2(0.5f, 0.055f), new Vector2(0.5f, 0.055f), Vector2.zero, new Vector2(320, 46),
                     () =>
                     {
                         HideAll();
                         onDecline.Invoke();
                     });
             }
+        }
+
+        public void ShowSkillXpPick(
+            Transform host,
+            RunPartyState party,
+            int amount,
+            Action<int, int> onConfirm,
+            Action onBack) =>
+            ShowSkillXpPick(host, party, amount, -1, -1, onConfirm, onBack);
+
+        void ShowSkillXpPick(
+            Transform host,
+            RunPartyState party,
+            int amount,
+            int selectedMember,
+            int selectedSlot,
+            Action<int, int> onConfirm,
+            Action onBack)
+        {
+            EnsureRoot(host);
+            HideAll();
+            _selectionPanel = CreateFullScreenPanel("SkillXpPick", new Color(0.005f, 0.008f, 0.025f, 0.96f));
+            _selectionPanel.AddComponent<CanvasGroup>();
+            _selectionPanel.AddComponent<RunPanelEntrance>();
+            BuildOverlayBackdrop(_selectionPanel.transform, BattleUITheme.Arcane);
+            var window = BattleUIChrome.CreateLuxuryWindow(_selectionPanel.transform, "XpWindow",
+                new Vector2(0.14f, 0.08f), new Vector2(0.86f, 0.92f), "GRANT EXPERIENCE", BattleUITheme.Gold);
+            var body = window.Find("Body") ?? window;
+            var title = CreateLabel(body, "Title", "経験値を渡すスキルを選ぶ", 28, TextAnchor.UpperCenter,
+                new Vector2(0.08f, 0.88f), new Vector2(0.92f, 0.98f), Vector2.zero, Vector2.zero, BattleUITheme.TextPrimary);
+            title.fontStyle = FontStyle.Bold;
+            CreateLabel(body, "Sub", $"装備中のスキルを選び、確定で経験値 +{amount}", 16, TextAnchor.UpperCenter,
+                new Vector2(0.08f, 0.81f), new Vector2(0.92f, 0.88f), Vector2.zero, Vector2.zero, BattleUITheme.TextMuted);
+
+            var entries = ListEquippedSlots(party);
+            if (entries.Count == 0)
+            {
+                CreateLabel(body, "Empty", "装備中のスキルがない", 18, TextAnchor.MiddleCenter,
+                    new Vector2(0.1f, 0.3f), new Vector2(0.9f, 0.7f), Vector2.zero, Vector2.zero, BattleUITheme.TextMuted);
+            }
+            else
+            {
+                var top = 0.78f;
+                var height = Mathf.Min(0.09f, 0.62f / entries.Count);
+                for (var i = 0; i < entries.Count; i++)
+                {
+                    var entry = entries[i];
+                    var yMax = top - i * (height + 0.008f);
+                    var selected = entry.MemberIndex == selectedMember && entry.SlotIndex == selectedSlot;
+                    var row = CreateSubPanel(body, $"Xp_{entry.MemberIndex}_{entry.SlotIndex}",
+                        new Vector2(0.08f, yMax - height), new Vector2(0.92f, yMax));
+                    var image = row.GetComponent<Image>();
+                    image.color = selected
+                        ? new Color(0.22f, 0.16f, 0.04f, 0.98f)
+                        : new Color(0.025f, 0.04f, 0.085f, 0.96f);
+                    var outline = row.gameObject.AddComponent<Outline>();
+                    outline.effectColor = selected ? BattleUITheme.Gold : BattleUITheme.TextMuted;
+                    outline.effectDistance = new Vector2(1.5f, -1.5f);
+                    var button = row.gameObject.AddComponent<Button>();
+                    var memberIndex = entry.MemberIndex;
+                    var slotIndex = entry.SlotIndex;
+                    button.onClick.AddListener(() =>
+                        ShowSkillXpPick(host, party, amount, memberIndex, slotIndex, onConfirm, onBack));
+
+                    var skill = entry.Skill;
+                    var level = entry.Level;
+                    var text = $"{entry.OwnerName}　{SkillProgression.FormatName(skill, level)}\n<size=13>{SkillProgression.FormatXp(entry.Xp)}　{SkillProgression.Describe(skill, level, entry.Attack)}</size>";
+                    var label = CreateLabel(row, "Label", text, 16, TextAnchor.MiddleLeft,
+                        Vector2.zero, Vector2.one, new Vector2(16, 0), new Vector2(-12, 0), BattleUITheme.TextPrimary);
+                    label.supportRichText = true;
+                }
+            }
+
+            var canConfirm = selectedMember >= 0 && selectedSlot >= 0;
+            var confirm = CreateButton(_selectionPanel.transform, "確定",
+                new Vector2(0.38f, 0.06f), new Vector2(0.38f, 0.06f), Vector2.zero, new Vector2(220, 48),
+                () =>
+                {
+                    if (!canConfirm)
+                        return;
+                    HideAll();
+                    onConfirm?.Invoke(selectedMember, selectedSlot);
+                });
+            confirm.interactable = canConfirm;
+            CreateButton(_selectionPanel.transform, "戻る",
+                new Vector2(0.62f, 0.06f), new Vector2(0.62f, 0.06f), Vector2.zero, new Vector2(220, 48),
+                () =>
+                {
+                    HideAll();
+                    onBack?.Invoke();
+                });
+        }
+
+        readonly struct EquippedSlotEntry
+        {
+            public EquippedSlotEntry(int memberIndex, int slotIndex, string ownerName, SkillDefinition skill, int level, int xp, int attack)
+            {
+                MemberIndex = memberIndex;
+                SlotIndex = slotIndex;
+                OwnerName = ownerName;
+                Skill = skill;
+                Level = level;
+                Xp = xp;
+                Attack = attack;
+            }
+
+            public int MemberIndex { get; }
+            public int SlotIndex { get; }
+            public string OwnerName { get; }
+            public SkillDefinition Skill { get; }
+            public int Level { get; }
+            public int Xp { get; }
+            public int Attack { get; }
+        }
+
+        static List<EquippedSlotEntry> ListEquippedSlots(RunPartyState party)
+        {
+            var result = new List<EquippedSlotEntry>();
+            if (party?.Members == null)
+                return result;
+
+            for (var i = 0; i < party.Members.Count; i++)
+            {
+                var member = party.Members[i];
+                var owner = member.character != null ? StarterCharacters.Shown(member.character.characterName) : "?";
+                var attack = 0;
+                AddEquipped(result, member, i, MemberRunState.InnateSlotIndex, owner, attack);
+                AddEquipped(result, member, i, 0, owner, attack);
+                AddEquipped(result, member, i, 1, owner, attack);
+            }
+
+            return result;
+        }
+
+        static void AddEquipped(
+            List<EquippedSlotEntry> result,
+            MemberRunState member,
+            int memberIndex,
+            int slotIndex,
+            string owner,
+            int attack)
+        {
+            var skill = member.GetSlot(slotIndex);
+            if (skill == null)
+                return;
+            result.Add(new EquippedSlotEntry(
+                memberIndex,
+                slotIndex,
+                owner,
+                skill,
+                member.GetSlotLevel(slotIndex),
+                member.GetSlotXp(slotIndex),
+                attack));
         }
 
         void BuildRewardPartySummary(RectTransform root, RunPartyState party)
@@ -353,15 +421,16 @@ namespace TypingRoguelike.Run
                 portraitImage.preserveAspect = true;
                 portraitImage.raycastTarget = false;
 
-                var charName = member.character != null ? member.character.characterName : "?";
+                var charName = member.character != null ? StarterCharacters.Shown(member.character.characterName) : "?";
                 var name = CreateLabel(card, "Name", charName, 15, TextAnchor.MiddleLeft,
                     new Vector2(0.23f, 0.77f), new Vector2(0.97f, 0.98f), Vector2.zero, Vector2.zero,
                     BattleUITheme.TextPrimary);
                 name.fontStyle = FontStyle.Bold;
 
-                CreateRewardSkillRow(card, "Innate", member.innateSlot, true, 1, 0.53f, 0.75f);
-                CreateRewardSkillRow(card, "Slot1", member.GetSlot(0), false, member.GetSlotLevel(0), 0.28f, 0.5f);
-                CreateRewardSkillRow(card, "Slot2", member.GetSlot(1), false, member.GetSlotLevel(1), 0.03f, 0.25f);
+                var attack = 0;
+                CreateRewardSkillRow(card, "Innate", member.innateSlot, true, member.GetSlotLevel(MemberRunState.InnateSlotIndex), member.GetSlotXp(MemberRunState.InnateSlotIndex), attack, 0.53f, 0.75f);
+                CreateRewardSkillRow(card, "Slot1", member.GetSlot(0), false, member.GetSlotLevel(0), member.GetSlotXp(0), attack, 0.28f, 0.5f);
+                CreateRewardSkillRow(card, "Slot2", member.GetSlot(1), false, member.GetSlotLevel(1), member.GetSlotXp(1), attack, 0.03f, 0.25f);
             }
         }
 
@@ -371,6 +440,8 @@ namespace TypingRoguelike.Run
             SkillDefinition skill,
             bool innate,
             int level,
+            int xp,
+            int ownerAttack,
             float yMin,
             float yMax)
         {
@@ -381,8 +452,10 @@ namespace TypingRoguelike.Run
             row.GetComponent<Image>().color = color;
 
             var prefix = innate ? "★ " : "◆ ";
-            var displayName = skill != null ? SkillProgression.FormatName(skill, innate ? 1 : level) : "空き";
-            var effect = skill != null ? SkillProgression.Describe(skill, innate ? 1 : level) : string.Empty;
+            var displayName = skill != null ? SkillProgression.FormatName(skill, level) : "空き";
+            var effect = skill != null
+                ? $"{SkillProgression.FormatXp(xp)}　{SkillProgression.Describe(skill, level, ownerAttack)}"
+                : string.Empty;
             var label = CreateLabel(row, "Label", $"{prefix}{displayName}\n<size=10>{effect}</size>", 11, TextAnchor.MiddleLeft,
                 Vector2.zero, new Vector2(0.58f, 1f), new Vector2(7, 0), Vector2.zero,
                 skill != null ? BattleUITheme.TextPrimary : BattleUITheme.TextMuted);
@@ -488,7 +561,7 @@ namespace TypingRoguelike.Run
             var button = go.AddComponent<Button>();
             button.onClick.AddListener(() => onPicked?.Invoke(card));
 
-            var label = CreateLabel(rt, "Name", $"{card.displayName}\n<size=10>{card.effectText}</size>", 14,
+            var label = CreateLabel(rt, "Name", $"{card.displayName}\n<size=10>{SkillProgression.Describe(card, 1, AttackFor(card))}</size>", 14,
                 TextAnchor.MiddleLeft, new Vector2(0.04f, 0.08f), new Vector2(0.67f, 0.92f),
                 Vector2.zero, Vector2.zero, BattleUITheme.TextPrimary);
             label.supportRichText = true;
@@ -567,7 +640,7 @@ namespace TypingRoguelike.Run
             for (var m = 0; m < _party.Members.Count; m++)
             {
                 var member = _party.Members[m];
-                var name = member.character != null ? member.character.characterName : "?";
+                var name = member.character != null ? StarterCharacters.Shown(member.character.characterName) : "?";
                 var yMax = 1f - m * height;
                 var block = CreateSubPanel(membersRoot, $"Member_{m}",
                     new Vector2(0.02f, yMax - height + 0.012f), new Vector2(0.98f, yMax - 0.012f));
@@ -631,7 +704,7 @@ namespace TypingRoguelike.Run
             });
 
             var label = CreateLabel(go.transform, "Name",
-                $"{card.displayName}\n<size=10>{card.characterName}　{card.effectText}</size>", 14,
+                $"{card.displayName}\n<size=10>{StarterCharacters.Shown(card.characterName)}　{SkillProgression.Describe(card, 1, AttackFor(card))}</size>", 14,
                 TextAnchor.MiddleLeft, new Vector2(0.03f, 0.05f), new Vector2(0.64f, 0.95f),
                 Vector2.zero, Vector2.zero, BattleUITheme.TextPrimary);
             label.supportRichText = true;
@@ -652,10 +725,13 @@ namespace TypingRoguelike.Run
             var img = panel.GetComponent<Image>();
             img.color = isInnateSlot ? BattleUITheme.InnateRow : BattleUITheme.CardRow;
 
-            var label = skill != null ? $"{slotName}　{skill.displayName}" : $"{slotName}　（空き）";
-            CreateLabel(panel, "Text", label, 13, TextAnchor.MiddleLeft,
+            var label = skill != null
+                ? $"{slotName}　{SkillProgression.FormatName(skill, member.GetSlotLevel(slotIndex))}\n<size=11>{SkillProgression.FormatXp(member.GetSlotXp(slotIndex))}</size>"
+                : $"{slotName}　（空き）";
+            var slotLabel = CreateLabel(panel, "Text", label, 13, TextAnchor.MiddleLeft,
                 new Vector2(0.02f, 0), new Vector2(0.62f, 1), new Vector2(8, 0), Vector2.zero,
                 skill != null ? BattleUITheme.TextPrimary : BattleUITheme.TextMuted);
+            slotLabel.supportRichText = true;
             if (skill?.pattern is { Length: > 0 })
             {
                 var patternHost = BattleUIOrbPattern.CreateHost(panel, new Vector2(0.62f, 0.14f), new Vector2(0.98f, 0.86f));
@@ -693,7 +769,7 @@ namespace TypingRoguelike.Run
                 UnityEngine.Object.Destroy(_replacePanel);
 
             var member = party.Members[memberIndex];
-            var charName = member.character != null ? member.character.characterName : "?";
+            var charName = member.character != null ? StarterCharacters.Shown(member.character.characterName) : "?";
             _replacePanel = CreateFullScreenPanel("ReplaceSlot", new Color(0.005f, 0.008f, 0.025f, 0.96f));
             _replacePanel.AddComponent<CanvasGroup>();
             _replacePanel.AddComponent<RunPanelEntrance>();
@@ -706,7 +782,8 @@ namespace TypingRoguelike.Run
             title.fontStyle = FontStyle.Bold;
             CreateLabel(windowBody, "Sub", $"新しい刻印　{newCard.displayName}", 16, TextAnchor.UpperCenter,
                 new Vector2(0.05f, 0.74f), new Vector2(0.95f, 0.84f), Vector2.zero, Vector2.zero, CardAccent(newCard));
-            CreateLabel(windowBody, "NewEffect", SkillProgression.Describe(newCard, 1), 15, TextAnchor.UpperCenter,
+            var ownerAttack = 0;
+            CreateLabel(windowBody, "NewEffect", SkillProgression.Describe(newCard, 1, ownerAttack), 15, TextAnchor.UpperCenter,
                 new Vector2(0.08f, 0.66f), new Vector2(0.92f, 0.74f), Vector2.zero, Vector2.zero, BattleUITheme.TextPrimary);
 
             var body = CreateSubPanel(windowBody, "Body", new Vector2(0.08f, 0.14f), new Vector2(0.92f, 0.64f));
@@ -718,7 +795,7 @@ namespace TypingRoguelike.Run
 
             if (!cardSlotsOnly)
             {
-                CreateReplaceRow(body, "★ 初期", member.innateSlot, 1, () =>
+                CreateReplaceRow(body, "★ 初期", member.innateSlot, member.GetSlotLevel(MemberRunState.InnateSlotIndex), ownerAttack, () =>
                 {
                     party.ReplaceEquippedSlot(memberIndex, MemberRunState.InnateSlotIndex, newCard);
                     HideAll();
@@ -726,13 +803,13 @@ namespace TypingRoguelike.Run
                 });
             }
 
-            CreateReplaceRow(body, "◆ カード1", member.GetSlot(0), member.GetSlotLevel(0), () =>
+            CreateReplaceRow(body, "◆ カード1", member.GetSlot(0), member.GetSlotLevel(0), ownerAttack, () =>
             {
                 party.ReplaceEquippedSlot(memberIndex, 0, newCard);
                 HideAll();
                 onDone?.Invoke();
             });
-            CreateReplaceRow(body, "◆ カード2", member.GetSlot(1), member.GetSlotLevel(1), () =>
+            CreateReplaceRow(body, "◆ カード2", member.GetSlot(1), member.GetSlotLevel(1), ownerAttack, () =>
             {
                 party.ReplaceEquippedSlot(memberIndex, 1, newCard);
                 HideAll();
@@ -741,7 +818,7 @@ namespace TypingRoguelike.Run
 
             if (onDecline != null)
             {
-                CreateButton(windowBody, "見送る（取得しない）",
+                CreateButton(windowBody, "取らない",
                     new Vector2(0.5f, 0.05f), new Vector2(0.5f, 0.05f), Vector2.zero, new Vector2(280, 48),
                     () =>
                     {
@@ -796,7 +873,7 @@ namespace TypingRoguelike.Run
             var body = CreateSubPanel(_loadoutPanel.transform, "Body", new Vector2(0.06f, 0.14f), new Vector2(0.94f, 0.86f));
             BuildHubRepairPanel(body, profile, catalog, _loadoutPanel.transform, onClosed);
 
-            CreateButton(_loadoutPanel.transform, "聖堂に戻る",
+            CreateButton(_loadoutPanel.transform, "拠点に戻る",
                 new Vector2(0.5f, 0.05f), new Vector2(0.5f, 0.05f), Vector2.zero, new Vector2(280, 48),
                 () =>
                 {
@@ -815,7 +892,8 @@ namespace TypingRoguelike.Run
             EnsureRoot(host);
             HideAll();
             _loadoutPanel = CreateFullScreenPanel("HubShop", new Color(0.006f, 0.008f, 0.024f, 0.98f));
-            _loadoutPanel.AddComponent<CanvasGroup>();
+            var fadeGroup = _loadoutPanel.AddComponent<CanvasGroup>();
+            host.GetComponent<RunFlowController>()?.StartCoroutine(HubOfficeView.FadePopup(fadeGroup));
             BuildOverlayBackdrop(_loadoutPanel.transform, BattleUITheme.Cyan);
             CreateLabel(_loadoutPanel.transform, "Title", "拠点 — 店・レリック開発", 24,
                 TextAnchor.MiddleCenter, new Vector2(0.08f, 0.88f), new Vector2(0.92f, 0.96f),
@@ -824,7 +902,7 @@ namespace TypingRoguelike.Run
             var body = CreateSubPanel(_loadoutPanel.transform, "Body", new Vector2(0.06f, 0.14f), new Vector2(0.94f, 0.86f));
             BuildHubShopDevelopPanel(body, profile, catalog);
 
-            CreateButton(_loadoutPanel.transform, "聖堂に戻る",
+            CreateButton(_loadoutPanel.transform, "拠点に戻る",
                 new Vector2(0.5f, 0.05f), new Vector2(0.5f, 0.05f), Vector2.zero, new Vector2(280, 48),
                 () =>
                 {
@@ -841,7 +919,9 @@ namespace TypingRoguelike.Run
             RelicCatalogDefinition relicCatalog,
             RunExplorationInventory exploration,
             string closeButtonLabel,
-            Action onClosed)
+            Action onClosed,
+            PersonalityChartView[] charts = null,
+            Action<string, int> onSetAffinity = null)
         {
             EnsureRoot(host);
             HideAll();
@@ -853,13 +933,11 @@ namespace TypingRoguelike.Run
             _loadoutPanel = CreateFullScreenPanel("PartyStats", new Color(0.006f, 0.008f, 0.024f, 0.98f));
             _loadoutPanel.AddComponent<CanvasGroup>();
             BuildOverlayBackdrop(_loadoutPanel.transform, BattleUITheme.AccentAlly);
-            CreateLabel(_loadoutPanel.transform, "Title", "パーティステータス", 26, TextAnchor.MiddleCenter,
-                new Vector2(0.08f, 0.88f), new Vector2(0.92f, 0.96f), Vector2.zero, Vector2.zero, BattleUITheme.Gold);
+            CreateLabel(_loadoutPanel.transform, "Title", "ステータス", 26, TextAnchor.MiddleCenter,
+                new Vector2(0.08f, 0.9f), new Vector2(0.92f, 0.97f), Vector2.zero, Vector2.zero, BattleUITheme.Gold);
 
-            var bodyText = stats.BuildDetailText(party, runConfig, relicMods);
-            CreateLabel(_loadoutPanel.transform, "Body", bodyText, 17, TextAnchor.UpperLeft,
-                new Vector2(0.1f, 0.18f), new Vector2(0.9f, 0.86f), Vector2.zero, Vector2.zero,
-                BattleUITheme.TextPrimary);
+            var body = CreateSubPanel(_loadoutPanel.transform, "Body", new Vector2(0.04f, 0.14f), new Vector2(0.96f, 0.88f));
+            BuildDungeonStatus(body, party, stats, relicMods, charts, onSetAffinity);
 
             CreateButton(_loadoutPanel.transform, closeButtonLabel,
                 new Vector2(0.5f, 0.06f), new Vector2(0.5f, 0.06f), Vector2.zero, new Vector2(300, 48),
@@ -868,6 +946,147 @@ namespace TypingRoguelike.Run
                     HideAll();
                     onClosed?.Invoke();
                 });
+        }
+
+        void BuildDungeonStatus(
+            RectTransform body,
+            RunPartyState party,
+            PartyCombatStats stats,
+            RelicRunModifiers relicMods,
+            PersonalityChartView[] charts,
+            Action<string, int> onSetAffinity)
+        {
+            var chartCount = charts != null ? charts.Length : 0;
+            if (chartCount > 0)
+                BuildPersonalityCharts(body, charts, onSetAffinity);
+            if (party?.Members == null || party.Members.Count == 0)
+            {
+                if (chartCount == 0)
+                {
+                    CreateLabel(body, "Empty", "編成情報なし", 18, TextAnchor.MiddleCenter,
+                        Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero, BattleUITheme.TextMuted);
+                }
+
+                return;
+            }
+
+            var count = party.Members.Count;
+            var blockHeight = 0.76f / count;
+            var cardRight = chartCount > 0 ? 0.64f : 0.985f;
+            for (var i = 0; i < count; i++)
+            {
+                var member = party.Members[i];
+                var yMax = 0.98f - i * blockHeight;
+                var card = CreateSubPanel(body, $"Status_{i}",
+                    new Vector2(0.015f, yMax - blockHeight + 0.012f), new Vector2(cardRight, yMax - 0.006f));
+                BattleUIImage.ApplyPanel(card.GetComponent<Image>(), new Color(0.025f, 0.035f, 0.08f, 0.96f),
+                    BattleUITemplateLoader.Default?.partyCard);
+
+                var character = member.character;
+                var name = character != null ? StarterCharacters.Shown(character.characterName) : "?";
+                var role = character != null ? character.roleLabel : string.Empty;
+                var nameLabel = CreateLabel(card, "Name", $"{name}　{role}", 18, TextAnchor.MiddleLeft,
+                    new Vector2(0.02f, 0.78f), new Vector2(0.98f, 0.98f), new Vector2(12, 0), Vector2.zero,
+                    BattleUITheme.TextPrimary);
+                nameLabel.fontStyle = FontStyle.Bold;
+
+                var hp = character != null ? character.hp : 0;
+                var attack = RunPartyState.GetAttack(character);
+                var defense = character != null ? character.defense : 0;
+                var luck = character != null ? character.luck : 0;
+                CreateLabel(card, "Stats", $"HP {hp}　　攻撃 {attack}　　防御 {defense}　　運 {luck}", 15,
+                    TextAnchor.MiddleLeft, new Vector2(0.02f, 0.62f), new Vector2(0.98f, 0.78f),
+                    new Vector2(12, 0), Vector2.zero, BattleUITheme.Gold);
+
+                AddStatusSkillLine(card, member, MemberRunState.InnateSlotIndex, "★ 初期", 0.42f, 0.62f);
+                AddStatusSkillLine(card, member, 0, "◆ カード1", 0.22f, 0.42f);
+                AddStatusSkillLine(card, member, 1, "◆ カード2", 0.02f, 0.22f);
+            }
+
+            var luckShown = Mathf.Min(stats.TotalLuck, PartyCombatStats.LuckCap);
+            var footer = $"パーティ合計　HP {stats.TotalHp}　攻撃 {stats.TotalAttack}　防御 {stats.TotalDefense}　運 {luckShown}";
+            if (party.RunHpInitialized)
+                footer = $"探索 HP {(int)party.CurrentHp} / {(int)party.MaxHp}　　" + footer;
+            if (relicMods.PlayerDamageBonusPercent > 0)
+                footer += $"　　与ダメ +{relicMods.PlayerDamageBonusPercent}%";
+            CreateLabel(body, "Footer", footer, 14, TextAnchor.MiddleLeft,
+                new Vector2(0.02f, 0f), new Vector2(chartCount > 0 ? 0.63f : 0.98f, 0.2f),
+                Vector2.zero, Vector2.zero, BattleUITheme.TextMuted);
+        }
+
+        void BuildPersonalityCharts(RectTransform body, PersonalityChartView[] charts, Action<string, int> onSetAffinity)
+        {
+            var count = charts.Length;
+            var block = 1f / count;
+            var debugValues = onSetAffinity != null ? PersonalityCatalog.DebugAffinity : Array.Empty<int>();
+            for (var i = 0; i < count; i++)
+            {
+                var chart = charts[i];
+                if (chart == null)
+                    continue;
+                var yMax = 1f - i * block;
+                var card = CreateSubPanel(body, "Chart_" + i,
+                    new Vector2(0.655f, yMax - block + 0.012f), new Vector2(0.99f, yMax - 0.006f));
+                CreateLabel(card, "Name", $"{chart.Name}　好感度 {chart.Affinity}", 16, TextAnchor.MiddleCenter,
+                    new Vector2(0.04f, 0.86f), new Vector2(0.96f, 0.98f), Vector2.zero, Vector2.zero, BattleUITheme.Gold);
+                var summary = new System.Text.StringBuilder();
+                var axes = chart.AxisNames ?? Array.Empty<string>();
+                var stages = chart.Stages ?? Array.Empty<int>();
+                var n = Mathf.Min(axes.Length, stages.Length);
+                for (var a = 0; a < n; a++)
+                {
+                    if (summary.Length > 0)
+                        summary.Append("　");
+                    summary.Append(axes[a]);
+                    summary.Append(' ');
+                    summary.Append(stages[a]);
+                }
+
+                var summaryLabel = CreateLabel(card, "Axes", summary.ToString(), 12, TextAnchor.MiddleCenter,
+                    new Vector2(0.04f, 0.72f), new Vector2(0.96f, 0.86f), Vector2.zero, Vector2.zero, BattleUITheme.TextMuted);
+                summaryLabel.horizontalOverflow = HorizontalWrapMode.Wrap;
+
+                var radarGo = new GameObject("Radar");
+                radarGo.transform.SetParent(card, false);
+                var radarRt = radarGo.AddComponent<RectTransform>();
+                radarRt.anchorMin = new Vector2(0.18f, debugValues.Length > 0 ? 0.24f : 0.08f);
+                radarRt.anchorMax = new Vector2(0.82f, 0.72f);
+                radarRt.offsetMin = Vector2.zero;
+                radarRt.offsetMax = Vector2.zero;
+                var radar = radarGo.AddComponent<PersonalityRadarGraphic>();
+                var values = new float[n > 0 ? n : 3];
+                var max = chart.StageMax < 1 ? 1 : chart.StageMax;
+                for (var a = 0; a < values.Length; a++)
+                    values[a] = a < n ? Mathf.Clamp01(stages[a] / (float)max) : 0.2f;
+                radar.color = Color.white;
+                radar.SetShape(values, max);
+
+                if (debugValues.Length == 0 || string.IsNullOrEmpty(chart.Id))
+                    continue;
+                var shown = Mathf.Min(debugValues.Length, 5);
+                for (var d = 0; d < shown; d++)
+                {
+                    var value = debugValues[d];
+                    var x = shown == 1 ? 0.5f : 0.12f + 0.76f * d / (shown - 1);
+                    var id = chart.Id;
+                    CreateButton(card, value.ToString(),
+                        new Vector2(x, 0.08f), new Vector2(x, 0.08f), Vector2.zero, new Vector2(44f, 28f),
+                        () => onSetAffinity(id, value));
+                }
+            }
+        }
+
+        void AddStatusSkillLine(Transform parent, MemberRunState member, int slotIndex, string slotName, float yMin, float yMax)
+        {
+            var skill = member.GetSlot(slotIndex);
+            var attack = 0;
+            var text = skill == null
+                ? $"{slotName}　（空き）"
+                : $"{slotName}　{SkillProgression.FormatName(skill, member.GetSlotLevel(slotIndex))}　　{SkillProgression.FormatXp(member.GetSlotXp(slotIndex))}\n<size=12>{SkillProgression.Describe(skill, member.GetSlotLevel(slotIndex), attack)}</size>";
+            var label = CreateLabel(parent, $"Skill_{slotIndex}", text, 14, TextAnchor.MiddleLeft,
+                new Vector2(0.02f, yMin), new Vector2(0.98f, yMax), new Vector2(12, 0), Vector2.zero,
+                skill != null ? BattleUITheme.TextPrimary : BattleUITheme.TextMuted);
+            label.supportRichText = true;
         }
 
         public void ShowHubRelicPanel(
@@ -879,7 +1098,8 @@ namespace TypingRoguelike.Run
             EnsureRoot(host);
             HideAll();
             _loadoutPanel = CreateFullScreenPanel("HubRelics", new Color(0.006f, 0.008f, 0.024f, 0.98f));
-            _loadoutPanel.AddComponent<CanvasGroup>();
+            var fadeGroup = _loadoutPanel.AddComponent<CanvasGroup>();
+            host.GetComponent<RunFlowController>()?.StartCoroutine(HubOfficeView.FadePopup(fadeGroup));
             BuildOverlayBackdrop(_loadoutPanel.transform, BattleUITheme.Gold);
             CreateLabel(_loadoutPanel.transform, "Title", "拠点 — レリック装備（次の出発時）", 24,
                 TextAnchor.MiddleCenter, new Vector2(0.08f, 0.88f), new Vector2(0.92f, 0.96f),
@@ -888,7 +1108,7 @@ namespace TypingRoguelike.Run
             var body = CreateSubPanel(_loadoutPanel.transform, "Body", new Vector2(0.06f, 0.14f), new Vector2(0.94f, 0.86f));
             BuildHubRelicPanel(body, profile, catalog);
 
-            CreateButton(_loadoutPanel.transform, "聖堂に戻る",
+            CreateButton(_loadoutPanel.transform, "拠点に戻る",
                 new Vector2(0.5f, 0.05f), new Vector2(0.5f, 0.05f), Vector2.zero, new Vector2(280, 48),
                 () =>
                 {
@@ -1187,7 +1407,7 @@ namespace TypingRoguelike.Run
             }
         }
 
-        void CreateReplaceRow(RectTransform parent, string slotLabel, SkillDefinition skill, int level, Action onPick)
+        void CreateReplaceRow(RectTransform parent, string slotLabel, SkillDefinition skill, int level, int ownerAttack, Action onPick)
         {
             var go = new GameObject(slotLabel);
             go.transform.SetParent(parent, false);
@@ -1207,7 +1427,7 @@ namespace TypingRoguelike.Run
             }
 
             var name = skill != null ? SkillProgression.FormatName(skill, level) : "（空）";
-            var effect = skill != null ? SkillProgression.Describe(skill, level) : "効果なし";
+            var effect = skill != null ? SkillProgression.Describe(skill, level, ownerAttack) : "効果なし";
             var label = CreateLabel(row, "Label", $"{slotLabel}\n{name}\n<size=14>{effect}</size>", 16, TextAnchor.MiddleLeft,
                 new Vector2(0, 0), new Vector2(0.62f, 1), new Vector2(12, 0), Vector2.zero, Color.white);
             label.supportRichText = true;
@@ -1219,119 +1439,156 @@ namespace TypingRoguelike.Run
             }
         }
 
+        const string RewardCardSprites = "Battle/UI/Cards/";
+
         void CreateCardButton(Transform parent, SkillDefinition card, RunPartyState party, Action onClick)
         {
-            var panel = CreateSubPanel(parent, card.displayName, Vector2.zero, Vector2.one);
-            panel.offsetMin = new Vector2(12, 12);
-            panel.offsetMax = new Vector2(-12, -12);
-            var layout = panel.gameObject.AddComponent<LayoutElement>();
-            layout.minWidth = 300;
-            layout.minHeight = 440;
-            var img = panel.GetComponent<Image>();
-            img.sprite = null;
-            EnsureImageDrawable(img);
-            img.type = Image.Type.Simple;
-            img.color = new Color(0.02f, 0.02f, 0.028f, 1f);
+            // The layout group sizes the slot. The card fits inside it at a fixed 3:4 ratio.
+            var slot = new GameObject("RewardCardSlot", typeof(RectTransform));
+            slot.transform.SetParent(parent, false);
+            var panel = CreateSubPanel(slot.transform, card.displayName, Vector2.zero, Vector2.one);
+            var aspect = panel.gameObject.AddComponent<AspectRatioFitter>();
+            aspect.aspectMode = AspectRatioFitter.AspectMode.FitInParent;
+            aspect.aspectRatio = 3f / 4f;
 
-            var accent = CardAccent(card);
-            var displayLevel = CardDisplayLevel(card, party);
-            PlaceCardSprite(panel, "Illustration", CardArtSprite(), new Vector2(0.1f, 0.36f), new Vector2(0.9f, 0.9f));
-            PlaceCardSprite(panel, "CardFrame", CardFrameSprite(displayLevel), Vector2.zero, Vector2.one);
-            PlaceCardSprite(panel, "NamePlate", Resources.Load<Sprite>("Battle/UI/Cards/CardNamePlate"),
-                new Vector2(0.05f, 0.6f), new Vector2(0.95f, 0.76f));
-            PlaceCardSprite(panel, "EffectPlate", Resources.Load<Sprite>("Battle/UI/Cards/CardEffectPlate"),
-                new Vector2(0.08f, 0.2f), new Vector2(0.92f, 0.58f));
+            var hitArea = panel.GetComponent<Image>();
+            hitArea.color = Color.clear;
+            var rarity = card.rarity?.Trim().ToUpperInvariant() switch
+            {
+                "SR" => "Rainbow",
+                "R" => "Gold",
+                _ => "Silver"
+            };
 
-            var outline = panel.gameObject.AddComponent<Outline>();
-            outline.effectColor = new Color(accent.r, accent.g, accent.b, 0.35f);
-            outline.effectDistance = new Vector2(1, -1);
+            PlaceCardSprite(panel, "Illustration", "CardArt_NoImage", CardPoint(10, 590), CardPoint(440, 10));
+            PlaceCardSprite(panel, "EffectShade", "CardEffectPlate", CardPoint(10, 590), CardPoint(440, 10));
+            var frame = PlaceCardSprite(panel, "CardFrame", $"CardFrame_{rarity}", Vector2.zero, Vector2.one);
+            var levelPlate = rarity == "Silver" ? "CardNamePlate" : $"CardLevelPlate_{rarity}";
+            PlaceCardSprite(panel, "LevelPlate", levelPlate, CardPoint(139, 58), CardPoint(311, 16));
 
-            var btn = panel.gameObject.AddComponent<Button>();
-            btn.onClick.AddListener(() => onClick());
-            var colors = btn.colors;
+            var level = CardDisplayLevel(card, party);
+            CreateCardLabel(panel, "Level", $"Lv {level}", BattleUITheme.FontDisplay, 26,
+                TextAnchor.MiddleCenter, 151, 17, 299, 53, new Color32(236, 232, 244, 255));
+
+            CreateCardLabel(panel, "Owner", StarterCharacters.Shown(card.characterName), BattleUITheme.FontBold, 12,
+                TextAnchor.MiddleLeft, 27, 28, 133, 56, BattleUITheme.TextPrimary);
+
+            var orbPlateLeft = PlaceCardOrbs(panel, card.pattern, rarity);
+            var titleFont = Resources.Load<Font>("Battle/Fonts/ShipporiMinchoB1-ExtraBold") ?? BattleUITheme.FontDisplay;
+            CreateCardLabel(panel, "Name", card.displayName, titleFont, 32, TextAnchor.MiddleLeft,
+                28, 392, orbPlateLeft - 10, 452, new Color32(252, 246, 238, 255));
+
+            var effect = SkillProgression.Describe(card, level, 0) ?? string.Empty;
+            if (!effect.Contains("<"))
+                effect = System.Text.RegularExpressions.Regex.Replace(effect, @"[+＋\-−]?\d+(?:[.．]\d+)?[%％]?",
+                    "<nobr><color=#F2D58A>$0</color></nobr>");
+            var effectLabel = BattleHudKit.Text(panel, "Fx", effect, BattleHudKit.Gothic, 21,
+                new Color32(240, 236, 246, 255), TextAlignmentOptions.TopLeft,
+                CardPoint(29, 563), CardPoint(421, 466));
+            effectLabel.textWrappingMode = TextWrappingModes.Normal;
+            effectLabel.enableAutoSizing = true;
+            effectLabel.fontSizeMin = 16f;
+            effectLabel.fontSizeMax = 21f;
+            effectLabel.overflowMode = TextOverflowModes.Ellipsis;
+
+            var button = panel.gameObject.AddComponent<Button>();
+            button.targetGraphic = frame != null ? frame : hitArea;
+            button.onClick.AddListener(() => onClick());
+            var colors = button.colors;
             colors.highlightedColor = new Color(1.16f, 1.12f, 1.2f, 1f);
             colors.pressedColor = new Color(0.78f, 0.74f, 0.82f, 1f);
-            btn.colors = colors;
-            var motion = panel.gameObject.AddComponent<RewardCardMotion>();
-            motion.Configure(outline, null, accent);
-
-            var name = CreateLabel(panel, "Name", card.displayName, 24, TextAnchor.MiddleCenter,
-                new Vector2(0.16f, 0.615f), new Vector2(0.84f, 0.745f), Vector2.zero, Vector2.zero, Color.white);
-            name.font = BattleUITheme.FontBold;
-            name.fontStyle = FontStyle.Bold;
-            name.horizontalOverflow = HorizontalWrapMode.Wrap;
-            name.verticalOverflow = VerticalWrapMode.Truncate;
-            BattleUITheme.AddTextShadow(name, new Color(0, 0, 0, 0.95f), new Vector2(2, -2));
-            var owner = CreateLabel(panel, "Owner", $"{card.characterName}  Lv.{displayLevel}", 12, TextAnchor.MiddleCenter,
-                new Vector2(0.16f, 0.74f), new Vector2(0.84f, 0.8f), Vector2.zero, Vector2.zero, accent);
-            owner.font = BattleUITheme.FontBold;
-            owner.fontStyle = FontStyle.Bold;
-            var effectLine = card.effectText;
-            if (party != null && party.TryGetEquippedLevel(card, out var ownedLevel) && ownedLevel < SkillProgression.MaxLevel)
-            {
-                effectLine =
-                    $"強化  Lv.{ownedLevel} → Lv.{ownedLevel + 1}\n" +
-                    $"{SkillProgression.Describe(card, ownedLevel)} → {SkillProgression.Describe(card, ownedLevel + 1)}";
-            }
-
-            var effect = CreateLabel(panel, "Fx", effectLine, 15, TextAnchor.MiddleCenter,
-                new Vector2(0.14f, 0.24f), new Vector2(0.86f, 0.54f), Vector2.zero, Vector2.zero, BattleUITheme.TextPrimary);
-            effect.font = BattleUITheme.Font;
-            effect.fontStyle = FontStyle.Normal;
-            effect.horizontalOverflow = HorizontalWrapMode.Wrap;
-            effect.verticalOverflow = VerticalWrapMode.Truncate;
-            effect.lineSpacing = 1.05f;
-
-            if (card.pattern != null && card.pattern.Length > 0)
-            {
-                var host = BattleUIOrbPattern.CreateHost(panel, new Vector2(0.16f, 0.05f), new Vector2(0.84f, 0.16f));
-                BattleUIOrbPattern.Apply(host, card.pattern, 19f);
-            }
+            button.colors = colors;
+            panel.gameObject.AddComponent<RewardCardMotion>();
         }
+
+        Text CreateCardLabel(Transform panel, string name, string value, Font font, int maxSize, TextAnchor alignment,
+            float left, float top, float right, float bottom, Color color)
+        {
+            var text = CreateLabel(panel, name, value, maxSize, alignment,
+                CardPoint(left, bottom), CardPoint(right, top), Vector2.zero, Vector2.zero, color);
+            text.font = font;
+            text.raycastTarget = false;
+            text.resizeTextForBestFit = true;
+            text.resizeTextMinSize = 8;
+            text.resizeTextMaxSize = maxSize;
+            BattleUITheme.AddTextShadow(text, new Color(0f, 0f, 0f, 0.9f), new Vector2(1, -1));
+            return text;
+        }
+
+        static float PlaceCardOrbs(Transform panel, ElementColor[] pattern, string rarity)
+        {
+            const float right = 424f;
+            if (pattern == null || pattern.Length == 0)
+                return right;
+
+            // Up to five circles use the approved spacing. Older data with more still shows every color.
+            var spacing = Mathf.Min(30f, 150f / pattern.Length);
+            var left = right - 18f - spacing * pattern.Length;
+            var plate = PlaceCardSprite(panel, "OrbPlate", $"CardOrbPlate_{rarity}",
+                CardPoint(left, 448), CardPoint(right, 400));
+            if (plate != null)
+            {
+                plate.type = Image.Type.Sliced;
+                plate.pixelsPerUnitMultiplier = 16f;
+            }
+
+            var radius = Mathf.Min(13.5f, spacing * 0.45f);
+            for (var i = 0; i < pattern.Length; i++)
+            {
+                var center = left + 9f + spacing * (i + 0.5f);
+                PlaceCardSprite(panel, $"Orb_{i}", $"CardOrb_{pattern[i]}",
+                    CardPoint(center - radius, 424f + radius), CardPoint(center + radius, 424f - radius));
+            }
+
+            return left;
+        }
+
+        static Vector2 CardPoint(float x, float y) => new Vector2(x / 450f, 1f - y / 600f);
 
         static int CardDisplayLevel(SkillDefinition card, RunPartyState party)
         {
             if (card != null && party != null && party.TryGetEquippedLevel(card, out var owned))
-                return Mathf.Clamp(owned < SkillProgression.MaxLevel ? owned + 1 : owned, 1, SkillProgression.MaxLevel);
+                return SkillProgression.ClampLevel(owned);
             return 1;
         }
 
-        static Sprite CardArtSprite() => Resources.Load<Sprite>("Battle/UI/Cards/CardArt_NoImage");
-
-        static Sprite CardFrameSprite(int level)
+        static Image PlaceCardSprite(Transform parent, string name, string asset, Vector2 anchorMin, Vector2 anchorMax)
         {
-            var file = level >= 3 ? "CardFrame_Rainbow" : level == 2 ? "CardFrame_Gold" : "CardFrame_Silver";
-            return Resources.Load<Sprite>($"Battle/UI/Cards/{file}");
-        }
-
-        static void PlaceCardSprite(Transform parent, string name, Sprite sprite, Vector2 anchorMin, Vector2 anchorMax)
-        {
+            var sprite = Resources.Load<Sprite>(RewardCardSprites + asset);
             if (sprite == null)
-                return;
-            var go = new GameObject(name);
+                return null;
+
+            var go = new GameObject(name, typeof(RectTransform));
             go.transform.SetParent(parent, false);
-            var rt = go.AddComponent<RectTransform>();
+            var rt = (RectTransform)go.transform;
             rt.anchorMin = anchorMin;
             rt.anchorMax = anchorMax;
             rt.offsetMin = Vector2.zero;
             rt.offsetMax = Vector2.zero;
             var image = go.AddComponent<Image>();
             image.sprite = sprite;
-            image.preserveAspect = false;
             image.raycastTarget = false;
+            return image;
         }
 
         static Color CardAccent(SkillDefinition card)
         {
             if (card == null)
                 return BattleUITheme.Arcane;
-            if (card.characterName == "アリス")
+            if (StarterCharacters.Same(card.characterName, StarterCharacters.Chara01))
                 return BattleUITheme.AccentBoss;
-            if (card.characterName == "エレン")
+            if (StarterCharacters.Same(card.characterName, StarterCharacters.Chara02))
                 return BattleUITheme.AccentAlly;
-            if (card.characterName == "ルナ")
+            if (StarterCharacters.Same(card.characterName, StarterCharacters.Chara03))
                 return BattleUITheme.Cyan;
             return BattleUITheme.Arcane;
+        }
+
+        int AttackFor(SkillDefinition skill, RunPartyState party = null)
+        {
+            _ = skill;
+            _ = party;
+            return 0;
         }
 
         static string CardLabel(SkillDefinition card) => $"{card.displayName} ({card.effectText})";
@@ -1362,7 +1619,7 @@ namespace TypingRoguelike.Run
                     BattleUITheme.Gold);
             }
 
-            CreateButton(body, "聖堂で整備する",
+            CreateButton(body, "拠点で整備する",
                 new Vector2(0.5f, 0.1f), new Vector2(0.5f, 0.1f), Vector2.zero, new Vector2(320, 52),
                 () =>
                 {
@@ -1389,11 +1646,14 @@ namespace TypingRoguelike.Run
                 UnityEngine.Object.Destroy(_replacePanel);
             if (_selectionPanel != null)
                 UnityEngine.Object.Destroy(_selectionPanel);
+            if (_jackpotDebugPanel != null)
+                UnityEngine.Object.Destroy(_jackpotDebugPanel);
             _hubPanel = null;
             _rewardPanel = null;
             _loadoutPanel = null;
             _replacePanel = null;
             _selectionPanel = null;
+            _jackpotDebugPanel = null;
         }
 
         public void TryCloseLoadout()
@@ -1469,6 +1729,227 @@ namespace TypingRoguelike.Run
             if (img.sprite != null)
                 return;
             BattleUITheme.EnsureSprite(img);
+        }
+
+        public GameObject BuildHubPrefabSource(Transform host)
+        {
+            SuppressPrefab = true;
+            try
+            {
+                var profile = new MetaProgressData
+                {
+                    arcaneShards = 120,
+                    bankedCoins = 40,
+                    totalRuns = 3,
+                    completedRuns = 1,
+                    extractedRuns = 1,
+                    bestClearedNodes = 12,
+                    lastRunReward = 12,
+                    towerRunActive = true,
+                    unlockedElevatorFloors = new List<int> { 3 }
+                };
+                ShowHub(host, profile, null, () => { }, () => { }, "探索を再開", new[] { 3 }, _ => { },
+                    () => { }, () => { }, () => { }, () => { }, () => { });
+                return _hubPanel;
+            }
+            finally
+            {
+                SuppressPrefab = false;
+            }
+        }
+
+        bool TryBindHub(
+            MetaProgressData profile,
+            SkillCardPoolDefinition pool,
+            Action onStartRun,
+            Action onResumeRun,
+            string resumeRunLabel,
+            IReadOnlyList<int> elevatorFloors,
+            Action<int> onStartFromElevatorFloor,
+            Action onOpenRelicHub,
+            Action onOpenHubShop,
+            Action onOpenRepairShop,
+            Action onOpenPartyStats,
+            Action onOpenJackpotDebug)
+        {
+            var prefab = Resources.Load<GameObject>("UI/Hub");
+            if (prefab == null || _root == null)
+                return false;
+            _hubPanel = UnityEngine.Object.Instantiate(prefab, _root);
+            _hubPanel.name = "ArcaneSanctum";
+            var panelRt = _hubPanel.GetComponent<RectTransform>();
+            if (panelRt != null)
+            {
+                panelRt.anchorMin = Vector2.zero;
+                panelRt.anchorMax = Vector2.one;
+                panelRt.offsetMin = Vector2.zero;
+                panelRt.offsetMax = Vector2.zero;
+            }
+
+            var whMat = MetaProgression.WarehouseMaterialUnits(profile);
+            var whRel = profile?.warehouseRelicIds?.Count ?? 0;
+            var totalCards = pool?.cards?.Count(card => card != null) ?? 0;
+            var unlockedCards = pool?.cards?.Count(card => card != null && profile != null &&
+                profile.IsUnlocked(card.skillId)) ?? 0;
+            var elevatorLine = profile?.unlockedElevatorFloors != null && profile.unlockedElevatorFloors.Count > 0
+                ? $"解放エレベーター階: {string.Join(", ", profile.unlockedElevatorFloors)}F"
+                : "エレベーター未解放";
+            var hasElevatorRestart = elevatorFloors != null && elevatorFloors.Count > 0 &&
+                                     onStartFromElevatorFloor != null;
+            var hasResume = onResumeRun != null && profile != null && profile.towerRunActive &&
+                            !string.IsNullOrEmpty(resumeRunLabel);
+            SetHubText("Currency", $"◆ 魔石  {profile?.arcaneShards ?? 0}　　貯金 {profile?.bankedCoins ?? 0}");
+            SetHubText("Warehouse", $"素材倉庫 {whMat}　レリック倉庫 {whRel} 個");
+            SetHubText("Stats",
+                $"挑戦回数　{profile?.totalRuns ?? 0}\n\n" +
+                $"踏破 / 帰還　{profile?.completedRuns ?? 0} / {profile?.extractedRuns ?? 0}\n\n" +
+                $"最高進行　{profile?.bestClearedNodes ?? 0} ノード");
+            SetHubText("Progress", $"解放済み  {unlockedCards} / {totalCards}");
+            SetHubText("Latest", elevatorLine);
+            SetHubText("StartRule",
+                profile != null && profile.towerRunActive
+                    ? "中断中の探索は、刻印・レリックを持ったまま 1 階か解放済みエレベーター階から再開できる"
+                    : "出発時は各キャラの初期スキルのみ。カードは塔内で集める");
+            SetHubText("RunCopy",
+                profile != null && profile.towerRunActive &&
+                (profile.towerRunVitalsRested ||
+                 (profile.towerRunNodeId == LayerSquares.Count - 1 && !profile.towerRunElevatorRestConsumed))
+                    ? "エレベーターから帰還済み。1階からでも、どのエレベーターからでも HP は満タン、狂気は 0。"
+                    : profile != null && profile.towerRunActive
+                    ? "中断中の探索がある。拠点で整備してから塔へ戻れる。"
+                    : hasElevatorRestart
+                        ? "塔は再配置された。解放済みエレベーターから、新しい RUN を始められる。"
+                        : "1 階から新しく塔へ入る。");
+            var reward = FindNamed(_hubPanel.transform, "LastReward");
+            if (reward != null)
+            {
+                reward.gameObject.SetActive(profile != null && profile.lastRunReward > 0);
+                var rewardText = reward.GetComponent<Text>();
+                if (rewardText != null && profile != null)
+                    rewardText.text = $"前回の獲得魔石  +{profile.lastRunReward}";
+            }
+
+            WireHubButton("Relic", null, onOpenRelicHub, onOpenRelicHub != null);
+            WireHubButton("Shop", null, onOpenHubShop, onOpenHubShop != null);
+            WireHubButton("Repair", null, onOpenRepairShop, onOpenRepairShop != null);
+            WireHubButton("PartyStats", null, onOpenPartyStats, onOpenPartyStats != null);
+            WireHubButton("Jackpot", null, onOpenJackpotDebug, onOpenJackpotDebug != null);
+            WireHubButton("Resume", resumeRunLabel, hasResume ? onResumeRun : null, hasResume);
+            WireHubButton("Depart",
+                hasResume ? "1 階から再挑戦（踏破記録を保持）" : "ダンジョンへ出発（1 階）",
+                onStartRun, true);
+            var archive = FindNamed(_hubPanel.transform, "ArchiveButton")?.GetComponent<Button>();
+            if (archive != null)
+                archive.interactable = false;
+
+            var window = FindNamed(_hubPanel.transform, "SanctumWindow");
+            var body = window != null ? window.Find("Body") : FindNamed(_hubPanel.transform, "Body");
+            var samples = new List<RectTransform>();
+            CollectNamed(body != null ? body : _hubPanel.transform, "Elevator", samples);
+            samples.Sort((a, b) => b.anchorMin.y.CompareTo(a.anchorMin.y));
+            var originMin = new Vector2(0.5f, 0.22f);
+            var originMax = originMin;
+            var step = new Vector2(0f, -0.075f);
+            var spotPos = Vector2.zero;
+            var spotSize = new Vector2(420f, 58f);
+            var elevatorParent = body != null ? body : _hubPanel.transform;
+            if (samples.Count > 0)
+            {
+                originMin = samples[0].anchorMin;
+                originMax = samples[0].anchorMax;
+                spotPos = samples[0].anchoredPosition;
+                spotSize = samples[0].sizeDelta;
+                elevatorParent = samples[0].parent;
+                if (samples.Count > 1)
+                    step = samples[1].anchorMin - samples[0].anchorMin;
+            }
+
+            foreach (var sample in samples)
+                UnityEngine.Object.DestroyImmediate(sample.gameObject);
+            if (hasElevatorRestart)
+            {
+                var ordered = elevatorFloors.OrderBy(floor => floor).ToList();
+                for (var i = 0; i < ordered.Count; i++)
+                {
+                    var floor = ordered[i];
+                    var label = profile != null && profile.towerRunActive
+                        ? $"エレベーター（{floor} 階）から続ける"
+                        : $"エレベーター（{floor} 階）から再入";
+                    var button = CreateButton(elevatorParent, label, originMin + step * i, originMax + step * i,
+                        spotPos, spotSize, () => onStartFromElevatorFloor(floor));
+                    button.name = "Elevator";
+                }
+            }
+
+            foreach (var text in _hubPanel.GetComponentsInChildren<Text>(true))
+            {
+                if (text.font == null)
+                    text.font = BattleUITheme.FontBold ?? BattleUITheme.FontDisplay;
+            }
+
+            foreach (var image in _hubPanel.GetComponentsInChildren<Image>(true))
+            {
+                if (image.sprite == null)
+                    BattleUITheme.EnsureSprite(image);
+            }
+
+            return true;
+        }
+
+        void SetHubText(string name, string value)
+        {
+            var text = FindNamed(_hubPanel.transform, name)?.GetComponent<Text>();
+            if (text == null)
+                return;
+            text.text = value;
+            if (text.font == null)
+                text.font = BattleUITheme.FontBold ?? BattleUITheme.FontDisplay;
+        }
+
+        void WireHubButton(string name, string label, Action action, bool visible)
+        {
+            var target = FindNamed(_hubPanel.transform, name);
+            if (target == null)
+                return;
+            target.gameObject.SetActive(visible);
+            var button = target.GetComponent<Button>();
+            if (button == null)
+                return;
+            button.onClick.RemoveAllListeners();
+            if (action != null)
+                button.onClick.AddListener(() => action());
+            button.interactable = action != null;
+            if (string.IsNullOrEmpty(label))
+                return;
+            var text = target.Find("Text")?.GetComponent<Text>();
+            if (text != null)
+                text.text = label;
+        }
+
+        static Transform FindNamed(Transform root, string name)
+        {
+            if (root == null)
+                return null;
+            if (root.name == name)
+                return root;
+            for (var i = 0; i < root.childCount; i++)
+            {
+                var found = FindNamed(root.GetChild(i), name);
+                if (found != null)
+                    return found;
+            }
+
+            return null;
+        }
+
+        static void CollectNamed(Transform root, string name, List<RectTransform> into)
+        {
+            if (root == null)
+                return;
+            if (root.name == name && root is RectTransform rect)
+                into.Add(rect);
+            for (var i = 0; i < root.childCount; i++)
+                CollectNamed(root.GetChild(i), name, into);
         }
 
         Button CreateButton(Transform parent, string label, Vector2 anchorMin, Vector2 anchorMax, Vector2 pos, Vector2 size,

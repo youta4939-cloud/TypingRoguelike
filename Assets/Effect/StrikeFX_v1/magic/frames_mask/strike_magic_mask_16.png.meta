@@ -1,0 +1,1677 @@
+fileFormatVersion: 2
+guid: 16afb90faab21cc4eba9d4ed96153993
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 8890698661269268556
+    second: strike_magic_mask_16_0
+  - first:
+      213: 1328324549027466810
+    second: strike_magic_mask_16_1
+  - first:
+      213: 8470249289900399041
+    second: strike_magic_mask_16_2
+  - first:
+      213: -7675869280854766221
+    second: strike_magic_mask_16_3
+  - first:
+      213: -1979103845991902111
+    second: strike_magic_mask_16_4
+  - first:
+      213: -9045266634108141713
+    second: strike_magic_mask_16_5
+  - first:
+      213: 2807825065159771339
+    second: strike_magic_mask_16_6
+  - first:
+      213: 7654473120013628170
+    second: strike_magic_mask_16_7
+  - first:
+      213: 123514187786537031
+    second: strike_magic_mask_16_8
+  - first:
+      213: -2235119183983220185
+    second: strike_magic_mask_16_9
+  - first:
+      213: -2867178664773859328
+    second: strike_magic_mask_16_10
+  - first:
+      213: 5871418418626960299
+    second: strike_magic_mask_16_11
+  - first:
+      213: 1981189213255487281
+    second: strike_magic_mask_16_12
+  - first:
+      213: -6012860183913601210
+    second: strike_magic_mask_16_13
+  - first:
+      213: -2092667372640542580
+    second: strike_magic_mask_16_14
+  - first:
+      213: 4688182577629302699
+    second: strike_magic_mask_16_15
+  - first:
+      213: -7419089014158195467
+    second: strike_magic_mask_16_16
+  - first:
+      213: -3559828144107733660
+    second: strike_magic_mask_16_17
+  - first:
+      213: 7953175735932486990
+    second: strike_magic_mask_16_18
+  - first:
+      213: 134368445813261100
+    second: strike_magic_mask_16_19
+  - first:
+      213: 2587400544427284538
+    second: strike_magic_mask_16_20
+  - first:
+      213: 4560715718220429287
+    second: strike_magic_mask_16_21
+  - first:
+      213: 1160489255214359854
+    second: strike_magic_mask_16_22
+  - first:
+      213: -931846507335386263
+    second: strike_magic_mask_16_23
+  - first:
+      213: 5902758903505338336
+    second: strike_magic_mask_16_24
+  - first:
+      213: 4512332342328852271
+    second: strike_magic_mask_16_25
+  - first:
+      213: 1144732608734637980
+    second: strike_magic_mask_16_26
+  - first:
+      213: 7556007666486476860
+    second: strike_magic_mask_16_27
+  - first:
+      213: -3033728310835239672
+    second: strike_magic_mask_16_28
+  - first:
+      213: 3152753545069658684
+    second: strike_magic_mask_16_29
+  - first:
+      213: 9122523062237214506
+    second: strike_magic_mask_16_30
+  - first:
+      213: -4524848537615867180
+    second: strike_magic_mask_16_31
+  - first:
+      213: -8073988122224580219
+    second: strike_magic_mask_16_32
+  - first:
+      213: -5397642217334968999
+    second: strike_magic_mask_16_33
+  - first:
+      213: 3642505003366140307
+    second: strike_magic_mask_16_34
+  - first:
+      213: 6193578389698265139
+    second: strike_magic_mask_16_35
+  - first:
+      213: 8477144491240270603
+    second: strike_magic_mask_16_36
+  - first:
+      213: 8198617909175252507
+    second: strike_magic_mask_16_37
+  - first:
+      213: 5784198194135632746
+    second: strike_magic_mask_16_38
+  - first:
+      213: 5032575195534312600
+    second: strike_magic_mask_16_39
+  - first:
+      213: -7247744301960724357
+    second: strike_magic_mask_16_40
+  - first:
+      213: 8239173215951353195
+    second: strike_magic_mask_16_41
+  - first:
+      213: -6215936390046902908
+    second: strike_magic_mask_16_42
+  - first:
+      213: -8293052069523851545
+    second: strike_magic_mask_16_43
+  - first:
+      213: 5055358770603128575
+    second: strike_magic_mask_16_44
+  - first:
+      213: -1597565002273977793
+    second: strike_magic_mask_16_45
+  - first:
+      213: -3021169274790641680
+    second: strike_magic_mask_16_46
+  - first:
+      213: 2424598047803956486
+    second: strike_magic_mask_16_47
+  - first:
+      213: -8398810417077577850
+    second: strike_magic_mask_16_48
+  - first:
+      213: -4875104633156094493
+    second: strike_magic_mask_16_49
+  - first:
+      213: -5560322134617375967
+    second: strike_magic_mask_16_50
+  - first:
+      213: 5673689727121644349
+    second: strike_magic_mask_16_51
+  - first:
+      213: -6736282256784395514
+    second: strike_magic_mask_16_52
+  - first:
+      213: -6835182863072319784
+    second: strike_magic_mask_16_53
+  - first:
+      213: 5724409174496477785
+    second: strike_magic_mask_16_54
+  - first:
+      213: -5327794005940009243
+    second: strike_magic_mask_16_55
+  - first:
+      213: -5991020103843593066
+    second: strike_magic_mask_16_56
+  - first:
+      213: -1724794259996775442
+    second: strike_magic_mask_16_57
+  - first:
+      213: 8160350834203134302
+    second: strike_magic_mask_16_58
+  - first:
+      213: -7522363018689478222
+    second: strike_magic_mask_16_59
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 0
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 0
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: strike_magic_mask_16_0
+      rect:
+        serializedVersion: 2
+        x: 354
+        y: 507
+        width: 14
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c48eef5d35b126b70800000000000000
+      internalID: 8890698661269268556
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_1
+      rect:
+        serializedVersion: 2
+        x: 402
+        y: 522
+        width: 15
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a3e863bb3282f6210800000000000000
+      internalID: 1328324549027466810
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_2
+      rect:
+        serializedVersion: 2
+        x: 269
+        y: 487
+        width: 14
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1c994831ade5c8570800000000000000
+      internalID: 8470249289900399041
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_3
+      rect:
+        serializedVersion: 2
+        x: 334
+        y: 499
+        width: 11
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 37d815cbe85d97590800000000000000
+      internalID: -7675869280854766221
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_4
+      rect:
+        serializedVersion: 2
+        x: 390
+        y: 500
+        width: 10
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1641b0ea98fc884e0800000000000000
+      internalID: -1979103845991902111
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_5
+      rect:
+        serializedVersion: 2
+        x: 403
+        y: 489
+        width: 8
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f6f7a4f8be1c87280800000000000000
+      internalID: -9045266634108141713
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_6
+      rect:
+        serializedVersion: 2
+        x: 471
+        y: 501
+        width: 13
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bc44940350667f620800000000000000
+      internalID: 2807825065159771339
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_7
+      rect:
+        serializedVersion: 2
+        x: 488
+        y: 496
+        width: 14
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a03303d5fb62a3a60800000000000000
+      internalID: 7654473120013628170
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_8
+      rect:
+        serializedVersion: 2
+        x: 392
+        y: 468
+        width: 9
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 748ccb7df7fc6b100800000000000000
+      internalID: 123514187786537031
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_9
+      rect:
+        serializedVersion: 2
+        x: 457
+        y: 468
+        width: 11
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 72ae400c1f24bf0e0800000000000000
+      internalID: -2235119183983220185
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_10
+      rect:
+        serializedVersion: 2
+        x: 529
+        y: 475
+        width: 14
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0084392023cb538d0800000000000000
+      internalID: -2867178664773859328
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_11
+      rect:
+        serializedVersion: 2
+        x: 257
+        y: 457
+        width: 13
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bab12f191f77b7150800000000000000
+      internalID: 5871418418626960299
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_12
+      rect:
+        serializedVersion: 2
+        x: 356
+        y: 446
+        width: 9
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 13fcde8b7199e7b10800000000000000
+      internalID: 1981189213255487281
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_13
+      rect:
+        serializedVersion: 2
+        x: 402
+        y: 450
+        width: 8
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6476dbd25870e8ca0800000000000000
+      internalID: -6012860183913601210
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_14
+      rect:
+        serializedVersion: 2
+        x: 461
+        y: 451
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c80e5bcac1a55f2e0800000000000000
+      internalID: -2092667372640542580
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_15
+      rect:
+        serializedVersion: 2
+        x: 494
+        y: 457
+        width: 12
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: baf05cd1735cf0140800000000000000
+      internalID: 4688182577629302699
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_16
+      rect:
+        serializedVersion: 2
+        x: 228
+        y: 437
+        width: 15
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5f4091289d91a0990800000000000000
+      internalID: -7419089014158195467
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_17
+      rect:
+        serializedVersion: 2
+        x: 261
+        y: 433
+        width: 23
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 46d3509e923f89ec0800000000000000
+      internalID: -3559828144107733660
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_18
+      rect:
+        serializedVersion: 2
+        x: 316
+        y: 326
+        width: 126
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e450380b13b5f5e60800000000000000
+      internalID: 7953175735932486990
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_19
+      rect:
+        serializedVersion: 2
+        x: 407
+        y: 446
+        width: 8
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c2388b9b36f5dd100800000000000000
+      internalID: 134368445813261100
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_20
+      rect:
+        serializedVersion: 2
+        x: 495
+        y: 427
+        width: 16
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a389d36261b48e320800000000000000
+      internalID: 2587400544427284538
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_21
+      rect:
+        serializedVersion: 2
+        x: 273
+        y: 405
+        width: 14
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7e7b11238caea4f30800000000000000
+      internalID: 4560715718220429287
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_22
+      rect:
+        serializedVersion: 2
+        x: 448
+        y: 409
+        width: 11
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e25a5be34d2ea1010800000000000000
+      internalID: 1160489255214359854
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_23
+      rect:
+        serializedVersion: 2
+        x: 556
+        y: 412
+        width: 15
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 96bf519e98a6113f0800000000000000
+      internalID: -931846507335386263
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_24
+      rect:
+        serializedVersion: 2
+        x: 445
+        y: 398
+        width: 11
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0efb536d2ffcae150800000000000000
+      internalID: 5902758903505338336
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_25
+      rect:
+        serializedVersion: 2
+        x: 459
+        y: 396
+        width: 11
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f2f7405ab560f9e30800000000000000
+      internalID: 4512332342328852271
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_26
+      rect:
+        serializedVersion: 2
+        x: 310
+        y: 386
+        width: 13
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c9f2f6a1e38e2ef00800000000000000
+      internalID: 1144732608734637980
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_27
+      rect:
+        serializedVersion: 2
+        x: 448
+        y: 384
+        width: 13
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c300e0170f45cd860800000000000000
+      internalID: 7556007666486476860
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_28
+      rect:
+        serializedVersion: 2
+        x: 444
+        y: 378
+        width: 10
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 805ae97bc2806e5d0800000000000000
+      internalID: -3033728310835239672
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_29
+      rect:
+        serializedVersion: 2
+        x: 291
+        y: 359
+        width: 13
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c320b3e25a4d0cb20800000000000000
+      internalID: 3152753545069658684
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_30
+      rect:
+        serializedVersion: 2
+        x: 296
+        y: 368
+        width: 11
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a2735f35466b99e70800000000000000
+      internalID: 9122523062237214506
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_31
+      rect:
+        serializedVersion: 2
+        x: 249
+        y: 358
+        width: 16
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4d2e5fc8a328431c0800000000000000
+      internalID: -4524848537615867180
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_32
+      rect:
+        serializedVersion: 2
+        x: 262
+        y: 353
+        width: 11
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 589a416a49e63ff80800000000000000
+      internalID: -8073988122224580219
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_33
+      rect:
+        serializedVersion: 2
+        x: 476
+        y: 356
+        width: 12
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 95de8135009b715b0800000000000000
+      internalID: -5397642217334968999
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_34
+      rect:
+        serializedVersion: 2
+        x: 501
+        y: 352
+        width: 15
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 399c8327007cc8230800000000000000
+      internalID: 3642505003366140307
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_35
+      rect:
+        serializedVersion: 2
+        x: 216
+        y: 338
+        width: 18
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 330408efab204f550800000000000000
+      internalID: 6193578389698265139
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_36
+      rect:
+        serializedVersion: 2
+        x: 490
+        y: 342
+        width: 13
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b0b290e300ed4a570800000000000000
+      internalID: 8477144491240270603
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_37
+      rect:
+        serializedVersion: 2
+        x: 286
+        y: 328
+        width: 11
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b16fb8ddc8757c170800000000000000
+      internalID: 8198617909175252507
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_38
+      rect:
+        serializedVersion: 2
+        x: 315
+        y: 331
+        width: 11
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a6b09ef8c99954050800000000000000
+      internalID: 5784198194135632746
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_39
+      rect:
+        serializedVersion: 2
+        x: 501
+        y: 324
+        width: 14
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 894c3430a7c47d540800000000000000
+      internalID: 5032575195534312600
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_40
+      rect:
+        serializedVersion: 2
+        x: 306
+        y: 315
+        width: 10
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b7005c225f6da6b90800000000000000
+      internalID: -7247744301960724357
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_41
+      rect:
+        serializedVersion: 2
+        x: 401
+        y: 317
+        width: 9
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b6571bb036c675270800000000000000
+      internalID: 8239173215951353195
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_42
+      rect:
+        serializedVersion: 2
+        x: 418
+        y: 308
+        width: 10
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 48594d469ce8cb9a0800000000000000
+      internalID: -6215936390046902908
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_43
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 314
+        width: 15
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7e6763cc41929ec80800000000000000
+      internalID: -8293052069523851545
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_44
+      rect:
+        serializedVersion: 2
+        x: 227
+        y: 302
+        width: 17
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ff674f5740e382640800000000000000
+      internalID: 5055358770603128575
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_45
+      rect:
+        serializedVersion: 2
+        x: 242
+        y: 296
+        width: 13
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f3a0ddd381f44d9e0800000000000000
+      internalID: -1597565002273977793
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_46
+      rect:
+        serializedVersion: 2
+        x: 257
+        y: 299
+        width: 12
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0ff77c92d86a216d0800000000000000
+      internalID: -3021169274790641680
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_47
+      rect:
+        serializedVersion: 2
+        x: 329
+        y: 301
+        width: 6
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 60dd5721417e5a120800000000000000
+      internalID: 2424598047803956486
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_48
+      rect:
+        serializedVersion: 2
+        x: 349
+        y: 298
+        width: 8
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6879d3aac6e617b80800000000000000
+      internalID: -8398810417077577850
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_49
+      rect:
+        serializedVersion: 2
+        x: 363
+        y: 299
+        width: 7
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3e5bed16a26285cb0800000000000000
+      internalID: -4875104633156094493
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_50
+      rect:
+        serializedVersion: 2
+        x: 445
+        y: 297
+        width: 10
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 12bb3697a74c5d2b0800000000000000
+      internalID: -5560322134617375967
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_51
+      rect:
+        serializedVersion: 2
+        x: 289
+        y: 276
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d3b5ede0fbefcbe40800000000000000
+      internalID: 5673689727121644349
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_52
+      rect:
+        serializedVersion: 2
+        x: 299
+        y: 284
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 60379915afae382a0800000000000000
+      internalID: -6736282256784395514
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_53
+      rect:
+        serializedVersion: 2
+        x: 372
+        y: 269
+        width: 9
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8d6acbf766d8421a0800000000000000
+      internalID: -6835182863072319784
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_54
+      rect:
+        serializedVersion: 2
+        x: 405
+        y: 283
+        width: 9
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 95289d2a0df217f40800000000000000
+      internalID: 5724409174496477785
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_55
+      rect:
+        serializedVersion: 2
+        x: 414
+        y: 273
+        width: 9
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5e68d77549fdf06b0800000000000000
+      internalID: -5327794005940009243
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_56
+      rect:
+        serializedVersion: 2
+        x: 282
+        y: 256
+        width: 14
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 694cd2415fe9bdca0800000000000000
+      internalID: -5991020103843593066
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_57
+      rect:
+        serializedVersion: 2
+        x: 292
+        y: 249
+        width: 11
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eeb624642cc4018e0800000000000000
+      internalID: -1724794259996775442
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_58
+      rect:
+        serializedVersion: 2
+        x: 372
+        y: 216
+        width: 8
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e598d3b29d36f3170800000000000000
+      internalID: 8160350834203134302
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: strike_magic_mask_16_59
+      rect:
+        serializedVersion: 2
+        x: 383
+        y: 232
+        width: 8
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2b18a7f80b23b9790800000000000000
+      internalID: -7522363018689478222
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      strike_magic_mask_16_0: 8890698661269268556
+      strike_magic_mask_16_1: 1328324549027466810
+      strike_magic_mask_16_10: -2867178664773859328
+      strike_magic_mask_16_11: 5871418418626960299
+      strike_magic_mask_16_12: 1981189213255487281
+      strike_magic_mask_16_13: -6012860183913601210
+      strike_magic_mask_16_14: -2092667372640542580
+      strike_magic_mask_16_15: 4688182577629302699
+      strike_magic_mask_16_16: -7419089014158195467
+      strike_magic_mask_16_17: -3559828144107733660
+      strike_magic_mask_16_18: 7953175735932486990
+      strike_magic_mask_16_19: 134368445813261100
+      strike_magic_mask_16_2: 8470249289900399041
+      strike_magic_mask_16_20: 2587400544427284538
+      strike_magic_mask_16_21: 4560715718220429287
+      strike_magic_mask_16_22: 1160489255214359854
+      strike_magic_mask_16_23: -931846507335386263
+      strike_magic_mask_16_24: 5902758903505338336
+      strike_magic_mask_16_25: 4512332342328852271
+      strike_magic_mask_16_26: 1144732608734637980
+      strike_magic_mask_16_27: 7556007666486476860
+      strike_magic_mask_16_28: -3033728310835239672
+      strike_magic_mask_16_29: 3152753545069658684
+      strike_magic_mask_16_3: -7675869280854766221
+      strike_magic_mask_16_30: 9122523062237214506
+      strike_magic_mask_16_31: -4524848537615867180
+      strike_magic_mask_16_32: -8073988122224580219
+      strike_magic_mask_16_33: -5397642217334968999
+      strike_magic_mask_16_34: 3642505003366140307
+      strike_magic_mask_16_35: 6193578389698265139
+      strike_magic_mask_16_36: 8477144491240270603
+      strike_magic_mask_16_37: 8198617909175252507
+      strike_magic_mask_16_38: 5784198194135632746
+      strike_magic_mask_16_39: 5032575195534312600
+      strike_magic_mask_16_4: -1979103845991902111
+      strike_magic_mask_16_40: -7247744301960724357
+      strike_magic_mask_16_41: 8239173215951353195
+      strike_magic_mask_16_42: -6215936390046902908
+      strike_magic_mask_16_43: -8293052069523851545
+      strike_magic_mask_16_44: 5055358770603128575
+      strike_magic_mask_16_45: -1597565002273977793
+      strike_magic_mask_16_46: -3021169274790641680
+      strike_magic_mask_16_47: 2424598047803956486
+      strike_magic_mask_16_48: -8398810417077577850
+      strike_magic_mask_16_49: -4875104633156094493
+      strike_magic_mask_16_5: -9045266634108141713
+      strike_magic_mask_16_50: -5560322134617375967
+      strike_magic_mask_16_51: 5673689727121644349
+      strike_magic_mask_16_52: -6736282256784395514
+      strike_magic_mask_16_53: -6835182863072319784
+      strike_magic_mask_16_54: 5724409174496477785
+      strike_magic_mask_16_55: -5327794005940009243
+      strike_magic_mask_16_56: -5991020103843593066
+      strike_magic_mask_16_57: -1724794259996775442
+      strike_magic_mask_16_58: 8160350834203134302
+      strike_magic_mask_16_59: -7522363018689478222
+      strike_magic_mask_16_6: 2807825065159771339
+      strike_magic_mask_16_7: 7654473120013628170
+      strike_magic_mask_16_8: 123514187786537031
+      strike_magic_mask_16_9: -2235119183983220185
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

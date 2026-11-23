@@ -1,0 +1,99 @@
+{
+  "slots": 5,
+  "exWordCountsAsNormalWord": true,
+  "colorStock": { "id": "color_stock", "name": "色ストック" },
+  "poison": { "id": "poison", "name": "毒", "intervalSec": 3, "damagePerStack": 3 },
+  "paralysis": { "id": "paralysis", "name": "麻痺", "intervalSec": 4, "damagePerStack": 2 },
+  "frenzy": { "id": "frenzy", "name": "伝播", "intervalSec": 15, "madnessPerBurst": 100 },
+  "focus": { "id": "focus", "name": "集中", "maxStacks": 20, "critChancePerStack": 0.05 },
+  "version": "ex_area_v4",
+  "specialRules": {
+    "cardDamageFirst": true,
+    "blockedByParalysis": true,
+    "countsAsSkillDamage": true,
+    "wordMode": "fixed"
+  },
+  "effects": [
+    {
+      "id": "red_refill",
+      "nameJa": "赤補充",
+      "kind": "colorStock",
+      "color": "red",
+      "word": "red",
+      "stacks": false,
+      "pushable": true,
+      "damagePercent": 0,
+      "percentPerCount": 0,
+      "percentPerBlood": 0,
+      "forceCrit": false,
+      "consume": "one",
+      "bloodCap": 0,
+      "wordMode": "fixed"
+    },
+    {
+      "id": "battou",
+      "nameJa": "抜刀",
+      "kind": "special",
+      "color": "",
+      "word": "battou",
+      "stacks": true,
+      "pushable": false,
+      "damagePercent": 0.3,
+      "percentPerCount": 0.1,
+      "percentPerBlood": 0,
+      "forceCrit": false,
+      "consume": "all",
+      "bloodCap": 0,
+      "wordMode": "fixed"
+    },
+    {
+      "id": "issen_kiwami",
+      "nameJa": "一閃・極",
+      "kind": "special",
+      "color": "",
+      "word": "issenkiwami",
+      "stacks": true,
+      "pushable": false,
+      "damagePercent": 0.5,
+      "percentPerCount": 0,
+      "percentPerBlood": 0,
+      "forceCrit": true,
+      "consume": "one",
+      "bloodCap": 0,
+      "wordMode": "fixed"
+    },
+    {
+      "id": "hyakki_yakou",
+      "nameJa": "百鬼夜行",
+      "kind": "special",
+      "color": "",
+      "word": "hyakkiyakou",
+      "stacks": true,
+      "pushable": false,
+      "damagePercent": 0.2,
+      "percentPerCount": 0,
+      "percentPerBlood": 0.04,
+      "forceCrit": false,
+      "consume": "one",
+      "bloodCap": 0,
+      "wordMode": "fixed"
+    }
+  ],
+  "colors": [
+    { "id": "red", "name": "赤" },
+    { "id": "blue", "name": "青" },
+    { "id": "yellow", "name": "黄" },
+    { "id": "green", "name": "緑" },
+    { "id": "purple", "name": "紫" }
+  ],
+  "enemySpecials": {
+    "enabled": false,
+    "normalIntervalSec": 20,
+    "eliteIntervalSec": 14,
+    "bossIntervalSec": 16,
+    "firstDelayMinSec": 6,
+    "firstDelayMaxSec": 12,
+    "jitter": 0.2,
+    "kinds": [ "poison", "paralysis", "frenzy" ]
+  }
+}

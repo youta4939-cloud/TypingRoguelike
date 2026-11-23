@@ -1,0 +1,85 @@
+{
+  "version": "axe_v2",
+  "note": "数値は試算v2＋追加B。オーブはトダさんの表のまま（青の入れ替え案は optionalPatternSwap に未承認として置いてあるだけ。enabled は false）。",
+  "targetCharacterName": "ルナ",
+  "targetCharacterNote": "【仮・要確認】リポジトリ（feature/events）に「斧」のキャラはいない。アリス＝アタッカー、エレン＝ヒーラー、ルナ＝メイジ。テスト用の割り当て先をルナにした理由：①の仮ATKが100（試算の主値）、最初のスキル「💧ウォータ」が青紫で鎧砕きと同じオーブ、ヒーラー（エレン）を外すと回復がなくなるため。違うキャラにするときはこの値だけ変える。",
+  "options": {
+    "replaceTargetSkills": true,
+    "innateSkillKey": "yoroi_kudaki",
+    "innateIsProvisional": true,
+    "passiveLabel": "型",
+    "vulnAppliesToWord": true,
+    "vulnAppliesToDot": true,
+    "vulnAppliesToExCards": true,
+    "atkDownStacking": "add",
+    "aslowStacking": "max",
+    "goufuVulnCountsAs": "separate",
+    "tsuigeExtendsBerserk": false,
+    "danzaiReducesMadness": true,
+    "berserkAtkCheck": "continuous",
+    "berserkAtkAppliesToWord": true,
+    "berserkAtkAppliesToDanzai": false,
+    "nextHitWithTatenaoshi": "multiply",
+    "useOptionalPatternSwap": false
+  },
+  "optionalPatternSwap": {
+    "enabled": false,
+    "note": "未承認。斧スキルが青に偏り、アリスの一ノ（赤青）・二ノ（青赤紫）とぶつかりやすい、という試算上の提案。トダさんが認めたときだけ options.useOptionalPatternSwap を true にする。既定では使わない。",
+    "patterns": {
+      "kyogeki": ["yellow", "purple", "purple", "red"],
+      "tsuige": ["green", "blue", "red"],
+      "berserk": ["yellow", "purple", "purple", "purple", "yellow"]
+    }
+  },
+  "skills": [
+    { "skillId": 200, "key": "yoroi_kudaki", "nameJa": "鎧砕き", "rarity": "N", "type": "active", "pattern": ["blue","purple"],
+      "damagePercent": [0.15, 0.20, 0.30], "vuln": [0.10, 0.15, 0.20], "vulnDurationSec": 20,
+      "text": ["攻撃力の15%のダメージ。敵の被ダメージ+10%（20秒）", "攻撃力の20%のダメージ。敵の被ダメージ+15%（20秒）", "攻撃力の30%のダメージ。敵の被ダメージ+20%（20秒）"] },
+
+    { "skillId": 201, "key": "ken_tachi", "nameJa": "腱断ち", "rarity": "N", "type": "active", "pattern": ["blue","green"],
+      "enemyAtkDown": [0.10, 0.20, 0.30], "durationSec": 15,
+      "text": ["敵の攻撃力-10%（15秒）", "敵の攻撃力-20%（15秒）", "敵の攻撃力-30%（15秒）"] },
+
+    { "skillId": 202, "key": "jinarashi", "nameJa": "地鳴らし", "rarity": "N", "type": "active", "pattern": ["yellow","green"],
+      "enemyAtkSpeedDown": 0.50, "durationSec": [10, 15, 20],
+      "text": ["敵の攻撃速度50%DOWN（10秒）", "敵の攻撃速度50%DOWN（15秒）", "敵の攻撃速度50%DOWN（20秒）"] },
+
+    { "skillId": 203, "key": "kabuto_wari", "nameJa": "兜割り", "rarity": "N", "type": "active", "pattern": ["blue","red"],
+      "damagePercent": [0.30, 0.40, 0.50], "debuffBonus": [0.50, 0.60, 0.70],
+      "text": ["攻撃力の30%のダメージ。敵にデバフがあれば+50%", "攻撃力の40%のダメージ。敵にデバフがあれば+60%", "攻撃力の50%のダメージ。敵にデバフがあれば+70%"] },
+
+    { "skillId": 204, "key": "tsuige", "nameJa": "追撃", "rarity": "N", "type": "active", "pattern": ["blue","blue","red"],
+      "damagePercent": [0.15, 0.20, 0.30], "extendDebuffSec": [5, 8, 10],
+      "text": ["攻撃力の15%のダメージ。敵のデバフ時間+5秒", "攻撃力の20%のダメージ。敵のデバフ時間+8秒", "攻撃力の30%のダメージ。敵のデバフ時間+10秒"] },
+
+    { "skillId": 205, "key": "bougyo_taisei", "nameJa": "防御態勢", "rarity": "N", "type": "active", "pattern": ["blue","green","blue"],
+      "nextHitReduction": [0.50, 0.60, 0.70],
+      "text": ["次に受ける敵の攻撃を50%軽減", "次に受ける敵の攻撃を60%軽減", "次に受ける敵の攻撃を70%軽減"] },
+
+    { "skillId": 206, "key": "kyogeki", "nameJa": "狂撃", "rarity": "R", "type": "active", "pattern": ["blue","purple","purple","red"],
+      "damagePercent": [0.70, 0.90, 1.20], "addDenpa": 1,
+      "text": ["攻撃力の70%のダメージ。自分に伝播×1", "攻撃力の90%のダメージ。自分に伝播×1", "攻撃力の120%のダメージ。自分に伝播×1"] },
+
+    { "skillId": 207, "key": "goufu_ichigeki", "nameJa": "剛斧一撃", "rarity": "R", "type": "active", "pattern": ["red","blue","purple"],
+      "damagePercent": [0.20, 0.30, 0.40], "percentPerDebuff": [0.30, 0.30, 0.40],
+      "text": ["攻撃力の20%のダメージ。敵のデバフ1つにつき+30%", "攻撃力の30%のダメージ。敵のデバフ1つにつき+30%", "攻撃力の40%のダメージ。敵のデバフ1つにつき+40%"] },
+
+    { "skillId": 208, "key": "kishu", "nameJa": "奇襲", "rarity": "R", "type": "active", "pattern": ["blue","red","purple"],
+      "damagePercent": [1.00, 1.10, 1.20], "hpThreshold": 0.80, "hpBonus": [0.50, 0.60, 0.70],
+      "text": ["攻撃力の100%のダメージ。敵のHPが80%以上なら+50%", "攻撃力の110%のダメージ。敵のHPが80%以上なら+60%", "攻撃力の120%のダメージ。敵のHPが80%以上なら+70%"] },
+
+    { "skillId": 209, "key": "juso", "nameJa": "呪詛", "rarity": "R", "type": "active", "pattern": ["purple","purple","blue"],
+      "enemyAtkDown": [0.10, 0.15, 0.20], "atkDownDurationSec": [15, 20, 25],
+      "enemyAtkSpeedDown": 0.50, "aslowDurationSec": [10, 15, 20],
+      "vuln": [0.10, 0.15, 0.20], "vulnDurationSec": [20, 25, 30],
+      "text": ["敵の攻撃力-10%（15秒）。攻撃速度50%DOWN（10秒）。被ダメージ+10%（20秒）", "敵の攻撃力-15%（20秒）。攻撃速度50%DOWN（15秒）。被ダメージ+15%（25秒）", "敵の攻撃力-20%（25秒）。攻撃速度50%DOWN（20秒）。被ダメージ+20%（30秒）"] },
+
+    { "skillId": 210, "key": "danzai", "nameJa": "断罪", "rarity": "SR", "type": "active", "pattern": ["blue","red","red","red","yellow"],
+      "madnessDamagePercent": [0.20, 0.30, 0.40], "madnessOnKill": [-50, -75, -100],
+      "text": ["現在の狂気値の20%のダメージ。このスキルで敵を倒すと狂気-50", "現在の狂気値の30%のダメージ。このスキルで敵を倒すと狂気-75", "現在の狂気値の40%のダメージ。このスキルで敵を倒すと狂気-100"] },
+
+    { "skillId": 211, "key": "berserk", "nameJa": "バーサークモード", "rarity": "SR", "type": "active", "oncePerBattle": true, "pattern": ["blue","purple","purple","purple","blue"],
+      "vuln": [0.20, 0.25, 0.30], "atkUp": [0.30, 0.40, 0.50], "atkUpMadnessNeed": 500,
+      "text": ["この戦闘中、敵の被ダメージ+20%。狂気500以上ならATK+30%", "この戦闘中、敵の被ダメージ+25%。狂気500以上ならATK+40%", "この戦闘中、敵の被ダメージ+30%。狂気500以上ならATK+50%"] }
+  ]
+}
