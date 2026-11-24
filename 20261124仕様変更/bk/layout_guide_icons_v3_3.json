@@ -1,0 +1,379 @@
+{
+  "confidential": true,
+  "screen": [
+    1920,
+    1080
+  ],
+  "base": "battle_hand_v6 mocks.C  (words y592–704, hints start y712, chip width = word 250px, wrap)",
+  "chip_text": {
+    "format": "effect（skill） + state",
+    "primary": "full unit, wraps before （スキル名） or ＋ when needed",
+    "font_px": 17,
+    "values": {
+      "斬撃": {
+        "effect": "6ダメージ",
+        "value": 6,
+        "source": "v5.H5 / cards.csv / battle log",
+        "placeholder": false
+      },
+      "突き": {
+        "effect": "8ダメージ",
+        "value": 8,
+        "source": "v5.H5",
+        "placeholder": false
+      },
+      "居合い斬り": {
+        "effect": "14ダメージ",
+        "value": 14,
+        "source": "v5.H5 / cards.csv",
+        "placeholder": false,
+        "note": "興戸提案（未反映）は 20"
+      },
+      "防御": {
+        "effect": "シールド5",
+        "value": 5,
+        "source": "v5.H5 / cards.csv / battle log",
+        "placeholder": false
+      },
+      "構え": {
+        "effect": "攻撃+3",
+        "value": 3,
+        "source": "v5.H5『次の攻撃+3』（カードには『集中』+1 もある）",
+        "placeholder": false,
+        "note": "興戸提案（未反映）は +4"
+      },
+      "回復": {
+        "effect": "HP+10",
+        "value": 10,
+        "source": "placeholder (no heal card in prototype)",
+        "placeholder": true
+      },
+      "衰弱": {
+        "effect": "攻撃-3",
+        "value": -3,
+        "source": "placeholder (no debuff card in starter deck)",
+        "placeholder": true
+      },
+      "血華の舞": {
+        "effect": "12ダメージ＋出血3ターン",
+        "value": null,
+        "source": "placeholder (wrap test, not in prototype)",
+        "placeholder": true
+      }
+    }
+  },
+  "wrap": {
+    "max_width_px": 250,
+    "align": "same x and width as the word card",
+    "line_height_px": 22,
+    "chip_h_1line_px": 26,
+    "chip_gap_px": 4,
+    "padding": {
+      "text_x": 51,
+      "right": 8,
+      "text_w": 191,
+      "icon_left": 3,
+      "icon": 24,
+      "gem": 16
+    },
+    "max_text_lines_per_word": 3,
+    "overflow": "+n below, right-aligned, 40×26",
+    "break_before": [
+      "（",
+      "＋"
+    ],
+    "state": "right of first line if it fits with the first token; otherwise at the end of the last line",
+    "icon_gem": "top-left; wrapped lines indent to the text start"
+  },
+  "icon": {
+    "size_hint_px": 24,
+    "size_exports": [
+      22,
+      26,
+      64,
+      128
+    ],
+    "size_mock_px": 24,
+    "left_padding_px": 3,
+    "gap_to_gem_px": 3,
+    "gap_icon_to_text_px": 24,
+    "chip_h": 26,
+    "corner_radius_frac": 0.18,
+    "border_frac": 0.105,
+    "glyph_stroke_frac": 0.1,
+    "style": "monochrome: thick white border, black fill, thick white glyph (same as v2)",
+    "chip_border": "neutral grey (110,100,110,150); no gem-colour tint or glow",
+    "files": {
+      "attack": {
+        "22": "icons/icon_attack_22.png",
+        "24": "icons/icon_attack_24.png",
+        "26": "icons/icon_attack_26.png",
+        "64": "icons/icon_attack_64.png",
+        "128": "icons/icon_attack_128.png"
+      },
+      "defense": {
+        "22": "icons/icon_defense_22.png",
+        "24": "icons/icon_defense_24.png",
+        "26": "icons/icon_defense_26.png",
+        "64": "icons/icon_defense_64.png",
+        "128": "icons/icon_defense_128.png"
+      },
+      "buff": {
+        "22": "icons/icon_buff_22.png",
+        "24": "icons/icon_buff_24.png",
+        "26": "icons/icon_buff_26.png",
+        "64": "icons/icon_buff_64.png",
+        "128": "icons/icon_buff_128.png"
+      },
+      "heal": {
+        "22": "icons/icon_heal_22.png",
+        "24": "icons/icon_heal_24.png",
+        "26": "icons/icon_heal_26.png",
+        "64": "icons/icon_heal_64.png",
+        "128": "icons/icon_heal_128.png"
+      },
+      "debuff": {
+        "22": "icons/icon_debuff_22.png",
+        "24": "icons/icon_debuff_24.png",
+        "26": "icons/icon_debuff_26.png",
+        "64": "icons/icon_debuff_64.png",
+        "128": "icons/icon_debuff_128.png"
+      }
+    }
+  },
+  "type_map": {
+    "attack": "attack",
+    "shield": "defense",
+    "buff": "buff",
+    "consumable": "heal",
+    "heal": "heal",
+    "debuff": "debuff"
+  },
+  "starter_deck_7": {
+    "斬撃・紅蓮": "attack",
+    "斬撃・蒼水": "attack",
+    "突き・紅蓮": "attack",
+    "居合い斬り・紅蓮": "attack",
+    "防御・翠嵐": "defense",
+    "防御・蒼水": "defense",
+    "構え・金光": "buff"
+  },
+  "crop_words_hints": [
+    520,
+    570,
+    1690,
+    870
+  ],
+  "word_boxes": [
+    [
+      549,
+      592,
+      799,
+      704
+    ],
+    [
+      835,
+      592,
+      1085,
+      704
+    ],
+    [
+      1121,
+      592,
+      1371,
+      704
+    ]
+  ],
+  "word_w": 250,
+  "hint_bottom": 790,
+  "stock": [
+    1392,
+    622,
+    1666,
+    674
+  ],
+  "no_maeiro": true,
+  "no_susumu_card_nashi": true,
+  "hints": [
+    {
+      "word": "太陽",
+      "boxes": [],
+      "items": []
+    },
+    {
+      "word": "水晶",
+      "boxes": [
+        [
+          835,
+          712,
+          1085,
+          738
+        ],
+        [
+          835,
+          742,
+          1085,
+          790
+        ]
+      ],
+      "items": [
+        {
+          "name": "斬撃",
+          "type": "attack",
+          "icon": "attack",
+          "body": "6ダメージ（斬撃）",
+          "state": "発動",
+          "card_index": 0,
+          "lines": [
+            "6ダメージ（斬撃）"
+          ],
+          "n_lines": 1,
+          "chip_w": 250,
+          "chip_h": 26,
+          "state_on_first": true,
+          "value": 6,
+          "source": "v5.H5 / cards.csv / battle log",
+          "placeholder": false
+        },
+        {
+          "name": "居合い斬り",
+          "type": "attack",
+          "icon": "attack",
+          "body": "14ダメージ（居合い斬り）",
+          "state": "あと1",
+          "card_index": 1,
+          "lines": [
+            "14ダメージ",
+            "（居合い斬り）"
+          ],
+          "n_lines": 2,
+          "chip_w": 250,
+          "chip_h": 48,
+          "state_on_first": true,
+          "value": 14,
+          "source": "v5.H5 / cards.csv",
+          "placeholder": false,
+          "note": "興戸提案（未反映）は 20"
+        }
+      ]
+    },
+    {
+      "word": "若葉",
+      "boxes": [
+        [
+          1121,
+          712,
+          1371,
+          760
+        ]
+      ],
+      "items": [
+        {
+          "name": "防御",
+          "type": "shield",
+          "icon": "defense",
+          "body": "シールド5（防御）",
+          "state": "あと1",
+          "card_index": 2,
+          "lines": [
+            "シールド5",
+            "（防御）"
+          ],
+          "n_lines": 2,
+          "chip_w": 250,
+          "chip_h": 48,
+          "state_on_first": true,
+          "value": 5,
+          "source": "v5.H5 / cards.csv / battle log",
+          "placeholder": false
+        }
+      ]
+    }
+  ],
+  "issues": [],
+  "overlaps": [],
+  "crop_hand": [
+    350,
+    800,
+    1600,
+    1080
+  ],
+  "hand_cards": {
+    "no_edge_bars": true,
+    "no_ato1iro_tag": true,
+    "gem_pill": "centred on the card, still straddling the top edge",
+    "gem_1x": {
+      "backing_w": "28n+10 (same as gem_backing_n{n}.png)",
+      "bx": "(313 - backing_w) // 2",
+      "y": [
+        -16,
+        16
+      ],
+      "gem_size": 24,
+      "gem_step": 28,
+      "gem_inset_left": 7
+    }
+  },
+  "cards": [
+    {
+      "name": "斬撃・蒼水",
+      "card": [
+        376,
+        863,
+        752,
+        1043
+      ],
+      "tag": null,
+      "gems": [
+        524,
+        844,
+        603,
+        882
+      ],
+      "gem_center_x": 564,
+      "gem_bx_1x": 123,
+      "gem_bw_1x": 66,
+      "lift": 17
+    },
+    {
+      "name": "居合い斬り・紅蓮",
+      "card": [
+        772,
+        880,
+        1148,
+        1060
+      ],
+      "tag": null,
+      "gems": [
+        903,
+        861,
+        1016,
+        899
+      ],
+      "gem_center_x": 960,
+      "gem_bx_1x": 109,
+      "gem_bw_1x": 94,
+      "lift": 0
+    },
+    {
+      "name": "防御・蒼水",
+      "card": [
+        1168,
+        880,
+        1544,
+        1060
+      ],
+      "tag": null,
+      "gems": [
+        1316,
+        861,
+        1395,
+        899
+      ],
+      "gem_center_x": 1356,
+      "gem_bx_1x": 123,
+      "gem_bw_1x": 66,
+      "lift": 0
+    }
+  ]
+}

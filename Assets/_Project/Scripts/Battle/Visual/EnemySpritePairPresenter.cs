@@ -38,7 +38,6 @@ namespace TypingRoguelike.Battle.Visual
     bool _enraged;
     bool _broken;
     bool _paused;
-    float _displayScale = 1f;
     Vector2 _pivotIdle = new(0.5f, 0f);
     Vector2 _pivotAttack = new(0.5f, 0f);
     Vector2 _offsetIdle;
@@ -68,7 +67,7 @@ namespace TypingRoguelike.Battle.Visual
       var feet = new GameObject("FeetAnchor");
       feet.transform.SetParent(host.transform, false);
       var feetRt = feet.AddComponent<RectTransform>();
-      feetRt.anchorMin = feetRt.anchorMax = new Vector2(0.5f, 0.08f);
+      feetRt.anchorMin = feetRt.anchorMax = BattleVisualContext.FeetAnchor;
       feetRt.pivot = new Vector2(0.5f, 0f);
       feetRt.sizeDelta = Vector2.zero;
 
@@ -82,12 +81,8 @@ namespace TypingRoguelike.Battle.Visual
       var imgGo = new GameObject("Sprite");
       imgGo.transform.SetParent(body.transform, false);
       var imgRt = imgGo.AddComponent<RectTransform>();
-      imgRt.anchorMin = Vector2.zero;
-      imgRt.anchorMax = Vector2.one;
-      imgRt.offsetMin = Vector2.zero;
-      imgRt.offsetMax = Vector2.zero;
+      imgRt.anchorMin = imgRt.anchorMax = new Vector2(0.5f, 0f);
       var image = imgGo.AddComponent<Image>();
-      image.preserveAspect = true;
       image.raycastTarget = false;
 
       var presenter = host.AddComponent<EnemySpritePairPresenter>();
@@ -108,17 +103,16 @@ namespace TypingRoguelike.Battle.Visual
       if (enemy == null || _image == null || _body == null)
         return;
       var v = enemy.visual;
-      _displayScale = v.displayScale > 0f ? v.displayScale : 1f;
       _pivotIdle = v.feetPivotIdle;
       _pivotAttack = v.feetPivotAttack;
       _offsetIdle = v.poseOffsetIdle;
       _offsetAttack = v.poseOffsetAttack;
       _idleSprite = v.ResolveIdle(enemy);
-      _attackSprite = v.attackIllustration != null ? v.attackIllustration : _idleSprite;
+      _attackSprite = v.attackIllustration;
       _image.sprite = _idleSprite;
-      ApplyPivot(_pivotIdle);
-      _body.localScale = Vector3.one * _displayScale;
-      RecalcEh();
+      FitBody(v.displayScale > 0f ? v.displayScale : 1f);
+      PlaceSprite(_pivotIdle);
+      _body.localScale = Vector3.one;
       EnsureFx();
     }
 
@@ -138,34 +132,37 @@ namespace TypingRoguelike.Battle.Visual
         _strikeFx = EnemySpritePairStrikeFx.Create(_body);
     }
 
-    void RecalcEh()
+    void FitBody(float displayScale)
     {
       if (_image == null || _idleSprite == null)
       {
-        _ehPixels = 320f * _displayScale;
+        _ehPixels = 320f * displayScale;
         return;
       }
 
       var tr = _idleSprite.rect;
       var aspect = tr.width / Mathf.Max(1f, tr.height);
-      var h = 360f * _displayScale;
+      var large = _enemy.spawnCategory == EnemySpawnCategory.Boss;
+      var maxHeight = large ? BattleVisualContext.LargeEnemyMaxHeight : 360f;
+      var maxWidth = large ? 560f : 400f;
+      var height = Mathf.Min(maxHeight, maxWidth / aspect);
+      var h = Mathf.Min(height, (large ? maxHeight : 330f) * displayScale);
       var w = h * aspect;
-      if (w > 380f)
-      {
-        w = 380f;
-        h = w / aspect;
-      }
 
-      if (_body != null)
-        _body.sizeDelta = new Vector2(w, h);
+      _body.sizeDelta = new Vector2(w, h);
       _ehPixels = h;
     }
 
-    void ApplyPivot(Vector2 pivot)
+    void PlaceSprite(Vector2 pivot)
     {
-      if (_image == null)
+      if (_image == null || _image.sprite == null)
         return;
-      _image.rectTransform.pivot = new Vector2(pivot.x, pivot.y);
+      var source = _image.sprite.rect.size;
+      var bounds = _body.sizeDelta;
+      var scale = Mathf.Min(bounds.x / source.x, bounds.y / source.y);
+      _image.rectTransform.pivot = pivot;
+      _image.rectTransform.sizeDelta = source * scale;
+      _image.rectTransform.anchoredPosition = Vector2.zero;
     }
 
     public void SetEnraged(bool enraged) => _enraged = enraged;
@@ -279,7 +276,7 @@ namespace TypingRoguelike.Battle.Visual
       _strikeFx?.SetFrozen(false);
       if (_image != null && _idleSprite != null)
         _image.sprite = _idleSprite;
-      ApplyPivot(_pivotIdle);
+      PlaceSprite(_pivotIdle);
     }
 
     void Update()
@@ -444,8 +441,9 @@ namespace TypingRoguelike.Battle.Visual
       if (_image == null || _body == null)
         return;
 
-      _image.sprite = attackSprite && _attackSprite != null ? _attackSprite : _idleSprite;
-      ApplyPivot(attackSprite ? _pivotAttack : _pivotIdle);
+      var useAttackArt = attackSprite && _attackSprite != null;
+      _image.sprite = useAttackArt ? _attackSprite : _idleSprite;
+      PlaceSprite(useAttackArt ? _pivotAttack : _pivotIdle);
       var regOffset = attackSprite ? _offsetAttack : _offsetIdle;
       var offsetPx = new Vector2(
         (pose.OffsetEh.x + regOffset.x) * _ehPixels,
@@ -455,10 +453,7 @@ namespace TypingRoguelike.Battle.Visual
       // skew は足元シアー。UI Image では rot 近似（仕様 §2.4）
       var skewApproxDeg = 0.5f * pose.SkewX * Mathf.Rad2Deg;
       _body.localRotation = Quaternion.Euler(0f, 0f, pose.RotationDeg + skewApproxDeg + tilt);
-      _body.localScale = new Vector3(
-        _displayScale * pose.ScaleX,
-        _displayScale * pose.ScaleY,
-        _displayScale);
+      _body.localScale = new Vector3(pose.ScaleX, pose.ScaleY, 1f);
       var c = pose.Tint;
       c.a = pose.Alpha > 0f ? pose.Alpha : 1f;
       _image.color = c;

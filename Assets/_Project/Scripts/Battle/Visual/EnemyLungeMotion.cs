@@ -3,12 +3,13 @@ using UnityEngine;
 
 namespace TypingRoguelike.Battle.Visual
 {
-    /// <summary>imp v2 確定値（enemy_visual_preset_spec §4.1）。時刻はため開始＝0。</summary>
+    /// <summary>飛びかかり。時刻はため開始＝0。</summary>
     public static class EnemyLungeMotion
     {
         public const float DefaultWindup = 0.65f;
-        public const float EaseWindup = 0.57f;
-        public const float WindupHold = 0.08f;
+        const float WindupHold = 0.23f;
+        const float CrouchTilt = -6f;
+        static readonly Vector2 CrouchOffset = new(0.052f, -0.020f);
         public const float Leap = 0.13f;
         public const float Hang = 0.07f;
         public const float Dive = 0.09f;
@@ -18,7 +19,6 @@ namespace TypingRoguelike.Battle.Visual
         public const float HopBack = 0.40f;
         public const float LandBounce = 0.50f;
         public const float MaxScale = 1.30f;
-        public const float ApexScale = 1.12f;
 
         public static EnemySpritePairPose Sample(float t, float windupSeconds, bool strikeAlreadyFired)
         {
@@ -29,13 +29,11 @@ namespace TypingRoguelike.Battle.Visual
 
             if (t < windupSeconds)
             {
-                var easeDur = Mathf.Min(EaseWindup, windupSeconds);
-                var k = easeDur > 0f ? Mathf.Clamp01(t / easeDur) : 1f;
-                k = EnemyVisualEasing.EaseIn(k, 2.4f);
-                pose.OffsetEh = new Vector2(0.028f * k, -0.006f * k);
-                pose.ScaleX = Mathf.Lerp(1f, 1.10f, k);
-                pose.ScaleY = Mathf.Lerp(1f, 0.81f, k);
-                pose.RotationDeg = Mathf.Lerp(0f, -4f, k);
+                var hold = Mathf.Min(WindupHold, windupSeconds * 0.36f);
+                var crouchDuration = windupSeconds - hold;
+                var k = EnemyVisualEasing.EaseOut(t / crouchDuration, 2.6f);
+                pose.OffsetEh = CrouchOffset * k;
+                pose.RotationDeg = Mathf.Lerp(0f, CrouchTilt, k);
                 return pose;
             }
 
@@ -44,12 +42,8 @@ namespace TypingRoguelike.Battle.Visual
             {
                 var k = Leap > 0f ? u / Leap : 1f;
                 k = EnemyVisualEasing.EaseOut(k, 4f);
-                pose.OffsetEh = Vector2.LerpUnclamped(Vector2.zero, new Vector2(0.034f, 0.077f), k);
-                var syStretch = 1f + 0.10f * Mathf.Sin(Mathf.PI * k);
-                var baseScale = Mathf.Lerp(1f, ApexScale, k);
-                pose.ScaleY = baseScale * syStretch;
-                pose.ScaleX = baseScale / Mathf.Sqrt(Mathf.Max(0.01f, syStretch));
-                pose.RotationDeg = Mathf.Lerp(6.9f, 0f, k);
+                pose.OffsetEh = Vector2.LerpUnclamped(CrouchOffset, new Vector2(0.034f, 0.077f), k);
+                pose.RotationDeg = Mathf.Lerp(CrouchTilt, 0f, k) + 3f * Mathf.Sin(Mathf.PI * k);
                 return pose;
             }
 
@@ -58,7 +52,6 @@ namespace TypingRoguelike.Battle.Visual
             {
                 var k = Hang > 0f ? u / Hang : 1f;
                 pose.OffsetEh = new Vector2(0.034f, 0.077f + 0.012f * Mathf.Sin(Mathf.PI * k));
-                pose.ScaleX = pose.ScaleY = ApexScale;
                 return pose;
             }
 
@@ -70,25 +63,17 @@ namespace TypingRoguelike.Battle.Visual
                 var apex = new Vector2(0.034f, 0.077f);
                 var strike = new Vector2(-0.034f, -0.010f);
                 pose.OffsetEh = Vector2.LerpUnclamped(apex, strike, k);
-                var scale = Mathf.Lerp(ApexScale, MaxScale, k) * (1f + 0.06f * k);
-                pose.ScaleY = scale;
-                pose.ScaleX = scale;
                 pose.RotationDeg = Mathf.Lerp(0f, -3.4f, k);
                 return pose;
             }
 
             u -= Dive;
-            var impactStart = 0f;
             var impactEnd = ImpactHold;
             if (u < impactEnd)
             {
                 var k = impactEnd > 0f ? u / impactEnd : 1f;
                 var smooth = EnemyVisualEasing.SmoothStep(k);
-                var sq = 0.08f * Mathf.Exp(-14f * k);
                 pose.OffsetEh = new Vector2(-0.034f, -0.010f);
-                var baseS = Mathf.Lerp(MaxScale, 1.26f, smooth);
-                pose.ScaleX = baseS * (1f + sq);
-                pose.ScaleY = baseS * (1f - sq);
                 pose.RotationDeg = Mathf.Lerp(-3.4f, 0f, smooth);
                 if (!strikeAlreadyFired)
                 {
@@ -107,8 +92,7 @@ namespace TypingRoguelike.Battle.Visual
                 var io = EnemyVisualEasing.SmoothStep(k);
                 var strike = new Vector2(-0.034f, -0.010f);
                 pose.OffsetEh = Vector2.LerpUnclamped(strike, Vector2.zero, io);
-                pose.OffsetEh.y += 0.141f * Mathf.Sin(Mathf.PI * k);
-                pose.ScaleX = pose.ScaleY = Mathf.Lerp(1.26f, 1f, io);
+                pose.OffsetEh.y += 0.095f * Mathf.Sin(Mathf.PI * k);
                 pose.UseAttackSprite = true;
                 return pose;
             }
@@ -116,12 +100,10 @@ namespace TypingRoguelike.Battle.Visual
             u -= HopBack;
             if (u <= LandBounce)
             {
-                var k = LandBounce > 0f ? u / LandBounce : 1f;
-                var sq = 0.10f * Mathf.Exp(-9f * k) * Mathf.Cos(22f * k);
+                var settle = Mathf.Sin(Mathf.PI * Mathf.Clamp01(u / 0.17f));
                 pose.UseAttackSprite = false;
-                pose.OffsetEh = Vector2.zero;
-                pose.ScaleX = 1f + 0.5f * sq;
-                pose.ScaleY = 1f - sq;
+                pose.OffsetEh = new Vector2(0f, -0.008f * settle);
+                pose.RotationDeg = -2f * settle;
                 return pose;
             }
 

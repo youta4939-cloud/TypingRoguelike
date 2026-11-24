@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Char_Alice
   m_EditorClassIdentifier: TypingRoguelike::TypingRoguelike.Data.CharacterDefinition
   characterName: "\u30A2\u30EA\u30B9"
+  englishName: 
   roleLabel: "\u653B\u6483\u578B"
   battlePortrait: {fileID: 21300000, guid: b4ebe8c858f739b4a9837f70d318cc4e, type: 3}
   innateSkill: {fileID: 11400000, guid: f65134643199bb14c949fac316edc994, type: 2}

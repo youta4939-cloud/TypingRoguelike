@@ -1,0 +1,610 @@
+{
+ "card": [
+  313,
+  150
+ ],
+ "layout": {
+  "name": {
+   "font": "Shippori Mincho ExtraBold",
+   "size": 28,
+   "x": 20,
+   "baseline_y": 48,
+   "max_width": 270
+  },
+  "divider": {
+   "x0": 20,
+   "x1": 190,
+   "y": 64
+  },
+  "effect": {
+   "font": "Noto Sans JP Bold",
+   "size": 20,
+   "x": 20,
+   "baseline_y": [
+    102,
+    132
+   ],
+   "max_lines": 2,
+   "max_width": 262,
+   "number_color": "#F2D58A",
+   "color": "#F0ECF6"
+  },
+  "name_color": {
+   "N_silver": "#ECF2FC",
+   "R_gold": "#FFE9B0",
+   "SR_rainbow": "#EAD8FF"
+  },
+  "stars": {
+   "size": 22,
+   "centers_x": [
+    243,
+    264,
+    285
+   ],
+   "center_y": 66
+  },
+  "gem_backing": {
+   "right_x": 265,
+   "y": -16,
+   "h": 32,
+   "x_for_n": {
+    "1": 227,
+    "2": 199,
+    "3": 171,
+    "4": 143,
+    "5": 115
+   },
+   "note": "上辺をまたぐ（カード上端 y=0 が楕円の中心）。右揃え"
+  },
+  "gems": {
+   "size": 24,
+   "gap": 4,
+   "y": -12,
+   "x_first_for_n": {
+    "1": 234,
+    "2": 206,
+    "3": 178,
+    "4": 150,
+    "5": 122
+   },
+   "step": 28
+  },
+  "stack_badge": {
+   "pos_rel_card": [
+    271,
+    -22
+   ],
+   "pill_box_rel_card": [
+    277,
+    -16,
+    328,
+    13
+   ]
+  },
+  "ghost_card": {
+   "pos_rel_card": [
+    6,
+    -6
+   ]
+  },
+  "state_glow": {
+   "pos_rel_card": [
+    -28,
+    -28
+   ]
+  },
+  "tag": {
+   "sprite_pos_rel_card": [
+    -2,
+    -54
+   ],
+   "pill_box_rel_card": "x 8..(8+幅), y -44..-16",
+   "align": "左揃え"
+  }
+ },
+ "hand_positions": [
+  [
+   272,
+   888
+  ],
+  [
+   601,
+   902
+  ],
+  [
+   930,
+   916
+  ],
+  [
+   1259,
+   916
+  ],
+  [
+   1588,
+   902
+  ]
+ ],
+ "lift": {
+  "rest": 0,
+  "near": 14,
+  "ready": 28
+ },
+ "files": {
+  "card/card_base_313x150.png": {
+   "size": [
+    313,
+    150
+   ],
+   "note": "暗い下地。角丸10"
+  },
+  "card/card_base_9s_48.png": {
+   "size": [
+    48,
+    48
+   ],
+   "note": "9-slice 用。Border L/R/T/B = 14"
+  },
+  "card/art_window_mask_313x150.png": {
+   "size": [
+    313,
+    150
+   ],
+   "note": "白=イラストが見える範囲（カード全面・角丸10）。Unity Mask / Sprite Mask 用"
+  },
+  "card/text_gradient_313x150.png": {
+   "size": [
+    313,
+    150
+   ],
+   "note": "左が濃く右へ抜ける黒グラデ（左42%まで a238 → 右端 a60）"
+  },
+  "frame/frame_N_silver.png": {
+   "size": [
+    313,
+    150
+   ],
+   "note": "枠線のみ。中は透明"
+  },
+  "frame/frame_R_gold.png": {
+   "size": [
+    313,
+    150
+   ],
+   "note": "枠線のみ。中は透明"
+  },
+  "frame/frame_SR_rainbow.png": {
+   "size": [
+    313,
+    150
+   ],
+   "note": "枠線のみ。中は透明"
+  },
+  "edge/edge_left_R.png": {
+   "size": [
+    313,
+    150
+   ],
+   "note": "最初の色"
+  },
+  "edge/edge_left_B.png": {
+   "size": [
+    313,
+    150
+   ],
+   "note": "最初の色"
+  },
+  "edge/edge_left_G.png": {
+   "size": [
+    313,
+    150
+   ],
+   "note": "最初の色"
+  },
+  "edge/edge_left_Y.png": {
+   "size": [
+    313,
+    150
+   ],
+   "note": "最初の色"
+  },
+  "edge/edge_left_P.png": {
+   "size": [
+    313,
+    150
+   ],
+   "note": "最初の色"
+  },
+  "edge/edge_left_white.png": {
+   "size": [
+    313,
+    150
+   ],
+   "note": "白。Image.color で着色"
+  },
+  "edge/edge_right_R.png": {
+   "size": [
+    313,
+    150
+   ],
+   "note": "最後の色"
+  },
+  "edge/edge_right_B.png": {
+   "size": [
+    313,
+    150
+   ],
+   "note": "最後の色"
+  },
+  "edge/edge_right_G.png": {
+   "size": [
+    313,
+    150
+   ],
+   "note": "最後の色"
+  },
+  "edge/edge_right_Y.png": {
+   "size": [
+    313,
+    150
+   ],
+   "note": "最後の色"
+  },
+  "edge/edge_right_P.png": {
+   "size": [
+    313,
+    150
+   ],
+   "note": "最後の色"
+  },
+  "edge/edge_right_white.png": {
+   "size": [
+    313,
+    150
+   ],
+   "note": "白。Image.color で着色"
+  },
+  "gem/gem_R_on_24.png": {
+   "size": [
+    24,
+    24
+   ],
+   "note": "明るい状態"
+  },
+  "gem/gem_R_dim_24.png": {
+   "size": [
+    24,
+    24
+   ],
+   "note": "暗い状態：明度のみ42%（彩度・色相そのまま）"
+  },
+  "gem/gem_R_on_48.png": {
+   "size": [
+    48,
+    48
+   ],
+   "note": "明るい状態（@2x）"
+  },
+  "gem/gem_R_dim_48.png": {
+   "size": [
+    48,
+    48
+   ],
+   "note": "暗い状態：明度のみ42%（彩度・色相そのまま）（@2x）"
+  },
+  "gem/gem_B_on_24.png": {
+   "size": [
+    24,
+    24
+   ],
+   "note": "明るい状態"
+  },
+  "gem/gem_B_dim_24.png": {
+   "size": [
+    24,
+    24
+   ],
+   "note": "暗い状態：明度のみ42%（彩度・色相そのまま）"
+  },
+  "gem/gem_B_on_48.png": {
+   "size": [
+    48,
+    48
+   ],
+   "note": "明るい状態（@2x）"
+  },
+  "gem/gem_B_dim_48.png": {
+   "size": [
+    48,
+    48
+   ],
+   "note": "暗い状態：明度のみ42%（彩度・色相そのまま）（@2x）"
+  },
+  "gem/gem_G_on_24.png": {
+   "size": [
+    24,
+    24
+   ],
+   "note": "明るい状態"
+  },
+  "gem/gem_G_dim_24.png": {
+   "size": [
+    24,
+    24
+   ],
+   "note": "暗い状態：明度のみ42%（彩度・色相そのまま）"
+  },
+  "gem/gem_G_on_48.png": {
+   "size": [
+    48,
+    48
+   ],
+   "note": "明るい状態（@2x）"
+  },
+  "gem/gem_G_dim_48.png": {
+   "size": [
+    48,
+    48
+   ],
+   "note": "暗い状態：明度のみ42%（彩度・色相そのまま）（@2x）"
+  },
+  "gem/gem_Y_on_24.png": {
+   "size": [
+    24,
+    24
+   ],
+   "note": "明るい状態"
+  },
+  "gem/gem_Y_dim_24.png": {
+   "size": [
+    24,
+    24
+   ],
+   "note": "暗い状態：明度のみ42%（彩度・色相そのまま）"
+  },
+  "gem/gem_Y_on_48.png": {
+   "size": [
+    48,
+    48
+   ],
+   "note": "明るい状態（@2x）"
+  },
+  "gem/gem_Y_dim_48.png": {
+   "size": [
+    48,
+    48
+   ],
+   "note": "暗い状態：明度のみ42%（彩度・色相そのまま）（@2x）"
+  },
+  "gem/gem_P_on_24.png": {
+   "size": [
+    24,
+    24
+   ],
+   "note": "明るい状態"
+  },
+  "gem/gem_P_dim_24.png": {
+   "size": [
+    24,
+    24
+   ],
+   "note": "暗い状態：明度のみ42%（彩度・色相そのまま）"
+  },
+  "gem/gem_P_on_48.png": {
+   "size": [
+    48,
+    48
+   ],
+   "note": "明るい状態（@2x）"
+  },
+  "gem/gem_P_dim_48.png": {
+   "size": [
+    48,
+    48
+   ],
+   "note": "暗い状態：明度のみ42%（彩度・色相そのまま）（@2x）"
+  },
+  "gem/gem_backing_n1.png": {
+   "size": [
+    38,
+    32
+   ],
+   "note": "宝石1個用の暗い楕円（縁は灰。Image.color でレア色に着色可）"
+  },
+  "gem/gem_backing_n2.png": {
+   "size": [
+    66,
+    32
+   ],
+   "note": "宝石2個用の暗い楕円（縁は灰。Image.color でレア色に着色可）"
+  },
+  "gem/gem_backing_n3.png": {
+   "size": [
+    94,
+    32
+   ],
+   "note": "宝石3個用の暗い楕円（縁は灰。Image.color でレア色に着色可）"
+  },
+  "gem/gem_backing_n4.png": {
+   "size": [
+    122,
+    32
+   ],
+   "note": "宝石4個用の暗い楕円（縁は灰。Image.color でレア色に着色可）"
+  },
+  "gem/gem_backing_n5.png": {
+   "size": [
+    150,
+    32
+   ],
+   "note": "宝石5個用の暗い楕円（縁は灰。Image.color でレア色に着色可）"
+  },
+  "gem/gem_backing_9s.png": {
+   "size": [
+    32,
+    32
+   ],
+   "note": "9-slice。Border 15。縁は白なので着色前提"
+  },
+  "badge/star_lit_22.png": {
+   "size": [
+    22,
+    22
+   ],
+   "note": "Lv 星（点灯）"
+  },
+  "badge/star_unlit_22.png": {
+   "size": [
+    22,
+    22
+   ],
+   "note": "Lv 星（未点灯）。黒縁＋灰の縁取りで明るい絵の上でも見える"
+  },
+  "badge/star_lit_44.png": {
+   "size": [
+    44,
+    44
+   ],
+   "note": "@2x"
+  },
+  "badge/star_unlit_44.png": {
+   "size": [
+    44,
+    44
+   ],
+   "note": "@2x"
+  },
+  "badge/stack_x2.png": {
+   "size": [
+    64,
+    42
+   ],
+   "note": "重なり ×2。カード右上：badge 左上 = (card.x+W-42, card.y-22)"
+  },
+  "badge/stack_x3.png": {
+   "size": [
+    64,
+    42
+   ],
+   "note": "重なり ×3"
+  },
+  "badge/stack_blank.png": {
+   "size": [
+    64,
+    42
+   ],
+   "note": "数字なし（TMP で ×n を描く場合）"
+  },
+  "badge/stack_ghost_card.png": {
+   "size": [
+    313,
+    150
+   ],
+   "note": "重なりの“後ろのカード”。白縁なので枠色で着色。カード位置から (+6,-6) に、カードより先に描く"
+  },
+  "state/glow_ready_369x206.png": {
+   "size": [
+    369,
+    206
+   ],
+   "note": "条件成立の金の光。(card.x-28, card.y-28) に置く。カード部分はくり抜き済み"
+  },
+  "state/glow_chain_Y_369x206.png": {
+   "size": [
+    369,
+    206
+   ],
+   "note": "チェーンの光（例：黄）"
+  },
+  "state/glow_chain_white_369x206.png": {
+   "size": [
+    369,
+    206
+   ],
+   "note": "チェーンの光（白）。直前の色で Image.color 着色"
+  },
+  "state/glow_near_369x206.png": {
+   "size": [
+    369,
+    206
+   ],
+   "note": "あと1色の淡い光"
+  },
+  "state/near_top_edge_313x8.png": {
+   "size": [
+    313,
+    8
+   ],
+   "note": "あと1色の上辺ハイライト。(card.x, card.y) に重ねる"
+  },
+  "state/tag_ready.png": {
+   "size": [
+    122,
+    48
+   ],
+   "note": "カード中央上：タグ中心x=card中心, タグ上端 = card.y-48（余白10込み）"
+  },
+  "state/tag_chain_Y.png": {
+   "size": [
+    121,
+    48
+   ],
+   "note": "チェーンのタグ（黄）"
+  },
+  "state/tag_near_R.png": {
+   "size": [
+    138,
+    48
+   ],
+   "note": "あと1色＋足りない色の宝石（R）"
+  },
+  "state/tag_near_B.png": {
+   "size": [
+    138,
+    48
+   ],
+   "note": "あと1色＋足りない色の宝石（B）"
+  },
+  "state/tag_near_G.png": {
+   "size": [
+    138,
+    48
+   ],
+   "note": "あと1色＋足りない色の宝石（G）"
+  },
+  "state/tag_near_Y.png": {
+   "size": [
+    138,
+    48
+   ],
+   "note": "あと1色＋足りない色の宝石（Y）"
+  },
+  "state/tag_near_P.png": {
+   "size": [
+    138,
+    48
+   ],
+   "note": "あと1色＋足りない色の宝石（P）"
+  },
+  "state/tag_near_nodot.png": {
+   "size": [
+    114,
+    48
+   ],
+   "note": "宝石なし（宝石を別に置く場合）"
+  },
+  "art/placeholder_slash_626x300.png": {
+   "size": [
+    626,
+    300
+   ],
+   "note": "仮イラスト（抽象・顔なし）。@2x。カード全面に敷く"
+  },
+  "art/placeholder_moon_626x300.png": {
+   "size": [
+    626,
+    300
+   ],
+   "note": "仮イラスト（抽象・顔なし）。@2x。カード全面に敷く"
+  }
+ }
+}

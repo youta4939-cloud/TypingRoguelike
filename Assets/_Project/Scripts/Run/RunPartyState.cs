@@ -183,6 +183,18 @@ namespace TypingRoguelike.Run
         public int TotalCarriedCount => EquippedSkillCardCount + MemberInnateCount;
 
         int MemberInnateCount => _members.Count(m => m.innateSlot != null);
+        List<string> _deckCardIds;
+        public List<string> DeckCardIds => _deckCardIds ??= TypingRoguelike.Battle.Deck.DeckCardCatalog.BuildStarterDeckIds();
+        public List<string> RewardHistory { get; } = new();
+
+        public void RestoreDeck(List<string> ids, List<string> history)
+        {
+            _deckCardIds = ids != null && ids.Count > 0 ? new List<string>(ids) : null;
+            RewardHistory.Clear();
+            if (history != null)
+                RewardHistory.AddRange(history.GetRange(0, Mathf.Min(history.Count, 2)));
+        }
+
         public int RunCoins { get; private set; }
         public int Blood { get; private set; }
         public int CarriedFocus { get; private set; }
@@ -231,6 +243,7 @@ namespace TypingRoguelike.Run
             _members.Clear();
             RunHpInitialized = false;
             RunCoins = 0;
+            RestoreDeck(null, null);
             CurrentHp = 0;
             MaxHp = 0;
             Blood = 0;
@@ -238,8 +251,11 @@ namespace TypingRoguelike.Run
             if (party?.members == null)
                 return;
 
-            foreach (var m in party.members)
-                _members.Add(new MemberRunState { character = m.character, innateSlot = m.character?.innateSkill });
+            var solo = party.members.FirstOrDefault(m => m.character != null &&
+                StarterCharacters.Same(m.character.characterName, StarterCharacters.Chara03)).character;
+            solo ??= party.members.FirstOrDefault(m => m.character != null).character;
+            if (solo != null)
+                _members.Add(new MemberRunState { character = solo });
         }
 
         /// <summary>死亡など: 獲得カードのみ外し、各キャラの初期スキルだけ残す。</summary>

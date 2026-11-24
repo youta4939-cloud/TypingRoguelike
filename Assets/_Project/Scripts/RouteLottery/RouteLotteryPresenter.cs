@@ -150,7 +150,6 @@ namespace TypingRoguelike.RouteLottery
         DungeonNodeType _fourth;
         RunPartyState _hudParty;
         RunMadnessState _hudMadness;
-        TrustGaugeView[] _hudTrust;
         bool _startAtElevator;
         Action<string[]> _onDone;
         Action<string> _onBoardChanged;
@@ -226,7 +225,6 @@ namespace TypingRoguelike.RouteLottery
             _onBoardChanged = onBoardChanged;
             _hudParty = party;
             _hudMadness = madness;
-            _hudTrust = trust;
             _catalog = RouteLotteryAssets.Load();
             _board = MemoryBoard.Empty();
             _board.Restore(_catalog, savedBoard);
@@ -1382,7 +1380,6 @@ namespace TypingRoguelike.RouteLottery
             _fourth = fourth;
             _hudParty = party;
             _hudMadness = madness;
-            _hudTrust = trust;
             var canvas = gameObject.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             canvas.sortingOrder = 35;
@@ -1401,12 +1398,6 @@ namespace TypingRoguelike.RouteLottery
             try
             {
                 _catalog = RouteLotteryAssets.Get();
-                _hudTrust = new[]
-                {
-                    new TrustGaugeView { Name = "chara01", Trust = 0 },
-                    new TrustGaugeView { Name = "chara02", Trust = 0 },
-                    new TrustGaugeView { Name = "chara03", Trust = 0 }
-                };
                 PaintDungeonRoute(transform, 1, new[] { "battle", "event", "rest", "boss" }, new bool[4], 0,
                     _ => { }, () => { }, () => { }, () => { }, () => { });
             }
@@ -1512,6 +1503,7 @@ namespace TypingRoguelike.RouteLottery
                 ("ステータス", onStats, SpecInk),
                 ("放棄", () => ConfirmAbandon(onAbandon), HexColor("#C8352B"))
             };
+            items.RemoveAll(item => item.action == null);
             var menu = BuildRouteMenu(root, items);
             var button = hit.gameObject.AddComponent<Button>();
             button.targetGraphic = hitImage;
@@ -1853,36 +1845,6 @@ namespace TypingRoguelike.RouteLottery
             var madX = 780f + Mathf.Max(20f, madValue.preferredWidth) + 12f;
             RouteText(root, "MadMax", "/ " + madMax, BattleHudKit.SerifRegular, 26f, SpecSub, TextAlignmentOptions.MidlineLeft, madX, 968f, 120f, 24f, 0f);
             BuildRouteGauge(root, "MadMeter", 676f, 1008f, 428f, 12f, HexColor("#8A4FD0"), HexColor("#6E6A66"), false, madMax > 0 ? mad / (float)madMax : 0f);
-
-            var list = _hudTrust ?? Array.Empty<TrustGaugeView>();
-            var shown = Mathf.Min(3, list.Length);
-            float[] avatarX = { 1232f, 1480f, 1728f };
-            for (var i = 0; i < shown; i++)
-            {
-                var gauge = list[i];
-                if (gauge == null)
-                    continue;
-                var cx = avatarX[i];
-                var portrait = gauge.Portrait != null ? gauge.Portrait : BattlePortraitResolver.LoadCharacter(gauge.Name);
-                var face = BattleHudKit.CirclePortrait(root, "Portrait" + i, portrait, 96f, new Vector2(0f, 1f), new Vector2(cx, -1000f), new Color(1f, 1f, 1f, 0.25f), 1f);
-                if (portrait != null)
-                {
-                    var faceRt = face.rectTransform;
-                    faceRt.anchorMin = faceRt.anchorMax = new Vector2(0.5f, 0.5f);
-                    faceRt.pivot = new Vector2(0.5f, 0.5f);
-                    faceRt.anchoredPosition = Vector2.zero;
-                    faceRt.sizeDelta = new Vector2(96f, 96f);
-                    var fitter = face.gameObject.AddComponent<AspectRatioFitter>();
-                    fitter.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
-                    fitter.aspectRatio = portrait.rect.width / Mathf.Max(1f, portrait.rect.height);
-                }
-
-                var nameX = cx + 72f;
-                RouteText(root, "Name" + i, gauge.Name ?? "", BattleHudKit.SerifRegular, 20f, HexColor("#DEDEDE"), TextAlignmentOptions.MidlineLeft, nameX, 969f, 150f, 24f, 5f);
-                var underline = TopBox(root, "NameRule" + i, nameX - 4f, 999f, 64f, 1f);
-                BattleHudKit.AddImage(underline, BattleUISprites.Solid, new Color(1f, 1f, 1f, 0.3f));
-                RouteText(root, "Trust" + i, $"<size=22>信頼</size><space=12><size=24>{gauge.Trust}</size>", BattleHudKit.SerifRegular, 22f, HexColor("#E9EAEB"), TextAlignmentOptions.MidlineLeft, nameX, 1009f, 160f, 26f, 0f);
-            }
         }
 
         bool TryBindDungeonRoute(
@@ -1929,7 +1891,7 @@ namespace TypingRoguelike.RouteLottery
             if (view.madFill != null)
                 view.madFill.fillAmount = madMax > 0 ? Mathf.Clamp01(mad / (float)madMax) : 0f;
 
-            BindRoutePortraits(view);
+            HideLegacyRoutePortraits(view);
             LayoutRouteCards(view, count, cleared, currentIndex);
             var used = new Dictionary<string, int>();
             for (var i = 0; i < count; i++)
@@ -1970,21 +1932,30 @@ namespace TypingRoguelike.RouteLottery
             }
         }
 
-        void BindRoutePortraits(DungeonRouteView view)
+        static void HideLegacyRoutePortraits(DungeonRouteView view)
         {
-            var list = _hudTrust ?? Array.Empty<TrustGaugeView>();
+            foreach (var portrait in view.portraits ?? Array.Empty<Image>())
+            {
+                if (portrait == null)
+                    continue;
+                var root = portrait.transform.parent;
+                if (root != null && root.name.StartsWith("Portrait", StringComparison.Ordinal))
+                    root.gameObject.SetActive(false);
+                else
+                    portrait.gameObject.SetActive(false);
+            }
+            foreach (var label in view.portraitNames ?? Array.Empty<TMP_Text>())
+                if (label != null)
+                    label.gameObject.SetActive(false);
+            foreach (var label in view.portraitTrust ?? Array.Empty<TMP_Text>())
+                if (label != null)
+                    label.gameObject.SetActive(false);
+            var footer = view.transform;
             for (var i = 0; i < 3; i++)
             {
-                var gauge = i < list.Length ? list[i] : null;
-                if (view.portraitNames != null && i < view.portraitNames.Length && view.portraitNames[i] != null)
-                    view.portraitNames[i].text = gauge?.Name ?? "";
-                if (view.portraitTrust != null && i < view.portraitTrust.Length && view.portraitTrust[i] != null)
-                    view.portraitTrust[i].text = gauge != null ? $"<size=22>信頼</size><space=12><size=24>{gauge.Trust}</size>" : "";
-                if (view.portraits == null || i >= view.portraits.Length || view.portraits[i] == null)
-                    continue;
-                var portrait = gauge == null ? null : gauge.Portrait != null ? gauge.Portrait : BattlePortraitResolver.LoadCharacter(gauge.Name);
-                view.portraits[i].sprite = portrait;
-                view.portraits[i].color = portrait != null ? Color.white : new Color(1f, 1f, 1f, 0.25f);
+                var rule = footer.Find("NameRule" + i);
+                if (rule != null)
+                    rule.gameObject.SetActive(false);
             }
         }
 
@@ -2114,6 +2085,7 @@ namespace TypingRoguelike.RouteLottery
                 var action = actions[i];
                 if (button == null)
                     continue;
+                button.gameObject.SetActive(action != null);
                 button.onClick.RemoveAllListeners();
                 button.onClick.AddListener(() =>
                 {

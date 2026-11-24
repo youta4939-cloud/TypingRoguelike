@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using TMPro;
 using TypingRoguelike.Data;
+using TypingRoguelike.Battle.Deck;
 using TypingRoguelike.Battle.Visual;
 using TypingRoguelike.Run;
 using UnityEngine;
@@ -20,6 +21,7 @@ namespace TypingRoguelike.Battle
         public Image MadnessEmpty;
         public TMP_Text MadnessText;
         public TMP_Text AttackBarLabel;
+        public BattleAttackForecastView AttackForecast;
         public Image PlayerHpBar;
         public Image EnemyHpBar;
         public BossHpGauge EnemyHpGauge;
@@ -83,6 +85,8 @@ namespace TypingRoguelike.Battle
         public Text DebugCombatReadout;
         public Button DebugCritTestButton;
         public Button DebugAliceSlashButton;
+        public RectTransform SkillListRoot;
+        public DeckHandUIView DeckHand;
     }
 
     public sealed class WordBoxUI
@@ -97,6 +101,7 @@ namespace TypingRoguelike.Battle
         public TMP_Text RubyText;
         public TMP_Text WordText;
         public bool E5b;
+        public DeckHandUIView.WordGuide DeckGuide;
     }
 
     public static class BattleUIBuilder
@@ -110,7 +115,7 @@ namespace TypingRoguelike.Battle
             BattleVisualContext visuals = null)
         {
             visuals ??= BattleVisualContext.FromEncounter(null, null);
-            if (!SuppressPrefab)
+            if (!SuppressPrefab && !GameModeConfig.UseDeckMode)
             {
                 var bound = TryBindPrefab(parent, skills, visuals);
                 if (bound != null)
@@ -128,16 +133,25 @@ namespace TypingRoguelike.Battle
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(1920, 1080);
             scaler.matchWidthOrHeight = 0.5f;
+            var deckMode = GameModeConfig.UseDeckMode;
+            if (deckMode)
+                scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.Expand;
             canvasGo.AddComponent<GraphicRaycaster>();
 
             var bg = CreatePanel(canvasGo.transform, "Background", Vector2.zero, Vector2.one,
                 new Color(0.025f, 0.025f, 0.055f, 1f));
-            BuildBattleBackdrop(bg, visuals);
 
             refs.RootCard = CreatePanel(bg.transform, "BattleHud", Vector2.zero, Vector2.one,
                 new Color(0, 0, 0, 0)).GetComponent<RectTransform>();
 
-            BattleLayoutE5b.BuildContactShadow(refs.RootCard);
+            if (deckMode)
+            {
+                refs.RootCard.anchorMin = refs.RootCard.anchorMax = new Vector2(0.5f, 0.5f);
+                refs.RootCard.anchoredPosition = Vector2.zero;
+                refs.RootCard.sizeDelta = scaler.referenceResolution;
+            }
+
+            BattleDungeonBackdrop.Ensure(refs.RootCard);
             BuildArena(refs.RootCard, refs, visuals);
             BattleLayoutE5b.Build(refs.RootCard, refs, skills, visuals);
 
@@ -158,37 +172,6 @@ namespace TypingRoguelike.Battle
 
             RunOverlayUI.EnsureGlobalEventSystem();
             return refs;
-        }
-
-        static void BuildBattleBackdrop(RectTransform bg, BattleVisualContext visuals)
-        {
-            if (BattleParallaxBackdrop.TryBuild(bg))
-                return;
-
-            var backgroundSprite = Resources.Load<Sprite>("Battle/Art/Backgrounds/Battle_Background");
-            if (backgroundSprite != null)
-            {
-                var art = CreatePanel(bg, "EnvironmentArt", Vector2.zero, Vector2.one, Color.white);
-                var artImage = art.GetComponent<Image>();
-                artImage.sprite = backgroundSprite;
-                artImage.type = Image.Type.Simple;
-                artImage.preserveAspect = false;
-                artImage.raycastTarget = false;
-            }
-            else
-            {
-                CreatePanel(bg, "Sky", new Vector2(0, 0.42f), Vector2.one,
-                    new Color(0.055f, 0.055f, 0.14f, 1f));
-                CreatePanel(bg, "Horizon", new Vector2(0, 0.32f), new Vector2(1, 0.58f),
-                    new Color(0.28f, 0.055f, 0.11f, 0.34f));
-                CreatePanel(bg, "Ground", Vector2.zero, new Vector2(1, 0.42f),
-                    new Color(0.018f, 0.018f, 0.035f, 1f));
-
-                var moon = CreatePanel(bg, "EnemyBackGlow", new Vector2(0.5f, 0.52f),
-                    new Vector2(0.83f, 0.92f), new Color(0.7f, 0.08f, 0.12f, 0.13f));
-                moon.GetComponent<Image>().raycastTarget = false;
-            }
-
         }
 
         /// <summary>背景を沈め、周辺を落として中央の敵へ視線を集める。</summary>
@@ -279,7 +262,30 @@ namespace TypingRoguelike.Battle
             var focus = CreateCentered(arena, "CombatFocus", EnemyFocusLocal,
                 new Vector2(AttackRingDiameter, AttackRingDiameter));
             BuildEnemy(focus, refs, visuals);
+            PlaceEnemyOnFloor(refs, visuals);
             BuildPartyApproachSlot(root, refs);
+        }
+
+        static void PlaceEnemyOnFloor(BattleUIRefs refs, BattleVisualContext visuals)
+        {
+            if (refs.ArenaRoot == null || refs.EnemyStage == null || refs.EnemyHitRoot == null)
+                return;
+
+            refs.ArenaRoot.anchorMin = refs.ArenaRoot.anchorMax = visuals.GroundPosition;
+            refs.ArenaRoot.anchoredPosition = Vector2.zero;
+            var feet = BattleVisualContext.FeetAnchor.y;
+            refs.EnemyStage.anchoredPosition = Vector2.up * (refs.EnemyHitRoot.sizeDelta.y * (0.5f - feet));
+
+            var size = visuals.IsLargeEnemy ? new Vector2(330f, 66f) : new Vector2(205f, 42f);
+            var shadow = CreateCenteredImage(refs.ArenaRoot, "EnemyFloorShadow", Vector2.zero, size,
+                BattleUISprites.RadialGlow, new Color(0.035f, 0.028f, 0.04f, 0.87f));
+            shadow.transform.SetAsFirstSibling();
+
+            if (refs.EnemyEmoji != null)
+            {
+                refs.EnemyEmoji.alignment = TextAnchor.LowerCenter;
+                refs.EnemyEmoji.rectTransform.anchorMin = new Vector2(0f, feet);
+            }
         }
 
         /// <summary>単語カードは攻撃円の左・右・下。板では囲まない。</summary>
@@ -344,22 +350,54 @@ namespace TypingRoguelike.Battle
             if (kind == EnemyBattleVisualKind.StaticIllustration)
                 return;
 
+            Component rig = null;
             if (kind == EnemyBattleVisualKind.SkeletonSamurai)
             {
                 refs.SkeletonSamurai = SkeletonSamuraiAssembler.CreateUi(refs.EnemyHitRoot);
-                if (refs.SkeletonSamurai != null)
-                    return;
+                rig = refs.SkeletonSamurai;
             }
-
-            if (kind == EnemyBattleVisualKind.PaperAngel)
+            else if (kind == EnemyBattleVisualKind.PaperAngel)
             {
                 refs.PaperAngel = PaperAngelAssembler.CreateUi(refs.EnemyHitRoot);
-                if (refs.PaperAngel != null)
-                    return;
+                rig = refs.PaperAngel;
+            }
+            else if (kind == EnemyBattleVisualKind.BigMouth || kind == EnemyBattleVisualKind.Auto)
+            {
+                refs.BigMouth = BigMouthAssembler.CreateUi(refs.EnemyHitRoot);
+                rig = refs.BigMouth;
             }
 
-            if (kind == EnemyBattleVisualKind.BigMouth || kind == EnemyBattleVisualKind.Auto)
-                refs.BigMouth = BigMouthAssembler.CreateUi(refs.EnemyHitRoot);
+            if (rig == null)
+                return;
+
+            var rect = (RectTransform)rig.transform;
+            rect.anchorMin = rect.anchorMax = BattleVisualContext.FeetAnchor;
+            var height = rect.sizeDelta.y * (1f - rect.pivot.y);
+            var maxHeight = visuals != null && visuals.IsLargeEnemy ? BattleVisualContext.LargeEnemyMaxHeight : 360f;
+            var scale = Mathf.Min(rect.localScale.x, maxHeight / Mathf.Max(1f, height));
+            rect.localScale = Vector3.one * scale;
+        }
+
+        static void BuildStaticEnemy(BattleUIRefs refs, BattleVisualContext visuals)
+        {
+            var illustration = CreateCenteredImage(refs.EnemyHitRoot, "BossIllustration", Vector2.zero,
+                Vector2.zero, visuals.BossIllustration, visuals.BossIllustration != null ? Color.white : Color.clear);
+            illustration.rectTransform.anchorMin = illustration.rectTransform.anchorMax = BattleVisualContext.FeetAnchor;
+            illustration.rectTransform.pivot = visuals.Enemy != null
+                ? visuals.Enemy.visual.feetPivotIdle
+                : new Vector2(0.5f, 0f);
+            refs.BossPortrait = illustration;
+            FitStaticEnemy(illustration, visuals.IsLargeEnemy);
+        }
+
+        public static void FitStaticEnemy(Image illustration, bool large)
+        {
+            if (illustration.sprite == null)
+                return;
+            var source = illustration.sprite.rect.size;
+            var maxSize = large ? new Vector2(560f, BattleVisualContext.LargeEnemyMaxHeight) : new Vector2(400f, 330f);
+            var scale = Mathf.Min(maxSize.x / source.x, maxSize.y / source.y);
+            illustration.rectTransform.sizeDelta = source * scale;
         }
 
         static void BuildEnemy(RectTransform focus, BattleUIRefs refs, BattleVisualContext visuals)
@@ -388,25 +426,7 @@ namespace TypingRoguelike.Battle
             CreateAnimatedEnemy(refs, visuals);
 
             if (refs.BigMouth == null && refs.PaperAngel == null && refs.SkeletonSamurai == null)
-            {
-                var bossImgGo = new GameObject("BossIllustration");
-                bossImgGo.transform.SetParent(refs.EnemyHitRoot, false);
-                var bossRt = bossImgGo.AddComponent<RectTransform>();
-                bossRt.anchorMin = new Vector2(0.08f, 0.02f);
-                bossRt.anchorMax = new Vector2(0.92f, 0.96f);
-                bossRt.offsetMin = Vector2.zero;
-                bossRt.offsetMax = Vector2.zero;
-                refs.BossPortrait = bossImgGo.AddComponent<Image>();
-                refs.BossPortrait.sprite = visuals.BossIllustration;
-                refs.BossPortrait.preserveAspect = true;
-                refs.BossPortrait.color = visuals.BossIllustration != null
-                    ? Color.white
-                    : new Color(1f, 1f, 1f, 0f);
-                refs.BossPortrait.raycastTarget = false;
-                var bossShadow = bossImgGo.AddComponent<Shadow>();
-                bossShadow.effectColor = new Color(0f, 0f, 0f, 0.6f);
-                bossShadow.effectDistance = new Vector2(0f, -10f);
-            }
+                BuildStaticEnemy(refs, visuals);
 
             var showEmoji = refs.BigMouth == null && refs.PaperAngel == null && refs.SkeletonSamurai == null
                             && visuals.BossIllustration == null;
@@ -1304,6 +1324,18 @@ namespace TypingRoguelike.Battle
             }
 
             BattleLayoutE5b.RefillSkills(hud.Find("SkillList") as RectTransform, refs, skills, visuals);
+            foreach (var name in new[] { "ParallaxBackdrop", "EnvironmentArt", "EnemyContactShadow", "EnemyGroundFog", "SilhouettesRight" })
+            {
+                var oldLayer = FindDeep(hud.parent, name);
+                if (oldLayer != null)
+                    oldLayer.gameObject.SetActive(false);
+            }
+            // The editor can bake a generated HUD into the prefab.
+            BattleDungeonBackdrop.Ensure(hud);
+            var savedShadow = FindDeep(refs.ArenaRoot, "EnemyFloorShadow");
+            if (savedShadow != null)
+                UnityEngine.Object.DestroyImmediate(savedShadow.gameObject);
+            PlaceEnemyOnFloor(refs, visuals);
             RespawnEnemy(refs, visuals);
             RebuildStock(hud, refs);
             BindOverlay(refs, hud);
@@ -1421,22 +1453,7 @@ namespace TypingRoguelike.Battle
 
             CreateAnimatedEnemy(refs, visuals);
             if (refs.BigMouth == null && refs.PaperAngel == null && refs.SkeletonSamurai == null)
-            {
-                var bossImgGo = new GameObject("BossIllustration");
-                bossImgGo.transform.SetParent(refs.EnemyHitRoot, false);
-                var bossRt = bossImgGo.AddComponent<RectTransform>();
-                bossRt.anchorMin = new Vector2(0.08f, 0.02f);
-                bossRt.anchorMax = new Vector2(0.92f, 0.96f);
-                bossRt.offsetMin = Vector2.zero;
-                bossRt.offsetMax = Vector2.zero;
-                refs.BossPortrait = bossImgGo.AddComponent<Image>();
-                refs.BossPortrait.sprite = visuals != null ? visuals.BossIllustration : null;
-                refs.BossPortrait.preserveAspect = true;
-                refs.BossPortrait.color = refs.BossPortrait.sprite != null
-                    ? Color.white
-                    : new Color(1f, 1f, 1f, 0f);
-                refs.BossPortrait.raycastTarget = false;
-            }
+                BuildStaticEnemy(refs, visuals);
 
             if (refs.EnemyEmoji != null)
             {

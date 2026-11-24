@@ -26,7 +26,7 @@ MonoBehaviour:
     idleIllustration: {fileID: 2723536875300877509, guid: cce0456d41093d4428d6f7039dec709d, type: 3}
     attackIllustration: {fileID: -3305089036836174680, guid: 529f630e155653044ba13ece6c108e97, type: 3}
     displayScale: 0.957
-    feetPivotIdle: {x: 0.5, y: 0}
+    feetPivotIdle: {x: 0.68, y: 0.006}
     feetPivotAttack: {x: 0.5, y: 0}
     poseOffsetIdle: {x: 0, y: 0}
     poseOffsetAttack: {x: 0.039108366, y: 0.08680248}

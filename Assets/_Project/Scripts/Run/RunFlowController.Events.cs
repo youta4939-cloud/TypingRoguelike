@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using TypingRoguelike.Battle;
 using TypingRoguelike.Data;
@@ -12,9 +13,8 @@ namespace TypingRoguelike.Run
         EventDefinition _storyEvent;
         string _storyTargetId = "";
         string _storyTargetName = "仲間";
-        PersonalityOpinion[] _opinions = Array.Empty<PersonalityOpinion>();
         System.Random _eventRng;
-        bool _grantEventRelicAfterCards;
+        bool _grantEventBattleRelic;
 
         void StartStoryEvent()
         {
@@ -33,8 +33,6 @@ namespace TypingRoguelike.Run
 
             _storyEvent = ev;
             _dungeon.RememberEvent(ev.id);
-            _opinions = PersonalityOpinions.Roll(_profile, ev.options, EventRng());
-            LogOpinions();
             PersistActiveRun();
 
             var left = ev.options != null && ev.options.Length > 0 ? ev.options[0] : null;
@@ -53,13 +51,11 @@ namespace TypingRoguelike.Run
                 Madness = _madness != null ? _madness.CurrentMadness : 0,
                 MadnessMax = _madness != null ? _madness.MaxMadness : 0,
                 ShowChance = showChance,
-                Aside = YieldAside(),
                 Choices = new[]
                 {
                     ChoiceView(left, 0, showChance),
                     ChoiceView(right, 1, showChance)
                 },
-                Party = _trust != null ? _trust.Gauges(_profile) : Array.Empty<TrustGaugeView>()
             }, CommitStoryEvent);
         }
 
@@ -70,169 +66,7 @@ namespace TypingRoguelike.Run
             {
                 Label = EventText.Fill(option != null && !string.IsNullOrEmpty(option.label) ? option.label : fallback, _storyTargetName),
                 Effects = EventText.DescribeOptionLines(option, _party, _storyTargetName, showChance),
-                Marks = TrustMarks(option, index)
             };
-        }
-
-        StoryEventTrustMark[] TrustMarks(EventOption option, int optionIndex)
-        {
-            var gain = PersonalityCatalog.AgreeAffinity;
-            var marks = new List<StoryEventTrustMark>();
-            if (_opinions != null)
-            {
-                for (var i = 0; i < _opinions.Length; i++)
-                {
-                    var opinion = _opinions[i];
-                    if (opinion == null || opinion.Speak != PersonalitySpeak.Agree || opinion.Choice != optionIndex)
-                        continue;
-                    if (string.IsNullOrEmpty(opinion.Name))
-                        continue;
-                    marks.Add(new StoryEventTrustMark
-                    {
-                        CharacterId = opinion.Id,
-                        Name = opinion.Name,
-                        Up = true,
-                        Delta = gain,
-                        Line = opinion.Line,
-                        Supporter = true
-                    });
-                }
-            }
-
-            AddChoiceTrustPreview(option, marks);
-            return marks.ToArray();
-        }
-
-        void AddChoiceTrustPreview(EventOption option, List<StoryEventTrustMark> marks)
-        {
-            if (option == null || _trust == null)
-                return;
-            var gauges = _trust.Gauges(_profile);
-            if (gauges == null)
-                return;
-            for (var i = 0; i < gauges.Length; i++)
-            {
-                var gauge = gauges[i];
-                if (gauge == null || string.IsNullOrEmpty(gauge.Name))
-                    continue;
-                var extra = GuaranteedTrustDelta(option, gauge.CharacterId, gauge.Name);
-                if (extra == 0)
-                    continue;
-                StoryEventTrustMark found = null;
-                for (var m = 0; m < marks.Count; m++)
-                {
-                    if (marks[m] != null && marks[m].Name == gauge.Name)
-                    {
-                        found = marks[m];
-                        break;
-                    }
-                }
-
-                if (found != null)
-                {
-                    found.Delta += extra;
-                    continue;
-                }
-
-                marks.Add(new StoryEventTrustMark
-                {
-                    CharacterId = gauge.CharacterId,
-                    Name = gauge.Name,
-                    Up = extra > 0,
-                    Delta = extra
-                });
-            }
-        }
-
-        int GuaranteedTrustDelta(EventOption option, string characterId, string displayName)
-        {
-            if (option?.outcomes == null || _trust == null)
-                return 0;
-            var formation = _trust.Formation(_party);
-            var inFormation = false;
-            if (formation != null)
-            {
-                for (var i = 0; i < formation.Count; i++)
-                {
-                    var character = formation[i];
-                    if (character != null && StarterCharacters.Same(character.characterId, characterId))
-                        inFormation = true;
-                }
-            }
-
-            var isTarget = (!string.IsNullOrEmpty(characterId) && StarterCharacters.Same(characterId, _storyTargetId))
-                || (!string.IsNullOrEmpty(displayName) && (displayName == _storyTargetName || StarterCharacters.Same(displayName, _storyTargetName)));
-            int? common = null;
-            var saw = false;
-            for (var i = 0; i < option.outcomes.Length; i++)
-            {
-                var outcome = option.outcomes[i];
-                if (outcome == null || outcome.chance <= 0)
-                    continue;
-                saw = true;
-                var delta = 0;
-                var effects = outcome.effects;
-                if (effects != null)
-                {
-                    for (var e = 0; e < effects.Length; e++)
-                    {
-                        var effect = effects[e];
-                        if (effect == null || effect.type != "trust" || effect.value == 0)
-                            continue;
-                        if (effect.target == "all")
-                        {
-                            if (inFormation)
-                                delta += effect.value;
-                        }
-                        else if (isTarget)
-                            delta += effect.value;
-                    }
-                }
-
-                if (common == null)
-                    common = delta;
-                else if (common.Value != delta)
-                    return 0;
-            }
-
-            return saw && common.HasValue ? common.Value : 0;
-        }
-
-        string YieldAside()
-        {
-            if (_opinions == null || _opinions.Length == 0)
-                return "";
-            var lines = new StringBuilder();
-            for (var i = 0; i < _opinions.Length; i++)
-            {
-                var opinion = _opinions[i];
-                if (opinion == null || opinion.Speak != PersonalitySpeak.Yield)
-                    continue;
-                if (lines.Length > 0)
-                    lines.Append("　");
-                lines.Append(opinion.Name);
-                lines.Append("（遠慮）");
-                if (!string.IsNullOrEmpty(opinion.Line))
-                    lines.Append(opinion.Line);
-            }
-
-            return lines.ToString();
-        }
-
-        void LogOpinions()
-        {
-            if (_opinions == null)
-                return;
-            for (var i = 0; i < _opinions.Length; i++)
-            {
-                var opinion = _opinions[i];
-                if (opinion == null)
-                    continue;
-                var line = PersonalityOpinions.Describe(opinion);
-                if (!string.IsNullOrEmpty(opinion.Line))
-                    line += " 「" + opinion.Line + "」";
-                Debug.Log("[Opinion] " + line);
-            }
         }
 
         static string FloorOrdinal(int index)
@@ -265,15 +99,12 @@ namespace TypingRoguelike.Run
 
             var option = ev.options[optionIndex];
             var outcome = RollOutcome(option);
-            var trustNote = ApplyVoiceTrust(optionIndex);
             ClearOpenEvent();
 
-            if (TryBeginEventBattle(ev, outcome, trustNote))
+            if (TryBeginEventBattle(ev, outcome))
                 return;
 
             var summary = ApplyRewardEffects(outcome?.effects, out var runOver, out var warpFloor, out var relic);
-            if (!string.IsNullOrEmpty(trustNote))
-                summary = string.IsNullOrEmpty(summary) ? trustNote : trustNote + "\n" + summary;
             if (runOver)
                 return;
 
@@ -293,7 +124,7 @@ namespace TypingRoguelike.Run
                 });
         }
 
-        bool TryBeginEventBattle(EventDefinition ev, EventOutcome outcome, string trustNote)
+        bool TryBeginEventBattle(EventDefinition ev, EventOutcome outcome)
         {
             var effects = outcome?.effects;
             if (effects == null)
@@ -343,8 +174,6 @@ namespace TypingRoguelike.Run
             pending.battleIntro = EventText.Fill(outcome.battleIntro, _storyTargetName);
             pending.victoryText = EventText.Fill(outcome.victoryText, _storyTargetName);
             pending.resultText = EventText.Fill(outcome.text, _storyTargetName);
-            if (!string.IsNullOrEmpty(trustNote))
-                pending.resultText += "\n" + trustNote;
             pending.rewards = rewards.ToArray();
             PersistActiveRun();
             ContinuePendingEventBattle();
@@ -438,7 +267,7 @@ namespace TypingRoguelike.Run
                 _profile.towerRunEventWarpFloor = warpFloor;
             if (warpFloor > 0)
                 _eventWarpFloor = warpFloor;
-            _grantEventRelicAfterCards = relic;
+            _grantEventBattleRelic = relic;
             return false;
         }
 
@@ -447,9 +276,9 @@ namespace TypingRoguelike.Run
         void FinishEventBattleExtras()
         {
             var warp = _eventWarpFloor;
-            var relic = _grantEventRelicAfterCards;
+            var relic = _grantEventBattleRelic;
             _eventWarpFloor = 0;
-            _grantEventRelicAfterCards = false;
+            _grantEventBattleRelic = false;
             if (warp > 0 || relic)
                 FinishStoryEvent(warp, relic);
         }
@@ -533,35 +362,9 @@ namespace TypingRoguelike.Run
 
         void BindStoryTarget(EventDefinition ev, string savedId)
         {
-            var formation = _trust.Formation(_party);
-            CharacterConfig chosen = null;
-            if (!string.IsNullOrEmpty(savedId))
-            {
-                for (var i = 0; i < formation.Count; i++)
-                {
-                    if (formation[i] != null && StarterCharacters.Same(formation[i].characterId, savedId))
-                    {
-                        chosen = formation[i];
-                        break;
-                    }
-                }
-            }
-
-            if (chosen == null && formation.Count > 0)
-            {
-                var index = EventRng().Next(formation.Count);
-                for (var n = 0; n < formation.Count; n++)
-                {
-                    var candidate = formation[(index + n) % formation.Count];
-                    if (candidate == null)
-                        continue;
-                    chosen = candidate;
-                    break;
-                }
-            }
-
-            _storyTargetId = chosen != null ? chosen.characterId : "";
-            _storyTargetName = chosen != null && !string.IsNullOrEmpty(chosen.displayName) ? chosen.displayName : "仲間";
+            var chosen = _party?.Members.FirstOrDefault()?.character;
+            _storyTargetId = chosen != null ? StarterCharacters.CanonicalId(chosen.characterName) : "";
+            _storyTargetName = chosen != null && !string.IsNullOrEmpty(chosen.characterName) ? chosen.characterName : "探索者";
             _ = ev;
         }
 
@@ -601,51 +404,6 @@ namespace TypingRoguelike.Run
             }
 
             return outcomes[outcomes.Length - 1];
-        }
-
-        string ApplyVoiceTrust(int optionIndex)
-        {
-            if (_opinions == null || _opinions.Length == 0 || _profile == null || _trust == null)
-                return "";
-
-            var gain = PersonalityCatalog.AgreeAffinity;
-            var lines = new StringBuilder();
-            var adopted = optionIndex == 0 ? "選択肢A" : "選択肢B";
-            for (var i = 0; i < _opinions.Length; i++)
-            {
-                var opinion = _opinions[i];
-                if (opinion == null || string.IsNullOrEmpty(opinion.Id))
-                    continue;
-                var before = _trust.GetTrust(opinion.Id, _profile);
-                string notice = "";
-                var adoptedSide = opinion.Speak == PersonalitySpeak.Agree && opinion.Choice == optionIndex;
-                if (adoptedSide && gain != 0)
-                    notice = _trust.AdjustTrust(opinion.Id, gain, _profile);
-                var actual = _trust.GetTrust(opinion.Id, _profile) - before;
-                var verdict = opinion.Speak == PersonalitySpeak.Agree
-                    ? (adoptedSide ? " 採用" : " 不採用")
-                    : "";
-                Debug.Log("[Opinion] " + PersonalityOpinions.Describe(opinion)
-                    + verdict
-                    + " 好感度" + (actual > 0 ? "+" : "") + actual
-                    + " / プレイヤー " + adopted);
-                if (actual == 0)
-                    continue;
-                if (lines.Length > 0)
-                    lines.Append('\n');
-                lines.Append(opinion.Name);
-                lines.Append("の好感度 ");
-                lines.Append(actual > 0 ? "+" : "");
-                lines.Append(actual);
-                if (!string.IsNullOrEmpty(notice))
-                {
-                    lines.Append("（");
-                    lines.Append(notice);
-                    lines.Append("）");
-                }
-            }
-
-            return lines.ToString();
         }
 
         string ApplyRewardEffects(EventEffect[] effects, out bool runOver, out int warpFloor, out bool relic)
@@ -731,17 +489,6 @@ namespace TypingRoguelike.Run
                         return "道は、この層の先へは続いていなかった";
                     warpFloor = dest;
                     return dest > _dungeon.Floor ? $"{dest}層へ進んだ" : $"{dest}層へ戻った";
-                case "trust":
-                    return ApplyTrustEffect(effect);
-                case "card_choices":
-                    var extra = Mathf.Max(1, effect.value);
-                    _profile.opinionPendingCardChoices += extra;
-                    return $"次の刻印の選択肢 +{extra}";
-                case "skill_upgrade_random":
-                    if (_party.TryUpgradeRandomSkill(EventRng(), out var skillName, out var level))
-                        return $"{skillName} が Lv.{level} になった";
-                    _party.AddCoins(15);
-                    return "強化できる刻印がなかった。塔片 +15";
                 case "relic_gain":
                     relic = true;
                     return "レリックを受け取れる";
@@ -767,36 +514,6 @@ namespace TypingRoguelike.Run
             }
 
             return "塔片 変化なし";
-        }
-
-        string ApplyTrustEffect(EventEffect effect)
-        {
-            if (effect.target == "all")
-            {
-                var formation = _trust.Formation(_party);
-                var notices = new StringBuilder();
-                for (var i = 0; i < formation.Count; i++)
-                {
-                    var character = formation[i];
-                    if (character == null)
-                        continue;
-                    var notice = _trust.AdjustTrust(character.characterId, effect.value, _profile);
-                    if (!string.IsNullOrEmpty(notice))
-                    {
-                        if (notices.Length > 0)
-                            notices.Append(" ");
-                        notices.Append(notice);
-                    }
-                }
-
-                var line = $"全員の好感度 {Signed(effect.value)}";
-                return notices.Length == 0 ? line : line + "（" + notices + "）";
-            }
-
-            var who = string.IsNullOrEmpty(_storyTargetId) ? "" : _storyTargetId;
-            var tier = _trust.AdjustTrust(who, effect.value, _profile);
-            var text = $"{_storyTargetName}の好感度 {Signed(effect.value)}";
-            return string.IsNullOrEmpty(tier) ? text : text + "（" + tier + "）";
         }
 
         string AddLayerPercent(ref int field, int delta, string label)
@@ -930,57 +647,9 @@ namespace TypingRoguelike.Run
                 case "coins":
                     piece = ApplyCoins(effect.value);
                     return true;
-                case "affinity_all":
-                    piece = AdjustListedAffinity(effect.value, one: false);
-                    return true;
-                case "affinity_one":
-                    piece = AdjustListedAffinity(effect.value, one: true);
-                    return true;
                 default:
                     return true;
             }
-        }
-
-        string AdjustListedAffinity(int delta, bool one)
-        {
-            var characters = PersonalityCatalog.Characters;
-            if (characters.Length == 0 || _trust == null || _profile == null || delta == 0)
-                return "";
-            var ids = new List<string>();
-            var names = new List<string>();
-            for (var i = 0; i < characters.Length; i++)
-            {
-                if (characters[i] == null || string.IsNullOrEmpty(characters[i].id))
-                    continue;
-                ids.Add(characters[i].id);
-                names.Add(characters[i].name);
-            }
-
-            if (ids.Count == 0)
-                return "";
-            var start = 0;
-            var end = ids.Count;
-            if (one)
-            {
-                start = EventRng().Next(ids.Count);
-                end = start + 1;
-            }
-
-            var lines = new StringBuilder();
-            for (var i = start; i < end; i++)
-            {
-                var before = _trust.GetTrust(ids[i], _profile);
-                _trust.AdjustTrust(ids[i], delta, _profile);
-                var actual = _trust.GetTrust(ids[i], _profile) - before;
-                if (lines.Length > 0)
-                    lines.Append('\n');
-                lines.Append(names[i]);
-                lines.Append("の好感度 ");
-                lines.Append(actual > 0 ? "+" : "");
-                lines.Append(actual);
-            }
-
-            return lines.ToString();
         }
 
         System.Random EventRng()

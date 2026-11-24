@@ -24,7 +24,7 @@ namespace TypingRoguelike.Run
         Text _context, _liftDisplay, _liftStatus, _liftPage, _liftHeader;
         Font _bodyFont, _headingFont;
         MetaProgressData _profile;
-        Action _start, _resume, _relic, _shop, _repair, _party;
+        Action _start, _resume, _relic, _shop, _repair;
         Action<int> _elevator;
         Action _back;
         Button _departure, _closeDoor;
@@ -46,11 +46,11 @@ namespace TypingRoguelike.Run
 
         public void Build(MetaProgressData profile, Action start, Action resume,
             IReadOnlyList<int> floors, Action<int> elevator, Action relic, Action shop,
-            Action repair, Action party)
+            Action repair)
         {
             _profile = profile;
             _start = start; _resume = resume; _elevator = elevator;
-            _relic = relic; _shop = shop; _repair = repair; _party = party;
+            _relic = relic; _shop = shop; _repair = repair;
             _floors = (floors ?? Array.Empty<int>()).Where(f => f > 0).Distinct().OrderBy(f => f).ToList();
             var config = Resources.Load<LayerConfig>("Run/LayerConfig");
             _floorCount = Mathf.Max(18, config != null ? config.totalLayers : 20,
@@ -97,15 +97,15 @@ namespace TypingRoguelike.Run
             Box(menu, "DepartRule", 0, .63f, 1, .632f, Line);
             var active = profile != null && profile.towerRunActive;
             Label(menu, "RunState", active
-                ? $"中断中   第{profile.towerRunFloor}層     刻印・レリック保持"
+                ? $"中断中   第{profile.towerRunFloor}層     レリック保持"
                 : "新しい探索を始める", 19, 0, .55f, 1, .62f, Muted);
             Label(menu, "Preparation", "出発前の準備", 15, 0, .45f, 1, .51f, Muted);
             Service(menu, "Relic", "装備・倉庫", "レリックを整える", "装", "01", 0, .235f, .49f, .44f, _relic != null ? (Action)(() => Leave(_relic)) : null,
                 "レリックを装備し、持ち帰った物資を整理する。");
             Service(menu, "Shop", "商店・開発", "物資の購入と開発", "商", "02", .51f, .235f, 1, .44f, _shop != null ? (Action)(() => Leave(_shop)) : null,
                 "物資の購入と、レリックの開発を行う。");
-            Service(menu, "Party", "パーティ", "仲間の状態・修復", "仲", "03", 0, .015f, .49f, .22f,
-                _party != null || _repair != null ? (Action)ShowParty : null, "仲間の状態を確認する。修復屋もここから。");
+            Service(menu, "Repair", "修復屋", "探索者の最大HPを強化", "修", "03", 0, .015f, .49f, .22f,
+                _repair != null ? (Action)(() => Leave(_repair)) : null, "修復屋を開く。");
             Service(menu, "Record", "探索記録", "探索の軌跡を辿る", "録", "04", .51f, .015f, 1, .22f, ShowRecord,
                 "これまでの探索と、持ち帰った成果を振り返る。");
             _context = Label(_home, "Context", "帰還時の状態を引き継ぎ、塔へ戻る。", 17,
@@ -197,19 +197,6 @@ namespace TypingRoguelike.Run
                 Button(_modal, "Resume", $"中断地点の第{_profile.towerRunFloor}層へ戻る →",
                     .07f, .08f, .93f, .20f, Color.clear, () => Wipe(() => Leave(_resume)), 21);
             Focus(stairs);
-        }
-
-        void ShowParty()
-        {
-            Modal("PartyMenu", "登塔業務 ／ 仲間の準備", CloseModal);
-            Label(_modal, "Title", "パーティ", 41, .07f, .73f, .90f, .88f, Paper, true);
-            var stats = Button(_modal, "PartyStats", "能力・ステータスを確認", .07f, .44f, .93f, .64f,
-                new Color32(43, 35, 39, 255), () => Leave(_party), 28);
-            stats.interactable = _party != null;
-            var repair = Button(_modal, "Repair", "修復屋へ", .07f, .18f, .93f, .38f,
-                new Color32(43, 35, 39, 255), () => Leave(_repair), 28);
-            repair.interactable = _repair != null;
-            Focus(stats.interactable ? stats : repair);
         }
 
         void ShowRecord()

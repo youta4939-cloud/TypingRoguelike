@@ -195,6 +195,7 @@ namespace TypingRoguelike.Battle
             _stock = new OrbStock();
             var visuals = BattleVisualContext.FromEncounter(enc, party, enemy);
             _ui = BattleUIBuilder.Build(transform, _activeSkills, _innateSkillIds, visuals);
+            _ui?.AttackForecast?.gameObject.SetActive(false);
             // プレハブ経路は RespawnEnemy で後から作るため、ここでも取り直す
             _spritePresenter = _ui != null ? _ui.SpritePairPresenter : null;
             if (_spritePresenter == null && visuals != null && visuals.UseSpritePair && _ui?.EnemyHitRoot != null)
@@ -217,6 +218,7 @@ namespace TypingRoguelike.Battle
             _typing.GenerateWords();
             SetupExArea();
             RefreshAllUI();
+            SetupDeckBattle();
             var startMsg = _encounterMods.HasLogOverride ? _encounterMods.StartLogMessage : enc?.startLogMessage;
             var resolvedStartMessage = !string.IsNullOrEmpty(startMsg) ? startMsg : "戦闘開始！";
             if (_enemyStopRemaining > 0f)
@@ -243,6 +245,7 @@ namespace TypingRoguelike.Battle
             if (_ui?.CountdownOverlay == null || _ui.CountdownRing == null || _ui.CountdownText == null)
             {
                 _countdownActive = false;
+                RevealAttackForecast();
                 SetLog(startMessage);
                 yield break;
             }
@@ -283,12 +286,22 @@ namespace TypingRoguelike.Battle
 
             _ui.CountdownOverlay.SetActive(false);
             _countdownActive = false;
+            RevealAttackForecast();
             _battleElapsed = 0f;
             if (!_isPaused && _enemyStopRemaining <= 0f)
                 _spritePresenter?.SetPaused(false);
             // GO 直後に開幕短縮で既にリード内なら、ここでモーション開始
             TryStartSpriteAttackMotion();
             SetLog(startMessage);
+        }
+
+        void RevealAttackForecast()
+        {
+            var forecast = _ui?.AttackForecast;
+            if (forecast == null)
+                return;
+            RefreshAttackCountdown(_enemyStopRemaining);
+            forecast.gameObject.SetActive(true);
         }
 
         void RefreshPortraitImages(BattleVisualContext visuals)
@@ -322,6 +335,7 @@ namespace TypingRoguelike.Battle
 
             _ui.BossPortrait.sprite = boss;
             _ui.BossPortrait.color = Color.white;
+            BattleUIBuilder.FitStaticEnemy(_ui.BossPortrait, visuals.IsLargeEnemy);
         }
 
         void ApplyEncounter(
@@ -637,6 +651,12 @@ namespace TypingRoguelike.Battle
             if (_isPaused)
                 return;
 
+            if (DeckMode)
+            {
+                RefreshWordGuideHighlights();
+                _ui?.AttackForecast?.Advance(Time.deltaTime);
+            }
+
             var breakHeldThisFrame = _enemyBreak != null && _enemyBreak.IsBroken;
             if (_enemyBreak != null)
             {
@@ -696,6 +716,9 @@ namespace TypingRoguelike.Battle
                 _tickAccumulator = 0f;
             else
                 SyncSpriteAttackClock();
+
+            if (_ui?.AttackForecast != null)
+                RefreshAttackCountdown(0f);
         }
 
         void HandleKeyboard()
@@ -789,8 +812,9 @@ namespace TypingRoguelike.Battle
 
         float ComputeWordDamage(int inputLength)
         {
-            _ = inputLength;
             var multiplier = _encounterMods.WordDamageMultiplier > 0f ? _encounterMods.WordDamageMultiplier : 1f;
+            if (DeckMode)
+                return Mathf.Max(1f, inputLength * Deck.DeckCombatTuning.WordDamagePerChar * multiplier);
             if (_totalAttack <= 0f || _wordDamageCoefficient <= 0f)
                 return Mathf.Max(1f, Mathf.Round(_wordClearDamage * multiplier));
             var attack = Mathf.RoundToInt(_totalAttack);
@@ -878,6 +902,7 @@ namespace TypingRoguelike.Battle
                 // ダメージ＝着弾。モーション／斬撃を先に着弾時刻へ合わせてから与ダメージ
                 _spritePresenter?.NotifySwingImpact();
                 EnemyAttack(damage);
+                _ui?.AttackForecast?.BeginAttackCycle();
                 AdvanceToNextRotatedAttack();
             }
             finally
@@ -1485,7 +1510,7 @@ namespace TypingRoguelike.Battle
             if (_playerHp <= 0f)
             {
                 _isGameOver = true;
-                SetLog("☠️ パーティは力尽きた... GAME OVER");
+                SetLog("☠️ 探索者は力尽きた... GAME OVER");
                 CompleteDefeat();
             }
         }
@@ -1939,6 +1964,12 @@ namespace TypingRoguelike.Battle
 
         void TryTriggerSkill()
         {
+            if (DeckMode)
+            {
+                TryTriggerDeckCards();
+                return;
+            }
+
             if (_ex != null && _ex.Stack(ExKind.Paralysis) > 0)
             {
                 var pending = SkillResolver.ResolveTriggeredSkills(
@@ -2405,6 +2436,17 @@ namespace TypingRoguelike.Battle
 
         void RefreshAttackCountdown(float extraStop)
         {
+            if (_ui?.AttackForecast != null)
+            {
+                var stopped = extraStop > 0f;
+                var hasSwing = TryNextSwing(out var pending, out _);
+                var forecastRate = Mathf.Max(0.01f, EnemyAttackSpeedMultiplier());
+                var partialTick = Mathf.Clamp(_tickAccumulator, 0f, _tickInterval);
+                var secondsLeft = stopped ? extraStop : hasSwing ? Mathf.Max(0f, pending / forecastRate - partialTick) : -1f;
+                _ui.AttackForecast.Present(secondsLeft, hasSwing ? DeckIncomingDamage(_activeSwing.Damage) : -1, stopped);
+                return;
+            }
+
             if (!_showEnemyAttackTime || _ui?.AttackBarLabel == null)
                 return;
             if (extraStop > 0f)
@@ -2422,6 +2464,13 @@ namespace TypingRoguelike.Battle
             var rate = Mathf.Max(0.01f, EnemyAttackSpeedMultiplier());
             var seconds = Mathf.Max(0f, remaining / rate);
             _ui.AttackBarLabel.text = $"{seconds:0.0}秒";
+        }
+
+        int DeckIncomingDamage(float rawDamage)
+        {
+            var attackMultiplier = _enemyDamageMultiplier <= 0f ? 1f : _enemyDamageMultiplier;
+            var takenMultiplier = _encounterMods.DamageTakenMultiplier > 0f ? _encounterMods.DamageTakenMultiplier : 1f;
+            return Mathf.RoundToInt(rawDamage * attackMultiplier * takenMultiplier);
         }
 
         void EnemyAttack(float rawDamage)
@@ -2445,12 +2494,31 @@ namespace TypingRoguelike.Battle
 
             var takenMul = _encounterMods.DamageTakenMultiplier > 0f ? _encounterMods.DamageTakenMultiplier : 1f;
             var scaled = rawDamage * (_enemyDamageMultiplier <= 0f ? 1f : _enemyDamageMultiplier);
-            var constant = _defenseConstant > 0f ? _defenseConstant : 400f;
-            var denom = _partyDefense + constant;
-            var mitigated = denom > 0f ? scaled * constant / denom : scaled;
-            var damageTaken = mitigated * takenMul;
-            ApplyDefensiveMitigation(ref damageTaken, false);
-            damageTaken = Mathf.Max(1f, Mathf.Round(damageTaken));
+            float damageTaken;
+            if (DeckMode)
+            {
+                damageTaken = DeckIncomingDamage(rawDamage);
+                if (_deck != null)
+                {
+                    var shield = _deck.Shield;
+                    damageTaken = _deck.ApplyShieldToDamage(Mathf.RoundToInt(damageTaken));
+                    if (shield > 0 && _deck.Shield == 0)
+                    {
+                        _deckHandUi?.PlayShieldCrack(shield);
+                        if (_shieldSe != null && _shieldCrackClip != null)
+                            _shieldSe.PlayOneShot(_shieldCrackClip, 0.55f);
+                    }
+                }
+            }
+            else
+            {
+                var constant = _defenseConstant > 0f ? _defenseConstant : 400f;
+                var denom = _partyDefense + constant;
+                var mitigated = denom > 0f ? scaled * constant / denom : scaled;
+                damageTaken = mitigated * takenMul;
+                ApplyDefensiveMitigation(ref damageTaken, false);
+                damageTaken = Mathf.Max(1f, Mathf.Round(damageTaken));
+            }
             _playerHp = Mathf.Max(0f, _playerHp - damageTaken);
             RefreshHpBars();
             _ui?.Stock?.PlayHit(Mathf.RoundToInt(damageTaken));
@@ -2459,7 +2527,7 @@ namespace TypingRoguelike.Battle
             if (_playerHp <= 0f)
             {
                 _isGameOver = true;
-                SetLog("☠️ パーティは力尽きた... GAME OVER");
+                SetLog("☠️ 探索者は力尽きた... GAME OVER");
                 CompleteDefeat();
             }
         }
@@ -2472,7 +2540,7 @@ namespace TypingRoguelike.Battle
             _outcomeHandled = true;
             ClearExArea();
             if (!string.IsNullOrEmpty(_focusCarryLog))
-                SetLog(_focusCarryLog + "\n☠️ パーティは力尽きた... GAME OVER");
+                SetLog(_focusCarryLog + "\n☠️ 探索者は力尽きた... GAME OVER");
             _partyState?.SetCurrentHp(0);
             _onDefeat?.Invoke();
         }
@@ -2659,7 +2727,7 @@ namespace TypingRoguelike.Battle
             {
                 _pendingWordLog = null;
                 _recentSkillLog = null;
-                SetLog("☠️ パーティは力尽きた... GAME OVER");
+                SetLog("☠️ 探索者は力尽きた... GAME OVER");
                 CompleteDefeat();
                 return;
             }
@@ -2992,6 +3060,7 @@ namespace TypingRoguelike.Battle
 
         void RefreshMadnessMeter()
         {
+            RefreshDeckHandUI();
             if (_madness == null)
                 return;
             if (_ui?.Stock != null)
@@ -3049,6 +3118,7 @@ namespace TypingRoguelike.Battle
 
         void RefreshHpBars()
         {
+            RefreshDeckHandUI();
             if (_ui == null)
                 return;
             if (_ui.Stock != null)
@@ -3085,10 +3155,12 @@ namespace TypingRoguelike.Battle
             if (_ui == null || _typing == null)
                 return;
 
-            var candidates = SkillResolver.GetCandidates(EligibleSkills(), _stock, _cooldownSkillIds);
             var chanceColors = new HashSet<ElementColor>();
-            foreach (var c in candidates)
-                chanceColors.Add(c.NeededColor);
+            if (!DeckMode)
+            {
+                foreach (var c in SkillResolver.GetCandidates(EligibleSkills(), _stock, _cooldownSkillIds))
+                    chanceColors.Add(c.NeededColor);
+            }
 
             for (var i = 0; i < 3; i++)
             {
@@ -3108,6 +3180,8 @@ namespace TypingRoguelike.Battle
                     var untypedRomaji = slot.Text.Substring(typedCount);
                     BattleLayoutE5b.PaintWord(box, slot.Color, focused, dimmed, slot.DisplayText,
                         typedRomaji, untypedRomaji, slot.Active);
+                    if (box.DeckGuide != null)
+                        PaintDeckWordGuide(box, slot);
                     continue;
                 }
                 box.ElementStripe.color = dimmed ? Color.Lerp(col, Color.black, 0.55f) : col;
@@ -3164,6 +3238,14 @@ namespace TypingRoguelike.Battle
 
         void RefreshStockUI()
         {
+            if (DeckMode)
+            {
+                _pendingStockCard = null;
+                _stockVisualReady = true;
+                RefreshDeckHandUI();
+                RefreshWordBoxes(false);
+                return;
+            }
             if (_ui?.Stock != null)
             {
                 _ui.Stock.Sync(_stock.Orbs, _pendingStockCard, _stockVisualReady);
@@ -3193,6 +3275,12 @@ namespace TypingRoguelike.Battle
 
         void RefreshCandidatesUI()
         {
+            if (DeckMode)
+            {
+                RefreshDeckHandUI();
+                return;
+            }
+
             if (_ui?.CandidatesContainer == null)
                 return;
 
@@ -3234,6 +3322,12 @@ namespace TypingRoguelike.Battle
         {
             if (_ui == null)
                 return;
+
+            if (DeckMode)
+            {
+                RefreshDeckHandUI();
+                return;
+            }
 
             var readyIds = new HashSet<int>();
             if (_activeSkills != null && _stock != null)

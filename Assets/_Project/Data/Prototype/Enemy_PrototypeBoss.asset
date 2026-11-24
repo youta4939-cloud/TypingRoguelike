@@ -26,8 +26,8 @@ MonoBehaviour:
     idleIllustration: {fileID: 0}
     attackIllustration: {fileID: 0}
     displayScale: 1
-    feetPivotIdle: {x: 0.5, y: 0}
-    feetPivotAttack: {x: 0.5, y: 0}
+    feetPivotIdle: {x: 0.53, y: 0.09}
+    feetPivotAttack: {x: 0.53, y: 0.09}
     poseOffsetIdle: {x: 0, y: 0}
     poseOffsetAttack: {x: 0, y: 0}
     strikeOffsetEh: {x: 0, y: 0}

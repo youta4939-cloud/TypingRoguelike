@@ -16,6 +16,15 @@ namespace TypingRoguelike.Battle
         public string BossEmojiDefeated = "💀";
         public EnemyDefinition Enemy;
 
+        public bool IsLargeEnemy => Enemy != null && Enemy.spawnCategory == EnemySpawnCategory.Boss;
+        // Deck mode puts all three words below the enemy. The original HUD has a gap between rows.
+        public Vector2 GroundPosition => GameModeConfig.UseDeckMode
+            ? new Vector2(IsLargeEnemy ? 0.705f : 0.6875f, IsLargeEnemy ? 0.495f : 0.475f)
+            : new Vector2(IsLargeEnemy ? 0.705f : 0.6875f, IsLargeEnemy ? 0.444f : 0.434f);
+
+        public const float LargeEnemyMaxHeight = 390f;
+        public static readonly Vector2 FeetAnchor = new(0.5f, 0.08f);
+
         public bool UseSpritePair =>
             Enemy != null && Enemy.visual.graphicMode == EnemyGraphicMode.SpritePair;
 

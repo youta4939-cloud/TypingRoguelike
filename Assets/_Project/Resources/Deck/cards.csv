@@ -1,0 +1,10 @@
+id,name,colors,type,value,consumable,addCardId,rarity,text
+slash_r,斬撃・紅蓮,R-R,attack,6,0,,N,6ダメージ
+slash_b,斬撃・蒼水,R-B,attack,6,0,,N,6ダメージ
+thrust,突き・紅蓮,B-R,attack,5,0,,N,5ダメージ
+guard_g,防御・翠嵐,G-G,shield,5,0,,N,シールド5
+guard_b,防御・蒼水,B-G,shield,5,0,,N,シールド5
+stance,構え・金光,Y-R,buff,4,0,,N,次の攻撃+4
+iai,居合い斬り・紅蓮,R-B-R,attack,14,0,,R,14ダメージ
+quick_slash_r,小斬り・紅蓮,R,attack,3,0,,N,3ダメージ
+quick_guard_b,小防御・蒼水,B,shield,2,0,,N,シールド2

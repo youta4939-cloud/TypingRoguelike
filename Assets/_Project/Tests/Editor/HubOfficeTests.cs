@@ -71,7 +71,7 @@ namespace TypingRoguelike.Tests
             _root.GetComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
             var view = _root.AddComponent<HubOfficeView>();
             view.Build(new MetaProgressData { towerRunActive = true, towerRunFloor = 6 },
-                () => { }, () => { }, new[] { 3, 6, 99 }, _ => { }, () => { }, () => { }, repair, () => { });
+                () => { }, () => { }, new[] { 3, 6, 99 }, _ => { }, () => { }, () => { }, repair);
             return view;
         }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using TMPro;
+using TypingRoguelike.Battle.Deck;
 using TypingRoguelike.Data;
 using UnityEngine;
 using UnityEngine.TextCore.LowLevel;
@@ -22,40 +23,41 @@ namespace TypingRoguelike.Battle
         static TMP_FontAsset _sans;
         static bool _fontsLinked;
 
-        public static void BuildContactShadow(RectTransform root)
-        {
-            Img(Place(root, "EnemyContactShadow", 940f, 920f, 429f, 125f),
-                Sprite("parts/enemy/enemy_contact_shadow"), Color.white);
-        }
-
         public static void Build(RectTransform root, BattleUIRefs refs,
             IReadOnlyList<BattleSkillData> skills, BattleVisualContext visuals)
         {
             refs.AttackRingFillsOnApproach = true;
-            Img(Place(root, "EnemyGroundFog", 533f, 882f, 1243f, 186f),
-                Sprite("parts/enemy/enemy_ground_fog"), Color.white);
             Img(Place(root, "EdgeVignette", 0f, 0f, 1920f, 1080f),
                 Sprite("parts/fx/edge_vignette_1920"), Color.white);
-            Img(Place(root, "SilhouettesRight", 1436f, 0f, 484f, 1080f),
-                Sprite("parts/fx/silhouettes_right"), Color.white);
 
-            var stage = BuildAlly(root, visuals);
-            Img(Place(root, "SeamInnerShadow", 430f, 0f, 230f, 1080f),
-                Sprite("parts/seam/seam_inner_shadow_1x"), Color.white);
-            Img(Place(root, "SeamEdgeLine", 430f, 0f, 230f, 1080f),
-                Sprite("parts/seam/seam_edge_line_1x"), Color.white);
-            var flash = Img(Place(root, "SeamEdgeFlash", 430f, 0f, 230f, 1080f),
-                Sprite("parts/seam/seam_edge_flash_1x"), new Color(1f, 1f, 1f, 0f));
-            TryAdditive(flash);
-            Img(Place(root, "InkSplash", 235f, 32f, 132f, 93f),
-                Sprite("parts/fx/ink_splash_small"), Color.white);
+            var deckMode = GameModeConfig.UseDeckMode;
+            var stage = deckMode ? null : BuildAlly(root, visuals);
+            Image flash = null;
+            if (!deckMode)
+            {
+                Img(Place(root, "SeamInnerShadow", 430f, 0f, 230f, 1080f),
+                    Sprite("parts/seam/seam_inner_shadow_1x"), Color.white);
+                Img(Place(root, "SeamEdgeLine", 430f, 0f, 230f, 1080f),
+                    Sprite("parts/seam/seam_edge_line_1x"), Color.white);
+                flash = Img(Place(root, "SeamEdgeFlash", 430f, 0f, 230f, 1080f),
+                    Sprite("parts/seam/seam_edge_flash_1x"), new Color(1f, 1f, 1f, 0f));
+                TryAdditive(flash);
+                Img(Place(root, "InkSplash", 235f, 32f, 132f, 93f),
+                    Sprite("parts/fx/ink_splash_small"), Color.white);
+            }
 
             BuildSkillList(root, refs, skills, visuals);
             BuildRing(root, refs);
-            refs.Stock = StockPanel.Create(root, Serif(), Sans());
+            if (deckMode)
+                refs.DeckHand = DeckHandUIView.Build(root);
+            else
+                refs.Stock = StockPanel.Create(root, Serif(), Sans());
             BuildWordCards(root, refs);
             var noticeFace = BuildNotice(root, refs);
             BuildCornerText(root, refs);
+
+            if (stage == null)
+                return;
 
             stage.Flash = flash;
             stage.NoticeFace = noticeFace;
@@ -185,7 +187,17 @@ namespace TypingRoguelike.Battle
             IReadOnlyList<BattleSkillData> skills, BattleVisualContext visuals)
         {
             var list = Place(root, "SkillList", 0f, 0f, 0f, 0f);
-            FillSkillGroups(list, refs, skills, visuals);
+            refs.SkillListRoot = list;
+            if (!GameModeConfig.UseDeckMode)
+                FillSkillGroups(list, refs, skills, visuals);
+        }
+
+        public static void ShowDeckSoloPortrait(BattleE5bStage stage)
+        {
+            if (stage == null)
+                return;
+            if (stage.Luna != null && stage.Luna.Ready)
+                stage.ShowImmediate(KatanaPortraitPanelView.Character, default);
         }
 
         public static void RefillSkills(RectTransform list, BattleUIRefs refs,
@@ -380,6 +392,150 @@ namespace TypingRoguelike.Battle
 
         static void BuildRing(RectTransform root, BattleUIRefs refs)
         {
+            var deckMode = GameModeConfig.UseDeckMode;
+            if (deckMode)
+                BuildDeckAttackTimer(root, refs);
+            else
+                BuildAttackRing(root, refs);
+
+            var tag = Place(root, "HeavyTag", deckMode ? 516f : 1096f, deckMode ? 565f : 348f, 120f, 24f);
+            var tagImage = Img(tag, Sprite("parts/ring/tag_box_9s_1x"), Color.white);
+            tagImage.type = Image.Type.Sliced;
+            var hot = tag.gameObject.AddComponent<BattleE5bHotTag>();
+            hot.Box = tagImage;
+            hot.Normal = tagImage.sprite;
+            hot.Hot = Sprite("parts/ring/tag_box_hot_9s_1x");
+            var tagText = Tmp(Place(tag, "Label", 0f, 0f, 120f, 24f), "強攻撃",
+                Sans(), 15f, Hex("DCF0FF"), TextAlignmentOptions.Center);
+            tag.gameObject.SetActive(false);
+            refs.HeavyAttackCallout = tag.gameObject;
+        }
+
+        static Texture2D _forecastVeil;
+        static Texture2D _forecastFragment;
+
+        static void BuildDeckAttackTimer(RectTransform root, BattleUIRefs refs)
+        {
+            var panel = Place(root, "EnemyAttackForecast", 502f, 420f, 460f, 142f);
+
+            // Fade beyond the lettering so the set remains visible around the forecast.
+            _forecastVeil ??= CreateForecastTexture("ForecastVeil", 192, 72, (x, y) =>
+            {
+                var horizontal = Mathf.SmoothStep(0f, 1f, (1f - Mathf.Abs(x)) / 0.33f);
+                var vertical = Mathf.SmoothStep(0f, 1f, (1f - Mathf.Abs(y)) / 0.57f);
+                var rose = Mathf.Clamp01(1f - Mathf.Abs(x + 0.08f)) * (1f - Mathf.Abs(y));
+                return new Color(0.044f + 0.052f * rose, 0.018f, 0.033f + 0.012f * rose,
+                    0.89f * horizontal * vertical);
+            });
+            _forecastFragment ??= CreateForecastTexture("ForecastFragment", 64, 8, (x, y) =>
+            {
+                var row = Mathf.FloorToInt((y + 1f) * 3f);
+                var offset = ((row * 7) % 5 - 2) * 0.066f;
+                var u = x - offset;
+                var edge = Mathf.Clamp01((u + 0.94f) * 19f) * Mathf.Clamp01((0.86f - u) * 16f);
+                var block = u < -0.50f ? 0.34f : u < 0.22f ? 0.91f : 0.57f;
+                var dropout = row % 3 == 2 && u > 0.27f && u < 0.53f ? 0.10f : 1f;
+                return new Color(1f, 1f, 1f, edge * block * dropout);
+            });
+            ForecastImage(Place(panel, "FeatheredShadow", -37, -17, 534, 176), _forecastVeil, Color.white);
+
+            var palette = new[] { Hex("85344D"), Hex("E7A1AE"), Hex("617887"), Hex("A95068"), Hex("2C3045") };
+            var atmosphere = new[] { new Vector4(10, 32, 106, 4), new Vector4(64, 120, 115, 5),
+                new Vector4(98, 126, 48, 2), new Vector4(252, 15, 91, 4), new Vector4(338, 23, 84, 3),
+                new Vector4(274, 113, 143, 4), new Vector4(396, 103, 40, 3) };
+            for (var i = 0; i < atmosphere.Length; i++)
+            {
+                var line = atmosphere[i];
+                var tint = palette[i % palette.Length];
+                tint.a = i % 2 == 0 ? 0.27f : 0.39f;
+                ForecastImage(Place(panel, $"Trace{i}", line.x, line.y, line.z, line.w), _forecastFragment, tint);
+            }
+
+            var fangs = Resources.Load<Texture2D>(Root + "parts/hud/attack_forecast_fangs");
+            const float iconHeight = 136f;
+            var cuts = new[] { 0f, 24f, 35f, 55f, 71f, 96f, 104f, 121f, 129f, iconHeight };
+            var slices = new RawImage[cuts.Length - 1];
+            var echoes = new RawImage[4];
+            for (var i = 0; i < slices.Length; i++)
+            {
+                var height = cuts[i + 1] - cuts[i];
+                var rect = Place(panel, $"FangSlice{i}", 153, 3 + cuts[i], 150, height);
+                slices[i] = ForecastImage(rect, fangs, Color.white);
+                slices[i].uvRect = new Rect(0, 1f - cuts[i + 1] / iconHeight, 1f, height / iconHeight);
+                if (i % 2 != 0)
+                {
+                    var echo = ForecastImage(Place(panel, $"FangEcho{i}", 153, 3 + cuts[i], 150, height),
+                        fangs, i % 4 == 1 ? Hex("A3BAC8") : Hex("F2A7AB"));
+                    echo.uvRect = slices[i].uvRect;
+                    echoes[i / 2] = echo;
+                }
+            }
+
+            var fragments = new RawImage[15];
+            for (var i = 0; i < fragments.Length; i++)
+            {
+                var anchorX = i % 3 == 0 ? 40f : i % 3 == 1 ? 140f : 272f;
+                var anchorY = i % 3 == 1 ? 27f + (i * 13) % 90 : 11f + (i * 29) % 117;
+                fragments[i] = ForecastImage(Place(panel, $"Tear{i}", anchorX, anchorY,
+                    44 + (i * 19) % 97, 2 + (i * 3) % 8), _forecastFragment, palette[i % palette.Length]);
+            }
+
+            var pale = Hex("FFE2D7");
+            var title = Tmp(Place(panel, "Title", 15, 21, 150, 28), "次の攻撃",
+                Serif(), 23, pale, TextAlignmentOptions.MidlineLeft);
+            var timer = ForecastNumber(panel, "Countdown", 9, 48, 119, 62, TextAlignmentOptions.MidlineRight);
+            var unit = Tmp(Place(panel, "Unit", 132, 79, 24, 26), "秒", Serif(), 17, pale,
+                TextAlignmentOptions.MidlineLeft);
+            Tmp(Place(panel, "DamageTitle", 305, 21, 139, 28), "ダメージ",
+                Serif(), 23, pale, TextAlignmentOptions.MidlineRight);
+            var damage = ForecastNumber(panel, "Damage", 305, 46, 139, 68, TextAlignmentOptions.MidlineRight);
+
+            refs.AttackForecast = panel.gameObject.AddComponent<BattleAttackForecastView>();
+            refs.AttackForecast.Configure(title, timer, unit, damage, slices, echoes, fragments);
+        }
+
+        static TMP_Text ForecastNumber(RectTransform parent, string name, float x, float y, float width, float height,
+            TextAlignmentOptions alignment)
+        {
+            var number = Tmp(Place(parent, name, x, y, width, height), "",
+                BattleHudKit.Condensed, 58, Hex("FFE2D7"), alignment);
+            number.enableAutoSizing = true;
+            number.fontSizeMin = 31f;
+            number.fontSizeMax = 58f;
+            BattleHudKit.Outline(number, 0.16f, Hex("542438"));
+            return number;
+        }
+
+        static RawImage ForecastImage(RectTransform rect, Texture texture, Color color)
+        {
+            var image = rect.gameObject.AddComponent<RawImage>();
+            image.texture = texture;
+            image.color = color;
+            image.raycastTarget = false;
+            image.enabled = texture != null;
+            return image;
+        }
+
+        static Texture2D CreateForecastTexture(string name, int width, int height, System.Func<float, float, Color> sample)
+        {
+            var pixels = new Color[width * height];
+            for (var y = 0; y < height; y++)
+            for (var x = 0; x < width; x++)
+                pixels[y * width + x] = sample(2f * x / (width - 1) - 1f, 2f * y / (height - 1) - 1f);
+
+            var texture = new Texture2D(width, height, TextureFormat.RGBA32, false)
+            {
+                name = name,
+                filterMode = FilterMode.Bilinear,
+                wrapMode = TextureWrapMode.Clamp
+            };
+            texture.SetPixels(pixels);
+            texture.Apply(false, true);
+            return texture;
+        }
+
+        static void BuildAttackRing(RectTransform root, BattleUIRefs refs)
+        {
             var box = Place(root, "AttackRing", 956f, 355f, 400f, 400f);
             refs.EnemyAttackRingTrack = Img(box, Sprite("parts/ring/ring_track_1x"), Color.white);
             var progress = Img(Place(box, "Progress", 0f, 0f, 400f, 400f),
@@ -399,46 +555,37 @@ namespace TypingRoguelike.Battle
             var label = Tmp(Place(box, "Countdown", 120f, 170f, 160f, 36f), "",
                 Sans(), 18f, new Color(0.86f, 0.94f, 1f, 0f), TextAlignmentOptions.Center);
             refs.AttackBarLabel = label;
-
-            var tag = Place(root, "HeavyTag", 1156f - 60f, 360f - 12f, 120f, 24f);
-            var tagImage = Img(tag, Sprite("parts/ring/tag_box_9s_1x"), Color.white);
-            tagImage.type = Image.Type.Sliced;
-            var hot = tag.gameObject.AddComponent<BattleE5bHotTag>();
-            hot.Box = tagImage;
-            hot.Normal = tagImage.sprite;
-            hot.Hot = Sprite("parts/ring/tag_box_hot_9s_1x");
-            var tagText = Tmp(Place(tag, "Label", 0f, 0f, 120f, 24f), "強攻撃",
-                Sans(), 15f, Hex("DCF0FF"), TextAlignmentOptions.Center);
-            tag.gameObject.SetActive(false);
-            refs.HeavyAttackCallout = tag.gameObject;
         }
 
         static void BuildWordCards(RectTransform root, BattleUIRefs refs)
         {
-            var spots = new[]
+            var deckMode = GameModeConfig.UseDeckMode;
+            var spots = deckMode
+                ? new[] { new Vector2(549f, 592f), new Vector2(835f, 592f), new Vector2(1121f, 592f) }
+                : new[]
             {
                 new Vector2(884f, 468f),
                 new Vector2(1176f, 468f),
                 new Vector2(1030f, 630f)
             };
             for (var i = 0; i < spots.Length; i++)
-                refs.WordBoxes[i] = BuildWordCard(root, "WordCard" + i, spots[i].x, spots[i].y);
+                refs.WordBoxes[i] = BuildWordCard(root, "WordCard" + i, spots[i].x, spots[i].y, deckMode);
         }
 
-        static WordBoxUI BuildWordCard(RectTransform root, string name, float x, float y)
+        static WordBoxUI BuildWordCard(RectTransform root, string name, float x, float y, bool deckMode)
         {
-            var card = Place(root, name, x, y, 252f, 122f);
+            var card = Place(root, name, x, y, deckMode ? 250f : 252f, deckMode ? 112f : 122f);
             var frame = Img(card, Sprite("reused/wordcard_v2/frame_9slice_1x"), Color.white);
             frame.type = Image.Type.Sliced;
             frame.fillCenter = false;
-            var fill = Img(Place(card, "Fill", 10f, 10f, 232f, 102f), null, new Color(1f, 1f, 1f, 0.15f));
-            var kanji = Tmp(Place(card, "Kanji", 16f, 18f, 220f, 60f), "",
+            var fill = Img(Place(card, "Fill", 10f, 10f, card.sizeDelta.x - 20f, card.sizeDelta.y - 20f), null, new Color(1f, 1f, 1f, 0.15f));
+            var kanji = Tmp(Place(card, "Kanji", 16f, deckMode ? 12f : 18f, card.sizeDelta.x - 32f, 60f), "",
                 Sans(), 54f, Color.white, TextAlignmentOptions.Center);
-            var ruby = Tmp(Place(card, "Ruby", 16f, 74f, 220f, 32f), "",
+            var ruby = Tmp(Place(card, "Ruby", 16f, deckMode ? 68f : 74f, card.sizeDelta.x - 32f, 32f), "",
                 Sans(), 26f, Color.white, TextAlignmentOptions.Center);
             StyleWordCard(kanji);
             StyleWordCard(ruby);
-            var track = Img(Place(card, "RubyTrack", 56f, 108f, 140f, 5f), null,
+            var track = Img(Place(card, "RubyTrack", 56f, deckMode ? 102f : 108f, 140f, 5f), null,
                 new Color(0.03f, 0.02f, 0.03f, 0.92f));
             var typedBar = Img(Place(track.rectTransform, "RubyFill", 0f, 0f, 140f, 5f), null, Hex("FFD660"));
             typedBar.type = Image.Type.Filled;
@@ -454,6 +601,7 @@ namespace TypingRoguelike.Battle
             return new WordBoxUI
             {
                 FrameRoot = card,
+                DeckGuide = deckMode ? new DeckHandUIView.WordGuide(card) : null,
                 Frame = frame,
                 Fill = fill,
                 ElementStripe = stripe,
@@ -479,6 +627,19 @@ namespace TypingRoguelike.Battle
 
         static Image BuildNotice(RectTransform root, BattleUIRefs refs)
         {
+            if (GameModeConfig.UseDeckMode)
+            {
+                var log = Place(root, "DeckLog", 1600f, 840f, 304f, 220f);
+                Tmp(Place(log, "Title", 18f, 8f, 268f, 26f), "ログ",
+                    Sans(), 19f, Hex("E8D7C7"), TextAlignmentOptions.MidlineLeft);
+                Img(Place(log, "Divider", 18f, 40f, 268f, 1f), null, Hex("8F7963"));
+                refs.LogText = Tmp(Place(log, "Message", 18f, 49f, 268f, 161f), "",
+                    Sans(), 20f, Hex("FAF4E8"), TextAlignmentOptions.TopLeft);
+                refs.LogText.textWrappingMode = TextWrappingModes.Normal;
+                refs.LogText.overflowMode = TextOverflowModes.Ellipsis;
+                return null;
+            }
+
             var fill = Img(Place(root, "NoticeFill", 1515f, 786f, 300f, 60f),
                 Sprite("parts/hud/notice_fill_9s_1x"), new Color(0.133f, 0.024f, 0.039f, 0.9f));
             fill.type = Image.Type.Sliced;
@@ -556,12 +717,13 @@ namespace TypingRoguelike.Battle
 
         static void BuildCornerText(RectTransform root, BattleUIRefs refs)
         {
-            refs.RerollBadge = Tmp(Place(root, "Reroll", 1500f, 988f, 350f, 22f), "リロール 3/3",
+            var deckMode = GameModeConfig.UseDeckMode;
+            refs.RerollBadge = Tmp(Place(root, "Reroll", deckMode ? 1554f : 1500f, deckMode ? 722f : 988f, 350f, 22f), "リロール 3/3",
                 Sans(), 15f, Hex("FF8278"), TextAlignmentOptions.MidlineRight);
-            refs.JackpotMeterText = Tmp(Place(root, "Jackpot", 1450f, 1014f, 454f, 40f), "",
+            refs.JackpotMeterText = Tmp(Place(root, "Jackpot", deckMode ? 1554f : 1450f, deckMode ? 748f : 1014f, deckMode ? 350f : 454f, 40f), "",
                 Sans(), 15f, Hex("E6D6A0"), TextAlignmentOptions.TopRight);
             refs.JackpotMeterText.textWrappingMode = TextWrappingModes.Normal;
-            Tmp(Place(root, "PauseHint", 1450f, 1056f, 454f, 18f), "Space ポーズ   Enter リロール",
+            Tmp(Place(root, "PauseHint", deckMode ? 1554f : 1450f, deckMode ? 808f : 1056f, deckMode ? 350f : 454f, 18f), "Space ポーズ   Enter リロール",
                 Sans(), 12f, Hex("96908C"), TextAlignmentOptions.MidlineRight);
         }
 
@@ -1397,6 +1559,149 @@ namespace TypingRoguelike.Battle
             {
                 var level = 650f + (1f - amount) * 302f;
                 Value.anchoredPosition = new Vector2(1640f, -level);
+            }
+        }
+    }
+    public sealed class BattleAttackForecastView : MonoBehaviour
+    {
+        const float BurstDuration = 0.40f;
+        static readonly Color Ivory = new Color32(255, 226, 215, 255);
+        static readonly Color Danger = new Color32(255, 152, 161, 255);
+        static readonly Color Stopped = new Color32(180, 211, 239, 255);
+
+        const string CountdownFormat = "<mspace=0.48em>{0}</mspace>,<mspace=0.48em>{1}{2}</mspace>";
+        const string PaddedCountdownFormat = "<mspace=0.48em>0{0}</mspace>,<mspace=0.48em>{1}{2}</mspace>";
+        TMP_Text _title, _timer, _unit, _damage;
+        float _noiseWait;
+        int _noiseFrame;
+        RawImage[] _slices, _echoes, _fragments;
+        Vector2[] _sliceOrigins, _fragmentOrigins, _fragmentSizes;
+        float _burst;
+        bool _urgent;
+        bool _stopped;
+        int _lastCentiseconds = int.MinValue;
+        int _lastDamage = int.MinValue;
+
+        public void Configure(TMP_Text title, TMP_Text timer, TMP_Text unit, TMP_Text damage,
+            RawImage[] slices, RawImage[] echoes, RawImage[] fragments)
+        {
+            _title = title;
+            _timer = timer;
+            _unit = unit;
+            _damage = damage;
+            _slices = slices;
+            _echoes = echoes;
+            _fragments = fragments;
+            _sliceOrigins = System.Array.ConvertAll(slices, slice => slice.rectTransform.anchoredPosition);
+            _fragmentOrigins = System.Array.ConvertAll(fragments, fragment => fragment.rectTransform.anchoredPosition);
+            _fragmentSizes = System.Array.ConvertAll(fragments, fragment => fragment.rectTransform.sizeDelta);
+            Present(-1f, -1, false);
+            Advance(0f);
+        }
+
+        public void Present(float seconds, int damage, bool stopped)
+        {
+            var centiseconds = seconds >= 0f ? Mathf.CeilToInt(seconds * 100f) : -1;
+            var urgent = !stopped && centiseconds >= 0 && centiseconds <= 200;
+            if (urgent && !_urgent)
+                _burst = BurstDuration;
+            else if (!urgent)
+                _burst = 0f;
+
+            if (stopped != _stopped)
+                _title.text = stopped ? "攻撃停止中" : "次の攻撃";
+
+            _damage.color = urgent ? Danger : Ivory;
+            _urgent = urgent;
+            _stopped = stopped;
+
+            var tint = stopped ? Stopped : urgent ? Danger : Ivory;
+            _unit.color = tint;
+            _timer.color = tint;
+            if (centiseconds != _lastCentiseconds)
+            {
+                if (centiseconds >= 0)
+                    _timer.SetText(centiseconds < 1000 ? PaddedCountdownFormat : CountdownFormat,
+                        centiseconds / 100, centiseconds / 10 % 10, centiseconds % 10);
+                else
+                    _timer.text = "—";
+                _unit.enabled = centiseconds >= 0;
+                _lastCentiseconds = centiseconds;
+            }
+
+            if (damage != _lastDamage)
+            {
+                _damage.text = damage >= 0 ? damage.ToString() : "—";
+                _lastDamage = damage;
+            }
+        }
+
+        public void BeginAttackCycle()
+        {
+            _urgent = false;
+            _burst = 0f;
+        }
+
+        public void Advance(float deltaTime)
+        {
+            _burst = Mathf.Max(0f, _burst - deltaTime);
+            _noiseWait -= deltaTime;
+            if (_noiseWait > 0f)
+                return;
+
+            var frame = ++_noiseFrame;
+            var strength = Mathf.Sqrt(_burst / BurstDuration);
+            _noiseWait = (0.036f + 0.053f * Noise(frame, 0)) * (1f - 0.28f * strength);
+
+            // Hold each corrupted frame briefly. Move sampled image strips, not just decoration over them.
+            for (var i = 1; i < _slices.Length; i += 2)
+            {
+                var sample = Noise(frame, i * 3);
+                var torn = sample > 0.37f - strength * 0.2f;
+                var direction = Noise(frame, i * 3 + 1) < 0.5f ? -1f : 1f;
+                var offset = torn ? direction * (5f + sample * 12f + strength * 24f) : 0f;
+                var origin = _sliceOrigins[i];
+                var slice = _slices[i];
+                slice.rectTransform.anchoredPosition = origin + Vector2.right * offset;
+                SetOpacity(slice, torn && sample > 0.83f ? 0.54f : 1f);
+
+                var echo = _echoes[i / 2];
+                echo.rectTransform.anchoredPosition = origin - Vector2.right * (offset * 0.65f);
+                SetOpacity(echo, torn ? 0.11f + sample * 0.19f + strength * 0.22f : 0f);
+            }
+
+            for (var i = 0; i < _fragments.Length; i++)
+            {
+                var channel = 32 + i * 4;
+                var fragment = _fragments[i];
+                // Neighboring strips share some source rows and split into uneven blocks.
+                var cluster = Noise(frame / 2, 120 + i / 3);
+                var sample = Noise(frame, channel);
+                var direction = Noise(frame, channel + 1) - 0.5f;
+                fragment.rectTransform.anchoredPosition = _fragmentOrigins[i] +
+                    new Vector2(direction * (72f + strength * 60f), Mathf.Floor((cluster - 0.5f) * 12f));
+                var size = _fragmentSizes[i];
+                size.x *= 0.46f + Noise(frame, channel + 2) * 0.85f;
+                fragment.rectTransform.sizeDelta = size;
+                var visibility = sample > 0.32f ? 0.22f + sample * 0.46f + strength * 0.25f : 0f;
+                SetOpacity(fragment, visibility);
+            }
+        }
+
+        static void SetOpacity(RawImage image, float alpha)
+        {
+            var color = image.color;
+            color.a = alpha;
+            image.color = color;
+        }
+
+        static float Noise(int frame, int channel)
+        {
+            unchecked
+            {
+                var bits = (uint)frame * 747796405u + (uint)channel * 2891336453u;
+                bits = (bits ^ (bits >> 16)) * 2246822519u;
+                return (bits & 65535u) / 65535f;
             }
         }
     }

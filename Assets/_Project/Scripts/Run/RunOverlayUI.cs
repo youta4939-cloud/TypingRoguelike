@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using TypingRoguelike.Battle;
+using TypingRoguelike.Battle.Deck;
 using TypingRoguelike.Data;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -90,7 +91,7 @@ namespace TypingRoguelike.Run
             _hubPanel = CreateFullScreenPanel("OfficeHub", new Color(0.04f, 0.045f, 0.055f, 1));
             _hubPanel.AddComponent<HubOfficeView>().Build(profile, onStartRun, onResumeRun,
                 elevatorFloors, onStartFromElevatorFloor, onOpenRelicHub, onOpenHubShop,
-                onOpenRepairShop, onOpenPartyStats);
+                onOpenRepairShop);
         }
 
         public void ShowJackpotDebug(Transform host, Action onClosed)
@@ -153,6 +154,15 @@ namespace TypingRoguelike.Run
                     _jackpotDebugPanel = null;
                     onClosed?.Invoke();
                 });
+        }
+
+        public void ShowDeckReward(Transform host, RunPartyState party, IReadOnlyList<DeckCardDefinition> cards,
+            int coins, string notice, Action<DeckCardDefinition> onPicked)
+        {
+            EnsureRoot(host);
+            HideAll();
+            _rewardPanel = CreateFullScreenPanel("DeckReward", new Color(0.015f, 0.021f, 0.044f, 0.98f));
+            _rewardPanel.AddComponent<DeckRewardView>().Build(cards, party, coins, notice, onPicked);
         }
 
         public void ShowCardReward(
@@ -1606,7 +1616,7 @@ namespace TypingRoguelike.Run
                 insanity ? "発狂" : "GAME OVER", BattleUITheme.AccentBoss);
             var body = window.Find("Body") ?? window;
             var defaultBody =
-                "パーティは力尽きた。\n塔は再配置され、解放済みエレベーターから再挑戦できる。\n\n" +
+                "探索者は力尽きた。\n塔は再配置され、解放済みエレベーターから再挑戦できる。\n\n" +
                 "RUN 中のレリックと素材は失われる。";
             CreateLabel(body, "BodyText",
                 insanity ? customBody + "\n\n塔は再配置され、解放済みエレベーターから再挑戦できる。\n\nRUN 中のレリックと素材は失われる。" : defaultBody,

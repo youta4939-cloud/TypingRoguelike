@@ -139,8 +139,6 @@ namespace TypingRoguelike.Run
                 case "layer_battle_coin_percent":
                 case "layer_rerolls":
                 case "layer_heal_after_battle_percent":
-                case "card_choices":
-                case "trust":
                     return value > 0 ? 1 : value < 0 ? -1 : 0;
                 case "madness":
                 case "battle_enemy_hp_percent":
@@ -240,13 +238,6 @@ namespace TypingRoguelike.Run
                     return $"この層、戦闘後にHP {Signed(value)}%";
                 case "warp":
                     return value >= 0 ? $"{value}層先へ" : $"{-value}層前へ";
-                case "trust":
-                    var who = effect.target == "all" ? "全員" : targetName;
-                    return $"{who}の好感度 {Signed(value)}";
-                case "card_choices":
-                    return $"次の刻印の選択肢 {Signed(Mathf.Max(1, value))}";
-                case "skill_upgrade_random":
-                    return "刻印を1つレベルアップ";
                 case "relic_gain":
                     return "レリック入手";
                 default:

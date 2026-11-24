@@ -51,6 +51,8 @@ namespace TypingRoguelike.Run
         public bool reelDebugUnlocked;
         public bool towerRunPreFourthHealApplied;
         public int towerRunCoins;
+        public List<string> towerRunDeckCardIds = new();
+        public List<string> towerRunRewardHistory = new();
         public float towerRunCurrentHp;
         public float towerRunMaxHp;
         public int towerRunMadnessCurrent;
@@ -77,7 +79,7 @@ namespace TypingRoguelike.Run
         public List<string> previousRunEventIds = new();
         public List<int> towerRunSkipFromNodeIds = new();
         public bool towerRunEventBattlePending;
-        public List<CharacterTrustSave> characterTrust = new();
+        [NonSerialized] public List<CharacterTrustSave> characterTrust;
         public bool personalityMoodActive;
         public List<PersonalityWeightSave> personalityWeights = new();
         public string opinionLastAbsentId;
@@ -312,6 +314,8 @@ namespace TypingRoguelike.Run
             data.towerRunFloor = Mathf.Max(1, floor);
             data.towerRunNodeId = currentNodeId;
             data.towerRunCoins = party.RunCoins;
+            data.towerRunDeckCardIds = new List<string>(party.DeckCardIds);
+            data.towerRunRewardHistory = new List<string>(party.RewardHistory);
             data.towerRunCurrentHp = party.CurrentHp;
             data.towerRunMaxHp = party.MaxHp;
             data.towerRunClearedNodes = Mathf.Max(0, clearedNodesThisRun);
@@ -348,7 +352,6 @@ namespace TypingRoguelike.Run
             data.clearedTowerNodeIds ??= new List<int>();
             data.clearedTowerNodeIds.Clear();
             RollTowerSeed(data);
-            TrustRoster.Wipe(data);
             Save(data);
         }
 
@@ -378,6 +381,8 @@ namespace TypingRoguelike.Run
             data.reelDebugUnlocked = false;
             data.towerRunPreFourthHealApplied = false;
             data.towerRunCoins = 0;
+            data.towerRunDeckCardIds = new List<string>();
+            data.towerRunRewardHistory = new List<string>();
             data.towerRunCurrentHp = 0;
             data.towerRunMaxHp = 0;
             data.towerRunMadnessCurrent = 0;
@@ -471,7 +476,6 @@ namespace TypingRoguelike.Run
             data.towerRunSkipFromNodeIds ??= new List<int>();
             data.towerRunBoardId ??= "";
             data.reelLayout ??= "";
-            data.characterTrust ??= new List<CharacterTrustSave>();
             data.personalityWeights ??= new List<PersonalityWeightSave>();
             data.opinionLastAbsentId ??= "";
             data.towerRunOpenEventId ??= "";
